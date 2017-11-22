@@ -1,0 +1,13 @@
+<mat-nav-list>
+  <ng-container *ngFor="let user of users | async">
+    <mat-list-item routerLink="/user/edit/{{user.userName}}">
+      <span mat-line>{{user.userName}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+  </ng-container>
+
+</mat-nav-list>
+
+<a routerLink="/user/edit/new" class="user-add" mat-fab matTooltip="Add new User" matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

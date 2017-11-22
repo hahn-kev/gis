@@ -1,0 +1,52 @@
+﻿<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
+                  mode="query"></mat-progress-bar>
+<div class="main">
+  <mat-toolbar color="primary">
+    <button mat-icon-button i18n-mat-tooltip="menu button tooltip@@menu" mat-tooltip="Menu" (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span i18n="site title@@appTitle">GIS</span>
+    <span class="example-spacer"></span>
+    <ng-container appToolbarTemplate></ng-container>
+  </mat-toolbar>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav id="sidenav">
+      <mat-nav-list>
+        <div id="user" *ngIf="currentUser | async as user">
+          <h2>
+            <ng-container i18n="welcome user@@welcomeUser">Welcome {{user.userName}}</ng-container>
+            <button mat-icon-button (click)="logout()" i18n-mat-tooltip="logout button@@logoutTooltip"
+                    mat-tooltip="Logout">
+              <mat-icon>exit_to_app</mat-icon>
+            </button>
+          </h2>
+          <a mat-button routerLink="/user/edit/self">
+            <mat-icon mat-list-icon>edit</mat-icon>
+            <ng-container i18n="let user change password and contact info@@editProfileLink">
+              Edit profile
+            </ng-container>
+          </a>
+        </div>
+
+        <mat-list-item routerLink="/home" routerLinkActive="active-link">
+          <mat-icon mat-list-icon>home</mat-icon>
+          <a mat-line i18n="take user to home page link@@homeLink">Home</a>
+        </mat-list-item>
+
+        <mat-divider></mat-divider>
+
+        <ng-container *requireRole="'admin'">
+          <mat-divider></mat-divider>
+          <h3 mat-subheader>Admin</h3>
+          <mat-list-item routerLink="/user/admin" routerLinkActive="active-link">
+            <mat-icon mat-list-icon>face</mat-icon>
+            <a mat-line>User Managment</a>
+          </mat-list-item>
+        </ng-container>
+
+      </mat-nav-list>
+    </mat-sidenav>
+    <router-outlet></router-outlet>
+  </mat-sidenav-container>
+
+</div>

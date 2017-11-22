@@ -1,0 +1,89 @@
+<div class="user">
+  <mat-card>
+    <form #userForm="ngForm" (ngSubmit)="saveUser()">
+      <div>
+        <mat-form-field>
+          <input matInput required [disabled]="isSelf" name="name" [(ngModel)]="user.userName" placeholder="Username"
+                 i18n-placeholder="username input field@@username">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <input matInput required name="email" [(ngModel)]="user.email" type="email" email #emailElement="ngModel"
+                 placeholder="Email" i18n-placeholder="user email address@@email">
+          <mat-error *ngIf="emailElement.invalid && (emailElement.dirty || emailElement.touched)"
+                     i18n="email validation error@@emailValidation">
+            Email invalid
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <input matInput required name="phoneNumber" [(ngModel)]="user.phoneNumber" type="tel"
+                 placeholder="Phone Number" i18n-placeholder="user phone number@@phoneNumber">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <input matInput [required]="isNew" #passwordElement="ngModel" name="password" minlength="8" autocomplete="off"
+                 [(ngModel)]="password" type="password"
+                 placeholder="Password"
+                 i18n-placeholder="user password@@password">
+          <mat-error *ngIf="passwordElement.invalid && (passwordElement.dirty || passwordElement.touched)"
+                     i18n="password error@@passwordLengthWrong">
+            Password must be at least 8 characters long
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <input matInput [required]="isNew || (passwordElement.value != '' && passwordElement.value)"
+                 #passwordElement2="ngModel" name="password2" minlength="8" autocomplete="off"
+                 ngModel
+                 [pattern]="passwordElement.value"
+                 type="password"
+                 placeholder="Confirm Password"
+                 i18n-placeholder="user password confirm@@passwordConfirm">
+          <mat-error
+            *ngIf="passwordElement2.invalid && (passwordElement2.dirty || passwordElement2.touched || passwordElement.touched)"
+            i18n="password matching error@@passwordsMustMatch">
+            Passwords must match
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <ng-container *requireRole="'admin'">
+        <div *ngIf="!isNew">
+          <button type="button"
+                  *ngIf="!user.isAdmin"
+                  (click)="grantAdmin()"
+                  mat-raised-button
+                  color="accent">
+            Grant Admin rights
+          </button>
+          <button type="button"
+                  *ngIf="user.isAdmin"
+                  (click)="revokeAdmin()"
+                  mat-raised-button
+                  color="accent">
+            Revoke Admin rights
+          </button>
+          <button type="button" (click)="deleteUser()" mat-raised-button color="accent">Delete</button>
+        </div>
+      </ng-container>
+
+
+      <mat-error *ngIf="errorMessage">
+        {{errorMessage}}
+      </mat-error>
+      <button type="submit" [disabled]="!userForm.form.valid" mat-button>
+        <ng-container *ngIf="isNew; then register else save">
+        </ng-container>
+        <ng-template #save i18n="save@@save">Save</ng-template>
+        <ng-template #register i18n="register@@register">Register</ng-template>
+      </button>
+    </form>
+  </mat-card>
+</div>
+
+
+

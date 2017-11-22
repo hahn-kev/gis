@@ -1,0 +1,32 @@
+
+.tp-wrapper {
+  perspective: 800px;
+  height: 100%;
+}
+
+.tp-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1s;
+}
+
+.tp-box__side {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.tp-box__side /deep/ > * {
+  height: calc(100% - 48px);
+}
+
+.tp-box__front {
+}
+
+.tp-box__back {
+  transform: rotateY(180deg);
+}
+

@@ -1,0 +1,11 @@
+<div class="tp-wrapper">
+  <div class="tp-box" (click)="this.trigger = this.trigger == 'inactive' ? 'active' : 'inactive'"
+       [@flipState]="trigger">
+    <div class="tp-box__side tp-box__front">
+      <ng-content select=".front"></ng-content>
+    </div>
+    <div class="tp-box__side tp-box__back">
+      <ng-content select=".back"></ng-content>
+    </div>
+  </div>
+</div>
