@@ -129,6 +129,7 @@ namespace Backend.Controllers
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: GetTokenClaims(identityUser).Union(claimsPrincipal.Claims),
+                
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
@@ -140,7 +141,7 @@ namespace Backend.Controllers
         {
             return new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString())
             };
         }
 

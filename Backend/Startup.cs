@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
@@ -11,7 +8,6 @@ using Backend.DataLayer;
 using Backend.Services;
 using LinqToDB.Data;
 using LinqToDB.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -19,16 +15,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using Sentinel.Sdk.Extensions;
+using Sentinel.Sdk.Middleware;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace Backend
@@ -41,7 +37,7 @@ namespace Backend
         }
 
         public IConfiguration Configuration { get; set; }
-
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -49,17 +45,8 @@ namespace Backend
             services.AddOptions();
             services.Configure<Settings>(Configuration);
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-            AddStuffs<IdentityUser, IdentityRole<int>>(services, options =>
+            AddIdentity<IdentityUser, IdentityRole<int>>(services, options =>
                 {
-                    // avoid redirecting REST clients on 401
-//                    options.Cookies.ApplicationCookie.Events = new CookieAuthenticationEvents
-//                    {
-//                        OnRedirectToLogin = ctx =>
-//                        {
-//                            ctx.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
-//                            return Task.CompletedTask;
-//                        }
-//                    };
                     options.SignIn.RequireConfirmedEmail = false;
                     options.SignIn.RequireConfirmedPhoneNumber = false;
                     options.Password.RequireUppercase = false;
@@ -69,7 +56,14 @@ namespace Backend
                     options.Password.RequiredLength = 8;
                 })
                 .AddLinqToDBStores<int>(new DefaultConnectionFactory());
-
+            services.AddSentinel(new SentinelSettings
+            {
+                Dsn = Configuration.GetValue<string>("SentryDsn"),
+                Environment = Configuration.GetValue<string>("Environment") ?? "Production",
+                IncludeRequestData = true,
+                ServerName = Configuration.GetValue<string>("BaseUrl")
+            });
+            
             services.AddMvc(options =>
             {
                 options.InputFormatters.Add(new TextPlainInputFormatter());
@@ -128,7 +122,7 @@ namespace Backend
                     (NpgsqlConnection) provider.GetRequiredService<DbConnection>().Connection));
         }
 
-        private IdentityBuilder AddStuffs<TUser, TRole>(IServiceCollection services, Action<IdentityOptions> setupAction) where TUser : class where TRole : class
+        private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services, Action<IdentityOptions> setupAction) where TUser : class where TRole : class
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
@@ -175,8 +169,8 @@ namespace Backend
             });
             app.UseStaticFiles();
 //            app.UseResponseCaching();
-
             app.UseAuthentication();
+            app.UseSentinel();
             app.UseMvc();
             var settings = app.ApplicationServices.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
