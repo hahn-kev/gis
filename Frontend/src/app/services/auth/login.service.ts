@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { LocalStorageService } from 'angular-2-local-storage';
 import { JwtHelperService } from './jwt-helper.service';
 import { map } from 'rxjs/operators';
+import * as Raven from 'raven-js';
 
 @Injectable()
 export class LoginService implements CanActivate {
@@ -17,6 +18,13 @@ export class LoginService implements CanActivate {
   constructor(private router: Router, private localStorage: LocalStorageService) {
     this.redirectTo = router.routerState.snapshot.url;
     this.setLoggedIn(localStorage.get<User>('user'), localStorage.get<string>('accessToken'));
+    this.currentUserSubject.subscribe(user => {
+      if (user) {
+        Raven.setUserContext({username: user.userName});
+      } else {
+        Raven.setUserContext();
+      }
+    });
   }
 
   promptLogin(redirectTo?: string) {

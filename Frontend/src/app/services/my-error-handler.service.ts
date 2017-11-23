@@ -1,6 +1,7 @@
 import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { HttpErrorResponse } from '@angular/common/http';
+import * as Raven from 'raven-js';
 
 @Injectable()
 export class MyErrorHandlerService implements ErrorHandler {
@@ -25,11 +26,16 @@ export class MyErrorHandlerService implements ErrorHandler {
       message = error.toString();
     }
     let bar = this.snackBarService.open(message, 'Dismiss');
+    if (!(error.rejection instanceof HttpErrorResponse)) {
+      //don't report http errors, the server will report those
+      Raven.captureException(error);
+    }
     this.original.handleError(error);
   }
 
   private original = new ErrorHandler();
   private snackBarService: MatSnackBar;
+
   constructor(private injector: Injector) {
 
   }

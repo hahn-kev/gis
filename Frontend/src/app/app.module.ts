@@ -58,6 +58,9 @@ import { AuthenciateInterceptorService } from './services/auth/authenciate-inter
 import { LoginService } from 'app/services/auth/login.service';
 import { AuthenticateService } from './services/auth/authenticate.service';
 import { RoleGuardService } from 'app/services/auth/role-guard.service';
+import * as Raven from 'raven-js';
+
+Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').install();
 
 @NgModule({
   declarations: [
