@@ -17,29 +17,26 @@ const routes: Routes = [
     canActivate: [LoginService],
     children: [
       {
-        path: 'your-rights',
-        redirectTo: 'cms/your-rights'
-      },
-      {
-        path: 'life-lessons',
-        redirectTo: 'cms/life-lessons'
-      },
-      {
-        path: 'user/admin',
-        component: AdminComponent,
-        canActivate: [RoleGuardService],
-        data: {
-          requireRole: 'admin'
-        }
-      },
-      {
-        path: 'user/edit/:name',
-        component: UserComponent,
-        resolve: {
-          user: UserResolveService,
-          isNew: IsNewResolverService,
-          isSelf: IsSelfResolverService
-        }
+        path: 'user',
+        children: [
+          {
+            path: 'admin',
+            component: AdminComponent,
+            canActivate: [RoleGuardService],
+            data: {
+              requireRole: 'admin'
+            }
+          },
+          {
+            path: 'edit/:name',
+            component: UserComponent,
+            resolve: {
+              user: UserResolveService,
+              isNew: IsNewResolverService,
+              isSelf: IsSelfResolverService
+            }
+          }
+        ]
       },
       {
         path: 'home',

@@ -26,7 +26,7 @@ export class MyErrorHandlerService implements ErrorHandler {
       message = error.toString();
     }
     let bar = this.snackBarService.open(message, 'Dismiss');
-    if (!(error.rejection instanceof HttpErrorResponse)) {
+    if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse)) {
       //don't report http errors, the server will report those
       Raven.captureException(error);
     }
