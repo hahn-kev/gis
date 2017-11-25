@@ -2,9 +2,18 @@ import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { HttpErrorResponse } from '@angular/common/http';
 import * as Raven from 'raven-js';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class MyErrorHandlerService implements ErrorHandler {
+
+  private original = new ErrorHandler();
+  private snackBarService: MatSnackBar;
+
+  constructor(private injector: Injector) {
+
+  }
+
   handleError(error: any): void {
     if (!this.snackBarService) {
       //this error handeler gets created very early, so we must inject services here
@@ -25,19 +34,12 @@ export class MyErrorHandlerService implements ErrorHandler {
     } else {
       message = error.toString();
     }
-    let bar = this.snackBarService.open(message, 'Dismiss');
-    if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse)) {
+    this.snackBarService.open(message, 'Dismiss');
+    if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse) && environment.production) {
       //don't report http errors, the server will report those
       Raven.captureException(error);
     }
     this.original.handleError(error);
-  }
-
-  private original = new ErrorHandler();
-  private snackBarService: MatSnackBar;
-
-  constructor(private injector: Injector) {
-
   }
 
 }

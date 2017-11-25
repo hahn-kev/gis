@@ -48,7 +48,8 @@ export class UserComponent implements OnInit {
   }
 
   deleteUser() {
-    let dialogRef = this.dialog.open(ConfirmDialogComponent, {data: ConfirmDialogComponent.Options(`Delete User ${this.user.userName}?`, 'Delete', 'Cancel')});
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {data: ConfirmDialogComponent.Options(`Delete User ${this.user.userName}?`, 'Delete', 'Cancel')});
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.userService.deleteUser(this.user.id);

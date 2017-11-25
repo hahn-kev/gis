@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
@@ -37,7 +39,7 @@ namespace Backend
         }
 
         public IConfiguration Configuration { get; set; }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -45,16 +47,17 @@ namespace Backend
             services.AddOptions();
             services.Configure<Settings>(Configuration);
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-            AddIdentity<IdentityUser, IdentityRole<int>>(services, options =>
-                {
-                    options.SignIn.RequireConfirmedEmail = false;
-                    options.SignIn.RequireConfirmedPhoneNumber = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequiredLength = 8;
-                })
+            AddIdentity<IdentityUser, IdentityRole<int>>(services,
+                    options =>
+                    {
+                        options.SignIn.RequireConfirmedEmail = false;
+                        options.SignIn.RequireConfirmedPhoneNumber = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireDigit = false;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequiredLength = 8;
+                    })
                 .AddLinqToDBStores<int>(new DefaultConnectionFactory());
             services.AddSentinel(new SentinelSettings
             {
@@ -63,7 +66,7 @@ namespace Backend
                 IncludeRequestData = true,
                 ServerName = Configuration.GetValue<string>("BaseUrl")
             });
-            
+
             services.AddMvc(options =>
             {
                 options.InputFormatters.Add(new TextPlainInputFormatter());
@@ -89,40 +92,44 @@ namespace Backend
 //            });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
-            {
-                var jwtSettings = Configuration.GetSection("JWTSettings").Get<JWTSettings>();
-                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
-
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings.Issuer,
-
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings.Audience
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
+                    var jwtSettings = Configuration.GetSection("JWTSettings").Get<JWTSettings>();
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        context.Token = context.Request.Cookies[AuthenticateController.JwtCookieName];
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
+
+                        ValidateIssuer = true,
+                        ValidIssuer = jwtSettings.Issuer,
+
+                        ValidateAudience = true,
+                        ValidAudience = jwtSettings.Audience
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies[AuthenticateController.JwtCookieName];
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
             //todo addGoogle for authentication
 //            services.AddAuthorization();
-            services.AddScoped<UsersRepository>();
-            services.AddScoped<ImageRepository>();
-            services.AddScoped<EmailService>();
+            foreach (var type in GetType().Assembly.GetTypes()
+                .Where(type => type.Name.Contains("Service") || type.Name.Contains("Repository")))
+            {
+                services.AddScoped(type);
+            }
+
             services.AddScoped<DbConnection>();
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
                     (NpgsqlConnection) provider.GetRequiredService<DbConnection>().Connection));
         }
 
-        private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services, Action<IdentityOptions> setupAction) where TUser : class where TRole : class
+        private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services,
+            Action<IdentityOptions> setupAction) where TUser : class where TRole : class
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
@@ -138,7 +145,7 @@ namespace Backend
             services.TryAddScoped<RoleManager<TRole>, AspNetRoleManager<TRole>>();
             if (setupAction != null)
                 services.Configure<IdentityOptions>(setupAction);
-            return new IdentityBuilder(typeof (TUser), typeof (TRole), services);
+            return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -149,6 +156,7 @@ namespace Backend
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto

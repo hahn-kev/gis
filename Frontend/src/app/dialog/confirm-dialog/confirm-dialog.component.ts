@@ -7,13 +7,13 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
   styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
+  static Options(title: string, acceptText: string, rejectText: string) {
+    return {title: title, acceptText: acceptText, rejectText: rejectText};
+  }
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<ConfirmDialogComponent>) {
   }
 
-  static Options(title: string, acceptText: string, rejectText: string) {
-    return {title: title, acceptText: acceptText, rejectText: rejectText};
-  }
 
   reject() {
     this.dialogRef.close();
