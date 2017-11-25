@@ -29,6 +29,8 @@ namespace Backend.DataLayer
         }
 
         public ITable<ImageInfo> Images => GetTable<ImageInfo>();
+        public ITable<Person> People => GetTable<Person>();
+        public ITable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
 
         public IQueryable<UserProfile> UserProfiles
         {
@@ -61,6 +63,7 @@ namespace Backend.DataLayer
             TryCreateTable<IdentityRole<int>>();
             TryCreateTable<IdentityRoleClaim<int>>();
             TryCreateTable<ImageInfo>();
+            TryCreateTable<PersonExtended>();
 
             var roles = new[] {"admin"};
             foreach (var role in roles)

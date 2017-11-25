@@ -10,6 +10,10 @@ import { MessageComponent } from './message/message.component';
 import { IsSelfResolverService } from './user/is-self-resolver.service';
 import { LoginService } from './services/auth/login.service';
 import { RoleGuardService } from './services/auth/role-guard.service';
+import { PersonComponent } from './people/person/person.component';
+import { PersonResolverService } from './people/person-resolver.service';
+import { PeopleListComponent } from './people/list/people-list.component';
+import { PeopleResolveService } from './people/list/people-resolve.service';
 
 const routes: Routes = [
   {
@@ -34,6 +38,25 @@ const routes: Routes = [
               user: UserResolveService,
               isNew: IsNewResolverService,
               isSelf: IsSelfResolverService
+            }
+          }
+        ]
+      },
+      {
+        path: 'people',
+        children: [
+          {
+            path: 'edit/:id',
+            component: PersonComponent,
+            resolve: {
+              person: PersonResolverService
+            }
+          },
+          {
+            path: '',
+            component: PeopleListComponent,
+            resolve: {
+              people: PeopleResolveService
             }
           }
         ]
@@ -67,7 +90,13 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
-  providers: [UserResolveService, IsNewResolverService, IsSelfResolverService]
+  providers: [
+    UserResolveService,
+    IsNewResolverService,
+    IsSelfResolverService,
+    PersonResolverService,
+    PeopleResolveService
+  ]
 })
 export class AppRoutingModule {
 }

@@ -6,10 +6,10 @@
 @include mat-core();
 
 // Define a theme.
-$primary: mat-palette($mat-yellow);
-$accent: mat-palette($mat-deep-orange, A200, A100, A400);
+$primary: mat-palette($mat-deep-purple);
+$accent: mat-palette($mat-orange);
 
-$theme: mat-dark-theme($primary, $accent);
+$theme: mat-light-theme($primary, $accent);
 
 // Include all theme styles for the components.
 @include angular-material-theme($theme);
@@ -48,4 +48,10 @@ html, body {
 
 .md-link {
   color: mat-color($primary);
+}
+
+.add-button {
+  position: fixed !important;
+  bottom: 23px;
+  right: 23px;
 }

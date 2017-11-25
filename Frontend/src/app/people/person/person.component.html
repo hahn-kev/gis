@@ -1,0 +1,20 @@
+<div class="main-card">
+  <mat-card>
+    <form #personForm="ngForm" (ngSubmit)="save()">
+      <div>
+        <mat-form-field>
+          <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
+        <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
+      </div>
+
+      <button type="submit" [disabled]="!personForm.form.valid" mat-button>Save</button>
+    </form>
+  </mat-card>
+</div>

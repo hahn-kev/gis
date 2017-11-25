@@ -31,6 +31,7 @@ import {
   MatProgressBarModule,
   MatSelectModule,
   MatSidenavModule,
+  MatSlideToggleModule,
   MatSnackBarModule,
   MatTableModule,
   MatToolbarModule,
@@ -59,6 +60,9 @@ import { LoginService } from 'app/services/auth/login.service';
 import { AuthenticateService } from './services/auth/authenticate.service';
 import { RoleGuardService } from 'app/services/auth/role-guard.service';
 import * as Raven from 'raven-js';
+import { PersonComponent } from './people/person/person.component';
+import { PeopleListComponent } from './people/list/people-list.component';
+import { PersonService } from './people/person.service';
 
 Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').install();
 
@@ -77,7 +81,9 @@ Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').instal
     LifeLessonsComponent,
     DiscourseLinkDirective,
     ConfirmDialogComponent,
-    MessageComponent
+    MessageComponent,
+    PersonComponent,
+    PeopleListComponent
   ],
   entryComponents: [
     ConfirmDialogComponent
@@ -112,6 +118,7 @@ Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').instal
     MatButtonToggleModule,
     MatChipsModule,
     MatMenuModule,
+    MatSlideToggleModule,
     FormsModule,
     AppRoutingModule,
     MarkdownModule.forRoot(),
@@ -142,6 +149,7 @@ Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').instal
       useClass: MyErrorHandlerService
     },
     SettingsService,
+    PersonService
   ],
   bootstrap: [AppComponent]
 })
