@@ -17,4 +17,35 @@
       <button type="submit" [disabled]="!personForm.form.valid" mat-button>Save</button>
     </form>
   </mat-card>
+
+  <mat-accordion>
+    <!--new role-->
+    <mat-expansion-panel #newRolePanel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Add new Role</mat-panel-title>
+      </mat-expansion-panel-header>
+      <form #newRoleForm="ngForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+        <app-role [role]="newRole"></app-role>
+        <mat-action-row>
+          <button type="submit" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
+        </mat-action-row>
+      </form>
+    </mat-expansion-panel>
+
+    <!--roles list-->
+    <mat-expansion-panel *ngFor="let role of person.roles">
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{role.name}}</mat-panel-title>
+        <mat-panel-description>
+          {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <form #roleForm="ngForm" (submit)="saveRole(role)">
+        <app-role [role]="role"></app-role>
+        <mat-action-row>
+          <button type="submit" [disabled]="roleForm.form.invalid" mat-button>Save</button>
+        </mat-action-row>
+      </form>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>

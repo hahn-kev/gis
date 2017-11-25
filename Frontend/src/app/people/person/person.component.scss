@@ -1,0 +1,13 @@
+.main-card {
+  height: unset;
+  grid-template-rows: auto auto;
+  grid-template-areas: '. main-card .' '. accordion .';
+  grid-row-gap: 12px;
+  margin-left: 12px;
+  padding-top: 12px;
+  margin-right: 12px;
+}
+
+.mat-accordion {
+  grid-area: accordion;
+}

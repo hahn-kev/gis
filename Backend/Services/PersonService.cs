@@ -9,27 +9,23 @@ namespace Backend.Services
     public class PersonService
     {
         private readonly PersonRepository _personRepository;
+        private readonly EntityService _entityService;
 
-        public PersonService(PersonRepository personRepository)
+        public PersonService(PersonRepository personRepository, EntityService entityService)
         {
             _personRepository = personRepository;
+            _entityService = entityService;
         }
 
         public IList<Person> People() => _personRepository.People.ToList();
 
         public PersonExtended GetById(Guid id) => _personRepository.GetById(id);
 
-        public void Update(PersonExtended person)
+        public void Save(PersonRole role)
         {
-            if (person.Id == Guid.Empty)
-            {
-                person.Id = Guid.NewGuid();
-                _personRepository.Insert(person);
-            }
-            else
-            {
-                _personRepository.Update(person);
-            }
-        }
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
+            _entityService.Save(role);
+        } 
     }
 }

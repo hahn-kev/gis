@@ -18,17 +18,12 @@ namespace Backend.DataLayer
 
         public PersonExtended GetById(Guid id)
         {
-            return _dbConnection.PeopleExtended.FirstOrDefault(person => person.Id == id);
-        }
-
-        public void Update(PersonExtended person)
-        {
-            _dbConnection.Update(person);
-        }
-
-        public void Insert(PersonExtended person)
-        {
-            _dbConnection.Insert(person);
+            var personExtended = _dbConnection.PeopleExtended.FirstOrDefault(person => person.Id == id);
+            if (personExtended != null)
+            {
+                personExtended.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
+            }
+            return personExtended;
         }
     }
 }

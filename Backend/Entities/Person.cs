@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using LinqToDB.Mapping;
 
 namespace Backend.Entities
 {
-    public class Person
+    public class Person : BaseEntity
     {
-        [PrimaryKey]
-        public Guid Id { get; set; } = Guid.Empty;
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
@@ -16,5 +15,6 @@ namespace Backend.Entities
     {
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
+        public IList<PersonRole> Roles { get; set; }
     }
 }

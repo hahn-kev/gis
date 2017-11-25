@@ -22,6 +22,7 @@ import {
   MatChipsModule,
   MatDatepickerModule,
   MatDialogModule,
+  MatExpansionModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -63,8 +64,12 @@ import * as Raven from 'raven-js';
 import { PersonComponent } from './people/person/person.component';
 import { PeopleListComponent } from './people/list/people-list.component';
 import { PersonService } from './people/person.service';
+import { RoleComponent } from './people/person/role.component';
+import { environment } from '../environments/environment';
+import { RolesReportComponent } from './people/roles-report/roles-report.component';
 
-Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').install();
+if (environment.production)
+  Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
 
 @NgModule({
   declarations: [
@@ -83,7 +88,9 @@ Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').instal
     ConfirmDialogComponent,
     MessageComponent,
     PersonComponent,
-    PeopleListComponent
+    PeopleListComponent,
+    RoleComponent,
+    RolesReportComponent
   ],
   entryComponents: [
     ConfirmDialogComponent
@@ -119,6 +126,7 @@ Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854').instal
     MatChipsModule,
     MatMenuModule,
     MatSlideToggleModule,
+    MatExpansionModule,
     FormsModule,
     AppRoutingModule,
     MarkdownModule.forRoot(),

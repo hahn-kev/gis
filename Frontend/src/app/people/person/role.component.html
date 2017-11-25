@@ -1,0 +1,20 @@
+<mat-form-field>
+  <input matInput required name="name" [(ngModel)]="role.name" placeholder="Name">
+</mat-form-field>
+<div>
+  <mat-form-field>
+    <input name="date" required matInput [(ngModel)]="role.startDate" [matDatepicker]="startDatePicker"
+           placeholder="Start Date">
+    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #startDatePicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-slide-toggle name="active" [(ngModel)]="role.active">Active</mat-slide-toggle>
+</div>
+<mat-form-field>
+  <input name="date" [disabled]="role.active" [required]="!role.active" matInput [(ngModel)]="role.endDate"
+         [matDatepicker]="endDatePicker"
+         placeholder="End Date">
+  <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+  <mat-datepicker #endDatePicker></mat-datepicker>
+</mat-form-field>
