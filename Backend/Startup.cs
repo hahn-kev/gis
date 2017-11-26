@@ -151,9 +151,10 @@ namespace Backend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole().AddFile("Logs/log-{Date}.txt", LogLevel.Warning);
+            loggerFactory.AddFile("Logs/log-{Date}.txt", LogLevel.Warning);
             if (env.IsDevelopment())
             {
+                loggerFactory.AddConsole(LogLevel.Trace);
                 app.UseDeveloperExceptionPage();
             }
 
@@ -190,7 +191,8 @@ namespace Backend
                 if (env.IsDevelopment())
                 {
                     DataConnection.TurnTraceSwitchOn();
-                    DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message, category);
+                    var logger = loggerFactory.CreateLogger("sql");
+                    DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
                     hereForYouConnection.Setup().Wait();
                 }
             }
