@@ -1,0 +1,45 @@
+<ng-container *appToolbarContent>
+  <span class="mat-body-2">Roles Starting:</span>
+  <button mat-button [matMenuTriggerFor]="duringMenu">
+    {{during ? 'During or before' : 'Before'}}
+    <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #duringMenu="matMenu" [overlapTrigger]="false">
+    <button mat-menu-item (click)="setDuring(false)">Before</button>
+    <button mat-menu-item (click)="setDuring(true)">During or before</button>
+  </mat-menu>
+
+  <!--begin date-->
+  <button mat-button (click)="beginDatePicker.open()">
+    <mat-icon mat-list-icon>today</mat-icon>
+    {{beginDate | date: 'shortDate'}}
+  </button>
+  <input class="invisible" [ngModel]="beginDate" (ngModelChange)="setBeginDate($event)"
+         [matDatepicker]="beginDatePicker">
+  <mat-datepicker #beginDatePicker></mat-datepicker>
+  <span class="mat-body-2">and ending after</span>
+
+  <!--end date-->
+  <button mat-button (click)="endDatePicker.open()">
+    <mat-icon mat-list-icon>today</mat-icon>
+    {{endDate | date: 'shortDate'}}
+  </button>
+  <input class="invisible" [ngModel]="endDate" (ngModelChange)="setEndDate($event)"
+         [matDatepicker]="endDatePicker">
+  <mat-datepicker #endDatePicker></mat-datepicker>
+</ng-container>
+
+<mat-nav-list>
+  <ng-container *ngFor="let role of roles">
+    <mat-list-item routerLink="/people/edit/{{role.personId}}">
+      <span mat-line>{{role.firstName}} {{role.lastName}} as {{role.name}}</span>
+      <p mat-line>
+        <span class="accent-text">{{role.startDate | date: 'shortDate'}}</span>
+        to
+        <span class="accent-text">{{role.active ? 'now' : (role.endDate | date: 'shortDate')}}</span>
+      </p>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+  </ng-container>
+
+</mat-nav-list>

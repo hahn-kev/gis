@@ -1,8 +1,8 @@
 ﻿import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Person, PersonExtended } from './person';
 import { Observable } from 'rxjs/Observable';
-import { Role } from './role';
+import { Role, RoleExtended } from './role';
 
 @Injectable()
 export class PersonService {
@@ -24,5 +24,13 @@ export class PersonService {
 
   updateRole(role: Role): Promise<Role> {
     return this.http.post<Role>('/api/person/role', role).toPromise();
+  }
+
+  getRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleExtended[]> {
+    let params = new HttpParams()
+      .append('canStartDuringRange', canStartDuringRange.toString())
+      .append('beginRange', beginRange.toISOString())
+      .append('endRange', endRange.toISOString());
+    return this.http.get<RoleExtended[]>('/api/person/role', {params: params}).toPromise();
   }
 }

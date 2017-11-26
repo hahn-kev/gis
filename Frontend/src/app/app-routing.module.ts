@@ -14,6 +14,8 @@ import { PersonComponent } from './people/person/person.component';
 import { PersonResolverService } from './people/person-resolver.service';
 import { PeopleListComponent } from './people/list/people-list.component';
 import { PeopleResolveService } from './people/list/people-resolve.service';
+import { RolesReportComponent } from './people/roles-report/roles-report.component';
+import { RolesResolverService } from './people/roles-report/roles-resolver.service';
 
 const routes: Routes = [
   {
@@ -51,6 +53,23 @@ const routes: Routes = [
             resolve: {
               person: PersonResolverService
             }
+          },
+          {
+            path: 'report',
+            children: [
+              {
+                path: 'roles/:start',
+                component: RolesReportComponent,
+                runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+                resolve: {
+                  roles: RolesResolverService
+                }
+              },
+              {
+                path: 'roles',
+                redirectTo: 'roles/during'
+              }
+            ]
           },
           {
             path: '',
@@ -95,7 +114,8 @@ const routes: Routes = [
     IsNewResolverService,
     IsSelfResolverService,
     PersonResolverService,
-    PeopleResolveService
+    PeopleResolveService,
+    RolesResolverService
   ]
 })
 export class AppRoutingModule {

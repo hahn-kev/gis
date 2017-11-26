@@ -1,3 +1,8 @@
+<ng-container *appToolbarContent>
+  <a mat-icon-button routerLink="report/roles">
+    <mat-icon>insert_chart</mat-icon>
+  </a>
+</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="firstName">
     <mat-header-cell *matHeaderCellDef>First Name</mat-header-cell>
@@ -9,7 +14,7 @@
   </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="['firstName', 'lastName']"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: ['firstName', 'lastName']" [routerLink]="'edit/' + row.id"></mat-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['firstName', 'lastName']" [routerLink]="'edit/' + row.id"></mat-row>
 </mat-table>
 
 

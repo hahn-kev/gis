@@ -43,5 +43,11 @@ namespace Backend.Controllers
             _personService.Save(role);
             return Json(role);
         }
+
+        [HttpGet("role")]
+        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
+        {
+            return _personService.Roles(canStartDuringRange, beginRange, endRange);
+        }
     }
 }

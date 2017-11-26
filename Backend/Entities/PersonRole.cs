@@ -1,4 +1,5 @@
 ﻿using System;
+using LinqToDB.Mapping;
 
 namespace Backend.Entities
 {
@@ -9,5 +10,12 @@ namespace Backend.Entities
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool Active { get; set; }
+    }
+
+    [Table("PersonRole", IsColumnAttributeRequired = false)]
+    public class PersonRoleExtended : PersonRole
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

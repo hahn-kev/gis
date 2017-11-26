@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
+using LinqToDB;
 
 namespace Backend.Services
 {
@@ -26,6 +27,13 @@ namespace Backend.Services
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
             _entityService.Save(role);
-        } 
+        }
+
+        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
+        {
+            return _personRepository.PersonRolesExtended
+                .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
+                               (role.Active || role.EndDate > endRange)).ToList();
+        }
     }
 }
