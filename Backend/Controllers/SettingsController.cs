@@ -23,6 +23,7 @@ namespace Backend.Controllers
         {
             return Json(new
             {
+                version = GetType().Assembly.GetName().Version.ToString()
 //                _settings.DiscourseBaseUrl
             });
         }

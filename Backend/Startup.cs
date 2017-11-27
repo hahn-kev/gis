@@ -64,6 +64,7 @@ namespace Backend
                 Dsn = Configuration.GetValue<string>("SentryDsn"),
                 Environment = Configuration.GetValue<string>("Environment") ?? "Production",
                 IncludeRequestData = true,
+                Release = GetType().Assembly.GetName().Version.ToString(),
                 ServerName = Configuration.GetValue<string>("BaseUrl")
             });
 
