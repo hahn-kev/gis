@@ -47,7 +47,7 @@ namespace Backend
             services.AddOptions();
             services.Configure<Settings>(Configuration);
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-            AddIdentity<IdentityUser, IdentityRole<int>>(services,
+            AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
                     options =>
                     {
                         options.SignIn.RequireConfirmedEmail = false;

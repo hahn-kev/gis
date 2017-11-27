@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{1A0559EB-D954-4E18-90DB-EC9943520BC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqToDB.Identity", "..\LinqToDB.Identity\src\LinqToDB.Identity\LinqToDB.Identity.csproj", "{465E2069-3213-4B73-A7A8-7C7284C92E0B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,10 +20,6 @@ Global
 		{1A0559EB-D954-4E18-90DB-EC9943520BC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1A0559EB-D954-4E18-90DB-EC9943520BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A0559EB-D954-4E18-90DB-EC9943520BC6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{465E2069-3213-4B73-A7A8-7C7284C92E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{465E2069-3213-4B73-A7A8-7C7284C92E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{465E2069-3213-4B73-A7A8-7C7284C92E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{465E2069-3213-4B73-A7A8-7C7284C92E0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

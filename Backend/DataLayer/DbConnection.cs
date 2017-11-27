@@ -7,25 +7,25 @@ using LinqToDB.Identity;
 using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
-
+    
 namespace Backend.DataLayer
 {
-    public class DbConnection : IdentityDataConnection<IdentityUser, IdentityRole<int>, int>
+    public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>
     {
-        private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly RoleManager<LinqToDB.Identity.IdentityRole<int>> _roleManager;
 
-        public DbConnection(RoleManager<IdentityRole<int>> roleManager)
+        public DbConnection(RoleManager<LinqToDB.Identity.IdentityRole<int>> roleManager)
         {
             _roleManager = roleManager;
 
             var builder = MappingSchema.GetFluentMappingBuilder();
             builder.Entity<IdentityUser>().HasIdentity(user => user.Id);
-            builder.Entity<IdentityUserClaim<int>>().HasTableName("UserClaim").HasIdentity(claim => claim.Id);
-            builder.Entity<IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
-            builder.Entity<IdentityRoleClaim<int>>().HasTableName("RoleClaim").HasIdentity(claim => claim.Id);
-            builder.Entity<IdentityUserLogin<int>>().HasTableName("UserLogin");
-            builder.Entity<IdentityUserToken<int>>().HasTableName("UserToken");
-            builder.Entity<IdentityUserRole<int>>().HasTableName("UserRole");
+            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim").HasIdentity(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
+            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim").HasIdentity(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityUserLogin<int>>().HasTableName("UserLogin");
+            builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
+            builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
         }
 
         public ITable<ImageInfo> Images => GetTable<ImageInfo>();
@@ -57,12 +57,12 @@ namespace Backend.DataLayer
         {
 #if DEBUG
             TryCreateTable<IdentityUser>();
-            TryCreateTable<IdentityUserClaim<int>>();
-            TryCreateTable<IdentityUserLogin<int>>();
-            TryCreateTable<IdentityUserToken<int>>();
-            TryCreateTable<IdentityUserRole<int>>();
-            TryCreateTable<IdentityRole<int>>();
-            TryCreateTable<IdentityRoleClaim<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserClaim<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserLogin<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserToken<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserRole<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityRole<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
             TryCreateTable<ImageInfo>();
             TryCreateTable<PersonExtended>();
             TryCreateTable<PersonRole>();
@@ -71,7 +71,7 @@ namespace Backend.DataLayer
             {
                 if (!await _roleManager.RoleExistsAsync(role))
                 {
-                    await _roleManager.CreateAsync(new IdentityRole<int>(role));
+                    await _roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(role));
                 }
             }
 #endif
