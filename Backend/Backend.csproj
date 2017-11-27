@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="linq2db.Identity" Version="2.0.0-rc41" />
