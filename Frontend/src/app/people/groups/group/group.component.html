@@ -1,0 +1,30 @@
+<div class="main-card">
+  <mat-card>
+    <form id="form" #groupForm="ngForm" (ngSubmit)="save()">
+      <div>
+        <mat-form-field>
+          <input matInput required name="groupName" [(ngModel)]="group.groupName" placeholder="Name">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select required name="type" [(ngModel)]="group.type" placeholder="Type">
+            <mat-option value="Division">Division</mat-option>
+            <mat-option value="Department">Department</mat-option>
+            <mat-option value="Supervisor">Supervisor</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <input matInput required name="supervisor" [(ngModel)]="group.supervisor" placeholder="Supervisor">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput required name="parent" [(ngModel)]="group.parentId" placeholder="Parent Group">
+        </mat-form-field>
+      </div>
+    </form>
+
+    <mat-card-actions>
+      <button type="submit" form="form" [disabled]="!groupForm.form.valid" mat-button>Save</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

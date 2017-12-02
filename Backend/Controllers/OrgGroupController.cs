@@ -10,10 +10,12 @@ namespace Backend.Controllers
     public class OrgGroupController : Controller
     {
         private readonly OrgGroupService _orgGroupService;
+        private readonly EntityService _entityService;
 
-        public OrgGroupController(OrgGroupService orgGroupService)
+        public OrgGroupController(OrgGroupService orgGroupService, EntityService entityService)
         {
             _orgGroupService = orgGroupService;
+            _entityService = entityService;
         }
 
         [HttpGet("{id}")]
@@ -24,5 +26,12 @@ namespace Backend.Controllers
 
         [HttpGet]
         public List<OrgGroup> OrgGroups() => _orgGroupService.OrgGroups;
+
+        [HttpPost]
+        public OrgGroup Save([FromBody] OrgGroup orgGroup)
+        {
+            _entityService.Save(orgGroup);
+            return orgGroup;
+        }
     }
 }

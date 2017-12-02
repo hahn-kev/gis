@@ -67,9 +67,13 @@ import { PersonService } from './people/person.service';
 import { RoleComponent } from './people/person/role.component';
 import { environment } from '../environments/environment';
 import { RolesReportComponent } from './people/roles-report/roles-report.component';
+import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-list.component';
+import { GroupService } from './people/groups/group.service';
+import { GroupComponent } from './people/groups/group/group.component';
 
-if (environment.production)
+if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
+}
 
 @NgModule({
   declarations: [
@@ -90,7 +94,9 @@ if (environment.production)
     PersonComponent,
     PeopleListComponent,
     RoleComponent,
-    RolesReportComponent
+    RolesReportComponent,
+    OrgGroupListComponent,
+    GroupComponent
   ],
   entryComponents: [
     ConfirmDialogComponent
@@ -157,7 +163,8 @@ if (environment.production)
       useClass: MyErrorHandlerService
     },
     SettingsService,
-    PersonService
+    PersonService,
+    GroupService
   ],
   bootstrap: [AppComponent]
 })

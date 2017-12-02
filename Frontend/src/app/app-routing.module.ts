@@ -16,6 +16,10 @@ import { PeopleListComponent } from './people/list/people-list.component';
 import { PeopleResolveService } from './people/list/people-resolve.service';
 import { RolesReportComponent } from './people/roles-report/roles-report.component';
 import { RolesResolverService } from './people/roles-report/roles-resolver.service';
+import { GroupComponent } from './people/groups/group/group.component';
+import { GroupResolveService } from './people/groups/group/group-resolve.service';
+import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-list.component';
+import { GroupsResolveService } from './people/groups/org-group-list/groups-resolve.service';
 
 const routes: Routes = [
   {
@@ -81,6 +85,25 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'groups',
+        children: [
+          {
+            path: 'edit/:id',
+            component: GroupComponent,
+            resolve: {
+              group: GroupResolveService
+            }
+          },
+          {
+            path: '',
+            component: OrgGroupListComponent,
+            resolve: {
+              groups: GroupsResolveService
+            }
+          }
+        ]
+      },
+      {
         path: 'home',
         component: HomeComponent
       },
@@ -115,7 +138,9 @@ const routes: Routes = [
     IsSelfResolverService,
     PersonResolverService,
     PeopleResolveService,
-    RolesResolverService
+    RolesResolverService,
+    GroupResolveService,
+    GroupsResolveService
   ]
 })
 export class AppRoutingModule {
