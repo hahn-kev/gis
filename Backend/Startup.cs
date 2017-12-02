@@ -71,9 +71,13 @@ namespace Backend
             services.AddMvc(options =>
             {
                 options.InputFormatters.Add(new TextPlainInputFormatter());
-                //require auth on every controller by default
+#if DEBUG
+                options.Filters.Add(typeof(AllowAnonymousFilter));
+#else
+//require auth on every controller by default
                 options.Filters.Add(
                     new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+#endif
                 options.Filters.Add(typeof(GlobalExceptionHandler));
             });
             //todo response caching?
@@ -185,18 +189,16 @@ namespace Backend
             var settings = app.ApplicationServices.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
-
+#if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var hereForYouConnection = scope.ServiceProvider.GetService<DbConnection>();
-                if (env.IsDevelopment())
-                {
-                    DataConnection.TurnTraceSwitchOn();
-                    var logger = loggerFactory.CreateLogger("sql");
-                    DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
-                    hereForYouConnection.Setup().Wait();
-                }
+                DataConnection.TurnTraceSwitchOn();
+                var logger = loggerFactory.CreateLogger("sql");
+                DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
+                hereForYouConnection.Setup().Wait();
             }
+#endif
         }
     }
 }
