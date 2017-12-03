@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import * as Raven from 'raven-js';
 
 @Injectable()
 export class SettingsService {
@@ -9,6 +10,9 @@ export class SettingsService {
 
   constructor(private http: HttpClient) {
     http.get<any>('/api/settings').subscribe(value => this.settings.next(value));
+    this.getAsync<string>('version').subscribe(version => {
+      Raven.setRelease(version)
+    });
   }
 
   getAsync<T>(name: string, defaultValue?: T): Observable<T> {
