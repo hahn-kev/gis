@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Backend.Entities;
 using LinqToDB;
-using LinqToDB.Data;
 using LinqToDB.Identity;
+using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
@@ -18,14 +18,22 @@ namespace Backend.DataLayer
         {
             _roleManager = roleManager;
 
-            var builder = MappingSchema.GetFluentMappingBuilder();
+            SetupMappingBuilder(MappingSchema);
+        }
+
+        private static bool hasSetupMapping;
+        public static void SetupMappingBuilder(MappingSchema mappingSchema)
+        {
+            if (hasSetupMapping) return;
+            var builder = mappingSchema.GetFluentMappingBuilder();
             builder.Entity<IdentityUser>().HasIdentity(user => user.Id);
-            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim").HasIdentity(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim").HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
             builder.Entity<LinqToDB.Identity.IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
-            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim").HasIdentity(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim").HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
             builder.Entity<LinqToDB.Identity.IdentityUserLogin<int>>().HasTableName("UserLogin");
             builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
             builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
+            hasSetupMapping = true;
         }
 
         public ITable<ImageInfo> Images => GetTable<ImageInfo>();

@@ -10,6 +10,7 @@ using Backend.DataLayer;
 using Backend.Services;
 using LinqToDB.Data;
 using LinqToDB.Identity;
+using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -189,6 +190,8 @@ namespace Backend
             var settings = app.ApplicationServices.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
+            DbConnection.SetupMappingBuilder(MappingSchema.Default);
+            
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
