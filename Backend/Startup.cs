@@ -177,7 +177,7 @@ namespace Backend
                 {
 //                    var requestCulture = context.Features.Get<IRequestCultureFeature>().RequestCulture;
 //                    context.Request.Path = $"/{requestCulture.Culture.TwoLetterISOLanguageName}/index.html";
-                    context.Request.Path = "index.html";
+                    context.Request.Path = "/index.html";
                     await next();
                 }
             });
