@@ -1,0 +1,9 @@
+.org-chain {
+  .mat-icon {
+    vertical-align: middle;
+  }
+
+  [disabled] {
+    pointer-events: none;
+  }
+}

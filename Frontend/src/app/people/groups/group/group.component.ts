@@ -3,6 +3,7 @@ import { OrgGroup } from '../org-group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService } from '../group.service';
 import { Person } from '../../person';
+import { LinkType, OrgChain } from '../org-chain';
 
 @Component({
   selector: 'app-group',
@@ -10,13 +11,15 @@ import { Person } from '../../person';
   styleUrls: ['./group.component.scss']
 })
 export class GroupComponent implements OnInit {
+  LinkType = LinkType;
   public group: OrgGroup;
   public people: Person[];
   public groups: OrgGroup[];
+  public orgChain: OrgChain;
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private groupService: GroupService) {
+    private router: Router,
+    private groupService: GroupService) {
   }
 
   ngOnInit(): void {
@@ -24,7 +27,12 @@ export class GroupComponent implements OnInit {
       this.group = value.group;
       this.groups = value.groups;
       this.people = value.people;
+      this.refreshOrgChain();
     });
+  }
+
+  refreshOrgChain(): void {
+    this.orgChain = this.groupService.buildOrgChain(this.group, this.people, this.groups);
   }
 
   async save(): Promise<void> {
