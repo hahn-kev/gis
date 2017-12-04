@@ -91,7 +91,9 @@ const routes: Routes = [
             path: 'edit/:id',
             component: GroupComponent,
             resolve: {
-              group: GroupResolveService
+              group: GroupResolveService,
+              groups: GroupsResolveService,
+              people: PeopleResolveService
             }
           },
           {

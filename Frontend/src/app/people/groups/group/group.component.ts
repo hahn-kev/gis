@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrgGroup } from '../org-group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService } from '../group.service';
+import { Person } from '../../person';
 
 @Component({
   selector: 'app-group',
@@ -10,6 +11,8 @@ import { GroupService } from '../group.service';
 })
 export class GroupComponent implements OnInit {
   public group: OrgGroup;
+  public people: Person[];
+  public groups: OrgGroup[];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -17,8 +20,10 @@ export class GroupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { group: OrgGroup }) => {
+    this.route.data.subscribe((value) => {
       this.group = value.group;
+      this.groups = value.groups;
+      this.people = value.people;
     });
   }
 
