@@ -18,7 +18,7 @@ namespace Backend.Services
             _entityService = entityService;
         }
 
-        public IList<Person> People() => _personRepository.People.ToList();
+        public IList<Person> People() => _personRepository.People.OrderBy(person => person.FirstName).ThenBy(person => person.LastName).ToList();
 
         public PersonExtended GetById(Guid id) => _personRepository.GetById(id);
 

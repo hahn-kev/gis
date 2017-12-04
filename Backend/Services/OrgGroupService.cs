@@ -15,7 +15,7 @@ namespace Backend.Services
             _orgGroupRepository = orgGroupRepository;
         }
 
-        public List<OrgGroup> OrgGroups => _orgGroupRepository.OrgGroups.ToList();
+        public List<OrgGroup> OrgGroups => _orgGroupRepository.OrgGroups.OrderBy(group => group.GroupName).ToList();
 
         public OrgGroup GetById(Guid id)
         {
