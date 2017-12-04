@@ -23,6 +23,6 @@ export class OrgChainLink {
 }
 
 export enum LinkType {
-  Group,
-  Person
+  Group = 'groups',
+  Person = 'people'
 }

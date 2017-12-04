@@ -35,7 +35,7 @@
     <div class="org-chain">
       <ng-container *ngFor="let link of orgChain.links; last as isLast">
         <a mat-button [disabled]="!link.id"
-           [routerLink]="'/' + (link.type == LinkType.Group ? 'groups':'people') + '/edit/' + link.id">{{link.title}}</a>
+           [routerLink]="'/' + (link.type) + '/edit/' + link.id">{{link.title}}</a>
         <mat-icon *ngIf="!isLast">arrow_forward</mat-icon>
       </ng-container>
     </div>
