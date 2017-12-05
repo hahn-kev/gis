@@ -20,6 +20,7 @@ import { GroupComponent } from './people/groups/group/group.component';
 import { GroupResolveService } from './people/groups/group/group-resolve.service';
 import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-list.component';
 import { GroupsResolveService } from './people/groups/org-group-list/groups-resolve.service';
+import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
 
 const routes: Routes = [
   {
@@ -102,6 +103,15 @@ const routes: Routes = [
             resolve: {
               groups: GroupsResolveService
             }
+          }
+        ]
+      },
+      {
+        path: 'leave-request',
+        children: [
+          {
+            path: 'new',
+            component: LeaveRequestComponent
           }
         ]
       },
