@@ -1,44 +1,41 @@
 <div class="main-card">
   <mat-card>
     <form id="form" #groupForm="ngForm" (ngSubmit)="save()">
-      <div>
-        <mat-form-field>
-          <input matInput required name="groupName" [(ngModel)]="group.groupName" placeholder="Name">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select required name="type" [(ngModel)]="group.type" placeholder="Type">
-            <mat-option value="Division">Division</mat-option>
-            <mat-option value="Department">Department</mat-option>
-            <mat-option value="Supervisor">Supervisor</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="refreshOrgChain()"
-                      placeholder="Supervisor">
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-              {{eachPerson.lastName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select name="parent" [(ngModel)]="group.parentId" (ngModelChange)="refreshOrgChain()"
-                      placeholder="Parent Group">
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field>
+        <input matInput required name="groupName" [(ngModel)]="group.groupName" placeholder="Name">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select required name="type" [(ngModel)]="group.type" placeholder="Type">
+          <mat-option value="Division">Division</mat-option>
+          <mat-option value="Department">Department</mat-option>
+          <mat-option value="Supervisor">Supervisor</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="refreshOrgChain()"
+                    placeholder="Supervisor">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
+            {{eachPerson.lastName}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="parent" [(ngModel)]="group.parentId" (ngModelChange)="refreshOrgChain()"
+                    placeholder="Parent Group">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="org-chain" *ngIf="orgChain">
+        <ng-container *ngFor="let link of orgChain.links; last as isLast">
+          <a mat-button [disabled]="!link.id"
+             [routerLink]="'/' + (link.type) + '/edit/' + link.id">{{link.title}}</a>
+          <mat-icon *ngIf="!isLast">arrow_forward</mat-icon>
+        </ng-container>
       </div>
     </form>
-    <div class="org-chain">
-      <ng-container *ngFor="let link of orgChain.links; last as isLast">
-        <a mat-button [disabled]="!link.id"
-           [routerLink]="'/' + (link.type) + '/edit/' + link.id">{{link.title}}</a>
-        <mat-icon *ngIf="!isLast">arrow_forward</mat-icon>
-      </ng-container>
-    </div>
+
     <mat-card-actions>
       <button type="submit" form="form" [disabled]="!groupForm.form.valid" mat-button>Save</button>
     </mat-card-actions>

@@ -19,17 +19,19 @@ export class GroupService {
     return this.http.get<OrgGroup[]>('/api/orggroup');
   }
 
-  updateGroup(group: OrgGroup): Promise<OrgGroup> {
-    return this.http.post('/api/orggroup', group).toPromise();
+  updateGroup(group: OrgGroup): Promise<Object> {
+    return this.http.post<OrgGroup>('/api/orggroup', group).toPromise();
   }
 
   buildOrgChain(orgGroup: OrgGroup, people: Person[], groups: OrgGroup[]): OrgChain {
-    let chainList = [];
+    let chainList: OrgChainLink[] = [];
     let currentGroup = orgGroup;
     while (currentGroup != null) {
       chainList.push(OrgChainLink.FromGroup(currentGroup));
       if (currentGroup.supervisor != null && currentGroup != orgGroup) break;
       currentGroup = groups.find(value => currentGroup.parentId == value.id);
+      if (currentGroup.id == orgGroup.id) currentGroup = orgGroup;
+      if (chainList.length > 20) throw new Error('Circular Orginization chart detected, please resolve');
     }
     if (currentGroup != null && currentGroup.supervisor != null) {
       chainList.push(OrgChainLink.FromPerson(people.find(value => currentGroup.supervisor == value.id)));

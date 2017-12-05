@@ -27,7 +27,7 @@ export class GroupComponent implements OnInit {
       this.group = value.group;
       this.groups = value.groups;
       this.people = value.people;
-      this.refreshOrgChain();
+      setTimeout(() => this.refreshOrgChain());
     });
   }
 
