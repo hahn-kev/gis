@@ -15,6 +15,8 @@ namespace Backend.Entities
     {
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
+        public string Email { get; set; }
+        public string PreferredName { get; set; }
         public IList<PersonRole> Roles { get; set; }
     }
 }
