@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
@@ -37,12 +38,14 @@ namespace Backend.Services
 
         public struct Template
         {
-            private Template(string id)
+            private Template(string id, [CallerMemberName] string name = null)
             {
                 Id = id;
+                Name = name;
             }
 
             public string Id { get; }
+            public string Name { get; }
             public static readonly Template NotifyLeaveRequest = new Template("na");
             public static readonly Template RequestLeaveApproval = new Template("70b6165d-f367-401f-9ae4-56814033b720");
 
@@ -70,6 +73,11 @@ namespace Backend.Services
             public override int GetHashCode()
             {
                 return (Id != null ? Id.GetHashCode() : 0);
+            }
+
+            public override string ToString()
+            {
+                return Name;
             }
         }
 

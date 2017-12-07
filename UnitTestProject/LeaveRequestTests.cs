@@ -69,9 +69,9 @@ namespace UnitTestProject
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
-                        It.IsAny<EmailService.Template>(),
-                        It.Is<PersonExtended>(extended => extended.FirstName != "Jacob"),
-                        It.Is<PersonExtended>(extended => extended.FirstName != "Bob")),
+                        It.Is<EmailService.Template>(template => template == EmailService.Template.NotifyLeaveRequest),
+                        It.IsAny<PersonExtended>(),
+                        It.IsAny<PersonExtended>()),
                 Times.Never);
         }
 
@@ -178,7 +178,10 @@ namespace UnitTestProject
                     true,
                     1);
 
-                yield return ("person with 2 groups who could approve, stops at department", new LeaveRequest {PersonId = person1Id},
+                yield return ("person with 2 groups who could approve, stops at department", new LeaveRequest
+                    {
+                        PersonId = person1Id
+                    },
                     new PersonExtended {Id = person1Id},
                     new OrgGroupWithSupervisor
                     {
@@ -220,7 +223,8 @@ namespace UnitTestProject
                     true,
                     0);
 
-                yield return ("supervisor requesting leave, 1 person to notify", new LeaveRequest {PersonId = person1Id},
+                yield return ("supervisor requesting leave, 1 person to notify", new LeaveRequest {PersonId = person1Id}
+                    ,
                     new PersonExtended {Id = person1Id},
                     new OrgGroupWithSupervisor
                     {
