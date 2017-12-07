@@ -54,7 +54,7 @@ namespace Backend.Services
                 result.supervisorGroup);
         }
 
-        private async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
+        public async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
             PersonExtended requestedBy,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
@@ -92,7 +92,7 @@ namespace Backend.Services
                 {"stuff", "herro"}
             };
             await _emailService.SendTemplateEmail(substituions,
-                "tbd",
+                EmailService.Template.NotifyLeaveRequest, 
                 requestedBy,
                 supervisor);
         }
@@ -107,7 +107,7 @@ namespace Backend.Services
             };
 
             await _emailService.SendTemplateEmail(substituions,
-                "tbd",
+                EmailService.Template.RequestLeaveApproval, 
                 requestedBy,
                 supervisor);
         }

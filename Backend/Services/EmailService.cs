@@ -17,12 +17,12 @@ namespace Backend.Services
         Task<MailgunReponse> SendEmail(string to, string subject, string body);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string templateId,
+            EmailService.Template template,
             PersonExtended from,
             PersonExtended to);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string templateId,
+            EmailService.Template template,
             string toEmail,
             string toName,
             string fromEmail,
@@ -34,6 +34,44 @@ namespace Backend.Services
         private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
         private readonly string _domain;
+
+        public struct Template
+        {
+            private Template(string id)
+            {
+                Id = id;
+            }
+
+            public string Id { get; }
+            public static readonly Template NotifyLeaveRequest = new Template("na");
+            public static readonly Template RequestLeaveApproval = new Template("70b6165d-f367-401f-9ae4-56814033b720");
+
+            public bool Equals(Template other)
+            {
+                return string.Equals(Id, other.Id);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is Template && Equals((Template) obj);
+            }
+
+            public static bool operator ==(Template a, Template b)
+            {
+                return object.Equals(a, b);
+            }
+
+            public static bool operator !=(Template a, Template b)
+            {
+                return !(a == b);
+            }
+
+            public override int GetHashCode()
+            {
+                return (Id != null ? Id.GetHashCode() : 0);
+            }
+        }
 
         public EmailService(IOptions<Settings> options)
         {
@@ -55,12 +93,12 @@ namespace Backend.Services
         }
 
         public Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string templateId,
+            Template template,
             PersonExtended from,
             PersonExtended to)
         {
             return SendTemplateEmail(substituions,
-                templateId,
+                template,
                 from.Email,
                 from.PreferredName,
                 to.Email,
@@ -68,7 +106,7 @@ namespace Backend.Services
         }
 
         public async Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string templateId,
+            Template template,
             string toEmail,
             string toName,
             string fromEmail,
@@ -85,12 +123,12 @@ namespace Backend.Services
                     }
                 },
                 From = new EmailAddress(fromEmail, fromName),
-                TemplateId = templateId
+                TemplateId = template.Id
             };
             var response = await _sendGridClient.SendEmailAsync(msg);
-            var body = await response.Body.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
+                var body = await response.Body.ReadAsStringAsync();
                 throw new Exception("send grid error: " + Environment.NewLine + body);
             }
         }
