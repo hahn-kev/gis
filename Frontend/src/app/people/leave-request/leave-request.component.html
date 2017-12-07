@@ -1,9 +1,9 @@
 <div class="main-card">
   <mat-card>
-    <form>
+    <form #leaveForm="ngForm" (submit)="request()" id="form">
       <div>
         <mat-form-field>
-          <mat-select name="person" [(ngModel)]="personLeaving" placeholder="Person Leaving">
+          <mat-select name="person" [(ngModel)]="personLeavingId" placeholder="Person Leaving">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
               {{eachPerson.lastName}}
@@ -27,5 +27,9 @@
         </mat-form-field>
       </div>
     </form>
+
+    <mat-card-actions>
+      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>Request Leave</button>
+    </mat-card-actions>
   </mat-card>
 </div>

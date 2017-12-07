@@ -56,7 +56,8 @@ const routes: Routes = [
             path: 'edit/:id',
             component: PersonComponent,
             resolve: {
-              person: PersonResolverService
+              person: PersonResolverService,
+              groups: GroupsResolveService
             }
           },
           {

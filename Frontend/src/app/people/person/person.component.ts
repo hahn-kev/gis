@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PersonExtended } from '../person';
 import { PersonService } from '../person.service';
 import { Role } from '../role';
+import { OrgGroup } from '../groups/org-group';
 
 @Component({
   selector: 'app-person',
@@ -11,6 +12,7 @@ import { Role } from '../role';
 })
 export class PersonComponent implements OnInit {
   public person: PersonExtended;
+  public groups: OrgGroup[];
   public newRole = new Role();
 
   constructor(private route: ActivatedRoute,
@@ -19,8 +21,9 @@ export class PersonComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { person: PersonExtended }) => {
+    this.route.data.subscribe((value: { person: PersonExtended, groups: OrgGroup[] }) => {
       this.person = value.person;
+      this.groups = value.groups;
       this.newRole.personId = this.person.id;
     });
   }

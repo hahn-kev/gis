@@ -71,6 +71,7 @@ import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-
 import { GroupService } from './people/groups/group.service';
 import { GroupComponent } from './people/groups/group/group.component';
 import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
+import { LeaveRequestService } from './people/leave-request/leave-request.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -166,7 +167,8 @@ if (environment.production) {
     },
     SettingsService,
     PersonService,
-    GroupService
+    GroupService,
+    LeaveRequestService
   ],
   bootstrap: [AppComponent]
 })

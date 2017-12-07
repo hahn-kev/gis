@@ -8,6 +8,7 @@ namespace Backend.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public Guid OrgGroupId { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]

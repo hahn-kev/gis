@@ -1,6 +1,6 @@
 <div class="main-card">
   <mat-card>
-    <form #personForm="ngForm" (ngSubmit)="save()">
+    <form #personForm="ngForm" id="form" (ngSubmit)="save()">
       <div>
         <mat-form-field>
           <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
@@ -13,9 +13,18 @@
         <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
         <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
       </div>
+      <mat-form-field>
+        <mat-select name="orgGroup" [(ngModel)]="person.orgGroupId"
+                    placeholder="Department/Devision">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <button type="submit" [disabled]="!personForm.form.valid" mat-button>Save</button>
     </form>
+    <mat-card-actions>
+      <button type="submit" form="form" [disabled]="!personForm.form.valid" mat-button>Save</button>
+    </mat-card-actions>
   </mat-card>
 
   <mat-accordion>
