@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class EmailController : Controller
+    public class EmailController : MyController
     {
         private readonly IEmailService _emailService;
 

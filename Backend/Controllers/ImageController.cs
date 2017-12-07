@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class ImageController : Controller
+    public class ImageController : MyController
     {
         private readonly ImageRepository _imageRepository;
 

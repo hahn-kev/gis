@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class OrgGroupController : Controller
+    public class OrgGroupController : MyController
     {
         private readonly OrgGroupService _orgGroupService;
         private readonly EntityService _entityService;

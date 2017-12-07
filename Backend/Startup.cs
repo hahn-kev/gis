@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -67,7 +68,8 @@ namespace Backend
                 Environment = Configuration.GetValue<string>("Environment") ?? "Production",
                 IncludeRequestData = true,
                 Release = GetType().Assembly.GetName().Version.ToString(),
-                ServerName = Configuration.GetValue<string>("BaseUrl")
+                ServerName = Configuration.GetValue<string>("BaseUrl"),
+                IgnoreTypes = new List<Type> {typeof(UserError)}
             });
 
             services.AddMvc(options =>

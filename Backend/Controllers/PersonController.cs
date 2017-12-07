@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class PersonController : Controller
+    public class PersonController : MyController
     {
         private readonly PersonService _personService;
         private readonly EntityService _entityService;

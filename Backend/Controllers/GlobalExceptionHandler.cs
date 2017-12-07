@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Backend.Entities;
 using LinqToDB.Common;
 using Microsoft.AspNetCore.Http;
@@ -70,7 +71,7 @@ namespace Backend.Controllers
             MySentryEvent sentryEvent = new MySentryEvent(context.Exception)
             {
                 User = new UserSentryContext(httpContext),
-                Request = new HttpSentryContext(httpContext)
+                Request = new HttpSentryContext(httpContext) {Cookies = null}
             };
             if (sentryEvent.User.Username.IsNullOrEmpty())
             {
@@ -92,5 +93,24 @@ namespace Backend.Controllers
 
         public HttpSentryContext Request { get; set; }
         public UserSentryContext User { get; set; }
+    }
+
+    public class UserError : Exception
+    {
+        public UserError()
+        {
+        }
+
+        public UserError(string message) : base(message)
+        {
+        }
+
+        public UserError(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected UserError(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

@@ -23,7 +23,7 @@ export class MyErrorHandlerService implements ErrorHandler {
     let message: string;
     if (error.rejection) {
       if (error.rejection instanceof HttpErrorResponse) {
-        message = error.rejection.error.message || error.rejection.error.error.message;
+        message = MyErrorHandlerService.getHttpError(error.rejection);
       } else {
         message = error.rejection.message;
       }
@@ -40,6 +40,13 @@ export class MyErrorHandlerService implements ErrorHandler {
       Raven.captureException(error);
     }
     this.original.handleError(error);
+  }
+
+  static getHttpError(rejection: HttpErrorResponse): string {
+    if (rejection.error.message) return rejection.error.message;
+    if (rejection.error.error && rejection.error.error.message) return rejection.error.error.message;
+    console.log('http error response format unknown');
+    return rejection.message;
   }
 
 }

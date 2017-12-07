@@ -18,7 +18,7 @@ namespace Backend.Controllers
     ///setup using this guide: https://auth0.com/blog/asp-dot-net-core-authentication-tutorial/
     ///and this https://pioneercode.com/post/authentication-in-an-asp-dot-net-core-api-part-3-json-web-token
     [Route("api/[controller]")]
-    public class AuthenticateController : Controller
+    public class AuthenticateController : MyController
     {
         public const string JwtCookieName = ".JwtAccessToken";
         private readonly JWTSettings _jwtOptions;
@@ -45,7 +45,7 @@ namespace Backend.Controllers
             user.ResetPassword = true;
             if (string.IsNullOrEmpty(user.Email))
             {
-                throw new ArgumentException("user email required");
+                throw new UserError("User email required");
             }
             var result = await _userManager.CreateAsync(user, registerUser.Password);
             if (!result.Succeeded)
@@ -144,7 +144,7 @@ namespace Backend.Controllers
 
         private Exception ThrowLoginFailed()
         {
-            return new ArgumentException("Invalid UserName or Password");
+            return new UserError("Invalid UserName or Password");
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Backend.Controllers
     #if DEBUG
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class TestController : Controller
+    public class TestController : MyController
     {
         [HttpGet]
         public IActionResult Index()

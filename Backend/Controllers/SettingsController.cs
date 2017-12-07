@@ -9,7 +9,7 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class SettingsController : Controller
+    public class SettingsController : MyController
     {
         private readonly Settings _settings;
 

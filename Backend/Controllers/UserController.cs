@@ -13,12 +13,12 @@ using IdentityUser = Backend.Entities.IdentityUser;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class UserController : Controller
+    public class UserController : MyController
     {
         private readonly UsersRepository _usersRepository;
-        private readonly UserManager<Entities.IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(UsersRepository usersRepository, UserManager<Entities.IdentityUser> userManager)
+        public UserController(UsersRepository usersRepository, UserManager<IdentityUser> userManager)
         {
             _usersRepository = usersRepository;
             _userManager = userManager;
