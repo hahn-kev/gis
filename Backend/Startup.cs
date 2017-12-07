@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Services;
+using LinqToDB.Common;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
@@ -123,9 +124,20 @@ namespace Backend
             //todo addGoogle for authentication
 //            services.AddAuthorization();
             foreach (var type in GetType().Assembly.GetTypes()
-                .Where(type => type.Name.Contains("Service") || type.Name.Contains("Repository")))
+                .Where(type => (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
             {
-                services.AddScoped(type);
+                var interfaces = type.GetInterfaces();
+                if (interfaces.Length > 0)
+                {
+                    foreach (var @interface in interfaces)
+                    {
+                        services.AddScoped(@interface, type);
+                    }
+                }
+                else
+                {
+                    services.AddScoped(type);
+                }
             }
 
             services.AddScoped<DbConnection>();
@@ -187,21 +199,25 @@ namespace Backend
             app.UseAuthentication();
             app.UseSentinel();
             app.UseMvc();
-            var settings = app.ApplicationServices.GetService<IOptions<Settings>>().Value;
-            DataConnection.DefaultSettings = settings;
-            LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
-            DbConnection.SetupMappingBuilder(MappingSchema.Default);
-            
+
+            ConfigureDatabase(app.ApplicationServices);
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var hereForYouConnection = scope.ServiceProvider.GetService<DbConnection>();
-                DataConnection.TurnTraceSwitchOn();
-                var logger = loggerFactory.CreateLogger("sql");
-                DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
                 hereForYouConnection.Setup().Wait();
             }
 #endif
+        }
+
+        public void ConfigureDatabase(IServiceProvider provider)
+        {
+            var settings = provider.GetService<IOptions<Settings>>().Value;
+            DataConnection.DefaultSettings = settings;
+            DataConnection.TurnTraceSwitchOn();
+            DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message);
+            LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
+            DbConnection.SetupMappingBuilder(MappingSchema.Default);
         }
     }
 }

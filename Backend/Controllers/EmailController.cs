@@ -8,9 +8,9 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class EmailController : Controller
     {
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
 
-        public EmailController(EmailService emailService)
+        public EmailController(IEmailService emailService)
         {
             _emailService = emailService;
         }

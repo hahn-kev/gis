@@ -12,7 +12,24 @@ using SendGrid.Helpers.Mail;
 
 namespace Backend.Services
 {
-    public class EmailService
+    public interface IEmailService
+    {
+        Task<MailgunReponse> SendEmail(string to, string subject, string body);
+
+        Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string templateId,
+            PersonExtended from,
+            PersonExtended to);
+
+        Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string templateId,
+            string toEmail,
+            string toName,
+            string fromEmail,
+            string fromName);
+    }
+
+    public class EmailService : IEmailService
     {
         private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
