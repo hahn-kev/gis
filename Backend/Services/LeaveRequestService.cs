@@ -1,46 +1,115 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
+using LinqToDB;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Services
 {
     public class LeaveRequestService
     {
         private readonly OrgGroupRepository _orgGroupRepository;
+
         private readonly PersonRepository _personRepository;
-//        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
+        private readonly Settings _settings;
 
-        public Person RequestLeave(LeaveRequest leaveRequest)
-        {
-            var result =
-            (from personOnLeave in _personRepository.People.Where(person => person.Id == leaveRequest.PersonId)
-                from department in _orgGroupRepository.OrgGroups.Where(@group => @group.Id == personOnLeave.OrgGroupId)
-                from devision in _orgGroupRepository.OrgGroups.Where(@group => @group.Id == department.ParentId).DefaultIfEmpty()
-                from supervisorGroup in _orgGroupRepository.OrgGroups.Where(@group => @group.Id == devision.ParentId).DefaultIfEmpty()
-                from depatmentSuper in _personRepository.People.Where(person => person.Id == department.Supervisor).DefaultIfEmpty()
-                from devisionSuper in _personRepository.People.Where(person => person.Id == devision.Supervisor).DefaultIfEmpty()
-                from supervisor in _personRepository.People.Where(person => person.Id == supervisorGroup.Supervisor).DefaultIfEmpty()
-                select new {supervisor, supervisor.FirstName, personOnLeave, department, devision, supervisorGroup}).FirstOrDefault();
-//            Console.WriteLine("Department super: {0}", result.dep?.FirstName);
-            var super = _personRepository.People.FirstOrDefault(person => person.Id == result.supervisorGroup.Supervisor);
-            Console.WriteLine("Person on leave: {0}", result.personOnLeave?.FirstName);
-            Console.WriteLine("dep name: {0}", result.department?.GroupName);
-            Console.WriteLine("dev name name: {0}", result.devision?.GroupName ?? "null");
-            Console.WriteLine("Super group name name: {0}", result.supervisorGroup?.GroupName);
-            Console.WriteLine("Super object first name: {0}", result.supervisor?.FirstName);
-            Console.WriteLine("Super first name: {0}", result.FirstName);
-            Console.WriteLine("second query, super: {0}", super?.FirstName);
-            return result.supervisor;
-        }
-
-        public LeaveRequestService(OrgGroupRepository orgGroupRepository, PersonRepository personRepository
-//            ,EmailService emailService
-            )
+        public LeaveRequestService(OrgGroupRepository orgGroupRepository,
+            PersonRepository personRepository,
+            IEmailService emailService,
+            IOptions<Settings> options)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
-//            _emailService = emailService;
+            _emailService = emailService;
+            _settings = options.Value;
+        }
+
+        private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
+
+        public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
+        {
+            var result =
+            (from personOnLeave in _personRepository.PeopleExtended.Where(person => person.Id == leaveRequest.PersonId)
+                from department in OrgGroups.InnerJoin(@group =>
+                    @group.Id == personOnLeave.OrgGroupId || @group.Supervisor == personOnLeave.Id)
+                from devision in OrgGroups.LeftJoin(@group => @group.Id == department.ParentId)
+                from supervisorGroup in OrgGroups.LeftJoin(@group => @group.Id == devision.ParentId)
+                select new
+                {
+                    personOnLeave,
+                    department,
+                    devision,
+                    supervisorGroup
+                }).FirstOrDefault();
+
+            return await ResolveLeaveRequestChain(leaveRequest,
+                result.personOnLeave,
+                result.department,
+                result.devision,
+                result.supervisorGroup);
+        }
+
+        private async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
+            PersonExtended requestedBy,
+            OrgGroupWithSupervisor department,
+            OrgGroupWithSupervisor devision,
+            OrgGroupWithSupervisor supervisorGroup)
+        {
+            return await DoNotifyWork(leaveRequest, requestedBy, department) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, devision) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup);
+        }
+
+        private async ValueTask<PersonExtended> DoNotifyWork(LeaveRequest leaveRequest,
+            PersonExtended requestedBy,
+            OrgGroupWithSupervisor orgGroup)
+        {
+            //super and requested by will be the same if the requester is a supervisor
+            if (requestedBy.Id == orgGroup.Supervisor) return null;
+            if (orgGroup.ApproverIsSupervisor && orgGroup.SupervisorPerson != null)
+            {
+                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
+                return orgGroup.SupervisorPerson;
+            }
+            if (orgGroup.SupervisorPerson != null)
+            {
+                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
+            }
+            return null;
+        }
+
+        private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
+            PersonExtended requestedBy,
+            PersonExtended supervisor)
+        {
+            var substituions = new Dictionary<string, string>
+            {
+                {"stuff", "herro"}
+            };
+            await _emailService.SendTemplateEmail(substituions,
+                "tbd",
+                requestedBy,
+                supervisor);
+        }
+
+        private async Task SendRequestApproval(LeaveRequest leaveRequest,
+            PersonExtended requestedBy,
+            PersonExtended supervisor)
+        {
+            var substituions = new Dictionary<string, string>
+            {
+                {"approveUrl", "some url"}
+            };
+
+            await _emailService.SendTemplateEmail(substituions,
+                "tbd",
+                requestedBy,
+                supervisor);
         }
     }
 }

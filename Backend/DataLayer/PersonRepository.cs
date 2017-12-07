@@ -15,6 +15,7 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Person> People => _dbConnection.People;
+        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended;
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
             from personRole in _dbConnection.PersonRoles
