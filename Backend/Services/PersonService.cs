@@ -10,9 +10,9 @@ namespace Backend.Services
     public class PersonService
     {
         private readonly PersonRepository _personRepository;
-        private readonly EntityService _entityService;
+        private readonly IEntityService _entityService;
 
-        public PersonService(PersonRepository personRepository, EntityService entityService)
+        public PersonService(PersonRepository personRepository, IEntityService entityService)
         {
             _personRepository = personRepository;
             _entityService = entityService;

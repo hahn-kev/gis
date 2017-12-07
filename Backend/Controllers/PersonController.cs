@@ -10,9 +10,9 @@ namespace Backend.Controllers
     public class PersonController : MyController
     {
         private readonly PersonService _personService;
-        private readonly EntityService _entityService;
+        private readonly IEntityService _entityService;
 
-        public PersonController(PersonService personService, EntityService entityService)
+        public PersonController(PersonService personService, IEntityService entityService)
         {
             _personService = personService;
             _entityService = entityService;

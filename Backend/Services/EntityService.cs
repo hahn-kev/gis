@@ -5,7 +5,12 @@ using LinqToDB;
 
 namespace Backend.Services
 {
-    public class EntityService
+    public interface IEntityService
+    {
+        void Save<T>(T entity) where T : BaseEntity;
+    }
+
+    public class EntityService : IEntityService
     {
         private readonly DbConnection _dbConnection;
 

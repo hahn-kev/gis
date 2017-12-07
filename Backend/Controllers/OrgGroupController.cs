@@ -10,9 +10,9 @@ namespace Backend.Controllers
     public class OrgGroupController : MyController
     {
         private readonly OrgGroupService _orgGroupService;
-        private readonly EntityService _entityService;
+        private readonly IEntityService _entityService;
 
-        public OrgGroupController(OrgGroupService orgGroupService, EntityService entityService)
+        public OrgGroupController(OrgGroupService orgGroupService, IEntityService entityService)
         {
             _orgGroupService = orgGroupService;
             _entityService = entityService;
