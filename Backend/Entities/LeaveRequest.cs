@@ -8,6 +8,6 @@ namespace Backend.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool? Approved { get; set; }
-        public Guid ApprovedById { get; set; }
+        public Guid? ApprovedById { get; set; }
     }
 }

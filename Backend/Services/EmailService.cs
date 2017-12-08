@@ -18,16 +18,18 @@ namespace Backend.Services
         Task<MailgunReponse> SendEmail(string to, string subject, string body);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
             EmailService.Template template,
             PersonExtended from,
             PersonExtended to);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
             EmailService.Template template,
-            string toEmail,
-            string toName,
             string fromEmail,
-            string fromName);
+            string fromName,
+            string toEmail,
+            string toName);
     }
 
     public class EmailService : IEmailService
@@ -46,8 +48,8 @@ namespace Backend.Services
 
             public string Id { get; }
             public string Name { get; }
-            public static readonly Template NotifyLeaveRequest = new Template("na");
-            public static readonly Template RequestLeaveApproval = new Template("70b6165d-f367-401f-9ae4-56814033b720");
+            public static Template NotifyLeaveRequest => new Template("na");
+            public static Template RequestLeaveApproval => new Template("70b6165d-f367-401f-9ae4-56814033b720");
 
             public bool Equals(Template other)
             {
@@ -101,11 +103,13 @@ namespace Backend.Services
         }
 
         public Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
             Template template,
             PersonExtended from,
             PersonExtended to)
         {
             return SendTemplateEmail(substituions,
+                subject,
                 template,
                 from.Email,
                 from.PreferredName,
@@ -114,23 +118,27 @@ namespace Backend.Services
         }
 
         public async Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
             Template template,
-            string toEmail,
-            string toName,
             string fromEmail,
-            string fromName)
+            string fromName,
+            string toEmail,
+            string toName)
         {
+            if (toEmail == null) throw new ArgumentNullException(nameof(toEmail));
+            if (fromEmail == null) throw new ArgumentNullException(nameof(fromEmail));
             var msg = new SendGridMessage
             {
-                Personalizations =
+                Personalizations = new List<Personalization>
                 {
                     new Personalization
                     {
-                        Tos = {new EmailAddress(toEmail, toName)},
+                        Tos = new List<EmailAddress> {new EmailAddress(toEmail, toName)},
                         Substitutions = substituions
                     }
                 },
                 From = new EmailAddress(fromEmail, fromName),
+                Subject = subject,
                 TemplateId = template.Id
             };
             var response = await _sendGridClient.SendEmailAsync(msg);

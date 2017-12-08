@@ -15,21 +15,39 @@ namespace Backend.Services
         private readonly OrgGroupRepository _orgGroupRepository;
 
         private readonly PersonRepository _personRepository;
+        private readonly LeaveRequestRepository _leaveRequestRepository;
         private readonly IEmailService _emailService;
         private readonly Settings _settings;
+        private readonly IEntityService _entityService;
+        private readonly UsersRepository _usersRepository;
 
         public LeaveRequestService(OrgGroupRepository orgGroupRepository,
             PersonRepository personRepository,
             IEmailService emailService,
-            IOptions<Settings> options)
+            IOptions<Settings> options,
+            LeaveRequestRepository leaveRequestRepository,
+            IEntityService entityService,
+            UsersRepository usersRepository)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
             _emailService = emailService;
+            _leaveRequestRepository = leaveRequestRepository;
+            _entityService = entityService;
+            _usersRepository = usersRepository;
             _settings = options.Value;
         }
 
         private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
+
+        public bool ApproveLeaveRequest(Guid id, int loggedInUser)
+        {
+            //todo fix how we get from logged in user to personId
+            var user = _usersRepository.UserById(loggedInUser);
+            var superviserId = _personRepository.PeopleExtended.Where(person => person.Email == user.Email)
+                .Select(extended => extended.Id).First();
+            return _leaveRequestRepository.ApproveLeaveRequest(id, superviserId);
+        }
 
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
@@ -47,11 +65,22 @@ namespace Backend.Services
                     supervisorGroup
                 }).FirstOrDefault();
 
-            return await ResolveLeaveRequestChain(leaveRequest,
-                result.personOnLeave,
-                result.department,
-                result.devision,
-                result.supervisorGroup);
+            leaveRequest.Approved = null;
+            leaveRequest.ApprovedById = null;
+            _entityService.Save(leaveRequest);
+            try
+            {
+                return await ResolveLeaveRequestChain(leaveRequest,
+                    result.personOnLeave,
+                    result.department,
+                    result.devision,
+                    result.supervisorGroup);
+            }
+            catch
+            {
+                _entityService.Delete(leaveRequest);
+                throw;
+            }
         }
 
         public async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
@@ -92,7 +121,8 @@ namespace Backend.Services
                 {"stuff", "herro"}
             };
             await _emailService.SendTemplateEmail(substituions,
-                EmailService.Template.NotifyLeaveRequest, 
+                $"{requestedBy.PreferredName} has requested leave",
+                EmailService.Template.NotifyLeaveRequest,
                 requestedBy,
                 supervisor);
         }
@@ -101,13 +131,18 @@ namespace Backend.Services
             PersonExtended requestedBy,
             PersonExtended supervisor)
         {
+            var leaveTimespan = (leaveRequest.StartDate - leaveRequest.EndDate).Duration();
             var substituions = new Dictionary<string, string>
             {
-                {"approveUrl", "some url"}
+                {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
+                {":firstName", supervisor.FirstName},
+                {":requester", requestedBy.FirstName},
+                {":time", $"{leaveTimespan.Days} Day(s)"}
             };
 
             await _emailService.SendTemplateEmail(substituions,
-                EmailService.Template.RequestLeaveApproval, 
+                $"{requestedBy.PreferredName} Leave request approval",
+                EmailService.Template.RequestLeaveApproval,
                 requestedBy,
                 supervisor);
         }

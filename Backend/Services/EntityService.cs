@@ -8,6 +8,7 @@ namespace Backend.Services
     public interface IEntityService
     {
         void Save<T>(T entity) where T : BaseEntity;
+        void Delete<T>(T entity) where T : BaseEntity;
     }
 
     public class EntityService : IEntityService
@@ -30,6 +31,12 @@ namespace Backend.Services
             }
             if (_dbConnection.Update(entity) != 1)
                 throw new Exception($"{typeof(T).Name} not found for id: {entity.Id}");
+        }
+
+        public void Delete<T>(T entity) where T : BaseEntity
+        {
+            if (entity.Id == Guid.Empty) return;
+            _dbConnection.Delete(entity);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace UnitTestProject
             ServiceCollection.AddLogging(loggingBuilder => loggingBuilder.AddConsole().AddDebug());
             startup.ConfigureServices(ServiceCollection);
             ServiceCollection.RemoveAll<IEmailService>().AddSingleton(Mock.Of<IEmailService>());
+            ServiceCollection.Replace(ServiceDescriptor.Singleton(Mock.Of<IEntityService>()));
             configure?.Invoke(ServiceCollection);
             ServiceProvider = ServiceCollection.BuildServiceProvider();
             startup.ConfigureDatabase(ServiceProvider);
