@@ -20,6 +20,9 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-slide-toggle name="approver" [(ngModel)]="group.approverIsSupervisor">Supervisor approves Leave
+      </mat-slide-toggle>
       <mat-form-field>
         <mat-select name="parent" [(ngModel)]="group.parentId" (ngModelChange)="refreshOrgChain()"
                     placeholder="Parent Group">
