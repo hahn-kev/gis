@@ -8,7 +8,7 @@ namespace Backend.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Guid OrgGroupId { get; set; }
+        public Guid? OrgGroupId { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]
@@ -17,7 +17,14 @@ namespace Backend.Entities
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
         public string Email { get; set; }
-        public string PreferredName { get; set; }
+        private string _preferredName;
+
+        public string PreferredName
+        {
+            get { return _preferredName ?? FirstName + " " + LastName; }
+            set { _preferredName = value; }
+        }
+
         public IList<PersonRole> Roles { get; set; }
     }
 }
