@@ -16,9 +16,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class LeaveRequestComponent implements OnInit, OnDestroy {
   public people: Person[];
   public groups: OrgGroup[];
-  public personLeavingId: string;
-  public leaveStartDate: Date;
-  public leaveEndDate: Date;
+  public leaveRequest = new LeaveRequest();
 
   private userTokenSubscription: Subscription;
 
@@ -38,7 +36,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       this.userTokenSubscription = this.loginService.safeUserToken().subscribe(user => {
         if (!this.people) return;
         let person = this.people.find(value => value.email == user.email);
-        if (person) this.personLeavingId = person.id;
+        if (person) this.leaveRequest.personId = person.id;
       });
     });
   }
@@ -48,10 +46,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   async request(): Promise<void> {
-    let notified = await this.leaveRequestService.requestLeave(new LeaveRequest(undefined,
-      this.personLeavingId,
-      this.leaveStartDate,
-      this.leaveEndDate));
+    let notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
     this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
   }
 }

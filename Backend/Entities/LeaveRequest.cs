@@ -9,5 +9,6 @@ namespace Backend.Entities
         public DateTime EndDate { get; set; }
         public bool? Approved { get; set; }
         public Guid? ApprovedById { get; set; }
+        public string Type { get; set; }
     }
 }

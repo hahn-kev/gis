@@ -1,5 +1,9 @@
 export class LeaveRequest {
 
-  constructor(public id?: string, public personId?: string, public startDate?: Date, public endDate?: Date) {
+  constructor(public id?: string,
+    public personId?: string,
+    public startDate?: Date,
+    public endDate?: Date,
+    public type?: string) {
   }
 }
