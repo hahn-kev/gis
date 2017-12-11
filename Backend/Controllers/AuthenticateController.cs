@@ -188,7 +188,8 @@ namespace Backend.Controllers
         {
             return new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, identityUser.Email)
             };
         }
 

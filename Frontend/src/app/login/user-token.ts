@@ -16,6 +16,9 @@ export class UserToken {
     return new Date(this.token.exp * 1000);
   }
 
+  get email(): string {
+    return this.token && this.token['email'];
+  }
   get roles(): string[] {
     let val = this.token['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
     if (isArray(val)) return val;

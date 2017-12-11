@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { JwtHelperService } from './jwt-helper.service';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import * as Raven from 'raven-js';
 import { CookieService } from 'ngx-cookie';
 import { UserToken } from '../../login/user-token';
@@ -44,6 +44,10 @@ export class LoginService implements CanActivate {
 
   currentUserToken(): Observable<UserToken> {
     return this.currentUserTokenSubject.pipe(map(jwt => jwt && new UserToken(JwtHelperService.decodeToken(jwt))));
+  }
+
+  safeUserToken(): Observable<UserToken> {
+    return this.currentUserToken().pipe(filter(value => !!value));
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {

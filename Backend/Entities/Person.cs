@@ -9,6 +9,7 @@ namespace Backend.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Guid? OrgGroupId { get; set; }
+        public string Email { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]
@@ -16,7 +17,6 @@ namespace Backend.Entities
     {
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
-        public string Email { get; set; }
         private string _preferredName;
 
         public string PreferredName
