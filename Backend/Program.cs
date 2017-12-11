@@ -1,6 +1,7 @@
 ﻿using Backend;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace Backend
 {
@@ -12,6 +13,9 @@ namespace Backend
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build();
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(builder => builder.AddJsonFile("client_id.json"))
+                .UseStartup<Startup>()
+                .Build();
     }
 }

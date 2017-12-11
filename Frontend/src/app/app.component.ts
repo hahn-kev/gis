@@ -1,12 +1,12 @@
 ﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { User } from './user/user';
 import { MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie';
 import { LoginService } from './services/auth/login.service';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { SettingsService } from './services/settings.service';
+import { UserToken } from './login/user-token';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +15,7 @@ import { SettingsService } from './services/settings.service';
 })
 export class AppComponent implements OnInit {
 
-  currentUser: Observable<User>;
+  currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: Observable<string>;
   @ViewChild('sidenav')
@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
               private cookieService: CookieService,
               activityIndicatorService: ActivityIndicatorService,
     settings: SettingsService) {
-    this.currentUser = loginService.observeCurrentUser();
+    this.currentUser = loginService.currentUserToken();
     this.indicatorStatus = activityIndicatorService.observeIndicator();
     this.version = settings.getAsync<string>('version');
   }
@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
   }
 
   logout(): void {
-  this.loginService.setLoggedIn(null, null);
+    this.loginService.setLoggedIn(null);
   this.cookieService.remove('.JwtAccessToken');
   this.loginService.promptLogin();
 }

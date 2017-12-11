@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +29,10 @@ namespace Backend.Controllers
         private readonly SecurityTokenHandler _securityTokenHandler;
         private readonly Settings _settings;
 
-        public AuthenticateController(IOptions<JWTSettings> jwtOptions, SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager, IOptions<Settings> options)
+        public AuthenticateController(IOptions<JWTSettings> jwtOptions,
+            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser> userManager,
+            IOptions<Settings> options)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -50,13 +54,61 @@ namespace Backend.Controllers
             var result = await _userManager.CreateAsync(user, registerUser.Password);
             if (!result.Succeeded)
             {
-                return result.Errors();
+                throw result.Errors();
             }
             if (user.Id <= 0)
             {
                 throw new ArgumentException("user id not generated error");
             }
             return Json(new {Status = "Success"});
+        }
+
+        [HttpGet("google")]
+        [AllowAnonymous]
+        public IActionResult Google(string redirectTo = null)
+        {
+            return Challenge(new AuthenticationProperties
+                {
+                    RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
+                },
+                "Google");
+        }
+
+        public const string ClaimTypeId = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+        public const string ClaimTypeFirstName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
+        public const string ClaimTypeLastName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname";
+        public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+
+        public async Task GoogleSignIn()
+        {
+            var googleId = User.FindFirstValue(ClaimTypeId);
+            var user = await _userManager.FindByLoginAsync("Google", googleId);
+
+            if (user == null)
+            {
+                var email = User.FindFirstValue(ClaimTypeEmail);
+                if (!email.EndsWith("@gisthailand.org") && email != "hahn.kev@gmail.com")
+                {
+                    throw new AuthenticationException("Only gis users or khahn are allowed to login with google sso");
+                }
+                //check for user by email
+                user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    user = new IdentityUser
+                    {
+                        Email = email,
+                        UserName = User.Identity.Name.Replace(" ", "_")
+                    };
+                    var newUserResult = await _userManager.CreateAsync(user);
+                    if (!newUserResult.Succeeded) throw newUserResult.Errors();
+                }
+
+                var newLoginResult =
+                    await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", googleId, User.Identity.Name));
+                if (!newLoginResult.Succeeded) throw newLoginResult.Errors();
+            }
+            Response.Cookies.Append(JwtCookieName, _securityTokenHandler.WriteToken(await GetJwtSecurityToken(user)));
         }
 
         [HttpPost("signin")]
@@ -74,10 +126,11 @@ namespace Backend.Controllers
         {
             var identityUser = await _userManager.FindByNameAsync(credentials.Username);
             if (identityUser == null) throw ThrowLoginFailed();
-            var identityResult = await _userManager.ChangePasswordAsync(identityUser, credentials.Password, credentials.NewPassword);
+            var identityResult =
+                await _userManager.ChangePasswordAsync(identityUser, credentials.Password, credentials.NewPassword);
             if (!identityResult.Succeeded)
             {
-                return identityResult.Errors();
+                throw identityResult.Errors();
             }
             identityUser.ResetPassword = false;
             await _userManager.UpdateAsync(identityUser);
@@ -113,20 +166,17 @@ namespace Backend.Controllers
             Response.Cookies.Append(JwtCookieName, accessTokenString);
             return Json(new Dictionary<string, object>
             {
-                {"access_token", accessTokenString},
-                {"user", new UserProfile(user)}
+                {"access_token", accessTokenString}
             });
         }
 
         private async Task<JwtSecurityToken> GetJwtSecurityToken(IdentityUser identityUser)
         {
             var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identityUser);
-
             return new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: GetTokenClaims(identityUser).Union(claimsPrincipal.Claims),
-                
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),

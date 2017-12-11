@@ -1,6 +1,6 @@
 <div class="login">
   <mat-card>
-    <form #loginForm="ngForm" (ngSubmit)="login()">
+    <form #loginForm="ngForm" id="form" (ngSubmit)="login()">
       <h1 i18n="login page welcome@@welcomeLogin">Welcome GIS</h1>
       <h3 i18n="label above login form@@loginLabel">Please login</h3>
       <div>
@@ -67,8 +67,12 @@
       <mat-error *ngIf="errorMessage">
         {{errorMessage}}
       </mat-error>
-      <button mat-button type="submit" [disabled]="!loginForm.form.valid" i18n="login button@@loginButton">Login
-      </button>
     </form>
+    <mat-card-actions>
+      <button mat-button type="submit" form="form" [disabled]="!loginForm.form.valid" i18n="login button@@loginButton">
+        Login
+      </button>
+      <a mat-raised-button color="accent" [href]="'/api/authenticate/google?redirectTo=' + redirectUrl">Google Login</a>
+    </mat-card-actions>
   </mat-card>
 </div>

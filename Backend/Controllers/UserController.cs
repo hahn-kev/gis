@@ -72,7 +72,7 @@ namespace Backend.Controllers
             var user = await _userManager.GetUserAsync(User);
             await _userManager.RemovePasswordAsync(user);
             var result = await _userManager.AddPasswordAsync(user, newPassword);
-            return !result.Succeeded ? result.Errors() : Ok();
+            return !result.Succeeded ? throw result.Errors() : Ok();
         }
 
         private async Task<IActionResult> UpdateUser(int id, RegisterUser registerUser)
@@ -84,7 +84,7 @@ namespace Backend.Controllers
 
             await _userManager.RemovePasswordAsync(user);
             var result = await _userManager.AddPasswordAsync(user, registerUser.Password);
-            return !result.Succeeded ? result.Errors() : Ok();
+            return !result.Succeeded ? throw result.Errors() : Ok();
         }
 
 //        [Authorize(Roles = "admin")]
@@ -94,7 +94,7 @@ namespace Backend.Controllers
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) throw new NullReferenceException("User not found");
             var identityResult = await _userManager.AddToRoleAsync(user, "admin");
-            if (!identityResult.Succeeded) return identityResult.Errors();
+            if (!identityResult.Succeeded) throw identityResult.Errors();
             return Ok();
         }
 
@@ -105,7 +105,7 @@ namespace Backend.Controllers
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) throw new NullReferenceException("User not found");
             var identityResult = await _userManager.RemoveFromRoleAsync(user, "admin");
-            if (!identityResult.Succeeded) return identityResult.Errors();
+            if (!identityResult.Succeeded) throw identityResult.Errors();
             return Ok();
         }
 

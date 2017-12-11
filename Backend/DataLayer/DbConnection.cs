@@ -79,7 +79,7 @@ namespace Backend.DataLayer
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             
-            var roles = new[] {"admin"};
+            var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
             {
                 if (!await _roleManager.RoleExistsAsync(role))

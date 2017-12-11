@@ -13,7 +13,9 @@ using LinqToDB.Common;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,7 +52,7 @@ namespace Backend
             services.AddOptions();
             services.Configure<Settings>(Configuration);
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-            AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
+            services.AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(
                     options =>
                     {
                         options.SignIn.RequireConfirmedEmail = false;
@@ -61,7 +63,8 @@ namespace Backend
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequiredLength = 8;
                     })
-                .AddLinqToDBStores<int>(new DefaultConnectionFactory());
+                .AddLinqToDBStores<int>(new DefaultConnectionFactory())
+                .AddDefaultTokenProviders();
             services.AddSentinel(new SentinelSettings
             {
                 Dsn = Configuration.GetValue<string>("SentryDsn"),
@@ -99,7 +102,7 @@ namespace Backend
 //                    options.SupportedCultures.Add(new CultureInfo(localeFolder));
 //                }
 //            });
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication()
                 .AddJwtBearer(options =>
                 {
                     var jwtSettings = Configuration.GetSection("JWTSettings").Get<JWTSettings>();
@@ -122,11 +125,29 @@ namespace Backend
                             return Task.CompletedTask;
                         }
                     };
+                })
+                .AddGoogle(options =>
+                {
+                    var google = Configuration.GetSection("web");
+                    options.ClientId = google["client_id"];
+                    options.ClientSecret = google["client_secret"];
+                    options.Events.OnTicketReceived = async context =>
+                    {
+                        context.HandleResponse();
+                        context.HttpContext.User = context.Principal;
+
+                        var authenticateController =
+                            context.HttpContext.RequestServices.GetRequiredService<AuthenticateController>();
+                        authenticateController.ControllerContext.HttpContext = context.HttpContext;
+                        await authenticateController.GoogleSignIn();
+                        context.Response.Redirect(context.ReturnUri);
+                    };
                 });
             //todo addGoogle for authentication
 //            services.AddAuthorization();
             foreach (var type in GetType().Assembly.GetTypes()
-                .Where(type => (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
+                .Where(type =>
+                    (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
             {
                 var interfaces = type.GetInterfaces();
                 if (interfaces.Length > 0)
@@ -141,7 +162,7 @@ namespace Backend
                     services.AddScoped(type);
                 }
             }
-
+            services.AddScoped<AuthenticateController>();
             services.AddScoped<DbConnection>();
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(

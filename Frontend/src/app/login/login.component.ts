@@ -17,20 +17,26 @@ export class LoginComponent implements OnInit {
   errorMessage: string;
   passwordReset = false;
 
+  get redirectUrl(): string {
+    return this.loginService.redirectTo;
+  }
+
   constructor(private authenticateService: AuthenticateService,
-              private loginService: LoginService,
-              private router: Router,
-              private snackBar: MatSnackBar) {
+    private loginService: LoginService,
+    private router: Router,
+    private snackBar: MatSnackBar) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
-  async login() {
+  async login(): Promise<void> {
     this.errorMessage = '';
     let user: User;
     try {
-      user = await this.authenticateService.login(this.username, this.password, this.passwordReset ? this.newPassword : null);
+      user = await this.authenticateService.login(this.username,
+        this.password,
+        this.passwordReset ? this.newPassword : null);
     } catch (errorResponse) {
       this.errorMessage = errorResponse.error.message;
       return;

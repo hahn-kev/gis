@@ -267,3 +267,4 @@ HereForYou/Logs/
 Backend/appsettings.json
 Backend/wwwroot/
 Backend/Logs/
+Backend/client_id.json

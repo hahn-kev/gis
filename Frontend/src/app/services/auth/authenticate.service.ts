@@ -20,7 +20,7 @@ export class AuthenticateService {
     let user = Object.assign(new User(), json.user);
     if (!user.resetPassword) {
       //we won't get an access token back if the users password needs to be reset
-      this.loginService.setLoggedIn(user, json.access_token);
+      this.loginService.setLoggedIn(json.access_token);
     }
     return user;
   }

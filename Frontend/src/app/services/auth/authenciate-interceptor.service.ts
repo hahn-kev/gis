@@ -11,12 +11,10 @@ export class AuthenciateInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.loginService.accessToken)
-      req = req.clone({setHeaders: {Authorization: 'Bearer ' + this.loginService.accessToken}});
     return next.handle(req).pipe(tap(event => {
     }, e => {
       if (e instanceof HttpErrorResponse) {
-        let err: HttpErrorResponse = e;
+        let err = e;
         if (err.status == 401 && !err.url.endsWith('signin')) {
           this.loginService.promptLogin();
         } else if (err.headers.has('content-type') && err.headers.get('content-type').indexOf('application/json') == 0) {
@@ -28,7 +26,7 @@ export class AuthenciateInterceptorService implements HttpInterceptor {
     }));
   }
 
-  setError(e: any) {
+  setError(e: any): void {
     if (typeof e.error === 'string') e.error = JSON.parse(e.error);
   }
 }
