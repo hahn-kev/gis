@@ -18,7 +18,8 @@ namespace Backend.Services
             _entityService = entityService;
         }
 
-        public IList<Person> People() => _personRepository.People.OrderBy(person => person.FirstName).ThenBy(person => person.LastName).ToList();
+        public IList<Person> People() => _personRepository.People.OrderBy(person => person.FirstName)
+            .ThenBy(person => person.LastName).ToList();
 
         public PersonExtended GetById(Guid id) => _personRepository.GetById(id);
 
@@ -34,6 +35,15 @@ namespace Backend.Services
             return _personRepository.PersonRolesExtended
                 .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
                                (role.Active || role.EndDate > endRange)).ToList();
+        }
+
+        public void Save(PersonExtended person)
+        {
+            if (string.IsNullOrEmpty(person.PreferredName))
+            {
+                person.PreferredName = $"{person.FirstName} {person.LastName}";
+            }
+            _entityService.Save(person);
         }
     }
 }

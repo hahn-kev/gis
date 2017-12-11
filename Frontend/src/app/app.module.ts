@@ -72,6 +72,7 @@ import { GroupService } from './people/groups/group.service';
 import { GroupComponent } from './people/groups/group/group.component';
 import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
 import { LeaveRequestService } from './people/leave-request/leave-request.service';
+import { LeaveListComponent } from './people/leave-request/leave-list/leave-list.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -99,7 +100,8 @@ if (environment.production) {
     RolesReportComponent,
     OrgGroupListComponent,
     GroupComponent,
-    LeaveRequestComponent
+    LeaveRequestComponent,
+    LeaveListComponent
   ],
   entryComponents: [
     ConfirmDialogComponent

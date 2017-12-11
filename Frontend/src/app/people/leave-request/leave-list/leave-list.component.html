@@ -1,0 +1,29 @@
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="requester">
+    <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="approved">
+    <mat-header-cell *matHeaderCellDef>Approved</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.approved"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="approvedBy">
+    <mat-header-cell *matHeaderCellDef>Approved by</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.approvedByName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="startDate">
+    <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.startDate | date:'shortDate'}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="endDate">
+    <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.endDate | date:'shortDate'}}</mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['requester', 'approved',  'approvedBy', 'startDate', 'endDate']"></mat-header-row>
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: ['requester', 'approved',  'approvedBy', 'startDate', 'endDate']"
+  ></mat-row>
+</mat-table>

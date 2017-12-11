@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -17,10 +18,17 @@ namespace Backend.Controllers
         private readonly LeaveRequestService _leaveRequestService;
         private readonly ClaimsIdentityOptions _identityOptions;
 
-        public LeaveRequestController(LeaveRequestService leaveRequestService, IOptions<ClaimsIdentityOptions> identityOptions)
+        public LeaveRequestController(LeaveRequestService leaveRequestService,
+            IOptions<ClaimsIdentityOptions> identityOptions)
         {
             _leaveRequestService = leaveRequestService;
             _identityOptions = identityOptions.Value;
+        }
+
+        [HttpGet]
+        public IList<LeaveRequestWithNames> List()
+        {
+            return _leaveRequestService.LeaveRequestsWithNames;
         }
 
         [HttpPost]

@@ -10,12 +10,10 @@ namespace Backend.Controllers
     public class PersonController : MyController
     {
         private readonly PersonService _personService;
-        private readonly IEntityService _entityService;
 
-        public PersonController(PersonService personService, IEntityService entityService)
+        public PersonController(PersonService personService)
         {
             _personService = personService;
-            _entityService = entityService;
         }
 
         [HttpGet]
@@ -33,7 +31,7 @@ namespace Backend.Controllers
         [HttpPost]
         public IActionResult Update([FromBody] PersonExtended person)
         {
-            _entityService.Save(person);
+            _personService.Save(person);
             return Ok();
         }
 

@@ -21,6 +21,8 @@ import { GroupResolveService } from './people/groups/group/group-resolve.service
 import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-list.component';
 import { GroupsResolveService } from './people/groups/org-group-list/groups-resolve.service';
 import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
+import { LeaveListComponent } from './people/leave-request/leave-list/leave-list.component';
+import { LeaveListResolverService } from './people/leave-request/leave-list/leave-list-resolver.service';
 
 const routes: Routes = [
   {
@@ -116,6 +118,13 @@ const routes: Routes = [
             resolve: {
               people: PeopleResolveService
             }
+          },
+          {
+            path: 'list',
+            component: LeaveListComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            }
           }
         ]
       },
@@ -156,7 +165,8 @@ const routes: Routes = [
     PeopleResolveService,
     RolesResolverService,
     GroupResolveService,
-    GroupsResolveService
+    GroupsResolveService,
+    LeaveListResolverService
   ]
 })
 export class AppRoutingModule {

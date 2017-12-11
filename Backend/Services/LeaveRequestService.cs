@@ -38,6 +38,8 @@ namespace Backend.Services
             _settings = options.Value;
         }
 
+        public IList<LeaveRequestWithNames> LeaveRequestsWithNames => _leaveRequestRepository.LeaveRequestWithNames.ToList();
+
         private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
 
         public bool ApproveLeaveRequest(Guid id, int loggedInUser)
@@ -67,6 +69,7 @@ namespace Backend.Services
 
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
+            leaveRequest.CreatedDate = DateTime.Now;
             _entityService.Save(leaveRequest);
             try
             {
