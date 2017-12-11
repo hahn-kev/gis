@@ -116,9 +116,12 @@ namespace Backend.Services
             PersonExtended requestedBy,
             PersonExtended supervisor)
         {
+            var leaveTimespan = (leaveRequest.StartDate - leaveRequest.EndDate).Duration();
             var substituions = new Dictionary<string, string>
             {
-                {"stuff", "herro"}
+                {":firstName", supervisor.FirstName},
+                {":requester", requestedBy.FirstName},
+                {":time", $"{leaveTimespan.Days} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",

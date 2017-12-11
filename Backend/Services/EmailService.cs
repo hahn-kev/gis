@@ -48,7 +48,7 @@ namespace Backend.Services
 
             public string Id { get; }
             public string Name { get; }
-            public static Template NotifyLeaveRequest => new Template("na");
+            public static Template NotifyLeaveRequest => new Template("5aa3038a-6c0d-4e6c-bc57-311c87916a0c");
             public static Template RequestLeaveApproval => new Template("70b6165d-f367-401f-9ae4-56814033b720");
 
             public bool Equals(Template other)
