@@ -52,7 +52,7 @@ namespace Backend
             services.AddOptions();
             services.Configure<Settings>(Configuration);
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-            services.AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(
+            AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
                     options =>
                     {
                         options.SignIn.RequireConfirmedEmail = false;
@@ -65,6 +65,7 @@ namespace Backend
                     })
                 .AddLinqToDBStores<int>(new DefaultConnectionFactory())
                 .AddDefaultTokenProviders();
+            
             services.AddSentinel(new SentinelSettings
             {
                 Dsn = Configuration.GetValue<string>("SentryDsn"),
@@ -102,7 +103,7 @@ namespace Backend
 //                    options.SupportedCultures.Add(new CultureInfo(localeFolder));
 //                }
 //            });
-            services.AddAuthentication()
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     var jwtSettings = Configuration.GetSection("JWTSettings").Get<JWTSettings>();
