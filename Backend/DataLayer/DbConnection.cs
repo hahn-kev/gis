@@ -7,7 +7,7 @@ using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
-    
+
 namespace Backend.DataLayer
 {
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>
@@ -22,14 +22,17 @@ namespace Backend.DataLayer
         }
 
         private static bool hasSetupMapping;
+
         public static void SetupMappingBuilder(MappingSchema mappingSchema)
         {
             if (hasSetupMapping) return;
             var builder = mappingSchema.GetFluentMappingBuilder();
             builder.Entity<IdentityUser>().HasIdentity(user => user.Id);
-            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim").HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim")
+                .HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
             builder.Entity<LinqToDB.Identity.IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
-            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim").HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
+            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim")
+                .HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
             builder.Entity<LinqToDB.Identity.IdentityUserLogin<int>>().HasTableName("UserLogin");
             builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
             builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
@@ -42,6 +45,7 @@ namespace Backend.DataLayer
         public ITable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
         public ITable<PersonRole> PersonRoles => GetTable<PersonRole>();
         public ITable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
+        public ITable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
 
         public IQueryable<UserProfile> UserProfiles
         {
@@ -78,7 +82,8 @@ namespace Backend.DataLayer
             TryCreateTable<PersonRole>();
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
-            
+            TryCreateTable<TrainingRequirement>();
+
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
             {

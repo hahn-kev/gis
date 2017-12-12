@@ -38,5 +38,10 @@ namespace Backend.Services
             if (entity.Id == Guid.Empty) return;
             _dbConnection.Delete(entity);
         }
+
+        public void Delete<T>(Guid id) where T : BaseEntity
+        {
+            _dbConnection.GetTable<T>().Delete(arg => arg.Id == id);
+        }
     }
 }
