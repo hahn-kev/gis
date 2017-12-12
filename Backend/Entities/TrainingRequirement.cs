@@ -1,4 +1,5 @@
 ﻿using System;
+using LinqToDB;
 using LinqToDB.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -11,6 +12,7 @@ namespace Backend.Entities
         public int FirstYear { get; set; }
         public int? LastYear { get; set; }
 
+        [Column(DataType = DataType.VarChar)]
         public TrainingScope Scope { get; set; }
         public Guid? DepatmentId { get; set; }
     }

@@ -1,0 +1,23 @@
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="firstYear">
+    <mat-header-cell *matHeaderCellDef>First Year</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.firstYear}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="lastYear">
+    <mat-header-cell *matHeaderCellDef>Last Year</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.lastYear}}</mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['name', 'firstYear',  'lastYear']"></mat-header-row>
+  <mat-row class="hover-overlay" [routerLink]="'../edit/' + row.id"
+           *matRowDef="let row; columns: ['name', 'firstYear',  'lastYear']"></mat-row>
+</mat-table>
+
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Training Requirement"
+   matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

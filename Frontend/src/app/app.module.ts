@@ -73,6 +73,9 @@ import { GroupComponent } from './people/groups/group/group.component';
 import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
 import { LeaveRequestService } from './people/leave-request/leave-request.service';
 import { LeaveListComponent } from './people/leave-request/leave-list/leave-list.component';
+import { TrainingListComponent } from './people/training-requirement/training-list/training-list.component';
+import { TrainingEditComponent } from './people/training-requirement/training-edit/training-edit.component';
+import { TrainingRequirementService } from './people/training-requirement/training-requirement.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -101,7 +104,9 @@ if (environment.production) {
     OrgGroupListComponent,
     GroupComponent,
     LeaveRequestComponent,
-    LeaveListComponent
+    LeaveListComponent,
+    TrainingListComponent,
+    TrainingEditComponent
   ],
   entryComponents: [
     ConfirmDialogComponent
@@ -170,7 +175,8 @@ if (environment.production) {
     SettingsService,
     PersonService,
     GroupService,
-    LeaveRequestService
+    LeaveRequestService,
+    TrainingRequirementService
   ],
   bootstrap: [AppComponent]
 })

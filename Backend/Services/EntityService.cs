@@ -9,6 +9,7 @@ namespace Backend.Services
     {
         void Save<T>(T entity) where T : BaseEntity;
         void Delete<T>(T entity) where T : BaseEntity;
+        void Delete<T>(Guid id) where T : BaseEntity;
     }
 
     public class EntityService : IEntityService

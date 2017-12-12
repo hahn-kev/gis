@@ -10,9 +10,9 @@ namespace Backend.Services
     public class TrainingService
     {
         private readonly TrainingRepository _trainingRepository;
-        private readonly EntityService _entityService;
+        private readonly IEntityService _entityService;
 
-        public TrainingService(TrainingRepository trainingRepository, EntityService entityService)
+        public TrainingService(TrainingRepository trainingRepository, IEntityService entityService)
         {
             _trainingRepository = trainingRepository;
             _entityService = entityService;

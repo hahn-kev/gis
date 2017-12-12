@@ -10,7 +10,7 @@ export class LeaveRequestService {
   constructor(private http: HttpClient) {
   }
 
-  requestLeave(leaveRequest: LeaveRequest): Promise<Object> {
+  requestLeave(leaveRequest: LeaveRequest): Promise<Person> {
     return this.http.post<Person>('/api/leaverequest/', leaveRequest).toPromise();
   }
 

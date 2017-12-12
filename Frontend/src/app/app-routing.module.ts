@@ -23,6 +23,10 @@ import { GroupsResolveService } from './people/groups/org-group-list/groups-reso
 import { LeaveRequestComponent } from './people/leave-request/leave-request.component';
 import { LeaveListComponent } from './people/leave-request/leave-list/leave-list.component';
 import { LeaveListResolverService } from './people/leave-request/leave-list/leave-list-resolver.service';
+import { TrainingListComponent } from './people/training-requirement/training-list/training-list.component';
+import { TrainingListResolverService } from './people/training-requirement/training-list-resolver.service';
+import { TrainingEditComponent } from './people/training-requirement/training-edit/training-edit.component';
+import { TrainingResolverService } from './people/training-requirement/training-resolver.service';
 
 const routes: Routes = [
   {
@@ -129,6 +133,25 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'training',
+        children: [
+          {
+            path: 'list',
+            component: TrainingListComponent,
+            resolve: {
+              trainingRequirements: TrainingListResolverService
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: TrainingEditComponent,
+            resolve: {
+              training: TrainingResolverService
+            }
+          }
+        ]
+      },
+      {
         path: 'home',
         component: HomeComponent
       },
@@ -166,7 +189,9 @@ const routes: Routes = [
     RolesResolverService,
     GroupResolveService,
     GroupsResolveService,
-    LeaveListResolverService
+    LeaveListResolverService,
+    TrainingListResolverService,
+    TrainingResolverService
   ]
 })
 export class AppRoutingModule {
