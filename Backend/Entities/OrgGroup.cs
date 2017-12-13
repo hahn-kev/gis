@@ -15,17 +15,7 @@ namespace Backend.Entities
     [Table("OrgGroup", IsColumnAttributeRequired = false)]
     public class OrgGroupWithSupervisor : OrgGroup
     {
-        private PersonExtended _supervisorPerson;
-
         [Column(SkipOnInsert = true, SkipOnUpdate = true)]
-        public PersonExtended SupervisorPerson
-        {
-            get => _supervisorPerson;
-            set
-            {
-                if (value != null && value.Id != Guid.Empty)
-                    _supervisorPerson = value;
-            }
-        }
+        public PersonExtended SupervisorPerson { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace Backend.DataLayer
         public IQueryable<OrgGroupWithSupervisor> OrgGroupsWithSupervisor =>
             from orgGroup in _connection.GetTable<OrgGroupWithSupervisor>()
             from person in _connection.PeopleExtended.LeftJoin(person => person.Id == orgGroup.Supervisor)
+                .DefaultIfEmpty()
             select new OrgGroupWithSupervisor()
             {
                 ApproverIsSupervisor = orgGroup.ApproverIsSupervisor,
