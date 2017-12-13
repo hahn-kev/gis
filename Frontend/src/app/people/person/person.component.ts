@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PersonExtended } from '../person';
+import { PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
 import { Role } from '../role';
 import { OrgGroup } from '../groups/org-group';
+import { MatDialog } from '@angular/material';
+import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-person',
@@ -11,21 +14,44 @@ import { OrgGroup } from '../groups/org-group';
   styleUrls: ['./person.component.scss']
 })
 export class PersonComponent implements OnInit {
-  public person: PersonExtended;
+  public person: PersonWithOthers;
   public groups: OrgGroup[];
   public newRole = new Role();
+  @ViewChild('isStaff') isStaffElement: NgModel;
 
   constructor(private route: ActivatedRoute,
     private personService: PersonService,
-    private router: Router) {
+    private router: Router,
+    private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { person: PersonExtended, groups: OrgGroup[] }) => {
+    this.route.data.subscribe((value: { person: PersonWithOthers, groups: OrgGroup[] }) => {
       this.person = value.person;
       this.groups = value.groups;
       this.newRole.personId = this.person.id;
     });
+  }
+
+  async isStaffChanged(isStaff: boolean): Promise<void> {
+    if (isStaff) {
+      this.person.staff = new Staff();
+      return;
+    }
+    //deleting?
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(`Deleting staff, data will be lost, this can not be undone`,
+          'Delete',
+          'Cancel')
+      });
+    let result = await dialogRef.afterClosed().toPromise();
+    if (result) {
+      this.person.staff = null;
+    } else {
+      //roll back switch
+      this.isStaffElement.control.setValue(true, {emitEvent: false});
+    }
   }
 
   async save(): Promise<void> {

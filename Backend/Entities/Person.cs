@@ -8,8 +8,13 @@ namespace Backend.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Guid? OrgGroupId { get; set; }
+        public Guid? StaffId { get; set; }
         public string Email { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}";
+        }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]
@@ -17,6 +22,7 @@ namespace Backend.Entities
     {
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
+
         private string _preferredName;
 
         public string PreferredName
@@ -25,6 +31,12 @@ namespace Backend.Entities
             set { _preferredName = value; }
         }
 
+        public Staff Staff { get; set; }
+    }
+
+    [Table("Person", IsColumnAttributeRequired = false)]
+    public class PersonWithOthers : PersonExtended
+    {
         public IList<PersonRole> Roles { get; set; }
     }
 }

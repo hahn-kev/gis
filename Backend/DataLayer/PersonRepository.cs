@@ -15,7 +15,24 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Person> People => _dbConnection.People;
-        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended;
+
+        public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
+
+        private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonExtended, new() =>
+            from person in _dbConnection.GetTable<T_Person>()
+            from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+            select new T_Person
+            {
+                Id = person.Id,
+                Email = person.Email,
+                FirstName = person.FirstName,
+                IsThai = person.IsThai,
+                LastName = person.LastName,
+                PreferredName = person.PreferredName,
+                SpeaksEnglish = person.SpeaksEnglish,
+                Staff = staff,
+                StaffId = person.StaffId
+            };
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
             from personRole in _dbConnection.PersonRoles
@@ -32,14 +49,14 @@ namespace Backend.DataLayer
                 LastName = person.LastName
             };
 
-        public PersonExtended GetById(Guid id)
+        public PersonWithOthers GetById(Guid id)
         {
-            var personExtended = _dbConnection.PeopleExtended.FirstOrDefault(person => person.Id == id);
-            if (personExtended != null)
+            var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
+            if (person != null)
             {
-                personExtended.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
+                person.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
             }
-            return personExtended;
+            return person;
         }
     }
 }

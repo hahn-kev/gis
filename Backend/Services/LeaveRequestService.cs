@@ -56,9 +56,9 @@ namespace Backend.Services
             var result =
             (from personOnLeave in _personRepository.PeopleExtended.Where(person => person.Id == leaveRequest.PersonId)
                 from department in OrgGroups.InnerJoin(@group =>
-                    @group.Id == personOnLeave.OrgGroupId || @group.Supervisor == personOnLeave.Id)
-                from devision in OrgGroups.LeftJoin(@group => @group.Id == department.ParentId)
-                from supervisorGroup in OrgGroups.LeftJoin(@group => @group.Id == devision.ParentId)
+                    @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id)
+                from devision in OrgGroups.LeftJoin(@group => @group.Id == department.ParentId).DefaultIfEmpty()
+                from supervisorGroup in OrgGroups.LeftJoin(@group => @group.Id == devision.ParentId).DefaultIfEmpty()
                 select new
                 {
                     personOnLeave,
@@ -102,7 +102,7 @@ namespace Backend.Services
             OrgGroupWithSupervisor orgGroup)
         {
             //super and requested by will be the same if the requester is a supervisor
-            if (requestedBy.Id == orgGroup.Supervisor) return null;
+            if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor) return null;
             if (orgGroup.ApproverIsSupervisor && orgGroup.SupervisorPerson != null)
             {
                 await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson);

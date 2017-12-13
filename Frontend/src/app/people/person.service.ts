@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Person, PersonExtended } from './person';
+import { Person, PersonExtended, PersonWithOthers } from './person';
 import { Observable } from 'rxjs/Observable';
 import { Role, RoleExtended } from './role';
 
@@ -10,8 +10,8 @@ export class PersonService {
   constructor(private http: HttpClient) {
   }
 
-  getPerson(id: string): Observable<PersonExtended> {
-    return this.http.get<PersonExtended>('/api/person/' + id);
+  getPerson(id: string): Observable<PersonWithOthers> {
+    return this.http.get<PersonWithOthers>('/api/person/' + id);
   }
 
   getAll(): Observable<Person[]> {

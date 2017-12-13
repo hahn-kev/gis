@@ -1,4 +1,11 @@
-<div class="main-card">
+<ng-container *appToolbarContent>
+  <button type="submit" form="form" [disabled]="!personForm.form.valid" mat-button>
+    <mat-icon mat-list-icon>save</mat-icon>
+    Save
+  </button>
+</ng-container>
+
+<div class="person">
   <mat-card>
     <form #personForm="ngForm" id="form" (ngSubmit)="save()">
       <div>
@@ -13,32 +20,45 @@
         <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
         <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
       </div>
+      <div>
+        <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
+                          (ngModelChange)="isStaffChanged($event)">Is Staff
+        </mat-slide-toggle>
+      </div>
+
+    </form>
+  </mat-card>
+
+  <!--staff-->
+  <mat-accordion *ngIf="person.staff" class="staff">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Staff</mat-panel-title>
+      </mat-expansion-panel-header>
       <mat-form-field>
-        <mat-select name="orgGroup" [(ngModel)]="person.orgGroupId"
+        <mat-select name="orgGroup" [(ngModel)]="person.staff.orgGroupId"
                     placeholder="Department/Devision">
           <mat-option>None</mat-option>
           <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
         </mat-select>
       </mat-form-field>
+    </mat-expansion-panel>
+  </mat-accordion>
 
-    </form>
-    <mat-card-actions>
-      <button type="submit" form="form" [disabled]="!personForm.form.valid" mat-button>Save</button>
-    </mat-card-actions>
-  </mat-card>
 
-  <mat-accordion>
+  <mat-accordion class="roles">
     <!--new role-->
     <mat-expansion-panel #newRolePanel>
       <mat-expansion-panel-header>
         <mat-panel-title>Add new Role</mat-panel-title>
       </mat-expansion-panel-header>
-      <form #newRoleForm="ngForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+      <form #newRoleForm="ngForm" id="newForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
         <app-role [role]="newRole"></app-role>
-        <mat-action-row>
-          <button type="submit" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
-        </mat-action-row>
+
       </form>
+      <mat-action-row>
+        <button type="submit" form="newForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
+      </mat-action-row>
     </mat-expansion-panel>
 
     <!--roles list-->
@@ -49,12 +69,14 @@
           {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <form #roleForm="ngForm" (submit)="saveRole(role)">
+      <form #roleForm="ngForm" [id]="'form_' + role.id" (submit)="saveRole(role)">
         <app-role [role]="role"></app-role>
-        <mat-action-row>
-          <button type="submit" [disabled]="roleForm.form.invalid" mat-button>Save</button>
-        </mat-action-row>
+
       </form>
+      <mat-action-row>
+        <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
+        </button>
+      </mat-action-row>
     </mat-expansion-panel>
   </mat-accordion>
 </div>

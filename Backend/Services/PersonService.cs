@@ -21,7 +21,7 @@ namespace Backend.Services
         public IList<Person> People() => _personRepository.People.OrderBy(person => person.FirstName)
             .ThenBy(person => person.LastName).ToList();
 
-        public PersonExtended GetById(Guid id) => _personRepository.GetById(id);
+        public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
 
         public void Save(PersonRole role)
         {
@@ -42,6 +42,16 @@ namespace Backend.Services
             if (string.IsNullOrEmpty(person.PreferredName))
             {
                 person.PreferredName = $"{person.FirstName} {person.LastName}";
+            }
+            if (person.Staff != null)
+            {
+                _entityService.Save(person.Staff);
+                person.StaffId = person.Staff.Id;
+            }
+            else
+            {
+                if (person.StaffId.HasValue) _entityService.Delete<Staff>(person.StaffId.Value);
+                person.StaffId = null;
             }
             _entityService.Save(person);
         }

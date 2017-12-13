@@ -1,15 +1,15 @@
 ﻿import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { PersonExtended } from './person';
+import { PersonWithOthers } from './person';
 import { Observable } from 'rxjs/Observable';
 import { PersonService } from './person.service';
 
 @Injectable()
-export class PersonResolverService implements Resolve<PersonExtended> {
+export class PersonResolverService implements Resolve<PersonWithOthers> {
   resolve(route: ActivatedRouteSnapshot,
-          state: RouterStateSnapshot): Observable<PersonExtended> | Promise<PersonExtended> | PersonExtended {
+    state: RouterStateSnapshot): Observable<PersonWithOthers> | Promise<PersonWithOthers> | PersonWithOthers {
     if (route.params['id'] === 'new') {
-      return new PersonExtended();
+      return new PersonWithOthers();
     }
     return this.personService.getPerson(route.params['id']);
   }

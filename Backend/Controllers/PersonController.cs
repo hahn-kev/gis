@@ -23,7 +23,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public PersonExtended Get(Guid id)
+        public PersonWithOthers Get(Guid id)
         {
             return _personService.GetById(id);
         }

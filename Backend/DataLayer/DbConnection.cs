@@ -46,6 +46,7 @@ namespace Backend.DataLayer
         public ITable<PersonRole> PersonRoles => GetTable<PersonRole>();
         public ITable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
         public ITable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
+        public ITable<Staff> Staff => GetTable<Staff>();
 
         public IQueryable<UserProfile> UserProfiles
         {
@@ -83,6 +84,7 @@ namespace Backend.DataLayer
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
+            TryCreateTable<Staff>();
 
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
