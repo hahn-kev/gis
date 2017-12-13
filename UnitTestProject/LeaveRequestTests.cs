@@ -48,6 +48,7 @@ namespace UnitTestProject
         {
             var emailMock = new Mock<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                It.IsAny<string>(),
                 It.IsAny<EmailService.Template>(),
                 It.IsAny<PersonExtended>(),
                 It.IsAny<PersonExtended>())).Returns(Task.CompletedTask);
@@ -61,6 +62,7 @@ namespace UnitTestProject
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                        It.IsAny<string>(),
                         It.Is<EmailService.Template>(template =>
                             template == EmailService.Template.RequestLeaveApproval),
                         It.Is<PersonExtended>(extended => extended.FirstName == "Jacob"),
@@ -69,6 +71,7 @@ namespace UnitTestProject
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                        It.IsAny<string>(),
                         It.Is<EmailService.Template>(template => template == EmailService.Template.NotifyLeaveRequest),
                         It.IsAny<PersonExtended>(),
                         It.IsAny<PersonExtended>()),
@@ -272,12 +275,13 @@ namespace UnitTestProject
 
             var emailMock = new Mock<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<string>(),
                     It.IsAny<EmailService.Template>(),
                     It.IsAny<PersonExtended>(),
                     It.IsAny<PersonExtended>()))
                 .Returns(Task.CompletedTask)
-                .Callback<Dictionary<string, string>, EmailService.Template, PersonExtended, PersonExtended>(
-                    (dictionary, template, to, from) =>
+                .Callback<Dictionary<string, string>, string, EmailService.Template, PersonExtended, PersonExtended>(
+                    (dictionary, subject, template, to, from) =>
                     {
                         if (template == EmailService.Template.RequestLeaveApproval) actualApprovalEmailSent = true;
                         else if (template == EmailService.Template.NotifyLeaveRequest) actualNotifyEmailCount++;
