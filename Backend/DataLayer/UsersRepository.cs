@@ -15,7 +15,20 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public IQueryable<UserProfile> Users => _dbConnection.UserProfiles;
+        public IQueryable<UserProfile> Users =>
+            from user in _dbConnection.GetTable<UserProfile>()
+            from role in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
+            from userRole in _dbConnection.UserRoles
+                .Where(userRole => userRole.RoleId == role.Id && userRole.UserId == user.Id)
+                .DefaultIfEmpty()
+            select new UserProfile
+            {
+                Id = user.Id,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                UserName = user.UserName,
+                IsAdmin = userRole != null
+            };
 
         public UserProfile UserByName(string name)
         {

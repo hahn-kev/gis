@@ -48,26 +48,6 @@ namespace Backend.DataLayer
         public ITable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
         public ITable<Staff> Staff => GetTable<Staff>();
 
-        public IQueryable<UserProfile> UserProfiles
-        {
-            get
-            {
-                return from user in GetTable<UserProfile>()
-                    from role in Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
-                    from userRole in UserRoles
-                        .Where(userRole => userRole.RoleId == role.Id && userRole.UserId == user.Id)
-                        .DefaultIfEmpty()
-                    select new UserProfile
-                    {
-                        Id = user.Id,
-                        Email = user.Email,
-                        PhoneNumber = user.PhoneNumber,
-                        UserName = user.UserName,
-                        IsAdmin = userRole != null
-                    };
-            }
-        }
-
         public async Task Setup()
         {
 #if DEBUG
