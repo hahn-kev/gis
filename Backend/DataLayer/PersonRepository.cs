@@ -49,6 +49,10 @@ namespace Backend.DataLayer
                 LastName = person.LastName
             };
 
+        public IQueryable<StaffWithName> StaffWithNames => from staff in _dbConnection.GetTable<StaffWithName>()
+            from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
+            select StaffWithName.Build(staff, person.PreferredName, person.Id);
+
         public PersonWithOthers GetById(Guid id)
         {
             var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);

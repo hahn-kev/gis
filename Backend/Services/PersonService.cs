@@ -55,5 +55,7 @@ namespace Backend.Services
             }
             _entityService.Save(person);
         }
+
+        public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
     }
 }

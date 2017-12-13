@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Person, PersonExtended, PersonWithOthers } from './person';
+import { Person, PersonExtended, PersonWithOthers, StaffWithName } from './person';
 import { Observable } from 'rxjs/Observable';
 import { Role, RoleExtended } from './role';
 
@@ -32,5 +32,9 @@ export class PersonService {
       .append('beginRange', beginRange.toISOString())
       .append('endRange', endRange.toISOString());
     return this.http.get<RoleExtended[]>('/api/person/role', {params: params}).toPromise();
+  }
+
+  getStaff() {
+    return this.http.get<StaffWithName[]>('/api/person/staff');
   }
 }

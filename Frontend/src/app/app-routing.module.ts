@@ -27,6 +27,9 @@ import { TrainingListComponent } from './people/training-requirement/training-li
 import { TrainingListResolverService } from './people/training-requirement/training-list-resolver.service';
 import { TrainingEditComponent } from './people/training-requirement/training-edit/training-edit.component';
 import { TrainingResolverService } from './people/training-requirement/training-resolver.service';
+import { TrainingReportComponent } from './people/training-requirement/training-report/training-report.component';
+import { StaffTrainingResolverService } from './people/training-requirement/staff-training-resolver.service';
+import { StaffResolveService } from './people/staff-resolve.service';
 
 const routes: Routes = [
   {
@@ -148,6 +151,16 @@ const routes: Routes = [
             resolve: {
               training: TrainingResolverService
             }
+          },
+          {
+            path: ['report/:year', 'report'],
+            component: TrainingReportComponent,
+            resolve: {
+              trainingRequirements: TrainingResolverService,
+              staffTraining: StaffTrainingResolverService,
+              groups: GroupsResolveService,
+              staff: StaffResolveService
+            }
           }
         ]
       },
@@ -191,7 +204,9 @@ const routes: Routes = [
     GroupsResolveService,
     LeaveListResolverService,
     TrainingListResolverService,
-    TrainingResolverService
+    TrainingResolverService,
+    StaffTrainingResolverService,
+    StaffResolveService
   ]
 })
 export class AppRoutingModule {

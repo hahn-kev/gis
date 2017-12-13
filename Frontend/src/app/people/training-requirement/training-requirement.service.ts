@@ -14,6 +14,10 @@ export class TrainingRequirementService {
     return this.http.get<TrainingRequirement[]>('/api/training');
   }
 
+  getStaffTrainingByYear(year: number) {
+    return this.http.get<StaffTraining[]>('/api/training/staff/' + year);
+  }
+
   get(id: string): Observable<Object> {
     return this.http.get<TrainingRequirement>('/api/training/' + id);
   }

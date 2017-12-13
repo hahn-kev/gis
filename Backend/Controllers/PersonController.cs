@@ -47,5 +47,11 @@ namespace Backend.Controllers
         {
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }
+
+        [HttpGet("staff")]
+        public IList<StaffWithName> Staff()
+        {
+            return _personService.StaffWithNames;
+        }
     }
 }
