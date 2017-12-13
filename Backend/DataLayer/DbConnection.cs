@@ -21,11 +21,11 @@ namespace Backend.DataLayer
             SetupMappingBuilder(MappingSchema);
         }
 
-        private static bool hasSetupMapping;
+        private static bool _hasSetupMapping;
 
         public static void SetupMappingBuilder(MappingSchema mappingSchema)
         {
-            if (hasSetupMapping) return;
+            if (_hasSetupMapping) return;
             var builder = mappingSchema.GetFluentMappingBuilder();
             builder.Entity<IdentityUser>().HasIdentity(user => user.Id);
             builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim")
@@ -36,7 +36,7 @@ namespace Backend.DataLayer
             builder.Entity<LinqToDB.Identity.IdentityUserLogin<int>>().HasTableName("UserLogin");
             builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
             builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
-            hasSetupMapping = true;
+            _hasSetupMapping = true;
         }
 
         public ITable<ImageInfo> Images => GetTable<ImageInfo>();
@@ -47,6 +47,7 @@ namespace Backend.DataLayer
         public ITable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
         public ITable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
         public ITable<Staff> Staff => GetTable<Staff>();
+        public ITable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
 
         public async Task Setup()
         {

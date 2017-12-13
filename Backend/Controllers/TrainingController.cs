@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Backend.Entities;
 using Backend.Services;
+using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -39,6 +41,15 @@ namespace Backend.Controllers
         public void Delete(Guid id)
         {
             _trainingService.Delete(id);
+        }
+
+        [HttpGet("staff/{year}")]
+        public IList<StaffTraining> StaffTrainings(int year)
+        {
+            var startDate = new DateTime(year, 8, 1);
+            var endDate = startDate.AddMonths(9);
+            return _trainingService.StaffTraining.Where(training =>
+                training.CompletedDate != null && training.CompletedDate.Between(startDate, endDate)).ToList();
         }
     }
 }

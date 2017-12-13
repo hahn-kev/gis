@@ -19,9 +19,11 @@ namespace Backend.Services
         }
 
         public IList<TrainingRequirement> TrainingRequirements => _trainingRepository.TrainingRequirements.ToList();
+        public IQueryable<StaffTraining> StaffTraining => _trainingRepository.StaffTraining;
 
         public TrainingRequirement GetById(Guid id) =>
             _trainingRepository.TrainingRequirements.FirstOrDefault(requirement => requirement.Id == id);
+
 
         public void Save(TrainingRequirement entity)
         {

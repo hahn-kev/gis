@@ -14,5 +14,6 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<TrainingRequirement> TrainingRequirements => _connection.TrainingRequirements;
+        public IQueryable<StaffTraining> StaffTraining => _connection.StaffTraining;
     }
 }
