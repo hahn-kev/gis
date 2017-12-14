@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TrainingRequirement } from './training-requirement';
 import { Observable } from 'rxjs/Observable';
 import { Year } from './year';
+import { StaffTraining } from './staff-training';
 
 @Injectable()
 export class TrainingRequirementService {

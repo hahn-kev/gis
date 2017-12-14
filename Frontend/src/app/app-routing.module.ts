@@ -153,10 +153,20 @@ const routes: Routes = [
             }
           },
           {
-            path: ['report/:year', 'report'],
+            path: 'report/:year',
             component: TrainingReportComponent,
             resolve: {
-              trainingRequirements: TrainingResolverService,
+              trainingRequirements: TrainingListResolverService,
+              staffTraining: StaffTrainingResolverService,
+              groups: GroupsResolveService,
+              staff: StaffResolveService
+            }
+          },
+          {
+            path: 'report',
+            component: TrainingReportComponent,
+            resolve: {
+              trainingRequirements: TrainingListResolverService,
               staffTraining: StaffTrainingResolverService,
               groups: GroupsResolveService,
               staff: StaffResolveService
