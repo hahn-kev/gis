@@ -17,16 +17,6 @@ namespace Backend.Entities
     [Table("LeaveRequest", IsColumnAttributeRequired = false)]
     public class LeaveRequestWithNames : LeaveRequest
     {
-        public static LeaveRequestWithNames Build(LeaveRequestWithNames leave,
-            string requesterName,
-            string approvedByName)
-        {
-            if (leave == null) return null;
-            leave.RequesterName = requesterName;
-            leave.ApprovedByName = approvedByName;
-            return leave;
-        }
-
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string RequesterName { get; set; }
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]

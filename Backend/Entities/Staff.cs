@@ -11,12 +11,6 @@ namespace Backend.Entities
     [Table("Staff")]
     public class StaffWithName : Staff
     {
-        public static StaffWithName Build(StaffWithName staff, string preferredName, Guid personId)
-        {
-            staff.PreferredName = preferredName;
-            staff.PersonId = personId;
-            return staff;
-        }
         public string PreferredName { get; set; }
         public Guid PersonId { get; set; }
     }
