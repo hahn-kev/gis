@@ -239,7 +239,7 @@ namespace Backend
             var settings = provider.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
             DataConnection.TurnTraceSwitchOn();
-            DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message);
+            DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
             DbConnection.SetupMappingBuilder(MappingSchema.Default);
         }
