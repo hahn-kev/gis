@@ -27,6 +27,18 @@ export class TrainingRequirementService {
     return this.http.post<TrainingRequirement>('/api/training/', training).toPromise();
   }
 
+  saveStaffTraining(staffTraining: StaffTraining) {
+    return this.http.post<StaffTraining>('/api/training/staff', staffTraining).toPromise();
+  }
+
+  markAllComplete(staffList: string[], requirementId: string, completeDate: Date) {
+    return this.http.post('/api/training/staff/allComplete', staffList,
+      {params: {
+        'completeDate': completeDate.toISOString(),
+        'requirementId': requirementId
+      }, responseType: 'text'}).toPromise();
+  }
+
   years(): Year[] {
     let today = new Date();
     let years = new Array<Year>(today.getUTCFullYear() - 2000 + 3);
@@ -43,4 +55,6 @@ export class TrainingRequirementService {
     }
     return years.reverse();
   }
+
+
 }

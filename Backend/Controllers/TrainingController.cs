@@ -51,5 +51,21 @@ namespace Backend.Controllers
             return _trainingService.StaffTraining.Where(training =>
                 training.CompletedDate != null && training.CompletedDate.Between(startDate, endDate)).ToList();
         }
+
+        [HttpPost("staff")]
+        public StaffTraining Save([FromBody] StaffTraining staffTraining)
+        {
+            _trainingService.Save(staffTraining);
+            return staffTraining;
+        }
+
+        [HttpPost("staff/allComplete")]
+        public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds, Guid? requirementId, DateTime? completeDate)
+        {
+            if (completeDate == null) throw new ArgumentNullException(nameof(completeDate));
+            if (!requirementId.HasValue || requirementId.Value == Guid.Empty) throw new ArgumentNullException(nameof(requirementId));
+            _trainingService.MarkAllComplete(staffIds, requirementId.Value, completeDate.Value);
+            return Ok();
+        }
     }
 }

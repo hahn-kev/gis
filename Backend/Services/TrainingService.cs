@@ -30,9 +30,32 @@ namespace Backend.Services
             _entityService.Save(entity);
         }
 
+        public void Save(StaffTraining staffTraining)
+        {
+            _entityService.Save(staffTraining);
+        }
+
         public void Delete(Guid id)
         {
             _entityService.Delete<TrainingRequirement>(id);
+        }
+
+        public void MarkAllComplete(List<Guid> staffIds, Guid requirementId, DateTime completeDate)
+        {
+            var existingTrainings = StaffTraining.Where(training =>
+                training.TrainingRequirementId == requirementId && staffIds.Contains(training.StaffId) &&
+                training.CompletedDate.Value.InSchoolYear(completeDate.SchoolYear())).ToList();
+            if (existingTrainings.Any())
+            {
+                staffIds.RemoveAll(id => existingTrainings.Any(training => training.StaffId == id));
+            }
+            _trainingRepository.InsertAll(staffIds.Select(staffId => new StaffTraining
+            {
+                Id = Guid.NewGuid(),
+                CompletedDate = completeDate,
+                StaffId = staffId,
+                TrainingRequirementId = requirementId
+            }));
         }
     }
 }

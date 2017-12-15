@@ -66,6 +66,7 @@ namespace Backend.DataLayer
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
             TryCreateTable<Staff>();
+            TryCreateTable<StaffTraining>();
 
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
