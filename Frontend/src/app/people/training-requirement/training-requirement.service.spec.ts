@@ -35,7 +35,7 @@ describe('TrainingRequirementService', () => {
       service.buildRequirementsWithStaff(
         Observable.of([new StaffWithName('s1', 'Jim')]),
         Observable.of([new TrainingRequirement('tr1', 'fire', 2016)]),
-        Observable.of(new Map([['s1', new StaffTraining('s1', 'tr1')]])),
+        Observable.of(new Map([['s1', new StaffTraining('s1', null, 'tr1')]])),
         Observable.of(2017))
         .subscribe(spy);
       expect(spy.calls.any()).toBeTruthy();
@@ -48,7 +48,7 @@ describe('TrainingRequirementService', () => {
       service.buildRequirementsWithStaff(
         Observable.of([new StaffWithName('s1', 'Jim')]),
         Observable.of([new TrainingRequirement('tr1', 'fire', 2016)]),
-        Observable.of(new Map([['s1', new StaffTraining('s1', 'tr1')]])),
+        Observable.of(new Map([['s1', new StaffTraining('s1', null, 'tr1')]])),
         year)
         .subscribe(spy);
       expect(spy.calls.count()).toBe(1);

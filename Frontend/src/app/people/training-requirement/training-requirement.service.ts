@@ -78,17 +78,20 @@ export class TrainingRequirementService {
       combineLatest(staff, requirements, year),
       map(([staffTraining, staff, requirements, year]) => {
         return requirements
-          .filter(requirement => requirement.firstYear <= year && (!requirement.lastYear || requirement.lastYear >= year))
+          .filter(this.isInYear.bind(this, year))
           .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining));
       }));
   }
 
   buildRequirementWithStaff(staff: StaffWithName[],
                             staffTraining: Map<string, StaffTraining>,
-                            requirement: TrainingRequirement) {
+                            requirement: TrainingRequirement): RequirementWithStaff {
     return new RequirementWithStaff(requirement,
       staff.map(staff => new StaffWithTraining(staff, staffTraining.get(staff.id + '_' + requirement.id)))
     );
   }
 
+  private isInYear(year: number, requirement: TrainingRequirement): boolean {
+    return requirement.firstYear <= year && (!requirement.lastYear || requirement.lastYear >= year);
+  }
 }
