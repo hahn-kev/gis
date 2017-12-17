@@ -91,7 +91,9 @@ export class TrainingRequirementService {
     );
   }
 
-  private isInYear(year: number, requirement: TrainingRequirement): boolean {
+  isInYear(year: number, requirement: TrainingRequirement): boolean {
     return requirement.firstYear <= year && (!requirement.lastYear || requirement.lastYear >= year);
   }
+
+
 }

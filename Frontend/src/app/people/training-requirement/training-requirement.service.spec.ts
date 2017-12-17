@@ -1,4 +1,4 @@
-import { inject, async, TestBed } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { TrainingRequirementService } from './training-requirement.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -54,6 +54,33 @@ describe('TrainingRequirementService', () => {
       expect(spy.calls.count()).toBe(1);
       year.next(2016);
       expect(spy.calls.count()).toBe(2);
+    }));
+  });
+
+  describe('isInYear', () => {
+    it(`should be true if there's no end year`, inject([TrainingRequirementService], (service: TrainingRequirementService) => {
+      let tr = new TrainingRequirement();
+      tr.firstYear = 2016;
+      tr.lastYear = null;
+      expect(service.isInYear(2017, tr)).toBeTruthy();
+    }));
+    it(`should be true if it's the same as the first year`, inject([TrainingRequirementService], (service: TrainingRequirementService) => {
+      let tr = new TrainingRequirement();
+      tr.firstYear = 2017;
+      tr.lastYear = 2019;
+      expect(service.isInYear(2017, tr)).toBeTruthy();
+    }));
+    it(`should be false if it's before the first year`, inject([TrainingRequirementService], (service: TrainingRequirementService) => {
+      let tr = new TrainingRequirement();
+      tr.firstYear = 2017;
+      tr.lastYear = 2019;
+      expect(service.isInYear(2016, tr)).toBeFalsy();
+    }));
+    it(`should be false if it's after the last year`, inject([TrainingRequirementService], (service: TrainingRequirementService) => {
+      let tr = new TrainingRequirement();
+      tr.firstYear = 2017;
+      tr.lastYear = 2019;
+      expect(service.isInYear(2020, tr)).toBeFalsy();
     }));
   });
 });
