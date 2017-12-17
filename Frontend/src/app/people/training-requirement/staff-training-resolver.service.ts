@@ -5,11 +5,11 @@ import { StaffTraining } from './staff-training';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
-export class StaffTrainingResolverService implements Resolve<StaffTraining[]> {
+export class StaffTrainingResolverService implements Resolve<Map<string, StaffTraining>> {
 
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<StaffTraining[]> | Promise<StaffTraining[]> | StaffTraining[] {
-    return this.trainingService.getStaffTrainingByYear(route.params['year'] || new Date().getUTCFullYear());
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Map<string, StaffTraining>> | Promise<Map<string, StaffTraining>> | Map<string, StaffTraining> {
+    return this.trainingService.getStaffTrainingByYearMapped(route.params['year'] || new Date().getUTCFullYear());
   }
 
   constructor(private trainingService: TrainingRequirementService) {

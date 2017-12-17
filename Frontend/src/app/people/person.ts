@@ -23,11 +23,22 @@ export class PersonWithOthers extends PersonExtended {
 }
 
 export class Staff {
+
+  constructor(id?: string) {
+    this.id = id;
+  }
+
   public id: string;
   public orgGroupId: string;
 }
 
 export class StaffWithName extends Staff {
+
+  constructor(id: string, preferredName: string) {
+    super(id);
+    this.preferredName = preferredName;
+  }
+
   public preferredName: string;
   public personId: string;
 }

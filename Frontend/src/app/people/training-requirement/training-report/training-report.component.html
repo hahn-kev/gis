@@ -1,14 +1,14 @@
 <ng-container *appToolbarContent>
 
-  <button (click)="setYear(selectedYear.value - 1)" mat-icon-button>
+  <button (click)="setYear(activeYear.value - 1)" mat-icon-button>
     <mat-icon>navigate_before</mat-icon>
   </button>
   <button mat-button [matMenuTriggerFor]="yearMenu">
-    School year {{selectedYear?.name}}
+    School year {{(selectedYear | async)?.name}}
     <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
   </button>
 
-  <button (click)="setYear(selectedYear.value + 1)" mat-icon-button>
+  <button (click)="setYear(activeYear.value + 1)" mat-icon-button>
     <mat-icon>navigate_next</mat-icon>
   </button>
   <mat-menu #yearMenu="matMenu" [overlapTrigger]="false">
@@ -17,10 +17,11 @@
 </ng-container>
 
 <mat-accordion>
-  <mat-expansion-panel *ngFor="let reqObj of requirementsWithStaff"
+  <mat-expansion-panel *ngFor="let reqObj of requirementsWithStaff | async"
                        [expanded]="expandedRequirementId == reqObj.requirement.id"
                        (opened)="expandedRequirementId = reqObj.requirement.id">
     <mat-expansion-panel-header>
+
       <mat-panel-title>{{reqObj.requirement.name}}</mat-panel-title>
       <mat-panel-description>
         Completed by {{reqObj.completedRequirement}} Staff out of {{reqObj.staffsWithTraining.length}}
