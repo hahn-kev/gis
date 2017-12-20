@@ -3,9 +3,11 @@ import { Person } from '../person';
 
 export class OrgChain {
   public linkStart: OrgChainLink;
+  public linkEnd: OrgChainLink;
 
   constructor(public links: OrgChainLink[]) {
     this.linkStart = this.links[0];
+    this.linkEnd = this.links[this.links.length - 1];
   }
 }
 

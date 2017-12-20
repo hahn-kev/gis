@@ -8,11 +8,14 @@ import { StaffTraining } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
 import { StaffWithName } from '../person';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
+import { OrgGroup } from 'app/people/groups/org-group';
+import { GroupService } from 'app/people/groups/group.service';
 
 @Injectable()
 export class TrainingRequirementService {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private groupService: GroupService) {
   }
 
   list(): Observable<TrainingRequirement[]> {
@@ -75,25 +78,31 @@ export class TrainingRequirementService {
                              staffTraining: Observable<Map<string, StaffTraining>>,
                              year: Observable<number>): Observable<RequirementWithStaff[]> {
     return staffTraining.pipe(
-      combineLatest(staff, requirements, year),
-      map(([staffTraining, staff, requirements, year]) => {
+      combineLatest(staff, requirements, year, Observable.of([])),
+      map(([staffTraining, staff, requirements, year, orgGroups]) => {
         return requirements
           .filter(this.isInYear.bind(this, year))
-          .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining));
+          .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups));
       }));
   }
 
-  buildRequirementWithStaff(staff: StaffWithName[],
-                            staffTraining: Map<string, StaffTraining>,
-                            requirement: TrainingRequirement): RequirementWithStaff {
-    return new RequirementWithStaff(requirement,
-      staff.map(staff => new StaffWithTraining(staff, staffTraining.get(staff.id + '_' + requirement.id)))
-    );
-  }
 
   isInYear(year: number, requirement: TrainingRequirement): boolean {
     return requirement.firstYear <= year && (!requirement.lastYear || requirement.lastYear >= year);
   }
 
+  buildRequirementWithStaff(staff: StaffWithName[],
+                            staffTraining: Map<string, StaffTraining>,
+                            orgGroups: OrgGroup[],
+                            requirement: TrainingRequirement): RequirementWithStaff {
+    let training = staff.filter(this.isInOrgGroup.bind(this, orgGroups, requirement))
+      .map(staff => new StaffWithTraining(staff, staffTraining.get(staff.id + '_' + requirement.id)));
+    return new RequirementWithStaff(requirement, training);
+  }
 
+  isInOrgGroup(orgGroups: OrgGroup[] | Map<string, OrgGroup>, requirement: TrainingRequirement, staff: StaffWithName) {
+    if (requirement.scope != 'Department') return true;
+    if (requirement.departmentId == null) throw new Error('training requirement corupt, missing department id');
+    return this.groupService.isChildOf(staff.orgGroupId, requirement.departmentId, orgGroups);
+  }
 }

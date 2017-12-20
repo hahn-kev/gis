@@ -34,7 +34,7 @@ export class Staff {
 
 export class StaffWithName extends Staff {
 
-  constructor(id: string, preferredName: string) {
+  constructor(id?: string, preferredName?: string) {
     super(id);
     this.preferredName = preferredName;
   }

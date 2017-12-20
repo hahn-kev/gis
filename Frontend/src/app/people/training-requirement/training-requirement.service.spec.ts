@@ -9,12 +9,16 @@ import { StaffWithName } from '../person';
 import { TrainingRequirement } from './training-requirement';
 import { StaffTraining } from './staff-training';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { GroupService } from 'app/people/groups/group.service';
 
 describe('TrainingRequirementService', () => {
+  let groupServiceSpy = jasmine.createSpyObj<GroupService>('groupService', ['isChildOf']);
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule, HttpClientTestingModule],
-      providers: [TrainingRequirementService]
+      providers: [TrainingRequirementService,
+
+        {provide: GroupService, useValue: groupServiceSpy}]
     });
   });
 
@@ -82,5 +86,27 @@ describe('TrainingRequirementService', () => {
       tr.lastYear = 2019;
       expect(service.isInYear(2020, tr)).toBeFalsy();
     }));
+
+  });
+
+
+  describe('isInOrgGroup', () => {
+    let service: TrainingRequirementService;
+    beforeEach(inject([TrainingRequirementService], (s) => service = s));
+    it('should let through all staff when type of requirement is all staff', () => {
+      let tr = new TrainingRequirement();
+      tr.scope = 'AllStaff';
+      let staff = new StaffWithName();
+      expect(service.isInOrgGroup([], tr, staff)).toBeTruthy();
+    });
+    it('should call the group service with department type', () => {
+      let tr = new TrainingRequirement();
+      tr.departmentId = 'd1';
+      tr.scope = 'Department';
+      let staff = new StaffWithName();
+      staff.orgGroupId = 'd2';
+      service.isInOrgGroup([], tr, staff);
+      expect(groupServiceSpy.isChildOf.calls.any()).toBeTruthy();
+    });
   });
 });
