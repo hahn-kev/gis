@@ -11,6 +11,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import { OrgGroup } from 'app/people/groups/org-group';
 import { GroupService } from 'app/people/groups/group.service';
+import 'rxjs/add/observable/of';
 
 @Injectable()
 export class TrainingRequirementService {
@@ -22,7 +23,7 @@ export class TrainingRequirementService {
     return this.http.get<TrainingRequirement[]>('/api/training');
   }
 
-  getStaffTrainingByYear(year: number) {
+  getStaffTrainingByYear(year: number): Observable<StaffTraining[]> {
     return this.http.get<StaffTraining[]>('/api/training/staff/' + year);
   }
 
@@ -34,19 +35,19 @@ export class TrainingRequirementService {
     });
   }
 
-  get(id: string): Observable<Object> {
+  get(id: string): Observable<TrainingRequirement> {
     return this.http.get<TrainingRequirement>('/api/training/' + id);
   }
 
-  save(training: TrainingRequirement): Promise<Object> {
+  save(training: TrainingRequirement): Promise<TrainingRequirement> {
     return this.http.post<TrainingRequirement>('/api/training/', training).toPromise();
   }
 
-  saveStaffTraining(staffTraining: StaffTraining) {
+  saveStaffTraining(staffTraining: StaffTraining): Promise<StaffTraining> {
     return this.http.post<StaffTraining>('/api/training/staff', staffTraining).toPromise();
   }
 
-  markAllComplete(staffList: string[], requirementId: string, completeDate: Date) {
+  markAllComplete(staffList: string[], requirementId: string, completeDate: Date): Promise<string> {
     return this.http.post('/api/training/staff/allComplete', staffList,
       {
         params: {
@@ -57,13 +58,13 @@ export class TrainingRequirementService {
   }
 
   years(): Year[] {
-    let today = new Date();
-    let years = new Array<Year>(today.getUTCFullYear() - 2000 + 3);
+    const today = new Date();
+    const years = new Array<Year>(today.getUTCFullYear() - 2000 + 3);
     for (let i = 0; i < years.length; i++) {
       let display;
       if (i < 9) {
         display = `0${i} - 0${i + 1}`;
-      } else if (i == 9) {
+      } else if (i === 9) {
         display = '09 - 10';
       } else {
         display = `${i} - ${i + 1}`;
@@ -73,12 +74,12 @@ export class TrainingRequirementService {
     return years.reverse();
   }
 
-  buildRequirementsWithStaff(staff: Observable<StaffWithName[]>,
-                             requirements: Observable<TrainingRequirement[]>,
-                             staffTraining: Observable<Map<string, StaffTraining>>,
-                             year: Observable<number>): Observable<RequirementWithStaff[]> {
-    return staffTraining.pipe(
-      combineLatest(staff, requirements, year, Observable.of([])),
+  buildRequirementsWithStaff(staffObservable: Observable<StaffWithName[]>,
+                             requirementsObservable: Observable<TrainingRequirement[]>,
+                             staffTrainingObservable: Observable<Map<string, StaffTraining>>,
+                             yearObservable: Observable<number>): Observable<RequirementWithStaff[]> {
+    return staffTrainingObservable.pipe(
+      combineLatest(staffObservable, requirementsObservable, yearObservable, Observable.of([])),
       map(([staffTraining, staff, requirements, year, orgGroups]) => {
         return requirements
           .filter(this.isInYear.bind(this, year))
@@ -95,14 +96,20 @@ export class TrainingRequirementService {
                             staffTraining: Map<string, StaffTraining>,
                             orgGroups: OrgGroup[],
                             requirement: TrainingRequirement): RequirementWithStaff {
-    let training = staff.filter(this.isInOrgGroup.bind(this, orgGroups, requirement))
-      .map(staff => new StaffWithTraining(staff, staffTraining.get(staff.id + '_' + requirement.id)));
+    const training = staff.filter(this.isInOrgGroup.bind(this, orgGroups, requirement))
+      .map(staffMember => new StaffWithTraining(staffMember, staffTraining.get(staffMember.id + '_' + requirement.id)));
     return new RequirementWithStaff(requirement, training);
   }
 
-  isInOrgGroup(orgGroups: OrgGroup[] | Map<string, OrgGroup>, requirement: TrainingRequirement, staff: StaffWithName) {
-    if (requirement.scope != 'Department') return true;
-    if (requirement.departmentId == null) throw new Error('training requirement corupt, missing department id');
+  isInOrgGroup(orgGroups: OrgGroup[] | Map<string, OrgGroup>,
+               requirement: TrainingRequirement,
+               staff: StaffWithName): boolean {
+    if (requirement.scope !== 'Department') {
+      return true;
+    }
+    if (requirement.departmentId == null) {
+      throw new Error('training requirement corupt, missing department id');
+    }
     return this.groupService.isChildOf(staff.orgGroupId, requirement.departmentId, orgGroups);
   }
 }

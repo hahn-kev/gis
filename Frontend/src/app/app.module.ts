@@ -15,28 +15,10 @@ import { LoginComponent } from './login/login.component';
 import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
-  MatButtonModule,
-  MatButtonToggleModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatChipsModule,
-  MatDatepickerModule,
-  MatDialogModule,
-  MatExpansionModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatMenuModule,
-  MatNativeDateModule,
-  MatOptionModule,
-  MatProgressBarModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSlideToggleModule,
-  MatSnackBarModule,
-  MatTableModule,
-  MatToolbarModule,
-  MatTooltipModule
+  MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule,
+  MatDialogModule, MatExpansionModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
+  MatNativeDateModule, MatOptionModule, MatProgressBarModule, MatSelectModule, MatSidenavModule, MatSlideToggleModule,
+  MatSnackBarModule, MatTableModule, MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 import { FlipCardComponent } from './home/flip-card/flip-card.component';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
@@ -50,7 +32,6 @@ import { YourRightsComponent } from './home/static/your-rights.component';
 import { LifeLessonsComponent } from './home/static/life-lessons.component';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { SettingsService } from './services/settings.service';
-import { DiscourseLinkDirective } from './directives/discourse-link.directive';
 import { ClipboardModule } from 'ngx-clipboard/dist';
 import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { MessageComponent } from './message/message.component';
@@ -95,7 +76,6 @@ if (environment.production) {
     ToolbarContentDirective,
     YourRightsComponent,
     LifeLessonsComponent,
-    DiscourseLinkDirective,
     ConfirmDialogComponent,
     MessageComponent,
     PersonComponent,

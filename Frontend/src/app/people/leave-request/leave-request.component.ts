@@ -35,7 +35,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       this.people = value.people;
       this.userTokenSubscription = this.loginService.safeUserToken().subscribe(user => {
         if (!this.people) return;
-        let person = this.people.find(value => value.email == user.email);
+        const person = this.people.find(eachPerson => eachPerson.email === user.email);
         if (person) this.leaveRequest.personId = person.id;
       });
     });
@@ -46,7 +46,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   async request(): Promise<void> {
-    let notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
+    const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
     this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
   }
 }
