@@ -16,31 +16,43 @@ namespace Backend.DataLayer
 
         public IQueryable<Person> People => _dbConnection.People;
 
+
         public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
             from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
-            from vacationLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
-                request.PersonId == person.Id && request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) &&
-                request.Type == LeaveType.Vacation)
-            from sickLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
-                request.PersonId == person.Id && request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) &&
-                request.Type == LeaveType.Sick)
-            group new
-            {
-                vacation = DataExtensions.DayDiff(vacationLeave.StartDate, vacationLeave.EndDate),
-                sick = DataExtensions.DayDiff(sickLeave.StartDate, sickLeave.EndDate)
-            } by person
-            into leaveGroup
-            where limitByPersonId == null || leaveGroup.Key.Id == limitByPersonId
+            from vacationLeave in LeaveRequestAggrigateByType(LeaveType.Vacation)
+                .Having(holder => holder.PersonId == person.Id)
+            from sickLeave in LeaveRequestAggrigateByType(LeaveType.Sick)
+                .Having(holder => holder.PersonId == person.Id)
+            where limitByPersonId == null || person.Id == limitByPersonId
             select new PersonWithDaysOfLeave
             {
-                Id = leaveGroup.Key.Id,
-                Email = leaveGroup.Key.Email,
-                FirstName = leaveGroup.Key.FirstName,
-                LastName = leaveGroup.Key.LastName,
-                StaffId = leaveGroup.Key.StaffId,
-                SickDaysOfLeaveUsed = leaveGroup.Sum(arg => arg.sick) ?? 0,
-                VacationDaysOfLeaveUsed = leaveGroup.Sum(arg => arg.vacation) ?? 0
+                Id = person.Id,
+                Email = person.Email,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                StaffId = person.StaffId,
+                SickDaysOfLeaveUsed = sickLeave.LeaveUsed ?? 0,
+                VacationDaysOfLeaveUsed = vacationLeave.LeaveUsed ?? 0
             };
+
+        class AggHolder
+        {
+            public Guid PersonId { get; set; }
+            public int? LeaveUsed { get; set; }
+        }
+
+        private IQueryable<AggHolder> LeaveRequestAggrigateByType(LeaveType leaveType)
+        {
+            return _dbConnection.LeaveRequests.Where(request =>
+                    request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) && request.Type == leaveType)
+                .GroupBy(request => request.PersonId,
+                    (personId, requests) => new AggHolder
+                    {
+                        PersonId = personId,
+                        LeaveUsed = requests.Sum(request => DataExtensions.DayDiff(request.StartDate, request.EndDate))
+                    })
+                .DefaultIfEmpty();
+        }
 
         public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
 
