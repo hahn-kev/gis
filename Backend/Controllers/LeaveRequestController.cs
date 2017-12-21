@@ -86,8 +86,9 @@ namespace Backend.Controllers
         [HttpGet("approve/{leaveRequestId}")]
         public IActionResult Approve(Guid leaveRequestId)
         {
-            var userId = int.Parse(User.FindFirstValue(_identityOptions.UserIdClaimType));
-            _leaveRequestService.ApproveLeaveRequest(leaveRequestId, userId);
+            var personId = User.PersonId();
+            if (personId == null) throw new UnauthorizedAccessException("Logged in user must be connected to a person talk to HR about this issue");
+            _leaveRequestService.ApproveLeaveRequest(leaveRequestId, personId.Value);
             return this.ShowFrontendMessage("Leave request approved");
         }
     }

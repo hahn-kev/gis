@@ -64,13 +64,11 @@ namespace Backend.Services
             _entityService.Delete<LeaveRequest>(id);
         }
 
-        public bool ApproveLeaveRequest(Guid id, int loggedInUser)
+        public bool ApproveLeaveRequest(Guid leaveRequestId, Guid personId)
         {
-            //todo fix how we get from logged in user to personId
-            var user = _usersRepository.UserById(loggedInUser);
-            var superviserId = _personRepository.PeopleExtended.Where(person => person.Email == user.Email)
+            var superviserId = _personRepository.PeopleExtended.Where(person => person.Id == personId)
                 .Select(extended => extended.Id).First();
-            return _leaveRequestRepository.ApproveLeaveRequest(id, superviserId);
+            return _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, superviserId);
         }
 
 
