@@ -14,6 +14,14 @@ export class LeaveRequestService {
     return this.http.post<Person>('/api/leaverequest/', leaveRequest).toPromise();
   }
 
+  getById(id: string): Observable<LeaveRequestWithNames> {
+    return this.http.get<LeaveRequestWithNames>('/api/leaveRequest/' + id);
+  }
+
+  updateLeave(leaveRequest: LeaveRequest): Observable<string> {
+    return this.http.put('/api/leaveRequest/', leaveRequest, {responseType: 'text'});
+  }
+
   list(): Observable<LeaveRequestWithNames[]> {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest');
   }

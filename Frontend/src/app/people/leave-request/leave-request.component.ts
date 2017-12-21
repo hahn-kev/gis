@@ -7,6 +7,11 @@ import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PersonService } from '../person.service';
 import { PersonWithDaysOfLeave } from '../person';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/combineLatest';
+import { UserToken } from '../../login/user-token';
+import 'rxjs/add/operator/defaultIfEmpty';
+import 'rxjs/add/operator/concat';
 
 @Component({
   selector: 'app-leave-request',
@@ -15,11 +20,11 @@ import { PersonWithDaysOfLeave } from '../person';
 })
 export class LeaveRequestComponent implements OnInit, OnDestroy {
   public people: PersonWithDaysOfLeave[];
-  public leaveRequest = new LeaveRequest();
-  public daysOfLeaveUsed: number;
+  public leaveRequest: LeaveRequest;
   public selectedPerson: PersonWithDaysOfLeave;
+  public isNew: boolean;
 
-  private userTokenSubscription: Subscription;
+  private subscription: Subscription;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -29,25 +34,36 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
               private personService: PersonService) {
   }
 
-  async ngOnInit(): Promise<void> {
-    this.people = await this.personService.getPeopleWithDaysOfLeave().toPromise();
-    this.userTokenSubscription = this.loginService.safeUserToken().subscribe(user => {
-      if (!this.people) return;
-      const person = this.people.find(eachPerson => eachPerson.id === user.personId);
-      if (person) {
-        this.leaveRequest.personId = person.id;
-        this.selectedPerson = person;
-      }
-    });
+  ngOnInit(): void {
+    //we're adding an empty list at the beginning of this observable
+    //so that we get a result right away, then later update with value
+    const peopleWithLeaveObservable = Observable.of([]).concat(this.personService.getPeopleWithDaysOfLeave());
+    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), peopleWithLeaveObservable)
+      .subscribe(([data, user, people]: [{ leaveRequest: LeaveRequest }, UserToken, PersonWithDaysOfLeave[]]) => {
+        this.people = people;
+        this.leaveRequest = data.leaveRequest;
+        if (!this.people) return;
+        const person = this.people.find(eachPerson => eachPerson.id === (this.leaveRequest.personId || user.personId));
+        if (person) {
+          this.leaveRequest.personId = person.id;
+          this.selectedPerson = person;
+        }
+      });
+    this.isNew = this.route.snapshot.params['id'] === 'new';
   }
 
   ngOnDestroy(): void {
-    this.userTokenSubscription.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
-  async request(): Promise<void> {
-    const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
-    this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
+  async submit(): Promise<void> {
+    if (this.isNew) {
+      const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
+      this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
+    } else {
+      await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
+      this.snackBar.open('Leave updated, notification was not sent of changes');
+    }
   }
 
   personSelectedChanged(personId: string): void {

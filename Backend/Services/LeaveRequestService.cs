@@ -43,8 +43,18 @@ namespace Backend.Services
         public IList<LeaveRequestWithNames> LeaveRequestsWithNames =>
             _leaveRequestRepository.LeaveRequestWithNames.ToList();
 
+        public LeaveRequestWithNames GetById(Guid id)
+        {
+            return _leaveRequestRepository.LeaveRequestWithNames.Single(request => request.Id == id);
+        }
+        
         private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
 
+        public void UpdateLeave(LeaveRequest leaveRequest)
+        {
+            _entityService.Save(leaveRequest);
+        }
+        
         public bool ApproveLeaveRequest(Guid id, int loggedInUser)
         {
             //todo fix how we get from logged in user to personId

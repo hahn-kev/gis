@@ -31,6 +31,19 @@ namespace Backend.Controllers
             return _leaveRequestService.LeaveRequestsWithNames;
         }
 
+        [HttpGet("{id}")]
+        public LeaveRequestWithNames Get(Guid id)
+        {
+            return _leaveRequestService.GetById(id);
+        }
+
+        [HttpPut]
+        public IActionResult Update([FromBody] LeaveRequest leaveRequest)
+        {
+            _leaveRequestService.UpdateLeave(leaveRequest);
+            return Ok();
+        }
+
         [HttpPost]
         public async Task<IActionResult> RequestLeave([FromBody] LeaveRequest leaveRequest)
         {

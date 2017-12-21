@@ -1,6 +1,6 @@
 <div class="main-card">
   <mat-card>
-    <form #leaveForm="ngForm" (submit)="request()" id="form">
+    <form #leaveForm="ngForm" (submit)="submit()" id="form">
       <div>
         <mat-form-field>
           <mat-select name="person"
@@ -55,7 +55,9 @@
     </form>
 
     <mat-card-actions>
-      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>Request Leave</button>
+      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>{{isNew ? 'Request Leave' :
+        'Save'}}
+      </button>
     </mat-card-actions>
   </mat-card>
 </div>

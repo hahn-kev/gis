@@ -30,6 +30,7 @@ import { TrainingResolverService } from './people/training-requirement/training-
 import { TrainingReportComponent } from './people/training-requirement/training-report/training-report.component';
 import { StaffTrainingResolverService } from './people/training-requirement/staff-training-resolver.service';
 import { StaffResolveService } from './people/staff-resolve.service';
+import { LeaveRequestResolverService } from './people/leave-request/leave-request-resolver.service';
 
 const routes: Routes = [
   {
@@ -120,8 +121,11 @@ const routes: Routes = [
         path: 'leave-request',
         children: [
           {
-            path: 'new',
-            component: LeaveRequestComponent
+            path: 'edit/:id',
+            component: LeaveRequestComponent,
+            resolve: {
+              leaveRequest: LeaveRequestResolverService
+            }
           },
           {
             path: 'list',
@@ -207,7 +211,8 @@ const routes: Routes = [
     TrainingListResolverService,
     TrainingResolverService,
     StaffTrainingResolverService,
-    StaffResolveService
+    StaffResolveService,
+    LeaveRequestResolverService
   ]
 })
 export class AppRoutingModule {

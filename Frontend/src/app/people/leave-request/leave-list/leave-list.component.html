@@ -32,7 +32,7 @@
   <!-- Header and Row Declarations -->
   <mat-header-row
     *matHeaderRowDef="['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']"></mat-header-row>
-  <mat-row class="hover-overlay"
+  <mat-row class="hover-overlay" [routerLink]="'../edit/' + row.id"
            *matRowDef="let row; columns: ['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']">
   </mat-row>
 </mat-table>
