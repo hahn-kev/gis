@@ -19,10 +19,10 @@ namespace Backend.DataLayer
         public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
             from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
             from vacationLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
-                request.PersonId == person.Id && request.StartDate.InSchoolYear(Sql.CurrentTimestamp.SchoolYear()) &&
+                request.PersonId == person.Id && request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) &&
                 request.Type == LeaveType.Vacation)
             from sickLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
-                request.PersonId == person.Id && request.StartDate.InSchoolYear(Sql.CurrentTimestamp.SchoolYear()) &&
+                request.PersonId == person.Id && request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) &&
                 request.Type == LeaveType.Sick)
             group new
             {

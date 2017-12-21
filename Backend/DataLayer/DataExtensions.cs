@@ -26,18 +26,12 @@ namespace Backend.DataLayer
 
         public static Expression<Func<DateTime, int, bool>> InSchoolYearImp()
         {
-            return (date, year) => date.Between(new DateTime(year, 7, 1), new DateTime(year + 1, 6, 1));
+            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, 7, 1)), Sql.ToSql(new DateTime(year + 1, 6, 1)));
         }
 
-        [ExpressionMethod(nameof(SchoolYearImp))]
         public static int SchoolYear(this DateTime date)
         {
             return date.Month >= 7 ? date.Year : date.Year - 1;
-        }
-
-        public static Expression<Func<DateTime, int>> SchoolYearImp()
-        {
-            return date => date.Month >= 7 ? date.Year : date.Year - 1;
         }
 
         [Sql.Expression("DATE_PART('day', {1} - {0})", PreferServerSide = true)]
