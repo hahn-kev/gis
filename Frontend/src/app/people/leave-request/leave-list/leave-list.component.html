@@ -3,6 +3,10 @@
     <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="type">
+    <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.type}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="approved">
     <mat-header-cell *matHeaderCellDef>Approved</mat-header-cell>
     <mat-cell *matCellDef="let row">
@@ -21,9 +25,14 @@
     <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.endDate | date:'shortDate'}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="createdDate">
+    <mat-header-cell *matHeaderCellDef>Created Date</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
+  </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['requester', 'approved',  'approvedBy', 'startDate', 'endDate']"></mat-header-row>
+  <mat-header-row
+    *matHeaderRowDef="['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['requester', 'approved',  'approvedBy', 'startDate', 'endDate']"
-  ></mat-row>
+           *matRowDef="let row; columns: ['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']">
+  </mat-row>
 </mat-table>
