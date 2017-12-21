@@ -5,13 +5,13 @@
         <mat-form-field>
           <mat-select name="person"
                       [(ngModel)]="leaveRequest.personId"
+                      (ngModelChange)="personSelectedChanged($event)"
                       required
                       [disabled]="!(loginService.hasRole('admin') | async)"
                       placeholder="Person Leaving">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-              {{eachPerson.lastName}} (Sick {{eachPerson.sickDaysOfLeaveUsed}}, Vacation
-              {{eachPerson.vacationDaysOfLeaveUsed}})
+              {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -41,6 +41,16 @@
           <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #endDatePicker></mat-datepicker>
         </mat-form-field>
+      </div>
+      <div>
+        <mat-chip-list>
+          <mat-chip color="accent" selected="true">Vacation used {{selectedPerson?.vacationDaysOfLeaveUsed}}
+            day{{selectedPerson?.vacationDaysOfLeaveUsed === 1 ? '' : 's'}}
+          </mat-chip>
+          <mat-chip color="accent" selected="true">Sick Leave used {{selectedPerson?.sickDaysOfLeaveUsed}}
+            day{{selectedPerson?.sickDaysOfLeaveUsed === 1 ? '' : 's'}}
+          </mat-chip>
+        </mat-chip-list>
       </div>
     </form>
 

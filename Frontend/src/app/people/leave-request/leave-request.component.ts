@@ -17,6 +17,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   public people: PersonWithDaysOfLeave[];
   public leaveRequest = new LeaveRequest();
   public daysOfLeaveUsed: number;
+  public selectedPerson: PersonWithDaysOfLeave;
 
   private userTokenSubscription: Subscription;
 
@@ -35,7 +36,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       const person = this.people.find(eachPerson => eachPerson.id === user.personId);
       if (person) {
         this.leaveRequest.personId = person.id;
-        this.daysOfLeaveUsed = person.daysOfLeaveUsed;
+        this.selectedPerson = person;
       }
     });
   }
@@ -47,5 +48,9 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   async request(): Promise<void> {
     const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
     this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
+  }
+
+  personSelectedChanged(personId: string): void {
+    this.selectedPerson = this.people.find(value => value.id === personId);
   }
 }
