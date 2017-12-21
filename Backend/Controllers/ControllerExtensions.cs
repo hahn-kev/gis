@@ -24,11 +24,16 @@ namespace Backend.Controllers
             return $"~/message?text={Uri.EscapeDataString(message)}";
         }
 
-        public static Guid PersonId(this ClaimsPrincipal user)
+        public static Guid? PersonId(this ClaimsPrincipal user)
         {
             return Guid.TryParse(user.FindFirstValue(AuthenticateController.ClaimPersonId), out var guid)
                 ? guid
-                : Guid.Empty;
+                : (Guid?) null;
+        }
+
+        public static bool IsInAnyRole(this ClaimsPrincipal user, params string[] roles)
+        {
+            return roles.Any(user.IsInRole);
         }
     }
 }

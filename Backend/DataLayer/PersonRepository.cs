@@ -16,7 +16,7 @@ namespace Backend.DataLayer
 
         public IQueryable<Person> People => _dbConnection.People;
 
-        public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave =>
+        public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
             from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
             from vacationLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
                 request.PersonId == person.Id && request.StartDate.InSchoolYear(Sql.CurrentTimestamp.SchoolYear()) &&
@@ -30,6 +30,7 @@ namespace Backend.DataLayer
                 sick = DataExtensions.DayDiff(sickLeave.StartDate, sickLeave.EndDate)
             } by person
             into leaveGroup
+            where limitByPersonId == null || leaveGroup.Key.Id == limitByPersonId
             select new PersonWithDaysOfLeave
             {
                 Id = leaveGroup.Key.Id,

@@ -162,7 +162,7 @@ namespace Backend.Services
         public bool CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
         {
             return leaveRequest.PersonId == user.PersonId() ||
-                   user.IsInRole("admin") || user.IsInRole("hr");
+                   user.IsInAnyRole("admin", "hr");
         }
     }
 }

@@ -75,9 +75,9 @@ namespace Backend.Services
                 _usersRepository.UpdatePersonId(user.Id, person.Id);
         }
 
-        public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
+        public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null)
         {
-            return _personRepository.PeopleWithDaysOfLeave.ToList();
+            return _personRepository.PeopleWithDaysOfLeave(limitByPersonId).ToList();
         }
     }
 }
