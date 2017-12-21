@@ -1,4 +1,5 @@
-﻿using LinqToDB.Mapping;
+﻿using System;
+using LinqToDB.Mapping;
 
 namespace Backend.Entities
 {
@@ -10,5 +11,6 @@ namespace Backend.Entities
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public bool ResetPassword { get; set; }
+        public Guid? PersonId { get; set; }
     }
 }

@@ -3,8 +3,11 @@
     <form #leaveForm="ngForm" (submit)="request()" id="form">
       <div>
         <mat-form-field>
-          <mat-select name="person" [(ngModel)]="leaveRequest.personId" required
-                      [disabled]="!(loginService.hasRole('admin') | async)" placeholder="Person Leaving">
+          <mat-select name="person"
+                      [(ngModel)]="leaveRequest.personId"
+                      required
+                      [disabled]="!(loginService.hasRole('admin') | async)"
+                      placeholder="Person Leaving">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
               {{eachPerson.lastName}}

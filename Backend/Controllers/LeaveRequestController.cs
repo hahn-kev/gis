@@ -34,6 +34,11 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> RequestLeave([FromBody] LeaveRequest leaveRequest)
         {
+            if (!_leaveRequestService.CanRequestLeave(User, leaveRequest))
+            {
+                throw new UnauthorizedAccessException("Logged in user isn't allowed to request leave for this person");
+            }
+
             Person notified = await _leaveRequestService.RequestLeave(leaveRequest);
             return Json(notified);
         }

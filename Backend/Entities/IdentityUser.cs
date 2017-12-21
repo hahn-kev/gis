@@ -1,4 +1,5 @@
-﻿using LinqToDB.Identity;
+﻿using System;
+using LinqToDB.Identity;
 using LinqToDB.Mapping;
 
 namespace Backend.Entities
@@ -7,5 +8,6 @@ namespace Backend.Entities
     public class IdentityUser: IdentityUser<int>, IUser
     {
         public bool ResetPassword { get; set; }
+        public Guid? PersonId { get; set; }
     }
 }

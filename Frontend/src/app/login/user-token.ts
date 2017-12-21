@@ -19,9 +19,15 @@ export class UserToken {
   get email(): string {
     return this.token && this.token['email'];
   }
+
   get roles(): string[] {
-    let val = this.token['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    const val = this.token['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
     if (isArray(val)) return val;
     return [val];
+  }
+
+  get personId(): string {
+    if (!this.token) return null;
+    return this.token['personId'];
   }
 }

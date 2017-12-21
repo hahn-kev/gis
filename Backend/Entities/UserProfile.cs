@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LinqToDB.Mapping;
 
 namespace Backend.Entities
@@ -21,6 +22,7 @@ namespace Backend.Entities
         public string PhoneNumber { get; set; }
         public bool ResetPassword { get; set; }
         public bool IsAdmin { get; set; }
+        public Guid? PersonId { get; set; }
     }
 
     public interface IUser
@@ -30,6 +32,7 @@ namespace Backend.Entities
         string Email { get; set; }
         string PhoneNumber { get; set; }
         bool ResetPassword { get; set; }
+        Guid? PersonId { get; set; }
     }
 
     public static class UserExtensions

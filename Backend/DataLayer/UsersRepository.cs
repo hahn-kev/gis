@@ -27,7 +27,9 @@ namespace Backend.DataLayer
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 UserName = user.UserName,
-                IsAdmin = userRole != null
+                IsAdmin = userRole != null,
+                PersonId = user.PersonId,
+                ResetPassword = user.ResetPassword
             };
 
         public UserProfile UserByName(string name)
@@ -35,6 +37,11 @@ namespace Backend.DataLayer
             if (string.IsNullOrEmpty(name)) return null;
             return Users.FirstOrDefault(user =>
                 user.UserName == name);
+        }
+
+        public void UpdatePersonId(int id, Guid personId)
+        {
+            _dbConnection.Users.Where(user => user.Id == id).Set(user => user.PersonId, personId).Update();
         }
 
         public UserProfile UserById(int id) => Users.FirstOrDefault(user => user.Id == id);

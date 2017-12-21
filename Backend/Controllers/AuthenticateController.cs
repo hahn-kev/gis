@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,18 +25,18 @@ namespace Backend.Controllers
     {
         public const string JwtCookieName = ".JwtAccessToken";
         private readonly JWTSettings _jwtOptions;
+        private readonly UserService _userService;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly SecurityTokenHandler _securityTokenHandler;
         private readonly Settings _settings;
 
         public AuthenticateController(IOptions<JWTSettings> jwtOptions,
             SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
-            IOptions<Settings> options)
+            IOptions<Settings> options,
+            UserService userService)
         {
             _signInManager = signInManager;
-            _userManager = userManager;
+            _userService = userService;
             _securityTokenHandler = new JwtSecurityTokenHandler();
             _jwtOptions = jwtOptions.Value;
             _settings = options.Value;
@@ -51,7 +52,7 @@ namespace Backend.Controllers
             {
                 throw new UserError("User email required");
             }
-            var result = await _userManager.CreateAsync(user, registerUser.Password);
+            var result = await _userService.CreateAsync(user, registerUser.Password);
             if (!result.Succeeded)
             {
                 throw result.Errors();
@@ -78,11 +79,12 @@ namespace Backend.Controllers
         public const string ClaimTypeFirstName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
         public const string ClaimTypeLastName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname";
         public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+        public const string ClaimPersonId = "personId";
 
         public async Task GoogleSignIn()
         {
             var googleId = User.FindFirstValue(ClaimTypeId);
-            var user = await _userManager.FindByLoginAsync("Google", googleId);
+            IdentityUser user = await _userService.FindByLoginAsync("Google", googleId);
 
             if (user == null)
             {
@@ -92,7 +94,7 @@ namespace Backend.Controllers
                     throw new AuthenticationException("Only gis users or khahn are allowed to login with google sso");
                 }
                 //check for user by email
-                user = await _userManager.FindByEmailAsync(email);
+                user = await _userService.FindByEmailAsync(email);
                 if (user == null)
                 {
                     user = new IdentityUser
@@ -100,12 +102,12 @@ namespace Backend.Controllers
                         Email = email,
                         UserName = User.Identity.Name.Replace(" ", "_")
                     };
-                    var newUserResult = await _userManager.CreateAsync(user);
+                    var newUserResult = await _userService.CreateAsync(user);
                     if (!newUserResult.Succeeded) throw newUserResult.Errors();
                 }
 
                 var newLoginResult =
-                    await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", googleId, User.Identity.Name));
+                    await _userService.AddLoginAsync(user, new UserLoginInfo("Google", googleId, User.Identity.Name));
                 if (!newLoginResult.Succeeded) throw newLoginResult.Errors();
             }
             Response.Cookies.Append(JwtCookieName, _securityTokenHandler.WriteToken(await GetJwtSecurityToken(user)));
@@ -115,7 +117,7 @@ namespace Backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SignIn([FromBody] Credentials credentials)
         {
-            var identityUser = await _userManager.FindByNameAsync(credentials.Username);
+            var identityUser = await _userService.FindByNameAsync(credentials.Username);
             if (identityUser == null) throw ThrowLoginFailed();
             return await SignIn(identityUser, credentials.Password);
         }
@@ -124,16 +126,16 @@ namespace Backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetSignIn([FromBody] CredentialsReset credentials)
         {
-            var identityUser = await _userManager.FindByNameAsync(credentials.Username);
+            var identityUser = await _userService.FindByNameAsync(credentials.Username);
             if (identityUser == null) throw ThrowLoginFailed();
             var identityResult =
-                await _userManager.ChangePasswordAsync(identityUser, credentials.Password, credentials.NewPassword);
+                await _userService.ChangePasswordAsync(identityUser, credentials.Password, credentials.NewPassword);
             if (!identityResult.Succeeded)
             {
                 throw identityResult.Errors();
             }
             identityUser.ResetPassword = false;
-            await _userManager.UpdateAsync(identityUser);
+            await _userService.UpdateAsync(identityUser);
             return await JsonLoginResult(identityUser);
         }
 
@@ -189,7 +191,8 @@ namespace Backend.Controllers
             return new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, identityUser.Email)
+                new Claim(JwtRegisteredClaimNames.Email, identityUser.Email),
+                new Claim(ClaimPersonId, identityUser.PersonId?.ToString() ?? string.Empty)
             };
         }
 

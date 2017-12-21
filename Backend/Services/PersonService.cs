@@ -10,16 +10,21 @@ namespace Backend.Services
     public class PersonService
     {
         private readonly PersonRepository _personRepository;
+        private readonly UsersRepository _usersRepository;
         private readonly IEntityService _entityService;
 
-        public PersonService(PersonRepository personRepository, IEntityService entityService)
+        public PersonService(PersonRepository personRepository,
+            IEntityService entityService,
+            UsersRepository usersRepository)
         {
             _personRepository = personRepository;
             _entityService = entityService;
+            _usersRepository = usersRepository;
         }
 
-        public IList<Person> People() => _personRepository.People.OrderBy(person => person.FirstName)
-            .ThenBy(person => person.LastName).ToList();
+        public IList<Person> People() =>
+            _personRepository.People.OrderBy(person => person.FirstName)
+                .ThenBy(person => person.LastName).ToList();
 
         public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
 
@@ -43,6 +48,7 @@ namespace Backend.Services
             {
                 person.PreferredName = $"{person.FirstName} {person.LastName}";
             }
+
             if (person.Staff != null)
             {
                 _entityService.Save(person.Staff);
@@ -53,9 +59,20 @@ namespace Backend.Services
                 if (person.StaffId.HasValue) _entityService.Delete<Staff>(person.StaffId.Value);
                 person.StaffId = null;
             }
+
             _entityService.Save(person);
+            MatchPersonWithUser(person);
         }
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
+
+        public void MatchPersonWithUser(Person person)
+        {
+            if (string.IsNullOrEmpty(person.Email)) return;
+            var user = _usersRepository.Users.SingleOrDefault(profile =>
+                profile.PersonId == null && profile.Email == person.Email);
+            if (user != null)
+                _usersRepository.UpdatePersonId(user.Id, person.Id);
+        }
     }
 }

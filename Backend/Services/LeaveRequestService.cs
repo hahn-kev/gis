@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
@@ -38,7 +40,8 @@ namespace Backend.Services
             _settings = options.Value;
         }
 
-        public IList<LeaveRequestWithNames> LeaveRequestsWithNames => _leaveRequestRepository.LeaveRequestWithNames.ToList();
+        public IList<LeaveRequestWithNames> LeaveRequestsWithNames =>
+            _leaveRequestRepository.LeaveRequestWithNames.ToList();
 
         private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
 
@@ -50,6 +53,7 @@ namespace Backend.Services
                 .Select(extended => extended.Id).First();
             return _leaveRequestRepository.ApproveLeaveRequest(id, superviserId);
         }
+
 
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
@@ -108,10 +112,12 @@ namespace Backend.Services
                 await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
                 return orgGroup.SupervisorPerson;
             }
+
             if (orgGroup.SupervisorPerson != null)
             {
                 await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
             }
+
             return null;
         }
 
@@ -151,6 +157,12 @@ namespace Backend.Services
                 EmailService.Template.RequestLeaveApproval,
                 requestedBy,
                 supervisor);
+        }
+
+        public bool CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
+        {
+            return leaveRequest.PersonId == user.PersonId() ||
+                   user.IsInRole("admin") || user.IsInRole("hr");
         }
     }
 }

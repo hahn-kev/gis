@@ -25,8 +25,6 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     private leaveRequestService: LeaveRequestService,
     private snackBar: MatSnackBar,
     public loginService: LoginService) {
-
-
   }
 
   ngOnInit(): void {
@@ -35,7 +33,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       this.people = value.people;
       this.userTokenSubscription = this.loginService.safeUserToken().subscribe(user => {
         if (!this.people) return;
-        const person = this.people.find(eachPerson => eachPerson.email === user.email);
+        const person = this.people.find(eachPerson => eachPerson.id === user.personId);
         if (person) this.leaveRequest.personId = person.id;
       });
     });

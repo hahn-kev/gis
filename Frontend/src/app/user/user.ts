@@ -4,7 +4,8 @@ export class User {
               public email?: string,
               public id?: number,
               public isAdmin = false,
-              public resetPassword = false) {
+              public resetPassword = false,
+              public personId?: string) {
   }
   // todo have range support
 }
