@@ -10,8 +10,9 @@ namespace Backend.Controllers
     {
         public static ArgumentException Errors(this IdentityResult result)
         {
-            return new ArgumentException(string.Join(Environment.NewLine, result.Errors
-                .Select(x => x.Description)));
+            return new ArgumentException(string.Join(Environment.NewLine,
+                result.Errors
+                    .Select(x => x.Description)));
         }
 
         public static IActionResult ShowFrontendMessage(this Controller controller, string message)
@@ -34,6 +35,21 @@ namespace Backend.Controllers
         public static bool IsInAnyRole(this ClaimsPrincipal user, params string[] roles)
         {
             return roles.Any(user.IsInRole);
+        }
+
+        public static bool IsAdminOrHr(this ClaimsPrincipal user)
+        {
+            return user.IsAdmin() || user.IsHr();
+        }
+
+        public static bool IsAdmin(this ClaimsPrincipal user)
+        {
+            return user.IsInRole("admin");
+        }
+
+        public static bool IsHr(this ClaimsPrincipal user)
+        {
+            return user.IsInRole("hr");
         }
     }
 }

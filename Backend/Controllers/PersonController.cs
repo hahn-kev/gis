@@ -26,7 +26,7 @@ namespace Backend.Controllers
         public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
         {
             return _personService.PeopleWithDaysOfLeave(
-                User.IsInAnyRole("hr", "admin") ? null : User.PersonId());
+                User.IsAdminOrHr() ? null : User.PersonId());
         }
 
         [HttpGet("{id}")]

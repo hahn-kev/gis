@@ -47,14 +47,23 @@ namespace Backend.Services
         {
             return _leaveRequestRepository.LeaveRequestWithNames.Single(request => request.Id == id);
         }
-        
+
+        public Guid? GetLeavePersonId(Guid leaveId) =>
+            _leaveRequestRepository.LeaveRequests.Where(request => request.Id == leaveId)
+                .Select(request => (Guid?) request.PersonId).SingleOrDefault();
+
         private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
 
         public void UpdateLeave(LeaveRequest leaveRequest)
         {
             _entityService.Save(leaveRequest);
         }
-        
+
+        public void DeleteLeaveRequest(Guid id)
+        {
+            _entityService.Delete<LeaveRequest>(id);
+        }
+
         public bool ApproveLeaveRequest(Guid id, int loggedInUser)
         {
             //todo fix how we get from logged in user to personId
@@ -172,7 +181,7 @@ namespace Backend.Services
         public bool CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
         {
             return leaveRequest.PersonId == user.PersonId() ||
-                   user.IsInAnyRole("admin", "hr");
+                   user.IsAdminOrHr();
         }
     }
 }
