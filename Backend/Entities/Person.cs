@@ -39,4 +39,10 @@ namespace Backend.Entities
     {
         public IList<PersonRole> Roles { get; set; }
     }
+
+    [Table("Person", IsColumnAttributeRequired = false)]
+    public class PersonWithDaysOfLeave : Person
+    {
+        public int DaysOfLeaveUsed { get; set; }
+    }
 }

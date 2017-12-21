@@ -10,7 +10,7 @@
                       placeholder="Person Leaving">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-              {{eachPerson.lastName}}
+              {{eachPerson.lastName}} (Leave {{eachPerson.daysOfLeaveUsed}})
             </mat-option>
           </mat-select>
         </mat-form-field>

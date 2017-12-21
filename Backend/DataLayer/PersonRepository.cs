@@ -16,6 +16,26 @@ namespace Backend.DataLayer
 
         public IQueryable<Person> People => _dbConnection.People;
 
+        public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave =>
+            from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
+            from leaveTotal in (from leaveRequest in _dbConnection.LeaveRequests
+                group leaveRequest by leaveRequest.PersonId
+                into g
+                select new
+                {
+                    personId = g.Key,
+                    totalLeave = g.Sum(request => DataExtensions.DateDiff(Sql.DateParts.Day, request.StartDate, request.EndDate))
+                }).LeftJoin(arg => arg.personId == person.Id)
+            select new PersonWithDaysOfLeave
+            {
+                Id = person.Id,
+                Email = person.Email,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                StaffId = person.StaffId,
+                DaysOfLeaveUsed = leaveTotal.totalLeave ?? 0
+            };
+
         public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
 
         private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonExtended, new() =>
@@ -49,7 +69,8 @@ namespace Backend.DataLayer
                 LastName = person.LastName
             };
 
-        public IQueryable<StaffWithName> StaffWithNames => from staff in _dbConnection.GetTable<Staff>()
+        public IQueryable<StaffWithName> StaffWithNames =>
+            from staff in _dbConnection.GetTable<Staff>()
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
             select new StaffWithName
             {
@@ -66,6 +87,7 @@ namespace Backend.DataLayer
             {
                 person.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
             }
+
             return person;
         }
     }

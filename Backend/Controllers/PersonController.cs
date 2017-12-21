@@ -22,6 +22,12 @@ namespace Backend.Controllers
             return _personService.People();
         }
 
+        [HttpGet("leave")]
+        public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
+        {
+            return _personService.PeopleWithDaysOfLeave();
+        } 
+
         [HttpGet("{id}")]
         public PersonWithOthers Get(Guid id)
         {

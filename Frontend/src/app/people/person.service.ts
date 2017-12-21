@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Person, PersonExtended, PersonWithOthers, StaffWithName } from './person';
+import { Person, PersonExtended, PersonWithDaysOfLeave, PersonWithOthers, StaffWithName } from './person';
 import { Observable } from 'rxjs/Observable';
 import { Role, RoleExtended } from './role';
 
@@ -16,6 +16,10 @@ export class PersonService {
 
   getAll(): Observable<Person[]> {
     return this.http.get<Person[]>('/api/person');
+  }
+
+  getPeopleWithDaysOfLeave(): Observable<PersonWithDaysOfLeave[]> {
+    return this.http.get<PersonWithDaysOfLeave[]>('/api/person/leave');
   }
 
   updatePerson(person: PersonExtended): Promise<string> {
@@ -34,7 +38,7 @@ export class PersonService {
     return this.http.get<RoleExtended[]>('/api/person/role', {params: params}).toPromise();
   }
 
-  getStaff() {
+  getStaff(): Observable<Object> {
     return this.http.get<StaffWithName[]>('/api/person/staff');
   }
 }

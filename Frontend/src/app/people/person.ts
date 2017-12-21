@@ -22,6 +22,10 @@ export class PersonWithOthers extends PersonExtended {
   public roles: Role[] = [];
 }
 
+export class PersonWithDaysOfLeave extends Person {
+  public daysOfLeaveUsed: number;
+}
+
 export class Staff {
 
   constructor(id?: string) {

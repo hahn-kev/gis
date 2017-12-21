@@ -34,5 +34,23 @@ namespace Backend.DataLayer
             if (date.Month >= 7) return date.Year;
             return date.Year - 1;
         }
+
+        [Sql.Expression("DATE_PART('{0}', {2} - {1})", PreferServerSide = true)]
+        public static int? DateDiff(Sql.DateParts part, DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate == null || endDate == null)
+                return null;
+
+            switch (part)
+            {
+                case Sql.DateParts.Day         : return (int)(endDate - startDate).Value.TotalDays;
+                case Sql.DateParts.Hour        : return (int)(endDate - startDate).Value.TotalHours;
+                case Sql.DateParts.Minute      : return (int)(endDate - startDate).Value.TotalMinutes;
+                case Sql.DateParts.Second      : return (int)(endDate - startDate).Value.TotalSeconds;
+                case Sql.DateParts.Millisecond : return (int)(endDate - startDate).Value.TotalMilliseconds;
+            }
+
+            throw new InvalidOperationException();
+        }
     }
 }

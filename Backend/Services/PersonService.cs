@@ -74,5 +74,10 @@ namespace Backend.Services
             if (user != null)
                 _usersRepository.UpdatePersonId(user.Id, person.Id);
         }
+
+        public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
+        {
+            return _personRepository.PeopleWithDaysOfLeave.ToList();
+        }
     }
 }

@@ -121,10 +121,7 @@ const routes: Routes = [
         children: [
           {
             path: 'new',
-            component: LeaveRequestComponent,
-            resolve: {
-              people: PeopleResolveService
-            }
+            component: LeaveRequestComponent
           },
           {
             path: 'list',
