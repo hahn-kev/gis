@@ -10,13 +10,19 @@
                       placeholder="Person Leaving">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-              {{eachPerson.lastName}} (Leave {{eachPerson.daysOfLeaveUsed}})
+              {{eachPerson.lastName}} (Sick {{eachPerson.sickDaysOfLeaveUsed}}, Vacation
+              {{eachPerson.vacationDaysOfLeaveUsed}})
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field>
           <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
             <mat-option value="Vacation">Vacation</mat-option>
+            <mat-option value="Sick">Sick</mat-option>
+            <mat-option value="Personal">Personal</mat-option>
+            <mat-option value="Funeral">Funeral</mat-option>
+            <mat-option value="Maternity">Maternity</mat-option>
+            <mat-option value="Paternity">Paternity</mat-option>
           </mat-select>
         </mat-form-field>
       </div>

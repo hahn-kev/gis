@@ -1,5 +1,8 @@
 ﻿using System;
+using LinqToDB;
 using LinqToDB.Mapping;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Backend.Entities
 {
@@ -10,7 +13,8 @@ namespace Backend.Entities
         public DateTime EndDate { get; set; }
         public bool? Approved { get; set; }
         public Guid? ApprovedById { get; set; }
-        public string Type { get; set; }
+        [Column(DataType = DataType.VarChar)]
+        public LeaveType Type { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 
@@ -19,7 +23,31 @@ namespace Backend.Entities
     {
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string RequesterName { get; set; }
+
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string ApprovedByName { get; set; }
+    }
+
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LeaveType
+    {
+        [MapValue("Vacation")]
+        Vacation,
+
+        [MapValue("Sick")]
+        Sick,
+
+        [MapValue("Personal")]
+        Personal,
+
+        [MapValue("Funeral")]
+        Funeral,
+
+        [MapValue("Maternity")]
+        Maternity,
+
+        [MapValue("Paternity")]
+        Paternity
     }
 }

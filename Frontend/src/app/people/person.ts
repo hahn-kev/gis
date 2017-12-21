@@ -23,7 +23,8 @@ export class PersonWithOthers extends PersonExtended {
 }
 
 export class PersonWithDaysOfLeave extends Person {
-  public daysOfLeaveUsed: number;
+  public sickDaysOfLeaveUsed: number;
+  public vacationDaysOfLeaveUsed: number;
 }
 
 export class Staff {

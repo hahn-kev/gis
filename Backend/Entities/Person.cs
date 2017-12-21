@@ -43,6 +43,7 @@ namespace Backend.Entities
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithDaysOfLeave : Person
     {
-        public int DaysOfLeaveUsed { get; set; }
+        public int SickDaysOfLeaveUsed { get; set; }
+        public int VacationDaysOfLeaveUsed { get; set; }
     }
 }

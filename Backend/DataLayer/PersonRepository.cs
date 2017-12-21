@@ -18,22 +18,27 @@ namespace Backend.DataLayer
 
         public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave =>
             from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
-            from leaveTotal in (from leaveRequest in _dbConnection.LeaveRequests
-                group leaveRequest by leaveRequest.PersonId
-                into g
-                select new
-                {
-                    personId = g.Key,
-                    totalLeave = g.Sum(request => DataExtensions.DateDiff(Sql.DateParts.Day, request.StartDate, request.EndDate))
-                }).LeftJoin(arg => arg.personId == person.Id)
+            from vacationLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
+                request.PersonId == person.Id && request.StartDate.InSchoolYear(Sql.CurrentTimestamp.SchoolYear()) &&
+                request.Type == LeaveType.Vacation)
+            from sickLeave in _dbConnection.LeaveRequests.LeftJoin(request =>
+                request.PersonId == person.Id && request.StartDate.InSchoolYear(Sql.CurrentTimestamp.SchoolYear()) &&
+                request.Type == LeaveType.Sick)
+            group new
+            {
+                vacation = DataExtensions.DayDiff(vacationLeave.StartDate, vacationLeave.EndDate),
+                sick = DataExtensions.DayDiff(sickLeave.StartDate, sickLeave.EndDate)
+            } by person
+            into leaveGroup
             select new PersonWithDaysOfLeave
             {
-                Id = person.Id,
-                Email = person.Email,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                StaffId = person.StaffId,
-                DaysOfLeaveUsed = leaveTotal.totalLeave ?? 0
+                Id = leaveGroup.Key.Id,
+                Email = leaveGroup.Key.Email,
+                FirstName = leaveGroup.Key.FirstName,
+                LastName = leaveGroup.Key.LastName,
+                StaffId = leaveGroup.Key.StaffId,
+                SickDaysOfLeaveUsed = leaveGroup.Sum(arg => arg.sick) ?? 0,
+                VacationDaysOfLeaveUsed = leaveGroup.Sum(arg => arg.vacation) ?? 0
             };
 
         public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
