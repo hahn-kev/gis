@@ -52,6 +52,17 @@
         </mat-form-field>
       </div>
       <ng-container *requireRole="'admin'">
+        <mat-form-field>
+          <mat-select name="person"
+                      [(ngModel)]="user.personId"
+                      placeholder="Person">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let eachPerson of people | async" [value]="eachPerson.id">{{eachPerson.firstName}}
+              {{eachPerson.lastName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <div *ngIf="!isNew">
           <button type="button"
                   *ngIf="!user.isAdmin"
