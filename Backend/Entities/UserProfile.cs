@@ -45,6 +45,7 @@ namespace Backend.Entities
             user.Email = from.Email;
             user.PhoneNumber = from.PhoneNumber;
             user.ResetPassword = from.ResetPassword;
+            user.PersonId = from.PersonId;
             return user;
         }
     }

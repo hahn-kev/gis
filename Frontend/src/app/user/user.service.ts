@@ -1,25 +1,26 @@
 import { Injectable } from '@angular/core';
 import { User } from './user';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class UserService {
   constructor(private http: HttpClient) {
   }
 
-  getUsers() {
+  getUsers(): Observable<User[]> {
     return this.http.get<User[]>('/api/user');
   }
 
-  getUser(name: string) {
+  getUser(name: string): Observable<User> {
     return this.http.get<User>(`/api/user/${name}`);
   }
 
-  getSelf() {
+  getSelf(): Observable<User> {
     return this.http.get<User>('/api/user/self');
   }
 
-  saveUser(user: User, password: string, isNewUser: boolean = false, isSelf: boolean = false) {
+  saveUser(user: User, password: string, isNewUser = false, isSelf = false): any {
     if (isNewUser) {
       return this.registerUser(user, password);
     } else if (isSelf) {
@@ -30,11 +31,12 @@ export class UserService {
       password: password,
       userName: user.userName,
       phoneNumber: user.phoneNumber,
-      email: user.email
+      email: user.email,
+      personId: user.personId
     }, {responseType: 'text'}).toPromise();
   }
 
-  updateSelf(user: User, password: string) {
+  updateSelf(user: User, password: string): Promise<string> {
     return this.http.put('/api/user/self', {
       id: user.id,
       password: password,
@@ -44,24 +46,25 @@ export class UserService {
     }, {responseType: 'text'}).toPromise();
   }
 
-  registerUser(user: User, password: string) {
+  registerUser(user: User, password: string): Promise<Object> {
     return this.http.post<any>('/api/authenticate/register', {
       password: password,
       userName: user.userName,
       phoneNumber: user.phoneNumber,
-      email: user.email
+      email: user.email,
+      personId: user.personId
     }).toPromise();
   }
 
-  grantAdmin(userName: string) {
+  grantAdmin(userName: string): Promise<string> {
     return this.http.put(`/api/user/grantadmin/${userName}`, null, {responseType: 'text'}).toPromise();
   }
 
-  revokeAdmin(userName: string) {
+  revokeAdmin(userName: string): Promise<string> {
     return this.http.put(`/api/user/revokeadmin/${userName}`, null, {responseType: 'text'}).toPromise();
   }
 
-  deleteUser(userId: number) {
+  deleteUser(userId: number): Promise<string> {
     return this.http.delete(`/api/user/${userId}`, {responseType: 'text'}).toPromise();
   }
 }
