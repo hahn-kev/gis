@@ -18,6 +18,10 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames>('/api/leaveRequest/' + id);
   }
 
+  deleteRequest(id: string): Observable<string> {
+    return this.http.delete('/api/leaveRequest/' + id, {responseType: 'text'});
+  }
+
   updateLeave(leaveRequest: LeaveRequest): Observable<string> {
     return this.http.put('/api/leaveRequest/', leaveRequest, {responseType: 'text'});
   }

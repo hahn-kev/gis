@@ -58,6 +58,7 @@
       <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>{{isNew ? 'Request Leave' :
         'Save'}}
       </button>
+      <button mat-button *ngIf="!isNew" (click)="deleteRequest()">Delete Request</button>
     </mat-card-actions>
   </mat-card>
 </div>

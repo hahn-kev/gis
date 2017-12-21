@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequest } from './leave-request';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PersonService } from '../person.service';
@@ -12,6 +12,7 @@ import 'rxjs/add/operator/combineLatest';
 import { UserToken } from '../../login/user-token';
 import 'rxjs/add/operator/defaultIfEmpty';
 import 'rxjs/add/operator/concat';
+import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-leave-request',
@@ -31,7 +32,8 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
               private leaveRequestService: LeaveRequestService,
               private snackBar: MatSnackBar,
               public loginService: LoginService,
-              private personService: PersonService) {
+              private personService: PersonService,
+              private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -68,5 +70,19 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
   personSelectedChanged(personId: string): void {
     this.selectedPerson = this.people.find(value => value.id === personId);
+  }
+
+  async deleteRequest(): Promise<void> {
+    const result = await this.dialog.open(ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(`Delete Request for ${this.selectedPerson.firstName}?`,
+          'Delete',
+          'Cancel')
+      }).afterClosed().toPromise();
+    if (!result) return;
+    await this.leaveRequestService.deleteRequest(this.leaveRequest.id).toPromise();
+
+    this.snackBar.open('Request deleted');
+    this.router.navigate(['../..', 'list'], {relativeTo: this.route});
   }
 }

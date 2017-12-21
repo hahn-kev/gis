@@ -40,7 +40,34 @@ namespace Backend.Controllers
         [HttpPut]
         public IActionResult Update([FromBody] LeaveRequest leaveRequest)
         {
-            _leaveRequestService.UpdateLeave(leaveRequest);
+            if (leaveRequest.Id == Guid.Empty)
+                throw new Exception("Trying to create a new request with the update action, use post instead");
+            if (User.IsAdminOrHr() ||
+                (User.PersonId() != null && _leaveRequestService.GetLeavePersonId(leaveRequest.Id) == User.PersonId()))
+            {
+                _leaveRequestService.UpdateLeave(leaveRequest);
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Logged in user isn't allowed to modify this leave request");
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            if (User.IsAdminOrHr() ||
+                (User.PersonId() != null && _leaveRequestService.GetLeavePersonId(id) == User.PersonId()))
+            {
+                _leaveRequestService.DeleteLeaveRequest(id);
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Logged in user isn't allowed to delete this leave request");
+            }
+
             return Ok();
         }
 
