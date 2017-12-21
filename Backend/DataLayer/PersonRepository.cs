@@ -44,7 +44,7 @@ namespace Backend.DataLayer
         private IQueryable<AggHolder> LeaveRequestAggrigateByType(LeaveType leaveType)
         {
             return _dbConnection.LeaveRequests.Where(request =>
-                    request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) && request.Type == leaveType)
+                    request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) && request.Type == Sql.ToSql(leaveType))
                 .GroupBy(request => request.PersonId,
                     (personId, requests) => new AggHolder
                     {
