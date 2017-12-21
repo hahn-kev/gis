@@ -125,8 +125,13 @@ namespace Backend.Services
             string toEmail,
             string toName)
         {
-            if (toEmail == null) throw new ArgumentNullException(nameof(toEmail));
-            if (fromEmail == null) throw new ArgumentNullException(nameof(fromEmail));
+#if DEBUG
+            return;
+#endif
+            if (toEmail == null)
+                throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
+            if (fromEmail == null)
+                throw new ArgumentNullException(nameof(fromEmail), $"{fromName} does not have an email assigned");
             var msg = new SendGridMessage
             {
                 Personalizations = new List<Personalization>
