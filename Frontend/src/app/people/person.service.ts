@@ -31,14 +31,14 @@ export class PersonService {
   }
 
   getRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleExtended[]> {
-    let params = new HttpParams()
+    const params = new HttpParams()
       .append('canStartDuringRange', canStartDuringRange.toString())
       .append('beginRange', beginRange.toISOString())
       .append('endRange', endRange.toISOString());
     return this.http.get<RoleExtended[]>('/api/person/role', {params: params}).toPromise();
   }
 
-  getStaff(): Observable<Object> {
+  getStaff(): Observable<StaffWithName[]> {
     return this.http.get<StaffWithName[]>('/api/person/staff');
   }
 }

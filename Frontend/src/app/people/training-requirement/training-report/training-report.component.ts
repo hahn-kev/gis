@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StaffTraining } from '../staff-training';
 import { TrainingRequirementService } from '../training-requirement.service';
 import { Year } from '../year';
-import { RequirementWithStaff} from './requirement-with-staff';
+import { RequirementWithStaff } from './requirement-with-staff';
 import { Observable } from 'rxjs/Observable';
 import { map, pluck } from 'rxjs/operators';
 import { PersonService } from '../../person.service';
@@ -33,12 +33,12 @@ export class TrainingReportComponent implements OnInit {
     this.route.params.pipe(
       pluck('year'),
       map(value => value || new Date().getUTCFullYear()),
-      map(yearValue => this.years.find(year => year.value == yearValue))
+      map(yearValue => this.years.find(year => year.value === yearValue))
     ).subscribe(this.selectedYear);
     this.selectedYear.subscribe(year => this.activeYear = year);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.data.pipe(pluck('staffTraining')).subscribe(this.staffTraining);
     this.requirementsWithStaff = this.trainingService.buildRequirementsWithStaff(this.personService.getStaff(),
       this.trainingService.list(),
@@ -46,16 +46,16 @@ export class TrainingReportComponent implements OnInit {
       this.selectedYear.pipe(pluck('value')));
   }
 
-  setYear(year: number) {
+  setYear(year: number): void {
     this.router.navigate([this.route.snapshot.params['year'] ? '..' : '.', year],
       {
         relativeTo: this.route,
       });
   }
 
-  async completeTraining(reqObject: RequirementWithStaff, index: number) {
-    let staffWithTraining = reqObject.staffsWithTraining[index];
-    let staffTraining = new StaffTraining();
+  async completeTraining(reqObject: RequirementWithStaff, index: number): Promise<void> {
+    const staffWithTraining = reqObject.staffsWithTraining[index];
+    const staffTraining = new StaffTraining();
     staffTraining.trainingRequirementId = reqObject.requirement.id;
     staffTraining.staffId = staffWithTraining.staff.id;
     staffTraining.completedDate = this.completedDate;
@@ -63,8 +63,8 @@ export class TrainingReportComponent implements OnInit {
     this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.getValue().value).subscribe(this.staffTraining);
   }
 
-  async markAllComplete(reqObject: RequirementWithStaff) {
-    let staffIds = reqObject.staffsWithTraining
+  async markAllComplete(reqObject: RequirementWithStaff): Promise<void> {
+    const staffIds = reqObject.staffsWithTraining
       .filter(value => !value.training.completedDate)
       .map(value => value.staff.id);
     await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate);
