@@ -11,6 +11,7 @@ import { AppDataSource } from 'app/classes/app-data-source';
 export class LeaveListComponent implements OnInit {
   public dataSource: AppDataSource<LeaveRequest>;
 
+//todo let non hr people access this, and filter by logged in user
   constructor(private route: ActivatedRoute) {
   }
 

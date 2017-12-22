@@ -86,6 +86,7 @@ namespace Backend.Controllers
         [HttpGet("approve/{leaveRequestId}")]
         public IActionResult Approve(Guid leaveRequestId)
         {
+            //todo validate that logged in user is HR/ADMIN or is the supervisor of the person who created the leave request
             var personId = User.PersonId();
             if (personId == null) throw new UnauthorizedAccessException("Logged in user must be connected to a person talk to HR about this issue");
             _leaveRequestService.ApproveLeaveRequest(leaveRequestId, personId.Value);

@@ -19,6 +19,7 @@ export class PersonComponent implements OnInit {
   public newRole = new Role();
   @ViewChild('isStaff') isStaffElement: NgModel;
 
+  //todo show and edit training for staff
   constructor(private route: ActivatedRoute,
     private personService: PersonService,
     private router: Router,
