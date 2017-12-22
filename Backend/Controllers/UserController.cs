@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
+using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,27 +16,27 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class UserController : MyController
     {
-        private readonly UsersRepository _usersRepository;
+        private readonly UserService _userService;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(UsersRepository usersRepository, UserManager<IdentityUser> userManager)
+        public UserController(UserManager<IdentityUser> userManager, UserService userService)
         {
-            _usersRepository = usersRepository;
             _userManager = userManager;
+            _userService = userService;
         }
 
         [Authorize(Roles = "admin")]
         [HttpGet]
         public IReadOnlyCollection<IUser> Users()
         {
-            return _usersRepository.Users.ToList();
+            return _userService.Users.ToList();
         }
 
         [Authorize(Roles = "admin")]
         [HttpGet("{name}")]
         public UserProfile Get(string name)
         {
-            return _usersRepository.UserByName(name);
+            return _userService.UserByName(name);
         }
 
         [Authorize(Roles = "admin")]
@@ -48,7 +49,7 @@ namespace Backend.Controllers
         [HttpGet("self")]
         public UserProfile Self()
         {
-            return _usersRepository.UserById(int.Parse(_userManager.GetUserId(User)));
+            return _userService.UserById(int.Parse(_userManager.GetUserId(User)));
         }
 
         [HttpPut("self")]
@@ -113,7 +114,7 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
-            _usersRepository.DeleteUser(id);
+            _userService.DeleteUser(id);
             return Ok();
         }
     }

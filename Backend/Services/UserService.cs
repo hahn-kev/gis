@@ -60,15 +60,16 @@ namespace Backend.Services
             return _userManager.CreateAsync(user);
         }
 
+        public Task<IdentityResult> CreateAsync(IdentityUser user, string password)
+        {
+            CheckUpdatePersonId(user);
+            return _userManager.CreateAsync(user, password);
+        }
+
         public Task<IdentityResult> UpdateAsync(IdentityUser user)
         {
             CheckUpdatePersonId(user);
             return _userManager.UpdateAsync(user);
-        }
-
-        public Task<IdentityResult> CreateAsync(IdentityUser user, string password)
-        {
-            return _userManager.CreateAsync(user, password);
         }
 
         public Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string currentPassword, string newPassword)
