@@ -6,7 +6,7 @@
     <form id="newForm" (submit)="saveNew()">
       <mat-form-field>
         <mat-select name="requirement" required [(ngModel)]="requirement" placeholder="Completed Requirement">
-          <mat-option *ngFor="let eachRequirement of requirements.values()" [value]="eachRequirement">{{eachRequirement.name}}
+          <mat-option *ngFor="let eachRequirement of requirementsList" [value]="eachRequirement">{{eachRequirement.name}}
           </mat-option>
         </mat-select>
       </mat-form-field>

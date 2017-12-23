@@ -31,7 +31,7 @@ export class LeaveRequestService {
   }
 
   listByPersonId(personId: string): Observable<LeaveRequestWithNames[]> {
-    return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person' + personId);
+    return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
 }

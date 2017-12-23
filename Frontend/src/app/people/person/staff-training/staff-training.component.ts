@@ -13,28 +13,35 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class StaffTrainingComponent implements OnInit {
 
-  private staffId;
+  private _staffId;
   public training: StaffTrainingWithRequirement[] = [];
   public requirements: Map<string, TrainingRequirement>;
+  public requirementsList: TrainingRequirement[];
   public newTraining = new StaffTraining();
   public requirement: TrainingRequirement;
   private subscription: Subscription;
 
   constructor(private trainingService: TrainingRequirementService) {
     this.subscription = this.staffIdSubject.switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
-      .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList);
+      .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList.bind(this));
   }
 
   staffIdSubject = new Subject<string>();
-  @Input()
-  public setStaffId(staffId: string) {
-    this.staffId = staffId;
+
+  get staffId() {
+    return this._staffId;
+  }
+
+  @Input('staffId')
+  set staffId(staffId: string) {
+    this._staffId = staffId;
     this.staffIdSubject.next(staffId);
   }
 
   updateTrainingList([training, requirements]: [StaffTraining[], Map<string, TrainingRequirement>]) {
     this.requirements = requirements;
-    this.training = training.map(this.includeRequirementsInTraining);
+    this.requirementsList = Array.from(requirements.values());
+    this.training = training.map(this.includeRequirementsInTraining.bind(this));
   }
 
   includeRequirementsInTraining(value: StaffTraining): StaffTrainingWithRequirement {

@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 import { LoginService } from './login.service';
 import { MatSnackBar } from '@angular/material';
 import { tap } from 'rxjs/operators';
-import * as console from 'console';
 
 @Injectable()
 export class RoleGuardService implements CanActivate {

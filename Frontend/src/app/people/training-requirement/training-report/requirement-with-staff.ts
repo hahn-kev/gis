@@ -20,6 +20,6 @@ export class StaffWithTraining {
 
   constructor(staff: StaffWithName, training: StaffTraining) {
     this.staff = staff;
-    this.training = training || new StaffTraining(staff.id, null);
+    this.training = training || StaffTraining.New(staff.id);
   }
 }
