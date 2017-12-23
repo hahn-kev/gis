@@ -43,13 +43,16 @@ namespace Backend.Controllers
             _trainingService.Delete(id);
         }
 
-        [HttpGet("staff/{year}")]
+        [HttpGet("staff/year/{year}")]
         public IList<StaffTraining> StaffTrainings(int year)
         {
-            var startDate = new DateTime(year, 8, 1);
-            var endDate = startDate.AddMonths(9);
-            return _trainingService.StaffTraining.Where(training =>
-                training.CompletedDate != null && training.CompletedDate.Between(startDate, endDate)).ToList();
+            return _trainingService.GetByYear(year);
+        }
+
+        [HttpGet("staff/{staffId}")]
+        public IList<StaffTrainingWithRequirement> StaffTrainingWithRequirements(Guid staffId)
+        {
+            return _trainingService.GetByStaff(staffId);
         }
 
         [HttpPost("staff")]
@@ -60,10 +63,12 @@ namespace Backend.Controllers
         }
 
         [HttpPost("staff/allComplete")]
-        public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds, Guid? requirementId, DateTime? completeDate)
+        public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds, Guid? requirementId,
+            DateTime? completeDate)
         {
             if (completeDate == null) throw new ArgumentNullException(nameof(completeDate));
-            if (!requirementId.HasValue || requirementId.Value == Guid.Empty) throw new ArgumentNullException(nameof(requirementId));
+            if (!requirementId.HasValue || requirementId.Value == Guid.Empty)
+                throw new ArgumentNullException(nameof(requirementId));
             _trainingService.MarkAllComplete(staffIds, requirementId.Value, completeDate.Value);
             return Ok();
         }

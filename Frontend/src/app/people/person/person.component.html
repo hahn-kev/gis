@@ -45,6 +45,8 @@
     </mat-expansion-panel>
   </mat-accordion>
 
+  <staff-training *ngIf="person.staff" [staffId]="person.staffId"></staff-training>
+
 
   <mat-accordion class="roles">
     <!--new role-->

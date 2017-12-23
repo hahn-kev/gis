@@ -28,6 +28,17 @@ namespace Backend.DataLayer
         {
             return (date, year) => date.Between(Sql.ToSql(new DateTime(year, 7, 1)), Sql.ToSql(new DateTime(year + 1, 6, 1)));
         }
+        
+        [ExpressionMethod(nameof(InSchoolYearNullImp))]
+        public static bool InSchoolYear(this DateTime? date, int year)
+        {
+            return date >= new DateTime(year, 7, 1) && date <= new DateTime(year - 1, 6, 1);
+        }
+
+        public static Expression<Func<DateTime?, int, bool>> InSchoolYearNullImp()
+        {
+            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, 7, 1)), Sql.ToSql(new DateTime(year + 1, 6, 1)));
+        }
 
         public static int SchoolYear(this DateTime date)
         {

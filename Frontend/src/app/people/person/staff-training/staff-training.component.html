@@ -1,0 +1,50 @@
+<mat-accordion>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Submit new Training complete</mat-panel-title>
+    </mat-expansion-panel-header>
+    <form id="newForm" (submit)="saveNew()">
+      <mat-form-field>
+        <mat-select name="requirement" required [(ngModel)]="requirement" placeholder="Completed Requirement">
+          <mat-option *ngFor="let eachRequirement of requirements.values()" [value]="eachRequirement">{{eachRequirement.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input name="completedDate" matInput [(ngModel)]="newTraining.completedDate"
+               required
+               [matDatepicker]="completedDatePicker"
+               placeholder="Date Completed">
+        <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #completedDatePicker></mat-datepicker>
+      </mat-form-field>
+    </form>
+    <mat-action-row>
+      <button type="submit" form="newForm" mat-raised-button>Mark Complete</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <!--completed training list-->
+  <mat-expansion-panel *ngFor="let staffTraining of training">
+    <mat-expansion-panel-header>
+      <mat-panel-title>{{staffTraining.requirementName}} Completed on
+        {{staffTraining.completedDate | date: 'shortDate'}}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <form [id]="'trainingForm_' + staffTraining.id" (submit)="saveTraining(staffTraining)">
+
+      <mat-form-field>
+        <input name="completedDate" matInput [(ngModel)]="staffTraining.completedDate"
+               required
+               [matDatepicker]="completedDatePicker"
+               placeholder="Date Completed">
+        <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #completedDatePicker></mat-datepicker>
+      </mat-form-field>
+    </form>
+    <mat-action-row>
+      <button type="submit" [attr.form]="'trainingForm_' + staffTraining.id" mat-button>Update</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>

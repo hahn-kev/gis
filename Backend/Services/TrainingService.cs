@@ -19,7 +19,18 @@ namespace Backend.Services
         }
 
         public IList<TrainingRequirement> TrainingRequirements => _trainingRepository.TrainingRequirements.ToList();
-        public IQueryable<StaffTraining> StaffTraining => _trainingRepository.StaffTraining;
+        private IQueryable<StaffTraining> StaffTraining => _trainingRepository.StaffTraining;
+
+        public IList<StaffTraining> GetByYear(int year)
+        {
+            return StaffTraining.Where(training => training.CompletedDate.InSchoolYear(year)).ToList();
+        }
+
+        public IList<StaffTrainingWithRequirement> GetByStaff(Guid staffId)
+        {
+            return _trainingRepository.StaffTrainingWithRequirements.Where(
+                requirement => requirement.StaffId == staffId).ToList();
+        }
 
         public TrainingRequirement GetById(Guid id) =>
             _trainingRepository.TrainingRequirements.FirstOrDefault(requirement => requirement.Id == id);
@@ -49,6 +60,7 @@ namespace Backend.Services
             {
                 staffIds.RemoveAll(id => existingTrainings.Any(training => training.StaffId == id));
             }
+
             _trainingRepository.InsertAll(staffIds.Select(staffId => new StaffTraining
             {
                 Id = Guid.NewGuid(),

@@ -4,7 +4,7 @@ import { TrainingRequirement } from './training-requirement';
 import { Observable } from 'rxjs/Observable';
 import { combineLatest, map } from 'rxjs/operators';
 import { Year } from './year';
-import { StaffTraining } from './staff-training';
+import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
 import { StaffWithName } from '../person';
 import 'rxjs/add/operator/do';
@@ -23,8 +23,19 @@ export class TrainingRequirementService {
     return this.http.get<TrainingRequirement[]>('/api/training');
   }
 
+  listMapped(): Observable<Map<string, TrainingRequirement>> {
+    return this.list().map(value =>
+      new Map<string, TrainingRequirement>(value
+        .map((training): [string, TrainingRequirement] => [training.id, training]))
+    );
+  }
+
+  getTrainingByStaffId(staffId: string) {
+    return this.http.get<StaffTrainingWithRequirement[]>('/api/training/staff/' + staffId);
+  }
+
   getStaffTrainingByYear(year: number): Observable<StaffTraining[]> {
-    return this.http.get<StaffTraining[]>('/api/training/staff/' + year);
+    return this.http.get<StaffTraining[]>('/api/training/staff/year/' + year);
   }
 
   getStaffTrainingByYearMapped(year: number): Observable<Map<string, StaffTraining>> {

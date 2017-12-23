@@ -1,11 +1,6 @@
 export class StaffTraining {
 
-  constructor(staffId?: string, completedDate?: Date, trainingRequirementId?: string) {
-    this.staffId = staffId;
-    this.trainingRequirementId = trainingRequirementId;
-    this.completedDate = completedDate;
-  }
-
+  public id: string;
   public staffId: string;
   public trainingRequirementId: string;
   public completedDate: Date;
@@ -13,4 +8,9 @@ export class StaffTraining {
   static getKey(staffTraining: StaffTraining) {
     return staffTraining.staffId + '_' + staffTraining.trainingRequirementId;
   }
+}
+
+export class StaffTrainingWithRequirement extends StaffTraining {
+  public requirementName: string;
+  public requirementScope: string;
 }
