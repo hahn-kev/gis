@@ -43,6 +43,12 @@ namespace Backend.Services
         public IList<LeaveRequestWithNames> LeaveRequestsWithNames =>
             _leaveRequestRepository.LeaveRequestWithNames.ToList();
 
+        public IList<LeaveRequestWithNames> ListByPersonId(Guid personId)
+        {
+            return _leaveRequestRepository.LeaveRequestWithNames.Where(request => request.PersonId == personId)
+                .ToList();
+        }
+
         public LeaveRequestWithNames GetById(Guid id)
         {
             return _leaveRequestRepository.LeaveRequestWithNames.Single(request => request.Id == id);

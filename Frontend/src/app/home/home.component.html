@@ -33,6 +33,11 @@
           <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
           <p mat-line>Request Leave</p>
         </a>
+
+        <a mat-list-item [routerLink]="'/leave-request/list/' + (userToken | async).personId">
+          <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+          <span mat-line>Leave</span>
+        </a>
       </mat-nav-list>
     </mat-card-content>
   </mat-card>

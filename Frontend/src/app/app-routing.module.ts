@@ -127,11 +127,23 @@ const routes: Routes = [
               leaveRequest: LeaveRequestResolverService
             }
           },
+
+          {
+            path: 'list/:personId',
+            component: LeaveListComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            }
+          },
           {
             path: 'list',
             component: LeaveListComponent,
             resolve: {
               leave: LeaveListResolverService
+            },
+            canActivate: [RoleGuardService],
+            data: {
+              requireRole: ['admin', 'hr']
             }
           }
         ]

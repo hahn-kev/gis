@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Entities;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -26,9 +27,19 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin,hr")]
         public IList<LeaveRequestWithNames> List()
         {
             return _leaveRequestService.LeaveRequestsWithNames;
+        }
+
+        [HttpGet("person/{personId}")]
+        public IList<LeaveRequestWithNames> ListByPerson(Guid personId)
+        {
+            if (!User.IsAdminOrHr() && User.PersonId() != personId)
+                throw new UnauthorizedAccessException(
+                    "You're only allowed to list your leave requests unless you're hr");
+            return _leaveRequestService.ListByPersonId(personId);
         }
 
         [HttpGet("{id}")]
@@ -88,7 +99,9 @@ namespace Backend.Controllers
         {
             //todo validate that logged in user is HR/ADMIN or is the supervisor of the person who created the leave request
             var personId = User.PersonId();
-            if (personId == null) throw new UnauthorizedAccessException("Logged in user must be connected to a person talk to HR about this issue");
+            if (personId == null)
+                throw new UnauthorizedAccessException(
+                    "Logged in user must be connected to a person talk to HR about this issue");
             _leaveRequestService.ApproveLeaveRequest(leaveRequestId, personId.Value);
             return this.ShowFrontendMessage("Leave request approved");
         }

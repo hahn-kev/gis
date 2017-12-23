@@ -8,6 +8,10 @@ import { Observable } from 'rxjs/Observable';
 export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]> {
   resolve(route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<LeaveRequestWithNames[]> | Promise<LeaveRequestWithNames[]> | LeaveRequestWithNames[] {
+    let personId = route.params['personId'];
+    if (personId) {
+      return this.leaveService.listByPersonId(personId);
+    }
     return this.leaveService.list();
   }
 
