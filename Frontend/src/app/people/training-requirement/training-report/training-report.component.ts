@@ -33,7 +33,7 @@ export class TrainingReportComponent implements OnInit {
     this.route.params.pipe(
       pluck('year'),
       map(value => value || new Date().getUTCFullYear()),
-      map(yearValue => this.years.find(year => year.value === yearValue))
+      map(yearValue => this.years.find(year => year.value == yearValue))
     ).subscribe(this.selectedYear);
     this.selectedYear.subscribe(year => this.activeYear = year);
   }
