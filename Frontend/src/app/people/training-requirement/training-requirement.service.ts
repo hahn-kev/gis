@@ -88,13 +88,16 @@ export class TrainingRequirementService {
   buildRequirementsWithStaff(staffObservable: Observable<StaffWithName[]>,
                              requirementsObservable: Observable<TrainingRequirement[]>,
                              staffTrainingObservable: Observable<Map<string, StaffTraining>>,
-                             yearObservable: Observable<number>): Observable<RequirementWithStaff[]> {
+                             yearObservable: Observable<number>,
+                             showCompletedObservable: Observable<boolean>): Observable<RequirementWithStaff[]> {
     return staffTrainingObservable.pipe(
-      combineLatest(staffObservable, requirementsObservable, yearObservable, Observable.of([])),
-      map(([staffTraining, staff, requirements, year, orgGroups]) => {
+      combineLatest(staffObservable, requirementsObservable, yearObservable, showCompletedObservable, Observable.of([])),
+      map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
         return requirements
           .filter(this.isInYear.bind(this, year))
-          .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups));
+          // .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups, showCompleted))
+          .map(requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
+          .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0 ))
       }));
   }
 
@@ -106,10 +109,17 @@ export class TrainingRequirementService {
   buildRequirementWithStaff(staff: StaffWithName[],
                             staffTraining: Map<string, StaffTraining>,
                             orgGroups: OrgGroup[],
+                            showCompleted: boolean,
                             requirement: TrainingRequirement): RequirementWithStaff {
     const training = staff.filter(this.isInOrgGroup.bind(this, orgGroups, requirement))
-      .map(staffMember => new StaffWithTraining(staffMember, staffTraining.get(staffMember.id + '_' + requirement.id)));
-    return new RequirementWithStaff(requirement, training);
+      .map(staffMember => new StaffWithTraining(staffMember, staffTraining.get(staffMember.id + '_' + requirement.id)))
+      .filter(this.filterCompletedTraining.bind(this, showCompleted));
+    return new RequirementWithStaff(requirement, training, staff.length);
+  }
+
+  filterCompletedTraining(showCompleted: boolean, staffTraining: StaffWithTraining) {
+    if (showCompleted) return true;
+    return staffTraining.training.completedDate == null;
   }
 
   isInOrgGroup(orgGroups: OrgGroup[] | Map<string, OrgGroup>,

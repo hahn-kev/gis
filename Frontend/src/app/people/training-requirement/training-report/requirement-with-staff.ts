@@ -6,11 +6,17 @@ export class RequirementWithStaff {
   public requirement: TrainingRequirement;
   public staffsWithTraining: StaffWithTraining[];
   public completedRequirement: number;
+  public totalStaff: number;
 
-  constructor(requirement: TrainingRequirement, staffsWithTraining: StaffWithTraining[]) {
+  constructor(requirement: TrainingRequirement, staffsWithTraining: StaffWithTraining[], totalStaff: number) {
     this.requirement = requirement;
     this.staffsWithTraining = staffsWithTraining;
     this.completedRequirement = this.staffsWithTraining.reduce((n, staffTraining) => n + (staffTraining.training.completedDate ? 1 : 0), 0);
+    this.totalStaff = totalStaff;
+    if (totalStaff > this.staffsWithTraining.length) {
+      //staff with training has been filtered, the missing staff have completed the training
+      this.completedRequirement = totalStaff - this.staffsWithTraining.length;
+    }
   }
 }
 

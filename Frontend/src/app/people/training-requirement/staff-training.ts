@@ -1,8 +1,9 @@
 export class StaffTraining {
 
-  static New(staffId: string) {
+  static New(staffId: string, trainingId?: string) {
       let training = new StaffTraining();
       training.staffId = staffId;
+      training.trainingRequirementId = trainingId;
       return training;
   }
 

@@ -31,7 +31,8 @@ describe('TrainingRequirementService', () => {
       expect(service.buildRequirementsWithStaff(Observable.of([]),
         Observable.of([]),
         Observable.of(new Map()),
-        Observable.of(2017))).not.toBeNull();
+        Observable.of(2017),
+        Observable.of(true))).not.toBeNull();
     }));
 
     it('should have a list of things', inject([TrainingRequirementService], (service: TrainingRequirementService) => {
@@ -39,8 +40,9 @@ describe('TrainingRequirementService', () => {
       service.buildRequirementsWithStaff(
         Observable.of([new StaffWithName('s1', 'Jim')]),
         Observable.of([new TrainingRequirement('tr1', 'fire', 2016)]),
-        Observable.of(new Map([['s1', new StaffTraining('s1', null, 'tr1')]])),
-        Observable.of(2017))
+        Observable.of(new Map([['s1', StaffTraining.New('s1', 'tr1')]])),
+        Observable.of(2017),
+        Observable.of(true))
         .subscribe(spy);
       expect(spy.calls.any()).toBeTruthy();
       expect(spy.calls.mostRecent().args[0].length).toBe(1);
@@ -52,8 +54,9 @@ describe('TrainingRequirementService', () => {
       service.buildRequirementsWithStaff(
         Observable.of([new StaffWithName('s1', 'Jim')]),
         Observable.of([new TrainingRequirement('tr1', 'fire', 2016)]),
-        Observable.of(new Map([['s1', new StaffTraining('s1', null, 'tr1')]])),
-        year)
+        Observable.of(new Map([['s1', StaffTraining.New('s1','tr1')]])),
+        year,
+        Observable.of(true))
         .subscribe(spy);
       expect(spy.calls.count()).toBe(1);
       year.next(2016);

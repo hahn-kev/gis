@@ -16,40 +16,55 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 })
 export class TrainingReportComponent implements OnInit {
   public years: Year[];
-  public selectedYear: BehaviorSubject<Year>;
-  public activeYear: Year;
+  public selectedYearSubject: BehaviorSubject<Year>;
+  public selectedYear: Year;
   public year: number;
   public expandedRequirementId: string;
   public completedDate = new Date();
   public staffTraining = new BehaviorSubject<Map<string, StaffTraining>>(null);
   public requirementsWithStaff: Observable<RequirementWithStaff[]>;
+  public showCompleted = new BehaviorSubject<boolean>(true);
 
   constructor(private route: ActivatedRoute,
               private trainingService: TrainingRequirementService,
               private personService: PersonService,
               private router: Router) {
     this.years = this.trainingService.years();
-    this.selectedYear = new BehaviorSubject(null);
+    this.selectedYearSubject = new BehaviorSubject(null);
     this.route.params.pipe(
       pluck('year'),
       map(value => value || new Date().getUTCFullYear()),
       map(yearValue => this.years.find(year => year.value == yearValue))
-    ).subscribe(this.selectedYear);
-    this.selectedYear.subscribe(year => this.activeYear = year);
-  }
+    ).subscribe(this.selectedYearSubject);
+    this.selectedYearSubject.subscribe(year => this.selectedYear = year);
+    this.route.queryParamMap.pipe(map(params => {
+      return params.has('showCompleted') ? params.get('showCompleted') == 'true' : true;
+    })).subscribe(this.showCompleted);
 
-  ngOnInit(): void {
     this.route.data.pipe(pluck('staffTraining')).subscribe(this.staffTraining);
     this.requirementsWithStaff = this.trainingService.buildRequirementsWithStaff(this.personService.getStaff(),
       this.trainingService.list(),
       this.staffTraining.asObservable(),
-      this.selectedYear.pipe(pluck('value')));
+      this.selectedYearSubject.pipe(pluck('value')),
+      this.showCompleted);
+  }
+
+  ngOnInit(): void {
   }
 
   setYear(year: number): void {
+    this.updateNavigation(year, this.showCompleted.getValue());
+  }
+
+  setShowCompleted(show) {
+    this.updateNavigation(this.selectedYear.value, show);
+  }
+
+  updateNavigation(year: number, showCompleted: boolean) {
     this.router.navigate([this.route.snapshot.params['year'] ? '..' : '.', year],
       {
         relativeTo: this.route,
+        queryParams: {showCompleted: showCompleted}
       });
   }
 
@@ -60,7 +75,7 @@ export class TrainingReportComponent implements OnInit {
     staffTraining.staffId = staffWithTraining.staff.id;
     staffTraining.completedDate = this.completedDate;
     await this.trainingService.saveStaffTraining(staffTraining);
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.getValue().value).subscribe(this.staffTraining);
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
   }
 
   async markAllComplete(reqObject: RequirementWithStaff): Promise<void> {
@@ -68,6 +83,6 @@ export class TrainingReportComponent implements OnInit {
       .filter(value => !value.training.completedDate)
       .map(value => value.staff.id);
     await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate);
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.getValue().value).subscribe(this.staffTraining);
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
   }
 }
