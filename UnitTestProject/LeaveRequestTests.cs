@@ -15,7 +15,7 @@ namespace UnitTestProject
     public class LeaveRequestTests
     {
         private LeaveRequestService _leaveRequestService;
-        private DbConnection _dbConnection;
+        private IDbConnection _dbConnection;
         private ServicesFixture _servicesFixture;
 
         public LeaveRequestTests()
@@ -26,8 +26,9 @@ namespace UnitTestProject
         private void Setup(Action<IServiceCollection> configure = null)
         {
             if (configure != null) _servicesFixture = new ServicesFixture(configure);
+            _servicesFixture.SetupPeople();
             _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
-            _dbConnection = _servicesFixture.Get<DbConnection>();
+            _dbConnection = _servicesFixture.Get<IDbConnection>();
         }
 
         [Fact]

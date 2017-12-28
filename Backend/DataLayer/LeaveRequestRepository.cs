@@ -7,9 +7,9 @@ namespace Backend.DataLayer
 {
     public class LeaveRequestRepository
     {
-        private readonly DbConnection _connection;
+        private readonly IDbConnection _connection;
 
-        public LeaveRequestRepository(DbConnection connection)
+        public LeaveRequestRepository(IDbConnection connection)
         {
             _connection = connection;
         }

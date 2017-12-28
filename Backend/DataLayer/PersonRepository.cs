@@ -7,9 +7,9 @@ namespace Backend.DataLayer
 {
     public class PersonRepository
     {
-        private readonly DbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
-        public PersonRepository(DbConnection dbConnection)
+        public PersonRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -18,7 +18,7 @@ namespace Backend.DataLayer
 
 
         public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
-            from person in _dbConnection.GetTable<PersonWithDaysOfLeave>()
+            from person in People
             from vacationLeave in LeaveRequestAggrigateByType(LeaveType.Vacation)
                 .Having(holder => holder.PersonId == person.Id)
             from sickLeave in LeaveRequestAggrigateByType(LeaveType.Sick)
@@ -57,7 +57,7 @@ namespace Backend.DataLayer
         public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
 
         private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonExtended, new() =>
-            from person in _dbConnection.GetTable<T_Person>()
+            from person in _dbConnection.PeopleExtended
             from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
             select new T_Person
             {
@@ -89,7 +89,7 @@ namespace Backend.DataLayer
             };
 
         public IQueryable<StaffWithName> StaffWithNames =>
-            from staff in _dbConnection.GetTable<Staff>()
+            from staff in _dbConnection.Staff
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
             select new StaffWithName
             {

@@ -6,9 +6,9 @@ namespace Backend.DataLayer
 {
     public class OrgGroupRepository
     {
-        private readonly DbConnection _connection;
+        private readonly IDbConnection _connection;
 
-        public OrgGroupRepository(DbConnection connection)
+        public OrgGroupRepository(IDbConnection connection)
         {
             _connection = connection;
         }

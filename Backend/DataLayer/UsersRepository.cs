@@ -8,9 +8,9 @@ namespace Backend.DataLayer
 {
     public class UsersRepository
     {
-        private readonly DbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
-        public UsersRepository(DbConnection dbConnection)
+        public UsersRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

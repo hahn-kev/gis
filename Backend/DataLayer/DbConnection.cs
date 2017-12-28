@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Backend.Entities;
 using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.DataProvider;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Identity;
@@ -10,14 +13,40 @@ using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace Backend.DataLayer
 {
-    public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>
+    public interface IDbConnection : IDataContext
+    {
+        IQueryable<ImageInfo> Images { get; }
+        IQueryable<Person> People { get; }
+        IQueryable<PersonExtended> PeopleExtended { get; }
+        IQueryable<OrgGroup> OrgGroups { get; }
+        IQueryable<PersonRole> PersonRoles { get; }
+        IQueryable<LeaveRequest> LeaveRequests { get; }
+        IQueryable<TrainingRequirement> TrainingRequirements { get; }
+        IQueryable<Staff> Staff { get; }
+        IQueryable<StaffTraining> StaffTraining { get; }
+        IQueryable<IdentityUser> Users { get; }
+        IQueryable<LinqToDB.Identity.IdentityUserClaim<int>> UserClaims { get; }
+        IQueryable<LinqToDB.Identity.IdentityUserLogin<int>> UserLogins { get; }
+        IQueryable<LinqToDB.Identity.IdentityUserRole<int>> UserRoles { get; }
+        IQueryable<LinqToDB.Identity.IdentityUserToken<int>> UserTokens { get; }
+        IQueryable<LinqToDB.Identity.IdentityRole<int>> Roles { get; }
+        IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> RoleClaims { get; }
+        void Setup();
+
+        DataConnectionTransaction BeginTransaction();
+        void CommitTransaction();
+        void RollbackTransaction();
+        BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list);
+    }
+
+    public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
+        IDbConnection
     {
         private readonly RoleManager<LinqToDB.Identity.IdentityRole<int>> _roleManager;
 
         public DbConnection(RoleManager<LinqToDB.Identity.IdentityRole<int>> roleManager)
         {
             _roleManager = roleManager;
-
             SetupMappingBuilder(MappingSchema);
         }
 
@@ -39,17 +68,25 @@ namespace Backend.DataLayer
             _hasSetupMapping = true;
         }
 
-        public ITable<ImageInfo> Images => GetTable<ImageInfo>();
-        public ITable<Person> People => GetTable<Person>();
-        public ITable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
-        public ITable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
-        public ITable<PersonRole> PersonRoles => GetTable<PersonRole>();
-        public ITable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
-        public ITable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
-        public ITable<Staff> Staff => GetTable<Staff>();
-        public ITable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
+        IQueryable<IdentityUser> IDbConnection.Users => Users;
+        IQueryable<LinqToDB.Identity.IdentityUserClaim<int>> IDbConnection.UserClaims => UserClaims;
+        IQueryable<LinqToDB.Identity.IdentityUserLogin<int>> IDbConnection.UserLogins => UserLogins;
+        IQueryable<LinqToDB.Identity.IdentityUserRole<int>> IDbConnection.UserRoles => UserRoles;
+        IQueryable<LinqToDB.Identity.IdentityUserToken<int>> IDbConnection.UserTokens => UserTokens;
+        IQueryable<LinqToDB.Identity.IdentityRole<int>> IDbConnection.Roles => Roles;
+        IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> IDbConnection.RoleClaims => RoleClaims;
 
-        public async Task Setup()
+        public IQueryable<ImageInfo> Images => GetTable<ImageInfo>();
+        public IQueryable<Person> People => GetTable<Person>();
+        public IQueryable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
+        public IQueryable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
+        public IQueryable<PersonRole> PersonRoles => GetTable<PersonRole>();
+        public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
+        public IQueryable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
+        public IQueryable<Staff> Staff => GetTable<Staff>();
+        public IQueryable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
+
+        public void Setup()
         {
 #if DEBUG
             TryCreateTable<IdentityUser>();
@@ -71,12 +108,17 @@ namespace Backend.DataLayer
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
             {
-                if (!await _roleManager.RoleExistsAsync(role))
+                if (!Roles.Any(identityRole => identityRole.Name == role))
                 {
-                    await _roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(role));
+                    this.InsertId(new LinqToDB.Identity.IdentityRole<int>(role));
                 }
             }
 #endif
+        }
+
+        public BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list)
+        {
+            return DataConnectionExtensions.BulkCopy(this, list);
         }
 
         private void TryCreateTable<T>()

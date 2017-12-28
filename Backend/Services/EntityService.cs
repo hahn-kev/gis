@@ -14,9 +14,9 @@ namespace Backend.Services
 
     public class EntityService : IEntityService
     {
-        private readonly DbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
-        public EntityService(DbConnection dbConnection)
+        public EntityService(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

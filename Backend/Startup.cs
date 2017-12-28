@@ -164,7 +164,7 @@ namespace Backend
                 }
             }
             services.AddScoped<AuthenticateController>();
-            services.AddScoped<DbConnection>();
+            services.AddScoped<IDbConnection, DbConnection>();
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
                     (NpgsqlConnection) provider.GetRequiredService<DbConnection>().Connection));
@@ -228,8 +228,8 @@ namespace Backend
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                var hereForYouConnection = scope.ServiceProvider.GetService<DbConnection>();
-                hereForYouConnection.Setup().Wait();
+                var hereForYouConnection = scope.ServiceProvider.GetService<IDbConnection>();
+                hereForYouConnection.Setup();
             }
 #endif
         }

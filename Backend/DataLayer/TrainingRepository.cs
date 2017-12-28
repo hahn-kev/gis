@@ -9,9 +9,9 @@ namespace Backend.DataLayer
 {
     public class TrainingRepository
     {
-        private readonly DbConnection _connection;
+        private readonly IDbConnection _connection;
 
-        public TrainingRepository(DbConnection connection)
+        public TrainingRepository(IDbConnection connection)
         {
             _connection = connection;
         }

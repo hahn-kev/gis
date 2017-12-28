@@ -12,10 +12,10 @@ namespace Backend.DataLayer
 {
     public class ImageRepository
     {
-        private readonly DbConnection _connection;
+        private readonly IDbConnection _connection;
         private readonly NpgsqlLargeObjectManager _largeObjectManager;
 
-        public ImageRepository(DbConnection connection, NpgsqlLargeObjectManager largeObjectManager)
+        public ImageRepository(IDbConnection connection, NpgsqlLargeObjectManager largeObjectManager)
         {
             _connection = connection;
             _largeObjectManager = largeObjectManager;
