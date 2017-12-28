@@ -69,7 +69,8 @@ namespace Backend.DataLayer
                 PreferredName = person.PreferredName,
                 SpeaksEnglish = person.SpeaksEnglish,
                 Staff = staff,
-                StaffId = person.StaffId
+                StaffId = person.StaffId,
+                Country = person.Country
             };
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>

@@ -25,6 +25,16 @@
                           (ngModelChange)="isStaffChanged($event)">Is Staff
         </mat-slide-toggle>
       </div>
+      <div>
+        <mat-form-field>
+          <input matInput name="country" [matAutocomplete]="countryAuto" [(ngModel)]="person.country"
+                 placeholder="Country">
+        </mat-form-field>
+        <mat-autocomplete #countryAuto="matAutocomplete">
+          <mat-option value="USA">USA</mat-option>
+          <mat-option value="UK">UK</mat-option>
+        </mat-autocomplete>
+      </div>
 
     </form>
   </mat-card>

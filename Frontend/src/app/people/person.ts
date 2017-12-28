@@ -15,6 +15,7 @@ export class PersonExtended extends Person {
   public isThai: boolean;
   public staff: Staff;
   public preferredName: string;
+  public country: string;
 }
 
 export class PersonWithOthers extends PersonExtended {

@@ -22,6 +22,7 @@ namespace Backend.Entities
     {
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
+        public string Country { get; set; }
 
         private string _preferredName;
 

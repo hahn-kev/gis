@@ -15,10 +15,10 @@ import { LoginComponent } from './login/login.component';
 import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
-  MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule,
-  MatDialogModule, MatExpansionModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
-  MatNativeDateModule, MatOptionModule, MatProgressBarModule, MatSelectModule, MatSidenavModule, MatSlideToggleModule,
-  MatSnackBarModule, MatTableModule, MatToolbarModule, MatTooltipModule
+  MatAutocompleteModule, MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,
+  MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatIconModule, MatInputModule,
+  MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressBarModule, MatSelectModule,
+  MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 import { FlipCardComponent } from './home/flip-card/flip-card.component';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
@@ -127,6 +127,7 @@ if (environment.production) {
     MatMenuModule,
     MatSlideToggleModule,
     MatExpansionModule,
+    MatAutocompleteModule,
     FormsModule,
     AppRoutingModule,
     MarkdownModule.forRoot(),
