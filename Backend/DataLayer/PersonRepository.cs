@@ -23,7 +23,7 @@ namespace Backend.DataLayer
                 .Having(holder => holder.PersonId == person.Id)
             from sickLeave in LeaveRequestAggrigateByType(LeaveType.Sick)
                 .Having(holder => holder.PersonId == person.Id)
-            where limitByPersonId == null || person.Id == limitByPersonId
+            where (limitByPersonId == null || person.Id == limitByPersonId) && person.StaffId != null
             select new PersonWithDaysOfLeave
             {
                 Id = person.Id,

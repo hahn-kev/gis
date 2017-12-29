@@ -93,7 +93,7 @@ namespace Backend.Services
                     devision,
                     supervisorGroup
                 }).FirstOrDefault();
-
+            if (result?.personOnLeave.StaffId == null) throw new Exception("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;
