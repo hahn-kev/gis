@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using AutoBogus;
 using Backend;
 using Backend.DataLayer;
@@ -38,6 +39,7 @@ namespace UnitTestProject
             ServiceProvider = ServiceCollection.BuildServiceProvider();
             startup.ConfigureDatabase(ServiceProvider);
             DataConnection.DefaultSettings = new MockDbSettings();
+            DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message, category);
             DbConnection.Setup();
         }
 
