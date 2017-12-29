@@ -12,6 +12,9 @@ namespace Backend.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool? Approved { get; set; }
+        /// <summary>
+        /// Id of the person who approved the leave request
+        /// </summary>
         public Guid? ApprovedById { get; set; }
         [Column(DataType = DataType.VarChar)]
         public LeaveType Type { get; set; }

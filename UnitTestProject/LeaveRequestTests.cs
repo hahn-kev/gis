@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
+using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -21,20 +23,26 @@ namespace UnitTestProject
         public LeaveRequestTests()
         {
             _servicesFixture = new ServicesFixture();
+            _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+            _dbConnection = _servicesFixture.Get<IDbConnection>();
         }
 
         private void Setup(Action<IServiceCollection> configure = null)
         {
-            if (configure != null) _servicesFixture = new ServicesFixture(configure);
+            if (configure != null)
+            {
+                _servicesFixture = new ServicesFixture(configure);
+                _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+                _dbConnection = _servicesFixture.Get<IDbConnection>();
+            }
+
             _servicesFixture.SetupPeople();
-            _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
-            _dbConnection = _servicesFixture.Get<IDbConnection>();
         }
 
         [Fact]
         public async Task FindsSupervisor()
         {
-            Setup();
+            _servicesFixture.SetupPeople();
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
@@ -53,12 +61,9 @@ namespace UnitTestProject
                 It.IsAny<EmailService.Template>(),
                 It.IsAny<PersonExtended>(),
                 It.IsAny<PersonExtended>())).Returns(Task.CompletedTask);
-            _servicesFixture = new ServicesFixture(collection =>
-            {
-                collection.RemoveAll<IEmailService>().AddSingleton(emailMock.Object);
-            });
-            Setup();
+            Setup(collection => collection.RemoveAll<IEmailService>().AddSingleton(emailMock.Object));
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            Assert.NotNull(jacob);
             await _leaveRequestService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
 
             emailMock.Verify(service =>
@@ -77,6 +82,43 @@ namespace UnitTestProject
                         It.IsAny<PersonExtended>(),
                         It.IsAny<PersonExtended>()),
                 Times.Never);
+        }
+
+        [Fact]
+        public void OrgGroupChainResolvesAsExpected()
+        {
+            var personFaker = _servicesFixture.PersonFaker();
+            var expectedPersonOnLeave = personFaker.Generate();
+            var expectedDepartment = AutoFaker.Generate<OrgGroup>();
+            var expectedDevision = AutoFaker.Generate<OrgGroup>();
+            var expectedDevisionSupervisor = personFaker.Generate();
+            
+            expectedPersonOnLeave.Staff.OrgGroupId = expectedDepartment.Id;
+            
+            expectedDepartment.Supervisor = null;
+            expectedDepartment.ParentId = expectedDevision.Id;
+            
+            expectedDevision.Supervisor = expectedDevisionSupervisor.Id;
+            expectedDevision.ParentId = null;
+            
+            _dbConnection.Insert(expectedPersonOnLeave);
+            _dbConnection.Insert(expectedPersonOnLeave.Staff);
+            _dbConnection.Insert(expectedDepartment);
+            _dbConnection.Insert(expectedDevision);
+            _dbConnection.Insert(expectedDevisionSupervisor);
+            _dbConnection.Insert(expectedDevisionSupervisor.Staff);
+
+            //test method
+            (var actualPersonOnLeave, var actualDepartment, var actualDevision, var actualSupervisorGroup) =
+                _leaveRequestService.PersonWithOrgGroupChain(expectedPersonOnLeave.Id);
+            
+            
+            Assert.Equal(expectedPersonOnLeave.Id, actualPersonOnLeave.Id);
+            Assert.Equal(expectedDepartment.Id, actualDepartment.Id);
+            Assert.Null(actualDepartment.SupervisorPerson);
+            Assert.Equal(expectedDevision.Id, actualDevision.Id);
+            Assert.Equal(expectedDevisionSupervisor.Id, actualDevision.SupervisorPerson.Id);
+            Assert.Null(actualSupervisorGroup);
         }
 
         public static IEnumerable<object[]> GetExpectedEmailValues()
@@ -285,7 +327,8 @@ namespace UnitTestProject
                     (dictionary, subject, template, to, from) =>
                     {
                         if (template == EmailService.Template.RequestLeaveApproval) actualApprovalEmailSent = true;
-                        else if (template == EmailService.Template.NotifyLeaveRequest) actualNotifyEmailCount++;
+                        else if (template == EmailService.Template.NotifyLeaveRequest)
+                            actualNotifyEmailCount++;
                     });
 
             Setup(collection => collection.Replace(ServiceDescriptor.Singleton(emailMock.Object)));

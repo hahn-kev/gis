@@ -72,16 +72,19 @@ namespace Backend.Services
 
         public bool ApproveLeaveRequest(Guid leaveRequestId, Guid personId)
         {
+            //todo why are we doing this? 
             var superviserId = _personRepository.PeopleExtended.Where(person => person.Id == personId)
                 .Select(extended => extended.Id).First();
             return _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, superviserId);
         }
 
-
-        public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
+        public (PersonExtended personOnLeave,
+            OrgGroupWithSupervisor department,
+            OrgGroupWithSupervisor devision,
+            OrgGroupWithSupervisor supervisorGroup) PersonWithOrgGroupChain(Guid personId)
         {
             var result =
-            (from personOnLeave in _personRepository.PeopleExtended.Where(person => person.Id == leaveRequest.PersonId)
+            (from personOnLeave in _personRepository.PeopleExtended.Where(person => person.Id == personId)
                 from department in OrgGroups.InnerJoin(@group =>
                     @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id)
                 from devision in OrgGroups.LeftJoin(@group => @group.Id == department.ParentId).DefaultIfEmpty()
@@ -93,7 +96,14 @@ namespace Backend.Services
                     devision,
                     supervisorGroup
                 }).FirstOrDefault();
-            if (result?.personOnLeave.StaffId == null) throw new Exception("Person requesting leave must be staff");
+            return (result?.personOnLeave, result?.department, result?.devision, result?.supervisorGroup);
+        }
+
+
+        public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
+        {
+            var result = PersonWithOrgGroupChain(leaveRequest.PersonId);
+            if (result.personOnLeave?.StaffId == null) throw new Exception("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;

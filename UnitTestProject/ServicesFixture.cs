@@ -4,6 +4,7 @@ using Backend;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
+using Bogus;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.Extensions.Configuration;
@@ -42,9 +43,7 @@ namespace UnitTestProject
 
         public void SetupPeople()
         {
-            var faker = new AutoFaker<PersonExtended>()
-                .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
-                .RuleFor(extended => extended.Staff, (f, extended) => new Staff {Id = extended.StaffId.Value});
+            var faker = PersonFaker();
             var jacob = faker.Generate();
             jacob.FirstName = "Jacob";
             var bob = faker.Generate();
@@ -61,6 +60,13 @@ namespace UnitTestProject
             jacobGroup.ApproverIsSupervisor = true;
             _dbConnection.Insert(jacobGroup);
         }
+
+        public Faker<PersonExtended> PersonFaker() =>
+            new AutoFaker<PersonExtended>()
+                .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
+                .RuleFor(extended => extended.Staff,
+                    (f, extended) =>
+                        new Staff {Id = extended.StaffId ?? throw new NullReferenceException("staffId null")});
     }
 
     [CollectionDefinition("ServicesCollection")]
