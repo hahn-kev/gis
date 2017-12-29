@@ -73,6 +73,7 @@ namespace Backend.Controllers
                 User = new UserSentryContext(httpContext),
                 Request = new HttpSentryContext(httpContext) {Cookies = null}
             };
+            sentryEvent.Request.Headers.Remove("Cookie");
             if (sentryEvent.User.Username.IsNullOrEmpty())
             {
                 sentryEvent.User.Username = "anonymous";

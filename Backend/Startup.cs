@@ -71,6 +71,7 @@ namespace Backend
                 Dsn = Configuration.GetValue<string>("SentryDsn"),
                 Environment = Configuration.GetValue<string>("Environment") ?? "Production",
                 IncludeRequestData = true,
+                IncludeCookies = false,
                 Release = GetType().Assembly.GetName().Version.ToString(),
                 ServerName = Configuration.GetValue<string>("BaseUrl"),
                 IgnoreTypes = new List<Type> {typeof(UserError)}
