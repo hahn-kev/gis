@@ -44,12 +44,12 @@ export class UserComponent implements OnInit {
   }
 
   async grantAdmin(): Promise<void> {
-    await this.userService.grantAdmin(this.user.userName);
+    await this.userService.grantAdmin(this.user.id);
     this.user.isAdmin = true;
   }
 
   async revokeAdmin(): Promise<void> {
-    await this.userService.revokeAdmin(this.user.userName);
+    await this.userService.revokeAdmin(this.user.id);
     this.user.isAdmin = false;
   }
 

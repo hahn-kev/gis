@@ -56,12 +56,12 @@ export class UserService {
     }).toPromise();
   }
 
-  grantAdmin(userName: string): Promise<string> {
-    return this.http.put(`/api/user/grantadmin/${userName}`, null, {responseType: 'text'}).toPromise();
+  grantAdmin(id: number): Promise<string> {
+    return this.http.put(`/api/user/grantadmin/${id}`, null, {responseType: 'text'}).toPromise();
   }
 
-  revokeAdmin(userName: string): Promise<string> {
-    return this.http.put(`/api/user/revokeadmin/${userName}`, null, {responseType: 'text'}).toPromise();
+  revokeAdmin(id: number): Promise<string> {
+    return this.http.put(`/api/user/revokeadmin/${id}`, null, {responseType: 'text'}).toPromise();
   }
 
   deleteUser(userId: number): Promise<string> {

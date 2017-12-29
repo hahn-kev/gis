@@ -88,11 +88,11 @@ namespace Backend.Controllers
             return !result.Succeeded ? throw result.Errors() : Ok();
         }
 
-//        [Authorize(Roles = "admin")]
-        [HttpPut("grantadmin/{username}")]
-        public async Task<IActionResult> GrantAdmin(string username)
+        [Authorize(Roles = "admin")]
+        [HttpPut("grantadmin/{id}")]
+        public async Task<IActionResult> GrantAdmin(int id)
         {
-            var user = await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) throw new NullReferenceException("User not found");
             var identityResult = await _userManager.AddToRoleAsync(user, "admin");
             if (!identityResult.Succeeded) throw identityResult.Errors();
@@ -100,10 +100,10 @@ namespace Backend.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [HttpPut("revokeadmin/{username}")]
-        public async Task<IActionResult> RevokeAdmin(string username)
+        [HttpPut("revokeadmin/{id}")]
+        public async Task<IActionResult> RevokeAdmin(int id)
         {
-            var user = await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) throw new NullReferenceException("User not found");
             var identityResult = await _userManager.RemoveFromRoleAsync(user, "admin");
             if (!identityResult.Succeeded) throw identityResult.Errors();

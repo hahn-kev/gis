@@ -1,6 +1,6 @@
 <div class="user">
   <mat-card>
-    <form #userForm="ngForm" (ngSubmit)="saveUser()">
+    <form #userForm="ngForm" id="userForm" (ngSubmit)="saveUser()">
       <div>
         <mat-form-field>
           <input matInput required [disabled]="isSelf" name="name" [(ngModel)]="user.userName" placeholder="Username"
@@ -86,13 +86,15 @@
       <mat-error *ngIf="errorMessage">
         {{errorMessage}}
       </mat-error>
-      <button type="submit" [disabled]="!userForm.form.valid" mat-button>
+    </form>
+    <mat-card-actions>
+      <button type="submit" form="userForm" [disabled]="!userForm.form.valid" mat-button>
         <ng-container *ngIf="isNew; then register else save">
         </ng-container>
         <ng-template #save i18n="save@@save">Save</ng-template>
         <ng-template #register i18n="register@@register">Register</ng-template>
       </button>
-    </form>
+    </mat-card-actions>
   </mat-card>
 </div>
 
