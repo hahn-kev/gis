@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using Backend.Entities;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "admin,hr")]
     public class OrgGroupController : MyController
     {
         private readonly OrgGroupService _orgGroupService;

@@ -33,8 +33,6 @@ namespace Backend.DataLayer
                 SupervisorPerson = person
             };
         
-        
-
         public (PersonWithStaff personOnLeave,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,

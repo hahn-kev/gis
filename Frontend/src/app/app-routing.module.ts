@@ -61,6 +61,10 @@ const routes: Routes = [
       },
       {
         path: 'people',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
         children: [
           {
             path: 'edit/:id',
@@ -88,7 +92,7 @@ const routes: Routes = [
             ]
           },
           {
-            path: '',
+            path: 'list',
             component: PeopleListComponent,
             resolve: {
               people: PeopleResolveService
@@ -98,6 +102,10 @@ const routes: Routes = [
       },
       {
         path: 'groups',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
         children: [
           {
             path: 'edit/:id',
@@ -109,7 +117,7 @@ const routes: Routes = [
             }
           },
           {
-            path: '',
+            path: 'list',
             component: OrgGroupListComponent,
             resolve: {
               groups: GroupsResolveService
@@ -150,6 +158,10 @@ const routes: Routes = [
       },
       {
         path: 'training',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
         children: [
           {
             path: 'list',

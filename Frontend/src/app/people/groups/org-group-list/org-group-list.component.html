@@ -10,10 +10,10 @@
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="['groupName', 'type']"></mat-header-row>
   <mat-row class="hover-overlay" *matRowDef="let row; columns: ['groupName', 'type']"
-           [routerLink]="'edit/' + row.id"></mat-row>
+           [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 
 
-<a routerLink="edit/new" class="add-button" mat-fab matTooltip="Add new Group" matTooltipPosition="left">
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Group" matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>

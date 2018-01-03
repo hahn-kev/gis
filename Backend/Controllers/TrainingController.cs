@@ -4,11 +4,13 @@ using System.Linq;
 using Backend.Entities;
 using Backend.Services;
 using LinqToDB;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "admin,hr")]
     public class TrainingController : Controller
     {
         private TrainingService _trainingService;

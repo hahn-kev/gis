@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Security.Authentication;
 using Backend.Entities;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -17,6 +20,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin,hr")]
         public IList<Person> List()
         {
             return _personService.People();
@@ -26,7 +30,10 @@ namespace Backend.Controllers
         public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
         {
             return _personService.PeopleWithDaysOfLeave(
-                User.IsAdminOrHr() ? null : User.PersonId());
+                User.IsAdminOrHr()
+                    ? (Guid?) null
+                    : (User.PersonId() ??
+                       throw new AuthenticationException("If user isn't admin or hr they must have a personId")));
         }
 
         [HttpGet("{id}")]
@@ -36,6 +43,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin,hr")]
         public IActionResult Update([FromBody] PersonWithStaff person)
         {
             _personService.Save(person);
@@ -43,6 +51,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("role")]
+        [Authorize(Roles = "admin,hr")]
         public IActionResult UpdateRole([FromBody] PersonRole role)
         {
             _personService.Save(role);
@@ -50,12 +59,14 @@ namespace Backend.Controllers
         }
 
         [HttpGet("role")]
+        [Authorize(Roles = "admin,hr")]
         public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
         {
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }
 
         [HttpGet("staff")]
+        [Authorize(Roles = "admin,hr")]
         public IList<StaffWithName> Staff()
         {
             return _personService.StaffWithNames;

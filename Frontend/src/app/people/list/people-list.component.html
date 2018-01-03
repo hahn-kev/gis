@@ -1,5 +1,5 @@
 <ng-container *appToolbarContent>
-  <a mat-icon-button routerLink="report/roles">
+  <a mat-icon-button routerLink="../report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
 </ng-container>
@@ -14,10 +14,11 @@
   </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="['firstName', 'lastName']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['firstName', 'lastName']" [routerLink]="'edit/' + row.id"></mat-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['firstName', 'lastName']"
+           [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 
 
-<a routerLink="edit/new" class="add-button" mat-fab matTooltip="Add new Person" matTooltipPosition="left">
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Person" matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>
