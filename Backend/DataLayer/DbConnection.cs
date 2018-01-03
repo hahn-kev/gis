@@ -37,6 +37,7 @@ namespace Backend.DataLayer
         void CommitTransaction();
         void RollbackTransaction();
         BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list);
+        System.Data.IDbConnection Connection { get; }
     }
 
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,

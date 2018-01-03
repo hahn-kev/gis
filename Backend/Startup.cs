@@ -168,7 +168,7 @@ namespace Backend
             services.AddScoped<IDbConnection, DbConnection>();
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
-                    (NpgsqlConnection) provider.GetRequiredService<DbConnection>().Connection));
+                    (NpgsqlConnection) provider.GetRequiredService<IDbConnection>().Connection));
         }
 
         private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services,

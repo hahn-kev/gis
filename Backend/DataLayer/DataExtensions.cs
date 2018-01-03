@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 using LinqToDB;
-using LinqToDB.DataProvider.PostgreSQL;
-using LinqToDB.Identity;
-using LinqToDB.SqlProvider;
-using LinqToDB.SqlQuery;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Backend.DataLayer
 {
