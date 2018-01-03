@@ -50,40 +50,39 @@ namespace UnitTestProject
         {
             return typeof(Startup).Assembly.GetTypes()
                 .Where(type => type.Name.Contains("Repository") && !type.IsInterface && type != typeof(ImageRepository))
-                .Select(type => new object[] {type});
+                .SelectMany(type => type.GetProperties()
+                    .Where(info => typeof(IQueryable).IsAssignableFrom(info.PropertyType))
+                    .Select(info => new object[] {type, info})
+                );
         }
 
         [Theory]
         [MemberData(nameof(GetRepoTypes))]
-        public void ShouldEachPropertyResultInAPopulatedObject(Type repoType)
+        public void ShouldEachPropertyResultInAPopulatedObject(Type repoType, PropertyInfo info)
         {
             var repo = _servicesFixture.ServiceProvider.GetService(repoType);
-            var valueTuples = repoType.GetProperties()
-                .Where(info => typeof(IQueryable).IsAssignableFrom(info.PropertyType))
-                .Select(info => (propertyName: info.Name, list: (IQueryable) info.GetValue(repo)));
-            foreach (var tuple in valueTuples)
-            {
-                var value = tuple.list.Cast<object>().FirstOrDefault();
-                if (value == null) throw new XunitException($"property:[{tuple.propertyName}] didn't list any values");
-                if (!IsPopulated(value))
-                    throw new XunitException(
-                        $"property:[{tuple.propertyName}] didn't populate all values {JsonConvert.SerializeObject(value)}");
-            }
+            var list = (IQueryable) info.GetValue(repo);
+
+            var value = list.Cast<object>().FirstOrDefault();
+            Assert.NotNull(value);
+            if (!IsPopulated(value))
+                throw new XunitException(
+                    $"didn't populate all values {JsonConvert.SerializeObject(value)}");
         }
 
         private bool IsPopulated(object o)
         {
             return o.GetType().GetProperties()
                 .All(info =>
-                {
-                    var val =
-                    info.GetValue(o);
-                    if (info.PropertyType == typeof(Guid)) return Guid.Empty != (Guid) val;
-                    return val != (info.PropertyType.IsPrimitive
-                        ? Activator.CreateInstance(info.PropertyType)
-                        : null);
-                }
-                    );
+                    {
+                        var val =
+                            info.GetValue(o);
+                        if (info.PropertyType == typeof(Guid)) return Guid.Empty != (Guid) val;
+                        return val != (info.PropertyType.IsPrimitive
+                                   ? Activator.CreateInstance(info.PropertyType)
+                                   : null);
+                    }
+                );
         }
     }
 }
