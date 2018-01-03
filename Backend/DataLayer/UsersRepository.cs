@@ -16,7 +16,7 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<UserProfile> Users =>
-            from user in _dbConnection.GetTable<UserProfile>()
+            from user in _dbConnection.Users
             from role in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
             from userRole in _dbConnection.UserRoles
                 .Where(userRole => userRole.RoleId == role.Id && userRole.UserId == user.Id)

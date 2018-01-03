@@ -17,6 +17,7 @@ namespace UnitTestProject
     public class LeaveRequestTests
     {
         private LeaveRequestService _leaveRequestService;
+        private OrgGroupRepository _orgGroupRepository;
         private IDbConnection _dbConnection;
         private ServicesFixture _servicesFixture;
 
@@ -24,6 +25,7 @@ namespace UnitTestProject
         {
             _servicesFixture = new ServicesFixture();
             _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+            _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
             _dbConnection = _servicesFixture.Get<IDbConnection>();
         }
 
@@ -33,6 +35,7 @@ namespace UnitTestProject
             {
                 _servicesFixture = new ServicesFixture(configure);
                 _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+                _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
                 _dbConnection = _servicesFixture.Get<IDbConnection>();
             }
 
@@ -110,7 +113,7 @@ namespace UnitTestProject
 
             //test method
             (var actualPersonOnLeave, var actualDepartment, var actualDevision, var actualSupervisorGroup) =
-                _leaveRequestService.PersonWithOrgGroupChain(expectedPersonOnLeave.Id);
+                _orgGroupRepository.PersonWithOrgGroupChain(expectedPersonOnLeave.Id);
             
             
             Assert.Equal(expectedPersonOnLeave.Id, actualPersonOnLeave.Id);

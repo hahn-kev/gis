@@ -31,12 +31,17 @@ namespace Backend.Entities
             get { return _preferredName ?? FirstName + " " + LastName; }
             set { _preferredName = value; }
         }
+    }
 
+    [Table("Person", IsColumnAttributeRequired = false)]
+    public class PersonWithStaff : PersonExtended
+    {
+        
         public Staff Staff { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]
-    public class PersonWithOthers : PersonExtended
+    public class PersonWithOthers : PersonWithStaff
     {
         public IList<PersonRole> Roles { get; set; }
     }

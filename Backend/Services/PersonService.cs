@@ -42,7 +42,7 @@ namespace Backend.Services
                                (role.Active || role.EndDate > endRange)).ToList();
         }
 
-        public void Save(PersonExtended person)
+        public void Save(PersonWithStaff person)
         {
             if (string.IsNullOrEmpty(person.PreferredName))
             {

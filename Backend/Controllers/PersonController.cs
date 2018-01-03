@@ -36,7 +36,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update([FromBody] PersonExtended person)
+        public IActionResult Update([FromBody] PersonWithStaff person)
         {
             _personService.Save(person);
             return Ok();

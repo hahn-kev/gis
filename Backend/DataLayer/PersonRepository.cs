@@ -54,9 +54,10 @@ namespace Backend.DataLayer
                 .DefaultIfEmpty();
         }
 
-        public IQueryable<PersonExtended> PeopleExtended => PeopleGeneric<PersonExtended>();
+        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended;
+        public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
-        private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonExtended, new() =>
+        private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonWithStaff, new() =>
             from person in _dbConnection.PeopleExtended
             from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
             select new T_Person

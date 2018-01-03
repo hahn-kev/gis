@@ -78,31 +78,9 @@ namespace Backend.Services
             return _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, superviserId);
         }
 
-        public (PersonExtended personOnLeave,
-            OrgGroupWithSupervisor department,
-            OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup) PersonWithOrgGroupChain(Guid personId)
-        {
-            var result =
-            (from personOnLeave in _personRepository.PeopleExtended.Where(person => person.Id == personId)
-                from department in OrgGroups.InnerJoin(@group =>
-                    @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id)
-                from devision in OrgGroups.LeftJoin(@group => @group.Id == department.ParentId).DefaultIfEmpty()
-                from supervisorGroup in OrgGroups.LeftJoin(@group => @group.Id == devision.ParentId).DefaultIfEmpty()
-                select new
-                {
-                    personOnLeave,
-                    department,
-                    devision,
-                    supervisorGroup
-                }).FirstOrDefault();
-            return (result?.personOnLeave, result?.department, result?.devision, result?.supervisorGroup);
-        }
-
-
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
-            var result = PersonWithOrgGroupChain(leaveRequest.PersonId);
+            var result = _orgGroupRepository.PersonWithOrgGroupChain(leaveRequest.PersonId);
             if (result.personOnLeave?.StaffId == null) throw new Exception("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;

@@ -64,8 +64,8 @@ namespace UnitTestProject
             _dbConnection.Insert(jacobGroup);
         }
 
-        public Faker<PersonExtended> PersonFaker() =>
-            new AutoFaker<PersonExtended>()
+        public Faker<PersonWithStaff> PersonFaker() =>
+            new AutoFaker<PersonWithStaff>()
                 .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
                 .RuleFor(extended => extended.Staff,
                     (f, extended) =>
