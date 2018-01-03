@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using AutoBogus;
 using Backend;
 using Backend.DataLayer;
@@ -68,7 +69,60 @@ namespace UnitTestProject
                 .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
                 .RuleFor(extended => extended.Staff,
                     (f, extended) =>
-                        new Staff {Id = extended.StaffId ?? throw new NullReferenceException("staffId null")});
+                    {
+                        var staff = AutoFaker.Generate<Staff>();
+                        staff.Id = extended.StaffId ?? throw new NullReferenceException("staffId null");
+                        return staff;
+                    });
+
+        public void SetupData()
+        {
+            SetupPeople();
+            var personFaker = PersonFaker();
+            var leaveRequester = personFaker.Generate();
+            _dbConnection.Insert(leaveRequester);
+            _dbConnection.Insert(leaveRequester.Staff);
+            var leaveApprover = personFaker.Generate();
+            _dbConnection.Insert(leaveApprover);
+            _dbConnection.Insert(leaveApprover.Staff);
+            var leaveRequest = AutoFaker.Generate<LeaveRequest>();
+            leaveRequest.PersonId = leaveRequester.Id;
+            leaveRequest.ApprovedById = leaveApprover.Id;
+            _dbConnection.Insert(leaveRequest);
+
+            var personWithRole = personFaker.Generate();
+            _dbConnection.Insert(personWithRole);
+            _dbConnection.Insert(personWithRole.Staff);
+            var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
+            _dbConnection.BulkCopy(personRoleFaker.Generate(5));
+            SetupTraining();
+            _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now).Generate());
+        }
+
+        public void SetupTraining()
+        {
+            var personFaker = PersonFaker();
+            var personWithTraining = personFaker.Generate();
+            var trainingRequirement = AutoFaker.Generate<TrainingRequirement>();
+            trainingRequirement.FirstYear = 2015;
+            trainingRequirement.LastYear = 2018;
+            trainingRequirement.DepatmentId = personWithTraining.Staff.OrgGroupId;
+            trainingRequirement.Scope = TrainingScope.Department;
+
+            var orgGroup = AutoFaker.Generate<OrgGroup>();
+            orgGroup.Id = personWithTraining.Staff.OrgGroupId;
+            _dbConnection.Insert(orgGroup);
+
+            _dbConnection.Insert(personWithTraining);
+            _dbConnection.Insert(personWithTraining.Staff);
+            _dbConnection.Insert(trainingRequirement);
+
+            var staffTraining = AutoFaker.Generate<StaffTraining>();
+            staffTraining.StaffId =
+                personWithTraining.StaffId ?? throw new NullReferenceException("person staff id is null");
+            staffTraining.TrainingRequirementId = trainingRequirement.Id;
+            _dbConnection.Insert(staffTraining);
+        }
     }
 
     [CollectionDefinition("ServicesCollection")]
