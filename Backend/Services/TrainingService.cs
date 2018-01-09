@@ -48,7 +48,7 @@ namespace Backend.Services
 
         public void DeleteRequirement(Guid id)
         {
-            _entityService.Delete<TrainingRequirement>(id);
+            _trainingRepository.DeleteRequirement(id);
         }
 
         public void DeleteStaffTraining(Guid id)

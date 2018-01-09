@@ -37,5 +37,15 @@ namespace Backend.DataLayer
         {
             _connection.BulkCopy(staffTraining);
         }
+
+        public void DeleteRequirement(Guid id)
+        {
+            using (var transaction = _connection.BeginTransaction())
+            {
+                _connection.StaffTraining.Where(training => training.TrainingRequirementId == id).Delete();
+                _connection.TrainingRequirements.Where(requirement => requirement.Id == id).Delete();
+                transaction.Commit();
+            }
+        }
     }
 }
