@@ -46,9 +46,14 @@ namespace Backend.Services
             _entityService.Save(staffTraining);
         }
 
-        public void Delete(Guid id)
+        public void DeleteRequirement(Guid id)
         {
             _entityService.Delete<TrainingRequirement>(id);
+        }
+
+        public void DeleteStaffTraining(Guid id)
+        {
+            _entityService.Delete<StaffTraining>(id);
         }
 
         public void MarkAllComplete(List<Guid> staffIds, Guid requirementId, DateTime completeDate)

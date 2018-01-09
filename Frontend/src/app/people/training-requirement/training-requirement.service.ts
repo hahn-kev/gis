@@ -54,8 +54,16 @@ export class TrainingRequirementService {
     return this.http.post<TrainingRequirement>('/api/training/', training).toPromise();
   }
 
+  deleteRequirement(id: string): Promise<string> {
+    return this.http.delete('/api/training/' + id, {responseType: 'text'}).toPromise();
+  }
+
   saveStaffTraining(staffTraining: StaffTraining): Promise<StaffTraining> {
     return this.http.post<StaffTraining>('/api/training/staff', staffTraining).toPromise();
+  }
+
+  deleteStaffTraining(id: string): Promise<string> {
+    return this.http.delete('/api/training/staff/' + id, {responseType: 'text'}).toPromise();
   }
 
   markAllComplete(staffList: string[], requirementId: string, completeDate: Date): Promise<string> {
@@ -91,13 +99,18 @@ export class TrainingRequirementService {
                              yearObservable: Observable<number>,
                              showCompletedObservable: Observable<boolean>): Observable<RequirementWithStaff[]> {
     return staffTrainingObservable.pipe(
-      combineLatest(staffObservable, requirementsObservable, yearObservable, showCompletedObservable, Observable.of([])),
+      combineLatest(staffObservable,
+        requirementsObservable,
+        yearObservable,
+        showCompletedObservable,
+        Observable.of([])),
       map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
         return requirements
           .filter(this.isInYear.bind(this, year))
           // .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups, showCompleted))
-          .map(requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
-          .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0 ))
+          .map(
+            requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
+          .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0))
       }));
   }
 

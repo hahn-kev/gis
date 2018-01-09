@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { StaffTraining, StaffTrainingWithRequirement } from '../../training-requirement/staff-training';
 import { TrainingRequirementService } from '../../training-requirement/training-requirement.service';
 import { TrainingRequirement } from '../../training-requirement/training-requirement';
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs/Subscription';
   templateUrl: './staff-training.component.html',
   styleUrls: ['./staff-training.component.scss']
 })
-export class StaffTrainingComponent implements OnInit {
+export class StaffTrainingComponent implements OnInit, OnDestroy {
 
   private _staffId;
   public training: StaffTrainingWithRequirement[] = [];
@@ -20,13 +20,13 @@ export class StaffTrainingComponent implements OnInit {
   public newTraining = new StaffTraining();
   public requirement: TrainingRequirement;
   private subscription: Subscription;
+  private staffIdSubject = new Subject<string>();
 
   constructor(private trainingService: TrainingRequirementService) {
     this.subscription = this.staffIdSubject.switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
       .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList.bind(this));
   }
 
-  staffIdSubject = new Subject<string>();
 
   get staffId() {
     return this._staffId;
@@ -45,8 +45,8 @@ export class StaffTrainingComponent implements OnInit {
   }
 
   includeRequirementsInTraining(value: StaffTraining): StaffTrainingWithRequirement {
-    let staffTraining = <StaffTrainingWithRequirement> value;
-    let requirement = this.requirements.get(value.trainingRequirementId);
+    const staffTraining = <StaffTrainingWithRequirement> value;
+    const requirement = this.requirements.get(value.trainingRequirementId);
     staffTraining.requirementName = requirement.name;
     staffTraining.requirementScope = requirement.scope;
     return staffTraining;
@@ -63,7 +63,7 @@ export class StaffTrainingComponent implements OnInit {
   async saveNew() {
     this.newTraining.staffId = this.staffId;
     this.newTraining.trainingRequirementId = this.requirement.id;
-    let savedTraining = await this.saveTraining(this.newTraining);
+    const savedTraining = await this.saveTraining(this.newTraining);
     this.training = [
       this.includeRequirementsInTraining(savedTraining),
       ...this.training
@@ -74,5 +74,11 @@ export class StaffTrainingComponent implements OnInit {
 
   async saveTraining(training: StaffTraining) {
     return await this.trainingService.saveStaffTraining(training);
+  }
+
+  async deleteTraining(training: StaffTraining) {
+
+    await this.trainingService.deleteStaffTraining(training.id);
+    this.training = this.training.filter(value => value.id !== training.id);
   }
 }

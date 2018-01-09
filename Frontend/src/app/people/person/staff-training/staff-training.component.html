@@ -44,6 +44,7 @@
       </mat-form-field>
     </form>
     <mat-action-row>
+      <button (click)="deleteTraining(staffTraining)" mat-button>Delete</button>
       <button type="submit" [attr.form]="'trainingForm_' + staffTraining.id" mat-button>Update</button>
     </mat-action-row>
   </mat-expansion-panel>

@@ -40,9 +40,9 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public void DeleteRequirement(Guid id)
         {
-            _trainingService.Delete(id);
+            _trainingService.DeleteRequirement(id);
         }
 
         [HttpGet("staff/year/{year}")]
@@ -62,6 +62,12 @@ namespace Backend.Controllers
         {
             _trainingService.Save(staffTraining);
             return staffTraining;
+        }
+
+        [HttpDelete("staff/{id}")]
+        public void DeleteStaffTraining(Guid id)
+        {
+            _trainingService.DeleteStaffTraining(id);
         }
 
         [HttpPost("staff/allComplete")]
