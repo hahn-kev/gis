@@ -56,7 +56,7 @@ namespace Backend.Services
             }
             else
             {
-                if (person.StaffId.HasValue) _entityService.Delete<Staff>(person.StaffId.Value);
+                if (person.StaffId.HasValue) _personRepository.DeleteStaff(person.StaffId.Value);
                 person.StaffId = null;
             }
 

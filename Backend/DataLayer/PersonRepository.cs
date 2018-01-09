@@ -110,5 +110,15 @@ namespace Backend.DataLayer
 
             return person;
         }
+
+        public void DeleteStaff(Guid staffId)
+        {
+            using (var transaction = _dbConnection.BeginTransaction())
+            {
+                _dbConnection.StaffTraining.Where(training => training.StaffId == staffId).Delete();
+                _dbConnection.Staff.Where(staff => staff.Id == staffId).Delete();
+                transaction.Commit();
+            }
+        }
     }
 }
