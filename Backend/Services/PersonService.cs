@@ -62,6 +62,25 @@ namespace Backend.Services
 
             _entityService.Save(person);
             MatchPersonWithUser(person);
+
+            if (person.SpouseChanged)
+            {
+                if (person.SpouseId.HasValue)
+                {
+                    //find the spouse and set them to be this persons spouse
+                    _personRepository.PeopleExtended.Where(extended => extended.Id == person.SpouseId)
+                        .Set(extended => extended.SpouseId, person.Id).Update();
+                    //note at the moment you could orphan a spouse this way, in the future we could write another update
+                    //so to set anyone who has this person as a spouse to null, this would only happen
+                    //if you changed someone from the spouse of one person to another though
+                }
+                else
+                {
+                    //find the current spouse and make them not spouses anymore
+                    _personRepository.PeopleExtended.Where(extended => extended.SpouseId == person.Id)
+                        .Set(extended => extended.SpouseId, (Guid?) null).Update();
+                }
+            }
         }
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();

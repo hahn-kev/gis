@@ -13,12 +13,18 @@ export class Person {
 export class PersonExtended extends Person {
   public speaksEnglish: boolean;
   public isThai: boolean;
-  public staff: Staff;
   public preferredName: string;
   public country: string;
+  public phoneNumber: string;
+  public spouseId: string;
+  public spouseChanged: boolean;
 }
 
-export class PersonWithOthers extends PersonExtended {
+export class PersonWithStaff extends PersonExtended {
+  public staff: Staff;
+}
+
+export class PersonWithOthers extends PersonWithStaff {
 
   public roles: Role[] = [];
 }

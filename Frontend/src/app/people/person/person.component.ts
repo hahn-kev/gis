@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PersonWithOthers, Staff } from '../person';
+import { Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
 import { Role } from '../role';
 import { OrgGroup } from '../groups/org-group';
@@ -16,6 +16,7 @@ import { NgModel } from '@angular/forms';
 export class PersonComponent implements OnInit {
   public person: PersonWithOthers;
   public groups: OrgGroup[];
+  public people: Person[];
   public newRole = new Role();
   @ViewChild('isStaff') isStaffElement: NgModel;
 
@@ -26,10 +27,11 @@ export class PersonComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { person: PersonWithOthers, groups: OrgGroup[] }) => {
+    this.route.data.subscribe((value: { person: PersonWithOthers, groups: OrgGroup[], people: Person[] }) => {
       this.person = value.person;
       this.groups = value.groups;
       this.newRole.personId = this.person.id;
+      this.people = value.people.filter(person => person.id != value.person.id);
     });
   }
 
@@ -56,7 +58,7 @@ export class PersonComponent implements OnInit {
 
   async save(): Promise<void> {
     await this.personService.updatePerson(this.person);
-    this.router.navigate(['/people']);
+    this.router.navigate(['/people/list']);
   }
 
   async saveRole(role: Role, isNew = false): Promise<void> {

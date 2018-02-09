@@ -16,6 +16,22 @@
           <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
         </mat-form-field>
       </div>
+
+      <div>
+        <mat-form-field>
+          <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
+                      placeholder="Spouse">
+            <mat-option [value]="null">None</mat-option>
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName + " " +
+              eachPerson.lastName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
       <div>
         <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
         <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
@@ -25,6 +41,22 @@
                           (ngModelChange)="isStaffChanged($event)">Is Staff
         </mat-slide-toggle>
       </div>
+
+      <div>
+        <mat-input-container>
+          <input matInput [(ngModel)]="person.email"
+                 type="email"
+                 name="email"
+                 placeholder="Email">
+        </mat-input-container>
+        <mat-input-container>
+          <input matInput [(ngModel)]="person.phoneNumber"
+                 type="tel"
+                 name="phone"
+                 placeholder="Phone Number">
+        </mat-input-container>
+      </div>
+
       <div>
         <mat-form-field>
           <input matInput name="country" [matAutocomplete]="countryAuto" [(ngModel)]="person.country"
@@ -33,6 +65,7 @@
         <mat-autocomplete #countryAuto="matAutocomplete">
           <mat-option value="USA">USA</mat-option>
           <mat-option value="UK">UK</mat-option>
+          <mat-option value="Thailand">Thailand</mat-option>
         </mat-autocomplete>
       </div>
 

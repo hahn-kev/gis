@@ -23,6 +23,11 @@ namespace Backend.Entities
         public bool SpeaksEnglish { get; set; }
         public bool IsThai { get; set; }
         public string Country { get; set; }
+        public string PhoneNumber { get; set; }
+        public Guid? SpouseId { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public bool SpouseChanged { get; set; }
 
         private string _preferredName;
 
@@ -36,7 +41,6 @@ namespace Backend.Entities
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithStaff : PersonExtended
     {
-        
         public Staff Staff { get; set; }
     }
 
