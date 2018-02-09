@@ -6,13 +6,8 @@ using AutoBogus;
 using Backend;
 using Backend.DataLayer;
 using Backend.Entities;
-using Bogus;
 using LinqToDB;
-using LinqToDB.Extensions;
-using Newtonsoft.Json;
 using Xunit;
-using Xunit.Sdk;
-using Person = Backend.Entities.Person;
 
 namespace UnitTestProject
 {
@@ -65,21 +60,17 @@ namespace UnitTestProject
 
             var value = list.Cast<object>().FirstOrDefault();
             Assert.NotNull(value);
-            if (!IsPopulated(value))
-                throw new XunitException(
-                    $"didn't populate all values {JsonConvert.SerializeObject(value)}");
+            Assert.Empty(NotPopulatedValues(value));
         }
 
-        private bool IsPopulated(object o)
+        private IEnumerable<(PropertyInfo, object)> NotPopulatedValues(object o)
         {
-            return o.GetType().GetProperties()
-                .All(info =>
+            return o.GetType().GetProperties().Select(info => (info: info, val: info.GetValue(o)))
+                .Where(t =>
                     {
-                        var val =
-                            info.GetValue(o);
-                        if (info.PropertyType == typeof(Guid)) return Guid.Empty != (Guid) val;
-                        return val != (info.PropertyType.IsPrimitive
-                                   ? Activator.CreateInstance(info.PropertyType)
+                        if (t.info.PropertyType == typeof(Guid)) return Guid.Empty == (Guid) t.val;
+                        return t.val == (t.info.PropertyType.IsPrimitive
+                                   ? Activator.CreateInstance(t.info.PropertyType)
                                    : null);
                     }
                 );
