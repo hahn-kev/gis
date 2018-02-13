@@ -20,16 +20,12 @@ import {
   MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressBarModule, MatSelectModule,
   MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatTooltipModule
 } from '@angular/material';
-import { FlipCardComponent } from './home/flip-card/flip-card.component';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { ActivityIndicatorInterceptorService } from './services/activity-indicator-interceptor.service';
-import { MarkdownModule } from 'angular2-markdown';
 import { CdkTableModule } from '@angular/cdk/table';
 import { ToolbarTemplateDirective } from './toolbar/toolbar-template.directive';
 import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { ToolbarService } from './toolbar/toolbar.service';
-import { YourRightsComponent } from './home/static/your-rights.component';
-import { LifeLessonsComponent } from './home/static/life-lessons.component';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { SettingsService } from './services/settings.service';
 import { ClipboardModule } from 'ngx-clipboard/dist';
@@ -71,12 +67,9 @@ if (environment.production) {
     LoginComponent,
     AdminComponent,
     HomeComponent,
-    FlipCardComponent,
     RequireRoleDirective,
     ToolbarTemplateDirective,
     ToolbarContentDirective,
-    YourRightsComponent,
-    LifeLessonsComponent,
     ConfirmDialogComponent,
     MessageComponent,
     PersonComponent,
@@ -130,7 +123,6 @@ if (environment.production) {
     MatAutocompleteModule,
     FormsModule,
     AppRoutingModule,
-    MarkdownModule.forRoot(),
     ClipboardModule,
     CookieModule.forRoot()
   ],
