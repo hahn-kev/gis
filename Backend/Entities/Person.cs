@@ -10,6 +10,13 @@ namespace Backend.Entities
         public string LastName { get; set; }
         public Guid? StaffId { get; set; }
         public string Email { get; set; }
+        private string _preferredName;
+
+        public string PreferredName
+        {
+            get { return _preferredName ?? FirstName + " " + LastName; }
+            set { _preferredName = value; }
+        }
 
         public override string ToString()
         {
@@ -28,14 +35,6 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public bool SpouseChanged { get; set; }
-
-        private string _preferredName;
-
-        public string PreferredName
-        {
-            get { return _preferredName ?? FirstName + " " + LastName; }
-            set { _preferredName = value; }
-        }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]

@@ -18,6 +18,7 @@ namespace Backend.DataLayer
         IQueryable<ImageInfo> Images { get; }
         IQueryable<Person> People { get; }
         IQueryable<PersonExtended> PeopleExtended { get; }
+        IQueryable<EmergencyContact> EmergencyContacts { get; }
         IQueryable<OrgGroup> OrgGroups { get; }
         IQueryable<PersonRole> PersonRoles { get; }
         IQueryable<LeaveRequest> LeaveRequests { get; }
@@ -80,6 +81,7 @@ namespace Backend.DataLayer
         public IQueryable<ImageInfo> Images => GetTable<ImageInfo>();
         public IQueryable<Person> People => GetTable<Person>();
         public IQueryable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
+        public IQueryable<EmergencyContact> EmergencyContacts => GetTable<EmergencyContact>();
         public IQueryable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
         public IQueryable<PersonRole> PersonRoles => GetTable<PersonRole>();
         public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
@@ -105,6 +107,7 @@ namespace Backend.DataLayer
             TryCreateTable<TrainingRequirement>();
             TryCreateTable<Staff>();
             TryCreateTable<StaffTraining>();
+            TryCreateTable<EmergencyContact>();
 
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)

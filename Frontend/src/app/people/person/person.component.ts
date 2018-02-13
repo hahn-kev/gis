@@ -7,6 +7,7 @@ import { OrgGroup } from '../groups/org-group';
 import { MatDialog } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { NgModel } from '@angular/forms';
+import { EmergencyContactExtended } from '../emergency-contact';
 
 @Component({
   selector: 'app-person',
@@ -17,21 +18,30 @@ export class PersonComponent implements OnInit {
   public person: PersonWithOthers;
   public groups: OrgGroup[];
   public people: Person[];
+  public emergencyContacts: EmergencyContactExtended[];
+  public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
   @ViewChild('isStaff') isStaffElement: NgModel;
 
   constructor(private route: ActivatedRoute,
-    private personService: PersonService,
-    private router: Router,
-    private dialog: MatDialog) {
+              private personService: PersonService,
+              private router: Router,
+              private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { person: PersonWithOthers, groups: OrgGroup[], people: Person[] }) => {
+    this.route.data.subscribe((value: {
+      person: PersonWithOthers,
+      groups: OrgGroup[],
+      people: Person[],
+      emergencyContacts: EmergencyContactExtended[]
+    }) => {
       this.person = value.person;
       this.groups = value.groups;
       this.newRole.personId = this.person.id;
+      this.newEmergencyContact.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
+      this.emergencyContacts = value.emergencyContacts;
     });
   }
 
@@ -81,6 +91,29 @@ export class PersonComponent implements OnInit {
     if (result) {
       await this.personService.deleteRole(role.id);
       this.person.roles = this.person.roles.filter(value => value.id != role.id);
+    }
+  }
+
+  async saveEmergencyContact(emergencyContact: EmergencyContactExtended, isNew = false) {
+    emergencyContact = await this.personService.updateEmergencyContact(emergencyContact);
+    if (isNew) {
+      this.emergencyContacts = [...this.emergencyContacts, emergencyContact];
+      this.newEmergencyContact = new EmergencyContactExtended();
+      this.newEmergencyContact.personId = this.person.id;
+    }
+  }
+
+  async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(`Deleting Emergency Contact: "${emergencyContact.contactPreferedName}", data will be lost, this can not be undone`,
+          'Delete',
+          'Cancel')
+      });
+    let result = await dialogRef.afterClosed().toPromise();
+    if (result) {
+      await this.personService.deleteEmergencyContact(emergencyContact.id);
+      this.emergencyContacts = this.emergencyContacts.filter(value => value.id != emergencyContact.id);
     }
   }
 }

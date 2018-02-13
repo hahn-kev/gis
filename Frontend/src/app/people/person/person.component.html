@@ -97,12 +97,12 @@
       <mat-expansion-panel-header>
         <mat-panel-title>Add new Role</mat-panel-title>
       </mat-expansion-panel-header>
-      <form #newRoleForm="ngForm" id="newForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+      <form #newRoleForm="ngForm" id="newRoleForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
         <app-role [role]="newRole"></app-role>
 
       </form>
       <mat-action-row>
-        <button type="submit" form="newForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
+        <button type="submit" form="newRoleForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
       </mat-action-row>
     </mat-expansion-panel>
 
@@ -121,6 +121,41 @@
       <mat-action-row>
         <button mat-button (click)="deleteRole(role)">Delete</button>
         <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
+        </button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-accordion>
+    <mat-expansion-panel #newEmergencyContactPanel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Add new Emergency Contact</mat-panel-title>
+      </mat-expansion-panel-header>
+      <form #newEmergencyContactForm="ngForm" id="newEmergencyContactForm"
+            (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
+        <app-emergency-contact [emergencyContact]="newEmergencyContact"></app-emergency-contact>
+      </form>
+      <mat-action-row>
+        <button type="submit" form="newEmergencyContactForm" [disabled]="newEmergencyContactForm.form.invalid"
+                mat-button>Add
+        </button>
+      </mat-action-row>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel *ngFor="let contact of emergencyContacts">
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
+      </mat-expansion-panel-header>
+      <form #contactForm="ngForm" [id]="'contactForm_' + contact.id"
+            (submit)="saveEmergencyContact(contact)">
+        <app-emergency-contact [emergencyContact]="contact"></app-emergency-contact>
+      </form>
+      <mat-action-row>
+        <button mat-button (click)="deleteEmergencyContact(contact)">Delete</button>
+        <button type="submit"
+                [attr.form]="'contactForm_' + contact.id"
+                [disabled]="contactForm.form.invalid"
+                mat-button>Save
         </button>
       </mat-action-row>
     </mat-expansion-panel>

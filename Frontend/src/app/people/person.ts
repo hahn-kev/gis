@@ -8,12 +8,13 @@ export class Person {
               public email?: string,
               public staffId?: string) {
   }
+
+  public preferredName: string;
 }
 
 export class PersonExtended extends Person {
   public speaksEnglish: boolean;
   public isThai: boolean;
-  public preferredName: string;
   public country: string;
   public phoneNumber: string;
   public spouseId: string;

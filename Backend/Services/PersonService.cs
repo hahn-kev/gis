@@ -22,30 +22,13 @@ namespace Backend.Services
             _usersRepository = usersRepository;
         }
 
+        #region people
+
         public IList<Person> People() =>
             _personRepository.People.OrderBy(person => person.FirstName)
                 .ThenBy(person => person.LastName).ToList();
 
         public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
-
-        public void Save(PersonRole role)
-        {
-            if (role == null) throw new ArgumentNullException(nameof(role));
-            if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
-            _entityService.Save(role);
-        }
-
-        public void DeleteRole(Guid id)
-        {
-            _entityService.Delete<PersonRole>(id);
-        }
-
-        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
-        {
-            return _personRepository.PersonRolesExtended
-                .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
-                               (role.Active || role.EndDate > endRange)).ToList();
-        }
 
         public void Save(PersonWithStaff person)
         {
@@ -88,10 +71,6 @@ namespace Backend.Services
             }
         }
 
-        public void Save(EmergencyContact contact)
-        {
-            _entityService.Save(contact);
-        }
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
 
@@ -108,5 +87,52 @@ namespace Backend.Services
         {
             return _personRepository.PeopleWithDaysOfLeave(limitByPersonId).ToList();
         }
+
+        #endregion
+
+        #region roles
+
+        public void Save(PersonRole role)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
+            _entityService.Save(role);
+        }
+
+        public void DeleteRole(Guid id)
+        {
+            _entityService.Delete<PersonRole>(id);
+        }
+
+        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
+        {
+            return _personRepository.PersonRolesExtended
+                .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
+                               (role.Active || role.EndDate > endRange)).ToList();
+        }
+
+        #endregion
+
+        #region emergency contact
+
+        public IList<EmergencyContactExtended> GetEmergencyContacts(Guid personId)
+        {
+            return _personRepository.EmergencyContactsExtended.Where(extended => extended.PersonId == personId)
+                .ToList();
+        }
+        
+        public void Save(EmergencyContact contact)
+        {
+            _entityService.Save(contact);
+        }
+
+        public void DeleteEmergencyContact(Guid id)
+        {
+            _entityService.Delete<EmergencyContact>(id);
+        }
+
+        #endregion
+
+        
     }
 }

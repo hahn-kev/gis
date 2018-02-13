@@ -55,6 +55,7 @@ import { TrainingEditComponent } from './people/training-requirement/training-ed
 import { TrainingRequirementService } from './people/training-requirement/training-requirement.service';
 import { TrainingReportComponent } from './people/training-requirement/training-report/training-report.component';
 import { StaffTrainingComponent } from './people/person/staff-training/staff-training.component';
+import { EmergencyContactComponent } from './people/person/emergency-contact/emergency-contact.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -77,13 +78,14 @@ if (environment.production) {
     RoleComponent,
     RolesReportComponent,
     OrgGroupListComponent,
-    GroupComponent,
+    GroupComponent, 
     LeaveRequestComponent,
     LeaveListComponent,
     TrainingListComponent,
     TrainingEditComponent,
     TrainingReportComponent,
-    StaffTrainingComponent
+    StaffTrainingComponent,
+    EmergencyContactComponent
   ],
   entryComponents: [
     ConfirmDialogComponent

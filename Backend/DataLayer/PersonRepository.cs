@@ -102,6 +102,18 @@ namespace Backend.DataLayer
                 PreferredName = person.PreferredName
             };
 
+        public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
+            from emergencyContact in _dbConnection.EmergencyContacts
+            join person in PeopleExtended on emergencyContact.ContactId equals person.Id
+            select new EmergencyContactExtended
+            {
+                Id = emergencyContact.Id,
+                ContactId = emergencyContact.ContactId,
+                Order = emergencyContact.Order,
+                PersonId = emergencyContact.PersonId,
+                ContactPreferedName = person.PreferredName
+            };
+
         public PersonWithOthers GetById(Guid id)
         {
             var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);

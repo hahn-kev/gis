@@ -81,12 +81,26 @@ namespace Backend.Controllers
             return _personService.StaffWithNames;
         }
 
+        [HttpGet("{personId}/emergency")]
+        [Authorize(Roles = "admin,hr")]
+        public IList<EmergencyContactExtended> GetEmergencyContacts(Guid personId)
+        {
+            return _personService.GetEmergencyContacts(personId);
+        }
+        
         [HttpPost("emergency")]
         [Authorize(Roles = "admin,hr")]
-        public EmergencyContact UpdateEmergencyContact([FromBody] EmergencyContact emergencyContact)
+        public EmergencyContactExtended UpdateEmergencyContact([FromBody] EmergencyContactExtended emergencyContact)
         {
             _personService.Save(emergencyContact);
             return emergencyContact;
+        }
+
+        [HttpDelete("emergency/{id}")]
+        [Authorize(Roles = "admin,hr")]
+        public void DeleteEmergencyContact(Guid id)
+        {
+            _personService.DeleteEmergencyContact(id);
         }
     }
 }

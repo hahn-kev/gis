@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Person, PersonExtended, PersonWithDaysOfLeave, PersonWithOthers, StaffWithName } from './person';
 import { Observable } from 'rxjs/Observable';
 import { Role, RoleExtended } from './role';
+import { EmergencyContactExtended } from './emergency-contact';
 
 @Injectable()
 export class PersonService {
@@ -44,5 +45,17 @@ export class PersonService {
 
   getStaff(): Observable<StaffWithName[]> {
     return this.http.get<StaffWithName[]>('/api/person/staff');
+  }
+
+  getEmergencyContacts(personId: string) {
+    return this.http.get<EmergencyContactExtended[]>(`/api/person/${personId}/emergency`).toPromise();
+  }
+
+  updateEmergencyContact(emergencyContact: EmergencyContactExtended) {
+    return this.http.post<EmergencyContactExtended>('api/person/emergency', emergencyContact).toPromise();
+  }
+
+  deleteEmergencyContact(id: string) {
+    return this.http.delete('/api/person/emergency/' + id, {responseType: 'text'}).toPromise();
   }
 }
