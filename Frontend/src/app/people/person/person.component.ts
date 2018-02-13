@@ -69,4 +69,18 @@ export class PersonComponent implements OnInit {
       this.newRole.personId = this.person.id;
     }
   }
+
+  async deleteRole(role: Role) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(`Deleting role: "${role.name}", data will be lost, this can not be undone`,
+          'Delete',
+          'Cancel')
+      });
+    let result = await dialogRef.afterClosed().toPromise();
+    if (result) {
+      await this.personService.deleteRole(role.id);
+      this.person.roles = this.person.roles.filter(value => value.id != role.id);
+    }
+  }
 }

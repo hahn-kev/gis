@@ -58,6 +58,15 @@ namespace Backend.Controllers
             return Json(role);
         }
 
+        
+        [HttpDelete("role/{roleId}")]
+        [Authorize(Roles = "admin,hr")]
+        public IActionResult DeleteRole(Guid roleId)
+        {
+            _personService.DeleteRole(roleId);
+            return Ok();
+        }
+
         [HttpGet("role")]
         [Authorize(Roles = "admin,hr")]
         public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
@@ -70,6 +79,14 @@ namespace Backend.Controllers
         public IList<StaffWithName> Staff()
         {
             return _personService.StaffWithNames;
+        }
+
+        [HttpPost("emergency")]
+        [Authorize(Roles = "admin,hr")]
+        public EmergencyContact UpdateEmergencyContact([FromBody] EmergencyContact emergencyContact)
+        {
+            _personService.Save(emergencyContact);
+            return emergencyContact;
         }
     }
 }

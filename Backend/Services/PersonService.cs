@@ -35,6 +35,11 @@ namespace Backend.Services
             _entityService.Save(role);
         }
 
+        public void DeleteRole(Guid id)
+        {
+            _entityService.Delete<PersonRole>(id);
+        }
+
         public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
         {
             return _personRepository.PersonRolesExtended
@@ -81,6 +86,11 @@ namespace Backend.Services
                         .Set(extended => extended.SpouseId, (Guid?) null).Update();
                 }
             }
+        }
+
+        public void Save(EmergencyContact contact)
+        {
+            _entityService.Save(contact);
         }
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();

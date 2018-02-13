@@ -30,6 +30,10 @@ export class PersonService {
     return this.http.post<Role>('/api/person/role', role).toPromise();
   }
 
+  deleteRole(roleId: string): Promise<string> {
+    return this.http.delete('/api/person/role/' + roleId, {responseType: 'text'}).toPromise();
+  }
+
   getRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleExtended[]> {
     const params = new HttpParams()
       .append('canStartDuringRange', canStartDuringRange.toString())

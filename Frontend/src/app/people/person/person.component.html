@@ -119,6 +119,7 @@
 
       </form>
       <mat-action-row>
+        <button mat-button (click)="deleteRole(role)">Delete</button>
         <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
         </button>
       </mat-action-row>
