@@ -73,6 +73,12 @@ namespace UnitTestProject
                         var staff = AutoFaker.Generate<Staff>();
                         staff.Id = extended.StaffId ?? throw new NullReferenceException("staffId null");
                         return staff;
+                    }).RuleSet("notStaff",
+                    set =>
+                    {
+                        set.RuleFor(staff => staff.StaffId, (Guid?) null);
+                        set.RuleFor(staff => staff.Staff, (Staff) null);
+                        
                     });
 
         public void SetupData()
@@ -96,7 +102,18 @@ namespace UnitTestProject
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             _dbConnection.BulkCopy(personRoleFaker.Generate(5));
             SetupTraining();
-            _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now).Generate());
+            _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now)
+                .Generate());
+
+            var personWithEmergencyContact = personFaker.Generate("default,notStaff");
+            _dbConnection.Insert(personWithEmergencyContact);
+            var contactPerson = personFaker.Generate("default,notStaff");
+            
+            _dbConnection.Insert(contactPerson);
+            var emergencyContact = AutoFaker.Generate<EmergencyContact>();
+            emergencyContact.ContactId = contactPerson.Id;
+            emergencyContact.PersonId = personWithEmergencyContact.Id;
+            _dbConnection.Insert(emergencyContact);
         }
 
         public void SetupTraining()
