@@ -2,7 +2,7 @@
                   mode="query"></mat-progress-bar>
 <div class="main">
   <mat-toolbar color="primary">
-    <button mat-icon-button i18n-mat-tooltip="menu button tooltip@@menu" mat-tooltip="Menu" (click)="sidenav.toggle()">
+    <button mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
     <span i18n="site title@@appTitle">GIS</span>
@@ -15,8 +15,8 @@
         <div id="user" *ngIf="currentUser | async as user">
           <h2>
             <ng-container i18n="welcome user@@welcomeUser">Welcome {{user.userName}}</ng-container>
-            <button mat-icon-button (click)="logout()" i18n-mat-tooltip="logout button@@logoutTooltip"
-                    mat-tooltip="Logout">
+            <button mat-icon-button (click)="logout()"
+                    matTooltip="Logout">
               <mat-icon>exit_to_app</mat-icon>
             </button>
           </h2>
