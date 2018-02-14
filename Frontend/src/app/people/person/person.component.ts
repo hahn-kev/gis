@@ -27,9 +27,6 @@ export class PersonComponent implements OnInit {
               private personService: PersonService,
               private router: Router,
               private dialog: MatDialog) {
-  }
-
-  ngOnInit(): void {
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       groups: OrgGroup[],
@@ -43,6 +40,10 @@ export class PersonComponent implements OnInit {
       this.people = value.people.filter(person => person.id != value.person.id);
       this.emergencyContacts = value.emergencyContacts;
     });
+  }
+
+  ngOnInit(): void {
+
   }
 
   async isStaffChanged(isStaff: boolean): Promise<void> {

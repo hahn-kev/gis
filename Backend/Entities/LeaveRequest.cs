@@ -8,6 +8,16 @@ namespace Backend.Entities
 {
     public class LeaveRequest : BaseEntity
     {
+        public LeaveRequest()
+        {
+        }
+
+        public LeaveRequest(DateTime startDate, DateTime endDate)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+        }
+
         public Guid PersonId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

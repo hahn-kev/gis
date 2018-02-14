@@ -1,3 +1,68 @@
-<p>
-  self works!
-</p>
+<div class="main-card">
+  <mat-card>
+    <div>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.firstName"
+               type="text"
+               readonly
+               placeholder="First Name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.lastName"
+               type="text"
+               readonly
+               placeholder="Last Name">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.preferredName"
+               type="text"
+               readonly
+               placeholder="Preferred Name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.spousePreferedName"
+               type="text"
+               readonly
+               placeholder="Spouse">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-icon matPrefix>email</mat-icon>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.email"
+               type="email"
+               readonly
+               placeholder="Email">
+      </mat-form-field>
+      <mat-icon>phone</mat-icon>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.phoneNumber"
+               type="tel"
+               readonly
+               placeholder="Phone Number">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-icon matPrefix>public</mat-icon>
+      <mat-form-field>
+        <input matInput [(ngModel)]="self.person.country"
+               readonly
+               placeholder="Country">
+      </mat-form-field>
+    </div>
+    <mat-grid-list cols="4" rowHeight="25px">
+      <mat-grid-tile></mat-grid-tile>
+      <mat-grid-tile>Used</mat-grid-tile>
+      <mat-grid-tile>Left</mat-grid-tile>
+      <mat-grid-tile>Total</mat-grid-tile>
+      <ng-container *ngFor="let leaveUsed of self.leaveDetails.leaveUseages">
+        <mat-grid-tile>{{leaveUsed.leaveType}}</mat-grid-tile>
+        <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
+        <mat-grid-tile>{{leaveUsed.left}}</mat-grid-tile>
+        <mat-grid-tile>{{leaveUsed.totalAllowed}}</mat-grid-tile>
+      </ng-container>
+    </mat-grid-list>
+  </mat-card>
+</div>

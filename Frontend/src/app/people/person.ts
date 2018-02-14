@@ -23,6 +23,7 @@ export class PersonExtended extends Person {
 
 export class PersonWithStaff extends PersonExtended {
   public staff: Staff;
+  public spousePreferedName: string;
 }
 
 export class PersonWithOthers extends PersonWithStaff {

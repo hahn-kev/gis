@@ -18,3 +18,9 @@
   <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
   <mat-datepicker #endDatePicker></mat-datepicker>
 </mat-form-field>
+<div>
+  <mat-slide-toggle name="staff" matTooltip="determines the start date of staff for leave calculations"
+                    [(ngModel)]="role.isStaffPosition">Staff position
+  </mat-slide-toggle>
+  <mat-slide-toggle name="director" [(ngModel)]="role.isDirectorPosition">Director position</mat-slide-toggle>
+</div>

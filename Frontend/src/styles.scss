@@ -82,6 +82,9 @@ html, body {
   align-items: center;
 }
 
+.mat-slide-toggle:not(:first-child) {
+  padding-left: 8px;
+}
 
 .spacer {
   flex: 1 1 auto;

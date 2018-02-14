@@ -10,6 +10,8 @@ namespace Backend.Entities
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool Active { get; set; }
+        public bool IsDirectorPosition { get; set; }
+        public bool IsStaffPosition { get; set; }
     }
 
     [Table("PersonRole", IsColumnAttributeRequired = false)]

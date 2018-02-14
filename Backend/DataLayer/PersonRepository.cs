@@ -16,6 +16,7 @@ namespace Backend.DataLayer
 
         public IQueryable<Person> People => _dbConnection.People;
 
+        public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
         public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
             from person in People
@@ -59,6 +60,7 @@ namespace Backend.DataLayer
 
         private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonWithStaff, new() =>
             from person in _dbConnection.PeopleExtended
+            from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
             from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
             select new T_Person
             {
@@ -73,7 +75,8 @@ namespace Backend.DataLayer
                 StaffId = person.StaffId,
                 Country = person.Country,
                 PhoneNumber = person.PhoneNumber,
-                SpouseId = person.SpouseId
+                SpouseId = person.SpouseId,
+                SpousePreferedName = spouse.PreferredName
             };
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>

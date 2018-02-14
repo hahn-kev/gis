@@ -4,6 +4,9 @@ using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
+using Backend.Utils;
+using Microsoft.AspNetCore.Razor.Language.CodeGeneration;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Backend.Services
 {
@@ -83,12 +86,75 @@ namespace Backend.Services
                 _usersRepository.UpdatePersonId(user.Id, person.Id);
         }
 
+        #endregion
+
+        #region leave
+
         public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null)
         {
             return _personRepository.PeopleWithDaysOfLeave(limitByPersonId).ToList();
         }
 
+        public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
+        {
+            return GetLeaveDetails(person, person.Roles, DateTime.Now.SchoolYear());
+        }
+
+        public LeaveDetails GetLeaveDetails(PersonWithOthers person, IList<PersonRole> personRoles, int schoolYear)
+        {
+            //todo does this include unapproved leave?
+            var leaveRequests = _personRepository.LeaveRequests
+                .Where(request => request.PersonId == person.Id && request.StartDate.InSchoolYear(schoolYear))
+                .ToArray();
+            var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
+
+            return new LeaveDetails
+            {
+                LeaveUseages = leaveTypes.GroupJoin(leaveRequests,
+                    type => type,
+                    request => request.Type,
+                    (type, requests) => new LeaveUseage
+                    {
+                        LeaveType = type,
+                        Used = TotalLeaveUsed(requests),
+                        TotalAllowed = LeaveAllowed(type, personRoles)
+                    }
+                ).ToList()
+            };
+        }
+
+        public static int TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
+        {
+            return requests.Sum(request => request.StartDate.BusinessDaysUntil(request.EndDate));
+        }
+
+        public static int? LeaveAllowed(LeaveType leaveType, IList<PersonRole> personRoles)
+        {
+            switch (leaveType)
+            {
+                case LeaveType.Sick: return 30;
+                case LeaveType.Personal: return 5;
+                case LeaveType.Funeral: return 5;
+                case LeaveType.Maternity: return 90;
+                case LeaveType.Paternity: return 5;
+                case LeaveType.Vacation: break;
+                default: throw new NotImplementedException($"Leave type {leaveType} is new and is not supported");
+            }
+
+            //calculation for vacation time is done here
+            var mostRecentRole = personRoles
+                .Where(role => role.Active && (role.IsStaffPosition || role.IsDirectorPosition))
+                .OrderBy(role => role.StartDate).FirstOrDefault();
+            if (mostRecentRole == null) return null;
+            if (mostRecentRole.IsDirectorPosition) return 20;
+            var yearsOfService = DateTime.Now.Year - mostRecentRole.StartDate.Year;
+            if (yearsOfService < 10) return 10;
+            if (yearsOfService < 20) return 15;
+            return 20;
+        }
+
         #endregion
+
 
         #region roles
 
@@ -120,7 +186,7 @@ namespace Backend.Services
             return _personRepository.EmergencyContactsExtended.Where(extended => extended.PersonId == personId)
                 .ToList();
         }
-        
+
         public void Save(EmergencyContact contact)
         {
             _entityService.Save(contact);
@@ -132,7 +198,5 @@ namespace Backend.Services
         }
 
         #endregion
-
-        
     }
 }

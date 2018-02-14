@@ -3,6 +3,9 @@
     <mat-icon mat-list-icon>save</mat-icon>
     Save
   </button>
+  <a mat-button [routerLink]="'/self/' + person?.id">
+    <mat-icon mat-list-icon>face</mat-icon>
+    Impersonate</a>
 </ng-container>
 
 <div class="person">
@@ -25,7 +28,7 @@
           <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
                       placeholder="Spouse">
             <mat-option [value]="null">None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName + " " +
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName + " " +
               eachPerson.lastName}}
             </mat-option>
           </mat-select>

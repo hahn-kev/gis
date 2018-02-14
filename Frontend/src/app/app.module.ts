@@ -14,9 +14,10 @@ import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
   MatAutocompleteModule, MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,
-  MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatIconModule, MatInputModule,
-  MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressBarModule, MatSelectModule,
-  MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatTooltipModule
+  MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule,
+  MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressBarModule,
+  MatSelectModule, MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatTableModule, MatToolbarModule,
+  MatTooltipModule
 } from '@angular/material';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { ActivityIndicatorInterceptorService } from './services/activity-indicator-interceptor.service';
@@ -55,6 +56,7 @@ import { TrainingReportComponent } from './people/training-requirement/training-
 import { StaffTrainingComponent } from './people/person/staff-training/staff-training.component';
 import { EmergencyContactComponent } from './people/person/emergency-contact/emergency-contact.component';
 import { SelfComponent } from './people/self/self.component';
+import { SelfService } from './people/self/self.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -123,6 +125,7 @@ if (environment.production) {
     MatSlideToggleModule,
     MatExpansionModule,
     MatAutocompleteModule,
+    MatGridListModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,
@@ -155,7 +158,8 @@ if (environment.production) {
     PersonService,
     GroupService,
     LeaveRequestService,
-    TrainingRequirementService
+    TrainingRequirementService,
+    SelfService
   ],
   bootstrap: [AppComponent]
 })

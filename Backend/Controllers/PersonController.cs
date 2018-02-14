@@ -37,6 +37,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public PersonWithOthers Get(Guid id)
         {
             return _personService.GetById(id);

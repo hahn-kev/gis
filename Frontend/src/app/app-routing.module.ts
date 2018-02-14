@@ -33,6 +33,7 @@ import { StaffResolveService } from './people/staff-resolve.service';
 import { LeaveRequestResolverService } from './people/leave-request/leave-request-resolver.service';
 import { EmergencyContactResolverService } from './people/emergency-contact-resolver.service';
 import { SelfComponent } from './people/self/self.component';
+import { SelfService } from './people/self/self.service';
 
 const routes: Routes = [
   {
@@ -199,8 +200,21 @@ const routes: Routes = [
       },
       {
         path: 'self',
-        component: SelfComponent,
-        resolve: {}
+        children: [
+          {
+            path: ':id', component: SelfComponent,
+            resolve: {
+              self: SelfService
+            }
+          },
+          {
+            path: '',
+            component: SelfComponent,
+            resolve: {
+              self: SelfService
+            }
+          }
+        ]
       },
       {
         path: 'home',

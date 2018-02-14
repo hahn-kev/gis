@@ -37,19 +37,17 @@ namespace Backend.Entities
         public bool SpouseChanged { get; set; }
     }
 
-    [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithStaff : PersonExtended
     {
         public Staff Staff { get; set; }
+        public string SpousePreferedName { get; set; }
     }
 
-    [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithOthers : PersonWithStaff
     {
         public IList<PersonRole> Roles { get; set; }
     }
 
-    [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithDaysOfLeave : Person
     {
         public int SickDaysOfLeaveUsed { get; set; }
