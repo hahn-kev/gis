@@ -3,9 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { LocalStorageModule } from 'angular-2-local-storage';
-
 import { AppComponent } from './app.component';
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import 'hammerjs';
 import { UserComponent } from './user/user.component';
@@ -56,6 +54,7 @@ import { TrainingRequirementService } from './people/training-requirement/traini
 import { TrainingReportComponent } from './people/training-requirement/training-report/training-report.component';
 import { StaffTrainingComponent } from './people/person/staff-training/staff-training.component';
 import { EmergencyContactComponent } from './people/person/emergency-contact/emergency-contact.component';
+import { SelfComponent } from './people/self/self.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -78,14 +77,15 @@ if (environment.production) {
     RoleComponent,
     RolesReportComponent,
     OrgGroupListComponent,
-    GroupComponent, 
+    GroupComponent,
     LeaveRequestComponent,
     LeaveListComponent,
     TrainingListComponent,
     TrainingEditComponent,
     TrainingReportComponent,
     StaffTrainingComponent,
-    EmergencyContactComponent
+    EmergencyContactComponent,
+    SelfComponent
   ],
   entryComponents: [
     ConfirmDialogComponent

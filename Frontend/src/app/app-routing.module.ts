@@ -32,6 +32,7 @@ import { StaffTrainingResolverService } from './people/training-requirement/staf
 import { StaffResolveService } from './people/staff-resolve.service';
 import { LeaveRequestResolverService } from './people/leave-request/leave-request-resolver.service';
 import { EmergencyContactResolverService } from './people/emergency-contact-resolver.service';
+import { SelfComponent } from './people/self/self.component';
 
 const routes: Routes = [
   {
@@ -195,6 +196,11 @@ const routes: Routes = [
             }
           }
         ]
+      },
+      {
+        path: 'self',
+        component: SelfComponent,
+        resolve: {}
       },
       {
         path: 'home',
