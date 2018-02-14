@@ -28,20 +28,20 @@
           </a>
         </div>
 
-        <mat-list-item routerLink="/home" routerLinkActive="active-link">
+        <a mat-list-item routerLink="/home" routerLinkActive="active-link">
           <mat-icon mat-list-icon>home</mat-icon>
           <a mat-line i18n="take user to home page link@@homeLink">Home</a>
-        </mat-list-item>
+        </a>
 
         <mat-divider></mat-divider>
 
         <ng-container *requireRole="'admin'">
           <mat-divider></mat-divider>
           <h3 mat-subheader>Admin</h3>
-          <mat-list-item routerLink="/user/admin" routerLinkActive="active-link">
+          <a mat-list-item routerLink="/user/admin" routerLinkActive="active-link">
             <mat-icon mat-list-icon>face</mat-icon>
             <a mat-line>User Managment</a>
-          </mat-list-item>
+          </a>
         </ng-container>
 
       </mat-nav-list>
