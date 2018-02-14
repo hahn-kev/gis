@@ -26,7 +26,7 @@
   <mat-card class="mat-elevation-z6 live">
 
     <!--<img mat-card-image src="assets/img/pexels-photo-592940.jpeg" alt="Live">-->
-    <mat-card-title>Self</mat-card-title>
+    <mat-card-title>Me!</mat-card-title>
     <mat-card-content>
       <mat-nav-list>
         <a mat-list-item routerLink="/leave-request/edit/new">
@@ -36,7 +36,7 @@
 
         <a mat-list-item [routerLink]="'/leave-request/list/' + (userToken | async).personId">
           <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
-          <span mat-line>Leave</span>
+          <span mat-line>My Leave</span>
         </a>
 
         <a mat-list-item routerLink="/self">
