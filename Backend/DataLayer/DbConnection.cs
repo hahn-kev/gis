@@ -44,11 +44,9 @@ namespace Backend.DataLayer
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
         IDbConnection
     {
-        private readonly RoleManager<LinqToDB.Identity.IdentityRole<int>> _roleManager;
 
-        public DbConnection(RoleManager<LinqToDB.Identity.IdentityRole<int>> roleManager)
+        public DbConnection()
         {
-            _roleManager = roleManager;
             SetupMappingBuilder(MappingSchema);
         }
 
