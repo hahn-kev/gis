@@ -51,8 +51,12 @@ namespace UnitTestProject
             jacob.FirstName = "Jacob";
             var bob = faker.Generate();
             bob.FirstName = "Bob";
+            var jacobWife = faker.Generate();
+            jacobWife.SpouseId = jacob.Id;
+            jacob.SpouseId = jacobWife.Id;
             Assert.Empty(_dbConnection.People);
             _dbConnection.Insert(jacob);
+            _dbConnection.Insert(jacobWife);
             _dbConnection.Insert(bob);
             _dbConnection.BulkCopy(faker.Generate(5));
             _dbConnection.Insert(jacob.Staff);
