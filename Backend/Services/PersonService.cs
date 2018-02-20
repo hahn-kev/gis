@@ -183,7 +183,9 @@ namespace Backend.Services
 
         public IList<EmergencyContactExtended> GetEmergencyContacts(Guid personId)
         {
-            return _personRepository.EmergencyContactsExtended.Where(extended => extended.PersonId == personId)
+            return _personRepository.EmergencyContactsExtended
+                .Where(extended => extended.PersonId == personId)
+                .OrderBy(contact => contact.Order)
                 .ToList();
         }
 
