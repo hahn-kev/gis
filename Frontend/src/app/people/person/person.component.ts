@@ -39,6 +39,7 @@ export class PersonComponent implements OnInit {
       this.newEmergencyContact.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
       this.emergencyContacts = value.emergencyContacts;
+      this.newEmergencyContact.order = this.emergencyContacts.length + 1;
     });
   }
 
@@ -101,6 +102,7 @@ export class PersonComponent implements OnInit {
       this.emergencyContacts = [...this.emergencyContacts, emergencyContact];
       this.newEmergencyContact = new EmergencyContactExtended();
       this.newEmergencyContact.personId = this.person.id;
+      this.newEmergencyContact.order = this.emergencyContacts.length + 1;
     }
   }
 
