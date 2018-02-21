@@ -106,6 +106,11 @@ namespace UnitTestProject
                         EndDate = new DateTime(2000, 1, 1)
                     }
                 });
+                yield return (null, new List<PersonRole>());
+                yield return (null, new List<PersonRole>
+                {
+                    new PersonRole {Active = true, StartDate = twoYearsAgo},
+                });
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
