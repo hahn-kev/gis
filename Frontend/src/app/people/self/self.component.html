@@ -54,7 +54,9 @@
     </div>
     <mat-grid-list cols="4" rowHeight="25px">
       <mat-grid-tile></mat-grid-tile>
-      <mat-grid-tile>Used</mat-grid-tile>
+      <mat-grid-tile class="hint" matTooltip="Pending leave requests are included in the calculation for used leave">
+        Used
+      </mat-grid-tile>
       <mat-grid-tile>Left</mat-grid-tile>
       <mat-grid-tile>Total</mat-grid-tile>
       <ng-container *ngFor="let leaveUsed of self.leaveDetails.leaveUseages">

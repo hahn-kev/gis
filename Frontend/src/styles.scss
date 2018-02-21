@@ -89,3 +89,7 @@ html, body {
 .spacer {
   flex: 1 1 auto;
 }
+
+.hint, .hint .mat-figure {
+  text-decoration: underline dashed;
+}
