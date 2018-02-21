@@ -41,5 +41,82 @@ namespace UnitTestProject
             var result = PersonService.TotalLeaveUsed(new[] {new LeaveRequest(startDate, endDate)});
             Assert.Equal(expectedDays, result);
         }
+
+        public static IEnumerable<object[]> RolesMemberData()
+        {
+            IEnumerable<(int?, IList<PersonRole> )> MakeValues()
+            {
+                var twoYearsAgo = DateTime.Now - TimeSpan.FromDays(2 * 366);
+                yield return (10,
+                    new List<PersonRole>
+                    {
+                        new PersonRole {Active = true, IsStaffPosition = true, StartDate = twoYearsAgo}
+                    });
+                yield return (10,
+                    new List<PersonRole>
+                    {
+                        new PersonRole {Active = true, IsStaffPosition = true, StartDate = twoYearsAgo},
+                        //director position doesn't count to the 20 days because it's not active
+                        new PersonRole
+                        {
+                            IsDirectorPosition = true,
+                            StartDate = new DateTime(2000, 1, 1),
+                            EndDate = new DateTime(2002, 1, 1)
+                        },
+                    });
+                yield return (20, new List<PersonRole>
+                {
+                    new PersonRole {Active = true, IsDirectorPosition = true, StartDate = twoYearsAgo}
+                });
+                yield return (15, new List<PersonRole>
+                {
+                    new PersonRole {Active = true, IsStaffPosition = true, StartDate = twoYearsAgo},
+                    new PersonRole
+                    {
+                        IsStaffPosition = true,
+                        StartDate = new DateTime(2000, 1, 1),
+                        EndDate = new DateTime(2002, 1, 1)
+                    },
+                    new PersonRole
+                    {
+                        IsStaffPosition = true,
+                        StartDate = new DateTime(2002, 1, 2),
+                        EndDate = new DateTime(2013, 1, 1)
+                    }
+                });
+                yield return (20, new List<PersonRole>
+                {
+                    new PersonRole {Active = true, IsStaffPosition = true, StartDate = twoYearsAgo},
+                    new PersonRole
+                    {
+                        IsStaffPosition = true,
+                        StartDate = new DateTime(2000, 1, 1),
+                        EndDate = new DateTime(2002, 1, 1)
+                    },
+                    new PersonRole
+                    {
+                        IsStaffPosition = true,
+                        StartDate = new DateTime(2002, 1, 2),
+                        EndDate = new DateTime(2013, 1, 1)
+                    },
+                    new PersonRole
+                    {
+                        IsStaffPosition = true,
+                        StartDate = new DateTime(1995, 1, 1),
+                        EndDate = new DateTime(2000, 1, 1)
+                    }
+                });
+            }
+
+            return MakeValues().Select(tuple => tuple.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(RolesMemberData))]
+        public void ShouldCalculateLeaveAllowed(int? expected, IList<PersonRole> personRoles)
+        {
+            var result = PersonService.LeaveAllowed(LeaveType.Vacation, personRoles);
+            Assert.Equal(expected, result);
+        }
     }
 }

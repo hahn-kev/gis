@@ -12,6 +12,16 @@ namespace Backend.Entities
         public bool Active { get; set; }
         public bool IsDirectorPosition { get; set; }
         public bool IsStaffPosition { get; set; }
+
+        public TimeSpan LengthOfService()
+        {
+            return (Active
+                       ? DateTime.Now
+                       : EndDate ??
+                         throw new NullReferenceException(
+                             "End date null for inactive role"))
+                   - StartDate;
+        }
     }
 
     [Table("PersonRole", IsColumnAttributeRequired = false)]

@@ -142,12 +142,11 @@ namespace Backend.Services
             }
 
             //calculation for vacation time is done here
-            var mostRecentRole = personRoles
-                .Where(role => role.Active && (role.IsStaffPosition || role.IsDirectorPosition))
-                .OrderBy(role => role.StartDate).FirstOrDefault();
-            if (mostRecentRole == null) return null;
-            if (mostRecentRole.IsDirectorPosition) return 20;
-            var yearsOfService = DateTime.Now.Year - mostRecentRole.StartDate.Year;
+            if (personRoles.Any(role => role.Active && role.IsDirectorPosition)) return 20;
+            var totalServiceTime = personRoles.Where(role => role.IsStaffPosition || role.IsDirectorPosition)
+                .Aggregate(TimeSpan.Zero, (serviceTime, role) => serviceTime + role.LengthOfService());
+
+            var yearsOfService = totalServiceTime.Days / 365;
             if (yearsOfService < 10) return 10;
             if (yearsOfService < 20) return 15;
             return 20;
