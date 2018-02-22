@@ -20,7 +20,7 @@ namespace Backend.DataLayer
             from l in _connection.LeaveRequests
             from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
             from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById)
-            select new LeaveRequestWithNames()
+            select new LeaveRequestWithNames
             {
                 Approved = l.Approved,
                 ApprovedById = l.ApprovedById,
@@ -31,7 +31,8 @@ namespace Backend.DataLayer
                 PersonId = l.PersonId,
                 RequesterName = person.PreferredName,
                 StartDate = l.StartDate,
-                Type = l.Type
+                Type = l.Type,
+                Reason = l.Reason
             };
 
         public bool ApproveLeaveRequest(Guid id, Guid approver)

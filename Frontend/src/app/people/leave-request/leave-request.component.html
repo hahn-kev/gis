@@ -1,64 +1,65 @@
 <div class="main-card">
   <mat-card>
-    <form #leaveForm="ngForm" (submit)="submit()" id="form">
-      <div>
-        <mat-form-field>
-          <mat-select name="person"
-                      [(ngModel)]="leaveRequest.personId"
-                      (ngModelChange)="personSelectedChanged($event)"
-                      required
-                      [disabled]="!(loginService.hasRole('admin') | async)"
-                      placeholder="Person Leaving">
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-              {{eachPerson.lastName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
-            <mat-option value="Vacation">Vacation</mat-option>
-            <mat-option value="Sick">Sick</mat-option>
-            <mat-option value="Personal">Personal</mat-option>
-            <mat-option value="Funeral">Funeral</mat-option>
+    <form #leaveForm="ngForm" (submit)="submit()" id="form" class="two-colum-grid">
+      <mat-form-field>
+        <mat-select name="person"
+                    [(ngModel)]="leaveRequest.personId"
+                    (ngModelChange)="personSelectedChanged($event)"
+                    required
+                    [disabled]="!(loginService.hasRole('admin') | async)"
+                    placeholder="Person Leaving">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
+            {{eachPerson.lastName}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
+          <mat-option value="Vacation">Vacation</mat-option>
+          <mat-option value="Sick">Sick</mat-option>
+          <mat-option value="Personal">Personal</mat-option>
+          <mat-option value="Funeral">Funeral</mat-option>
 
-            <!--todo only show mat/pat ernity leave based on gender-->
-            <mat-option value="Maternity">Maternity</mat-option>
-            <mat-option value="Paternity">Paternity</mat-option>
+          <!--todo only show mat/pat ernity leave based on gender-->
+          <mat-option *ngIf="selectedPerson?.gender == 'Male'" value="Maternity">Maternity</mat-option>
+          <mat-option *ngIf="selectedPerson?.gender == 'Female'" value="Paternity">Paternity</mat-option>
 
-            <mat-option value="Buisness">Buisness</mat-option>
-            <mat-option value="Compensation">Compensation</mat-option>
-            <mat-option value="NonPaid">Non-Paid</mat-option>
-            <mat-option value="Other">Other</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <input name="startDate" required matInput [(ngModel)]="leaveRequest.startDate"
-                 [matDatepicker]="startDatePicker"
-                 placeholder="Start Date">
-          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #startDatePicker></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field>
-          <input name="endDate" required matInput [(ngModel)]="leaveRequest.endDate"
-                 [matDatepicker]="endDatePicker"
-                 placeholder="End Date">
-          <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #endDatePicker></mat-datepicker>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-chip-list>
-          <mat-chip color="accent" selected="true">Vacation used {{selectedPerson?.vacationDaysOfLeaveUsed}}
-            day{{selectedPerson?.vacationDaysOfLeaveUsed === 1 ? '' : 's'}}
-          </mat-chip>
-          <mat-chip color="accent" selected="true">Sick Leave used {{selectedPerson?.sickDaysOfLeaveUsed}}
-            day{{selectedPerson?.sickDaysOfLeaveUsed === 1 ? '' : 's'}}
-          </mat-chip>
-        </mat-chip-list>
-      </div>
+          <mat-option value="Buisness">Buisness</mat-option>
+          <mat-option value="Compensation">Compensation</mat-option>
+          <mat-option value="NonPaid">Non-Paid</mat-option>
+          <mat-option value="Other">Other</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <input name="startDate" required matInput [(ngModel)]="leaveRequest.startDate"
+               [matDatepicker]="startDatePicker"
+               placeholder="Start Date">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <input name="endDate" required matInput [(ngModel)]="leaveRequest.endDate"
+               [matDatepicker]="endDatePicker"
+               placeholder="End Date">
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="span-2-columns">
+          <textarea matInput [(ngModel)]="leaveRequest.reason"
+                    name="reason"
+                    placeholder="Reason"></textarea>
+      </mat-form-field>
+
+      <mat-chip-list class="span-2-columns">
+        <mat-chip color="accent" selected="true">Vacation used {{selectedPerson?.vacationDaysOfLeaveUsed}}
+          day{{selectedPerson?.vacationDaysOfLeaveUsed === 1 ? '' : 's'}}
+        </mat-chip>
+        <mat-chip color="accent" selected="true">Sick Leave used {{selectedPerson?.sickDaysOfLeaveUsed}}
+          day{{selectedPerson?.sickDaysOfLeaveUsed === 1 ? '' : 's'}}
+        </mat-chip>
+      </mat-chip-list>
     </form>
 
     <mat-card-actions>

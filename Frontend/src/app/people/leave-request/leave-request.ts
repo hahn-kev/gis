@@ -8,6 +8,8 @@ export class LeaveRequest {
     public approved?: boolean,
     public createdDate?: Date) {
   }
+
+  public reason: string;
 }
 
 export class LeaveRequestWithNames extends LeaveRequest {

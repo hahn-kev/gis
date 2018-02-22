@@ -17,13 +17,10 @@ namespace Backend.Controllers
     public class LeaveRequestController : MyController
     {
         private readonly LeaveRequestService _leaveRequestService;
-        private readonly ClaimsIdentityOptions _identityOptions;
 
-        public LeaveRequestController(LeaveRequestService leaveRequestService,
-            IOptions<ClaimsIdentityOptions> identityOptions)
+        public LeaveRequestController(LeaveRequestService leaveRequestService)
         {
             _leaveRequestService = leaveRequestService;
-            _identityOptions = identityOptions.Value;
         }
 
         [HttpGet]
