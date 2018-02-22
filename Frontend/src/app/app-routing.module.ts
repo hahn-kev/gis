@@ -75,8 +75,7 @@ const routes: Routes = [
             resolve: {
               person: PersonResolverService,
               groups: GroupsResolveService,
-              people: PeopleResolveService,
-              emergencyContacts: EmergencyContactResolverService
+              people: PeopleResolveService
             }
           },
           {

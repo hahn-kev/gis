@@ -9,71 +9,184 @@
 </ng-container>
 
 <div class="person">
-  <mat-card>
-    <form #personForm="ngForm" id="form" (ngSubmit)="save()">
-      <div>
-        <mat-form-field>
-          <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
-        </mat-form-field>
-      </div>
+  <form #personForm="ngForm" id="form" (ngSubmit)="save()">
+    <mat-accordion displayMode="flat" multi="true">
+      <mat-expansion-panel disabled expanded="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Person</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+          <mat-form-field>
+            <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
+          </mat-form-field>
+        </div>
 
-      <div>
-        <mat-form-field>
-          <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
-                      placeholder="Spouse">
-            <mat-option [value]="null">None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName + " " +
-              eachPerson.lastName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+        <div>
+          <mat-form-field>
+            <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
+                        placeholder="Spouse">
+              <mat-option [value]="null">None</mat-option>
+              <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName + " " +
+                eachPerson.lastName}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div>
-        <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
-        <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
-      </div>
-      <div>
-        <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
-                          (ngModelChange)="isStaffChanged($event)">Is Staff
-        </mat-slide-toggle>
-      </div>
+        <div>
+          <mat-form-field>
+            <input name="birthdate" matInput [(ngModel)]="person.birthdate"
+                   [matDatepicker]="birthDatePicker"
+                   placeholder="Birthday">
+            <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #birthDatePicker></mat-datepicker>
+          </mat-form-field>
 
-      <div>
-        <mat-input-container>
-          <input matInput [(ngModel)]="person.email"
-                 type="email"
-                 name="email"
-                 placeholder="Email">
-        </mat-input-container>
-        <mat-input-container>
-          <input matInput [(ngModel)]="person.phoneNumber"
-                 type="tel"
-                 name="phone"
-                 placeholder="Phone Number">
-        </mat-input-container>
-      </div>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.gender" name="gender"
+                        placeholder="Gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div>
-        <mat-form-field>
-          <input matInput name="country" [matAutocomplete]="countryAuto" [(ngModel)]="person.country"
-                 placeholder="Country">
-        </mat-form-field>
-        <mat-autocomplete #countryAuto="matAutocomplete">
-          <mat-option value="USA">USA</mat-option>
-          <mat-option value="UK">UK</mat-option>
-          <mat-option value="Thailand">Thailand</mat-option>
-        </mat-autocomplete>
-      </div>
+        <div class="mat-form-field-wrapper">
+          <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
+          <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
+        </div>
+        <div class="mat-form-field-wrapper">
+          <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
+                            (ngModelChange)="isStaffChanged($event)">Is Staff
+          </mat-slide-toggle>
+        </div>
 
-    </form>
-  </mat-card>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.email"
+                   type="email"
+                   name="email"
+                   placeholder="Email">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.phoneNumber"
+                   type="tel"
+                   name="phone"
+                   placeholder="Phone Number">
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.nationality" name="nationality"
+                        placeholder="Nationality">
+              <mat-option value="NorthAmerica">North America</mat-option>
+              <mat-option value="CentralSouthAmerica">Central/South America</mat-option>
+              <mat-option value="Africa">Africa</mat-option>
+              <mat-option value="MiddleEast">Middle East</mat-option>
+              <mat-option value="Europe">Europe</mat-option>
+              <mat-option value="CentralAsia">Central Asia</mat-option>
+              <mat-option value="EastAsia">East Asia</mat-option>
+              <mat-option value="Oceania">Oceania</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+      <!--passport address-->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Passport Address</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+          <mat-form-field>
+          <textarea matInput [(ngModel)]="person.passportAddress"
+                    name="passportAddress"
+                    placeholder="Address"></textarea>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportCity"
+                   name="passportCity"
+                   placeholder="City">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportState"
+                   name="passportState"
+                   placeholder="State/Province">
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportZip"
+                   name="passportZip"
+                   placeholder="Zip">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportCountry"
+                   name="passportCountry"
+                   placeholder="Country">
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+
+      <!--thai address-->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Thai Address</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+          <mat-form-field>
+          <textarea matInput [(ngModel)]="person.thaiAddress"
+                    name="thaiAddress"
+                    placeholder="Address"></textarea>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiSoi"
+                   name="thaiSoi"
+                   placeholder="Soi">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiMubaan"
+                   name="thaiMubaan"
+                   placeholder="Mubaan">
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiTambon"
+                   name="thaiTambon"
+                   placeholder="Tambon">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiAmphur"
+                   name="thaiAmphur"
+                   placeholder="Amphur">
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiProvince"
+                   name="thaiProvince"
+                   placeholder="Province">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.thaiZip"
+                   name="thaiZip"
+                   placeholder="Zip">
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
 
   <!--staff-->
   <mat-accordion *ngIf="person.staff" class="staff">
@@ -145,7 +258,7 @@
       </mat-action-row>
     </mat-expansion-panel>
 
-    <mat-expansion-panel *ngFor="let contact of emergencyContacts">
+    <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
       <mat-expansion-panel-header>
         <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
       </mat-expansion-panel-header>

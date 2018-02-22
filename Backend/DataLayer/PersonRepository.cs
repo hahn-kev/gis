@@ -32,6 +32,8 @@ namespace Backend.DataLayer
                 FirstName = person.FirstName,
                 LastName = person.LastName,
                 StaffId = person.StaffId,
+                Gender = person.Gender,
+                PreferredName = person.PreferredName,
                 SickDaysOfLeaveUsed = sickLeave.LeaveUsed ?? 0,
                 VacationDaysOfLeaveUsed = vacationLeave.LeaveUsed ?? 0
             };
@@ -73,10 +75,24 @@ namespace Backend.DataLayer
                 SpeaksEnglish = person.SpeaksEnglish,
                 Staff = staff,
                 StaffId = person.StaffId,
-                Country = person.Country,
                 PhoneNumber = person.PhoneNumber,
                 SpouseId = person.SpouseId,
-                SpousePreferedName = spouse.PreferredName
+                SpousePreferedName = spouse.PreferredName,
+                Birthdate = person.Birthdate,
+                Gender = person.Gender,
+                Nationality = person.Nationality,
+                PassportAddress = person.PassportAddress,
+                PassportCity = person.PassportCity,
+                PassportCountry = person.PassportCountry,
+                PassportState = person.PassportState,
+                PassportZip = person.PassportZip,
+                ThaiAddress = person.ThaiAddress,
+                ThaiAmphur = person.ThaiAmphur,
+                ThaiMubaan = person.ThaiMubaan,
+                ThaiProvince = person.ThaiProvince,
+                ThaiSoi = person.ThaiSoi,
+                ThaiTambon = person.ThaiTambon,
+                ThaiZip = person.ThaiZip
             };
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
@@ -123,6 +139,7 @@ namespace Backend.DataLayer
             if (person != null)
             {
                 person.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
+                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
             }
 
             return person;

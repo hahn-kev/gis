@@ -97,14 +97,14 @@ namespace Backend.Services
 
         public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
         {
-            return GetLeaveDetails(person, person.Roles, DateTime.Now.SchoolYear());
+            return GetLeaveDetails(person.Id, person.Roles, DateTime.Now.SchoolYear());
         }
 
-        public LeaveDetails GetLeaveDetails(PersonWithOthers person, IList<PersonRole> personRoles, int schoolYear)
+        public LeaveDetails GetLeaveDetails(Guid personId, IList<PersonRole> personRoles, int schoolYear)
         {
             //todo does this include unapproved leave?
             var leaveRequests = _personRepository.LeaveRequests
-                .Where(request => request.PersonId == person.Id && request.StartDate.InSchoolYear(schoolYear))
+                .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear))
                 .ToArray();
             var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
 

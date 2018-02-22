@@ -1,4 +1,5 @@
 import { Role } from './role';
+import { EmergencyContactExtended } from './emergency-contact';
 
 export class Person {
 
@@ -10,15 +11,32 @@ export class Person {
   }
 
   public preferredName: string;
+  public gender: string;
 }
 
 export class PersonExtended extends Person {
   public speaksEnglish: boolean;
   public isThai: boolean;
-  public country: string;
   public phoneNumber: string;
   public spouseId: string;
   public spouseChanged: boolean;
+
+  public nationality: string;
+  public birthdate?: Date;
+
+  public passportAddress: string;
+  public passportCity: string;
+  public passportState: string;
+  public passportZip: string;
+  public passportCountry: string;
+
+  public thaiAddress: string;
+  public thaiSoi: string;
+  public thaiMubaan: string;
+  public thaiTambon: string;
+  public thaiAmphur: string;
+  public thaiProvince: string;
+  public thaiZip: string;
 }
 
 export class PersonWithStaff extends PersonExtended {
@@ -29,6 +47,7 @@ export class PersonWithStaff extends PersonExtended {
 export class PersonWithOthers extends PersonWithStaff {
 
   public roles: Role[] = [];
+  public emergencyContacts: EmergencyContactExtended[] = [];
 }
 
 export class PersonWithDaysOfLeave extends Person {

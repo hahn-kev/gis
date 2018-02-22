@@ -18,7 +18,6 @@ export class PersonComponent implements OnInit {
   public person: PersonWithOthers;
   public groups: OrgGroup[];
   public people: Person[];
-  public emergencyContacts: EmergencyContactExtended[];
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
   @ViewChild('isStaff') isStaffElement: NgModel;
@@ -30,16 +29,14 @@ export class PersonComponent implements OnInit {
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       groups: OrgGroup[],
-      people: Person[],
-      emergencyContacts: EmergencyContactExtended[]
+      people: Person[]
     }) => {
       this.person = value.person;
       this.groups = value.groups;
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
-      this.emergencyContacts = value.emergencyContacts;
-      this.newEmergencyContact.order = this.emergencyContacts.length + 1;
+      this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
     });
   }
 
@@ -99,10 +96,10 @@ export class PersonComponent implements OnInit {
   async saveEmergencyContact(emergencyContact: EmergencyContactExtended, isNew = false) {
     emergencyContact = await this.personService.updateEmergencyContact(emergencyContact);
     if (isNew) {
-      this.emergencyContacts = [...this.emergencyContacts, emergencyContact];
+      this.person.emergencyContacts = [...this.person.emergencyContacts, emergencyContact];
       this.newEmergencyContact = new EmergencyContactExtended();
       this.newEmergencyContact.personId = this.person.id;
-      this.newEmergencyContact.order = this.emergencyContacts.length + 1;
+      this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
     }
   }
 
@@ -116,7 +113,7 @@ export class PersonComponent implements OnInit {
     let result = await dialogRef.afterClosed().toPromise();
     if (result) {
       await this.personService.deleteEmergencyContact(emergencyContact.id);
-      this.emergencyContacts = this.emergencyContacts.filter(value => value.id != emergencyContact.id);
+      this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
     }
   }
 }
