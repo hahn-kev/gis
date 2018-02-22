@@ -1,6 +1,19 @@
-<mat-form-field>
-  <input matInput required name="name" [(ngModel)]="role.name" placeholder="Name">
-</mat-form-field>
+<div>
+  <mat-form-field>
+    <input matInput required name="name" [(ngModel)]="role.name" placeholder="Name">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-select [(ngModel)]="role.fullHalfTime" name="fullHalfTime"
+                placeholder="Type">
+      <mat-option [value]="null">None</mat-option>
+      <mat-option value="FullTime">Full Time</mat-option>
+      <mat-option value="HalfTime">Half Time</mat-option>
+      <mat-option value="Volunteer">Volunteer</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
 <div>
   <mat-form-field>
     <input name="date" required matInput [(ngModel)]="role.startDate" [matDatepicker]="startDatePicker"

@@ -107,7 +107,10 @@ namespace Backend.DataLayer
                 StartDate = personRole.StartDate,
                 EndDate = personRole.EndDate,
                 FirstName = person.FirstName,
-                LastName = person.LastName
+                LastName = person.LastName,
+                IsDirectorPosition = personRole.IsDirectorPosition,
+                IsStaffPosition = personRole.IsStaffPosition,
+                FullHalfTime = personRole.FullHalfTime
             };
 
         public IQueryable<StaffWithName> StaffWithNames =>

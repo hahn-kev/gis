@@ -1,5 +1,8 @@
 ﻿using System;
+using LinqToDB;
 using LinqToDB.Mapping;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Backend.Entities
 {
@@ -12,6 +15,9 @@ namespace Backend.Entities
         public bool Active { get; set; }
         public bool IsDirectorPosition { get; set; }
         public bool IsStaffPosition { get; set; }
+        
+        [Column(DataType = DataType.VarChar)]
+        public RoleType? FullHalfTime { get; set; }
 
         public TimeSpan LengthOfService()
         {
@@ -24,10 +30,17 @@ namespace Backend.Entities
         }
     }
 
-    [Table("PersonRole", IsColumnAttributeRequired = false)]
     public class PersonRoleExtended : PersonRole
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum RoleType
+    {
+        FullTime,
+        HalfTime, 
+        Volunteer
     }
 }

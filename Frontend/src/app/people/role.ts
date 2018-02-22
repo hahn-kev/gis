@@ -10,6 +10,7 @@
 
   public isDirectorPosition: boolean;
   public isStaffPosition: boolean;
+  public fullHalfTime: string;
 }
 
 export class RoleExtended extends Role {
