@@ -10,10 +10,12 @@ namespace Backend.Controllers
     public class SelfController : MyController
     {
         private PersonService _personService;
+        private LeaveService _leaveService;
 
-        public SelfController(PersonService personService)
+        public SelfController(PersonService personService, LeaveService leaveService)
         {
             _personService = personService;
+            _leaveService = leaveService;
         }
 
         [HttpGet("{id?}")]
@@ -29,7 +31,7 @@ namespace Backend.Controllers
             return Json(new Self
             {
                 Person = personWithOthers,
-                LeaveDetails = _personService.GetCurrentLeaveDetails(personWithOthers)
+                LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers)
             });
         }
     }

@@ -76,12 +76,6 @@ namespace Backend.Entities
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; }
     }
 
-    public class PersonWithDaysOfLeave : Person
-    {
-        public int SickDaysOfLeaveUsed { get; set; }
-        public int VacationDaysOfLeaveUsed { get; set; }
-    }
-
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Gender
     {

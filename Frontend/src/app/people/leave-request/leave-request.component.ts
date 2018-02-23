@@ -6,13 +6,13 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PersonService } from '../person.service';
-import { PersonWithDaysOfLeave } from '../person';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/combineLatest';
 import { UserToken } from '../../login/user-token';
 import 'rxjs/add/operator/defaultIfEmpty';
 import 'rxjs/add/operator/concat';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { PersonAndLeaveDetails } from './person-and-leave-details';
 
 @Component({
   selector: 'app-leave-request',
@@ -20,9 +20,9 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
   styleUrls: ['./leave-request.component.scss']
 })
 export class LeaveRequestComponent implements OnInit, OnDestroy {
-  public people: PersonWithDaysOfLeave[];
+  public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequest;
-  public selectedPerson: PersonWithDaysOfLeave;
+  public selectedPerson: PersonAndLeaveDetails;
   public isNew: boolean;
 
   private subscription: Subscription;
@@ -39,15 +39,16 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     //we're adding an empty list at the beginning of this observable
     //so that we get a result right away, then later update with value
-    const peopleWithLeaveObservable = Observable.of([]).concat(this.personService.getPeopleWithDaysOfLeave());
+    const peopleWithLeaveObservable = Observable.of([]).concat(this.leaveRequestService.listPeopleWithLeave(false));
     this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), peopleWithLeaveObservable)
-      .subscribe(([data, user, people]: [{ leaveRequest: LeaveRequest }, UserToken, PersonWithDaysOfLeave[]]) => {
+      .subscribe(([data, user, people]: [{ leaveRequest: LeaveRequest }, UserToken, PersonAndLeaveDetails[]]) => {
         this.people = people;
         this.leaveRequest = data.leaveRequest;
         if (!this.people) return;
-        const person = this.people.find(eachPerson => eachPerson.id === (this.leaveRequest.personId || user.personId));
+        const person = this.people.find(
+          eachPerson => eachPerson.person.id === (this.leaveRequest.personId || user.personId));
         if (person) {
-          this.leaveRequest.personId = person.id;
+          this.leaveRequest.personId = person.person.id;
           this.selectedPerson = person;
         }
       });
@@ -69,13 +70,13 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   personSelectedChanged(personId: string): void {
-    this.selectedPerson = this.people.find(value => value.id === personId);
+    this.selectedPerson = this.people.find(value => value.person.id === personId);
   }
 
   async deleteRequest(): Promise<void> {
     const result = await this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete Request for ${this.selectedPerson.firstName}?`,
+        data: ConfirmDialogComponent.Options(`Delete Request for ${this.selectedPerson.person.preferredName}?`,
           'Delete',
           'Cancel')
       }).afterClosed().toPromise();
@@ -84,5 +85,9 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
     this.snackBar.open('Request deleted');
     this.router.navigate(['../..', 'list'], {relativeTo: this.route});
+  }
+
+  async showAllPeople() {
+    this.people = await this.leaveRequestService.listPeopleWithLeave(true).toPromise();
   }
 }

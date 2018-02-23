@@ -1,3 +1,10 @@
+<ng-container *appToolbarContent>
+  <button mat-button (click)="showAllPeople()">
+    <mat-icon mat-list-icon>person_add</mat-icon>
+    Show all people
+  </button>
+</ng-container>
+
 <div class="main-card">
   <mat-card>
     <form #leaveForm="ngForm" (submit)="submit()" id="form" class="two-colum-grid">
@@ -9,8 +16,8 @@
                     [disabled]="!(loginService.hasRole('admin') | async)"
                     placeholder="Person Leaving">
           <mat-option>None</mat-option>
-          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-            {{eachPerson.lastName}}
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
+            {{eachPerson.person.preferredName}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -22,8 +29,8 @@
           <mat-option value="Funeral">Funeral</mat-option>
 
           <!--todo only show mat/pat ernity leave based on gender-->
-          <mat-option *ngIf="selectedPerson?.gender == 'Male'" value="Maternity">Maternity</mat-option>
-          <mat-option *ngIf="selectedPerson?.gender == 'Female'" value="Paternity">Paternity</mat-option>
+          <mat-option *ngIf="selectedPerson?.person.gender == 'Male'" value="Maternity">Maternity</mat-option>
+          <mat-option *ngIf="selectedPerson?.person.gender == 'Female'" value="Paternity">Paternity</mat-option>
 
           <mat-option value="Buisness">Buisness</mat-option>
           <mat-option value="Compensation">Compensation</mat-option>
@@ -52,19 +59,23 @@
                     placeholder="Reason"></textarea>
       </mat-form-field>
 
-      <mat-chip-list class="span-2-columns">
-        <mat-chip color="accent" selected="true">Vacation used {{selectedPerson?.vacationDaysOfLeaveUsed}}
-          day{{selectedPerson?.vacationDaysOfLeaveUsed === 1 ? '' : 's'}}
-        </mat-chip>
-        <mat-chip color="accent" selected="true">Sick Leave used {{selectedPerson?.sickDaysOfLeaveUsed}}
-          day{{selectedPerson?.sickDaysOfLeaveUsed === 1 ? '' : 's'}}
-        </mat-chip>
-      </mat-chip-list>
+      <div class="span-2-columns">
+        <div class="mat-caption">Leave days used/total</div>
+        <mat-chip-list>
+          <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">
+            <!--the if is here to hide paternity when the person is female and maternity when person is male-->
+            <mat-chip *ngIf="leave.leaveType != (selectedPerson.person.gender == 'Male' ? 'Maternity' : 'Paternity')"
+                      color="accent" selected="true">
+              {{leave.leaveType}} {{leave.used}}/{{leave.totalAllowed}}
+            </mat-chip>
+          </ng-container>
+        </mat-chip-list>
+      </div>
     </form>
 
     <mat-card-actions>
-      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>{{isNew ? 'Request Leave' :
-        'Save'}}
+      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>
+        {{isNew ? 'Request Leave' : 'Save'}}
       </button>
       <button mat-button *ngIf="!isNew" (click)="deleteRequest()">Delete Request</button>
     </mat-card-actions>

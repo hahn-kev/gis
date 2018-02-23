@@ -18,45 +18,6 @@ namespace Backend.DataLayer
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
-        public IQueryable<PersonWithDaysOfLeave> PeopleWithDaysOfLeave(Guid? limitByPersonId = null) =>
-            from person in People
-            from vacationLeave in LeaveRequestAggrigateByType(LeaveType.Vacation)
-                .Having(holder => holder.PersonId == person.Id)
-            from sickLeave in LeaveRequestAggrigateByType(LeaveType.Sick)
-                .Having(holder => holder.PersonId == person.Id)
-            where (limitByPersonId == null || person.Id == limitByPersonId) && person.StaffId != null
-            select new PersonWithDaysOfLeave
-            {
-                Id = person.Id,
-                Email = person.Email,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                StaffId = person.StaffId,
-                Gender = person.Gender,
-                PreferredName = person.PreferredName,
-                SickDaysOfLeaveUsed = sickLeave.LeaveUsed ?? 0,
-                VacationDaysOfLeaveUsed = vacationLeave.LeaveUsed ?? 0
-            };
-
-        class AggHolder
-        {
-            public Guid PersonId { get; set; }
-            public int? LeaveUsed { get; set; }
-        }
-
-        private IQueryable<AggHolder> LeaveRequestAggrigateByType(LeaveType leaveType)
-        {
-            return _dbConnection.LeaveRequests.Where(request =>
-                    request.StartDate.InSchoolYear(DateTime.Now.SchoolYear()) && request.Type == Sql.ToSql(leaveType))
-                .GroupBy(request => request.PersonId,
-                    (personId, requests) => new AggHolder
-                    {
-                        PersonId = personId,
-                        LeaveUsed = requests.Sum(request => DataExtensions.DayDiff(request.StartDate, request.EndDate))
-                    })
-                .DefaultIfEmpty();
-        }
-
         public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended;
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
@@ -94,6 +55,8 @@ namespace Backend.DataLayer
                 ThaiTambon = person.ThaiTambon,
                 ThaiZip = person.ThaiZip
             };
+
+        public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
             from personRole in _dbConnection.PersonRoles
@@ -141,11 +104,16 @@ namespace Backend.DataLayer
             var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
             if (person != null)
             {
-                person.Roles = _dbConnection.PersonRoles.Where(role => role.PersonId == id).ToList();
+                person.Roles = GetPersonRoles(id).ToList();
                 person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
             }
 
             return person;
+        }
+
+        public IQueryable<PersonRole> GetPersonRoles(Guid personId)
+        {
+            return _dbConnection.PersonRoles.Where(role => role.PersonId == personId);
         }
 
         public void DeleteStaff(Guid staffId)

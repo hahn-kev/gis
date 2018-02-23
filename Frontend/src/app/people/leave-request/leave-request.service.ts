@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
 import { Person } from '../person';
 import { Observable } from 'rxjs/Observable';
+import { PersonAndLeaveDetails } from './person-and-leave-details';
 
 @Injectable()
 export class LeaveRequestService {
@@ -34,4 +35,8 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
+  listPeopleWithLeave(listAll: boolean) {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people',
+      {params: {listAll: listAll ? 'true' : 'false'}});
+  }
 }

@@ -9,6 +9,17 @@ namespace UnitTestProject
 {
     public class LeaveCalculationsTests
     {
+        private LeaveService _leaveService;
+        private ServicesFixture _servicesFixture;
+
+        public LeaveCalculationsTests()
+        {
+            _servicesFixture = new ServicesFixture();
+            _servicesFixture.SetupData();
+            _leaveService = _servicesFixture.Get<LeaveService>();
+        }
+
+
         public static IEnumerable<object[]> LeaveMemberData()
         {
             IEnumerable<(DateTime, DateTime, int)> MakeValues()
@@ -38,7 +49,7 @@ namespace UnitTestProject
         [MemberData(nameof(LeaveMemberData))]
         public void ShouldMatchExpectedLeave(DateTime startDate, DateTime endDate, int expectedDays)
         {
-            var result = PersonService.TotalLeaveUsed(new[] {new LeaveRequest(startDate, endDate)});
+            var result = LeaveService.TotalLeaveUsed(new[] {new LeaveRequest(startDate, endDate)});
             Assert.Equal(expectedDays, result);
         }
 
@@ -120,8 +131,15 @@ namespace UnitTestProject
         [MemberData(nameof(RolesMemberData))]
         public void ShouldCalculateLeaveAllowed(int? expected, IList<PersonRole> personRoles)
         {
-            var result = PersonService.LeaveAllowed(LeaveType.Vacation, personRoles);
+            var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles);
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void ListAllLeaveWorks()
+        {
+            var personAndLeaveDetailses = _leaveService.PeopleWithLeave(null);
+            Assert.NotEmpty(personAndLeaveDetailses);
         }
     }
 }

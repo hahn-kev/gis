@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
+using Backend.Utils;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Backend.Services
 {
-    public class LeaveRequestService
+    public class LeaveService
     {
         private readonly OrgGroupRepository _orgGroupRepository;
 
@@ -21,22 +22,19 @@ namespace Backend.Services
         private readonly IEmailService _emailService;
         private readonly Settings _settings;
         private readonly IEntityService _entityService;
-        private readonly UsersRepository _usersRepository;
 
-        public LeaveRequestService(OrgGroupRepository orgGroupRepository,
+        public LeaveService(OrgGroupRepository orgGroupRepository,
             PersonRepository personRepository,
             IEmailService emailService,
             IOptions<Settings> options,
             LeaveRequestRepository leaveRequestRepository,
-            IEntityService entityService,
-            UsersRepository usersRepository)
+            IEntityService entityService)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
             _emailService = emailService;
             _leaveRequestRepository = leaveRequestRepository;
             _entityService = entityService;
-            _usersRepository = usersRepository;
             _settings = options.Value;
         }
 
@@ -58,8 +56,6 @@ namespace Backend.Services
             _leaveRequestRepository.LeaveRequests.Where(request => request.Id == leaveId)
                 .Select(request => (Guid?) request.PersonId).SingleOrDefault();
 
-        private IQueryable<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor;
-
         public void UpdateLeave(LeaveRequest leaveRequest)
         {
             _entityService.Save(leaveRequest);
@@ -72,7 +68,7 @@ namespace Backend.Services
 
         public bool ApproveLeaveRequest(Guid leaveRequestId, Guid personId)
         {
-            //todo why are we doing this? 
+            //ensure that this id is a valid person before we approve it
             var superviserId = _personRepository.PeopleExtended.Where(person => person.Id == personId)
                 .Select(extended => extended.Id).First();
             return _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, superviserId);
@@ -174,6 +170,112 @@ namespace Backend.Services
         {
             return leaveRequest.PersonId == user.PersonId() ||
                    user.IsAdminOrHr();
+        }
+
+        public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
+        {
+            return GetLeaveDetails(person.Id, person.Roles, DateTime.Now.SchoolYear());
+        }
+
+        public LeaveDetails GetCurrentLeaveDetails(Guid personId)
+        {
+            return GetLeaveDetails(personId,
+                _personRepository.GetPersonRoles(personId),
+                DateTime.Now.SchoolYear());
+        }
+
+        public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRole> personRoles, int schoolYear)
+        {
+            var leaveRequests = _personRepository.LeaveRequests
+                .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear));
+            return new LeaveDetails
+            {
+                LeaveUseages = CalculateLeaveDetails(personRoles, leaveRequests)
+            };
+        }
+
+        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRole> personRoles,
+            IEnumerable<LeaveRequest> leaveRequests)
+        {
+            var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
+            //we do this here so we can make personRoles enumerable
+            var vacationAllowed = LeaveAllowed(LeaveType.Vacation, personRoles);
+            return leaveTypes.GroupJoin(leaveRequests,
+                type => type,
+                request => request.Type,
+                (type, requests) => new LeaveUseage
+                {
+                    LeaveType = type,
+                    Used = TotalLeaveUsed(requests),
+                    TotalAllowed = type == LeaveType.Vacation
+                        ? vacationAllowed
+                        : LeaveAllowed(type, Enumerable.Empty<PersonRole>())
+                }
+            ).Where(useage => useage.TotalAllowed != null).ToList();
+        }
+
+        public static int TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
+        {
+            return requests.Sum(request => request.StartDate.BusinessDaysUntil(request.EndDate));
+        }
+
+        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRole> personRoles)
+        {
+            switch (leaveType)
+            {
+                case LeaveType.Sick: return 30;
+                case LeaveType.Personal: return 5;
+                case LeaveType.Funeral: return 5;
+                case LeaveType.Maternity: return 90;
+                case LeaveType.Paternity: return 5;
+                case LeaveType.Vacation: break;
+                default: return null;
+            }
+
+            //calculation for vacation time is done here
+            var totalServiceTime = TimeSpan.Zero;
+            foreach (var role in personRoles)
+            {
+                if (role.IsDirectorPosition && role.Active) return 20;
+                if (role.IsStaffPosition || role.IsDirectorPosition)
+                    totalServiceTime = totalServiceTime + role.LengthOfService();
+            }
+
+            //no time has been spent as staff or a director, therefore no vacation time is allowed
+            if (totalServiceTime == TimeSpan.Zero) return null;
+            var yearsOfService = totalServiceTime.Days / 365;
+            if (yearsOfService < 10) return 10;
+            if (yearsOfService < 20) return 15;
+            return 20;
+        }
+
+        public IList<PersonAndLeaveDetails> PeopleWithLeave(Guid? personId)
+        {
+            if (personId != null)
+            {
+                var person = _personRepository.People.Single(p => p.Id == personId);
+                return new List<PersonAndLeaveDetails>
+                {
+                    new PersonAndLeaveDetails
+                    {
+                        Person = person,
+                        LeaveUseages = GetCurrentLeaveDetails(personId.Value).LeaveUseages
+                    }
+                };
+            }
+
+            var people = _personRepository.People.Where(person => person.StaffId != null).ToList();
+            var peopleIds = people.Select(person => person.Id).ToList();
+            var leaveRequests = _personRepository.LeaveRequests.Where(request => peopleIds.Contains(request.PersonId))
+                .ToLookup(request => request.PersonId);
+            var personRoles = _personRepository.PersonRoles.Where(role => peopleIds.Contains(role.PersonId))
+                .ToLookup(role => role.PersonId);
+            return
+                people.Select(person => new PersonAndLeaveDetails
+                {
+                    Person = person,
+                    LeaveUseages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
+                }).ToList();
         }
     }
 }

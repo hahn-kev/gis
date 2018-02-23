@@ -16,7 +16,7 @@ namespace UnitTestProject
 {
     public class LeaveRequestTests
     {
-        private LeaveRequestService _leaveRequestService;
+        private LeaveService _leaveService;
         private OrgGroupRepository _orgGroupRepository;
         private IDbConnection _dbConnection;
         private ServicesFixture _servicesFixture;
@@ -24,7 +24,7 @@ namespace UnitTestProject
         public LeaveRequestTests()
         {
             _servicesFixture = new ServicesFixture();
-            _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+            _leaveService = _servicesFixture.Get<LeaveService>();
             _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
             _dbConnection = _servicesFixture.Get<IDbConnection>();
         }
@@ -34,7 +34,7 @@ namespace UnitTestProject
             if (configure != null)
             {
                 _servicesFixture = new ServicesFixture(configure);
-                _leaveRequestService = _servicesFixture.Get<LeaveRequestService>();
+                _leaveService = _servicesFixture.Get<LeaveService>();
                 _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
                 _dbConnection = _servicesFixture.Get<IDbConnection>();
             }
@@ -50,7 +50,7 @@ namespace UnitTestProject
             Assert.NotNull(jacob);
             var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
             Assert.NotNull(expectedSupervisor);
-            var actualSupervisor = await _leaveRequestService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
+            var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
             Assert.NotNull(actualSupervisor);
             Assert.Equal(expectedSupervisor.FirstName, actualSupervisor.FirstName);
         }
@@ -67,7 +67,7 @@ namespace UnitTestProject
             Setup(collection => collection.RemoveAll<IEmailService>().AddSingleton(emailMock.Object));
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            await _leaveRequestService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
+            await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
@@ -336,7 +336,7 @@ namespace UnitTestProject
 
             Setup(collection => collection.Replace(ServiceDescriptor.Singleton(emailMock.Object)));
 
-            var actualApprover = await _leaveRequestService.ResolveLeaveRequestChain(request,
+            var actualApprover = await _leaveService.ResolveLeaveRequestChain(request,
                 requestedBy,
                 department,
                 devision,

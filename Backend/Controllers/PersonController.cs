@@ -26,16 +26,6 @@ namespace Backend.Controllers
             return _personService.People();
         }
 
-        [HttpGet("leave")]
-        public IList<PersonWithDaysOfLeave> PeopleWithDaysOfLeave()
-        {
-            return _personService.PeopleWithDaysOfLeave(
-                User.IsAdminOrHr()
-                    ? (Guid?) null
-                    : (User.PersonId() ??
-                       throw new AuthenticationException("If user isn't admin or hr they must have a personId")));
-        }
-
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,hr")]
         public PersonWithOthers Get(Guid id)
