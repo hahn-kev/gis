@@ -50,6 +50,9 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
         if (person) {
           this.leaveRequest.personId = person.person.id;
           this.selectedPerson = person;
+        } else if (this.people.length > 0) {
+          //todo clean this up so we're not doing it twice
+          this.showAllPeople();
         }
       });
     this.isNew = this.route.snapshot.params['id'] === 'new';

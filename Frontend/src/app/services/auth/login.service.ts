@@ -61,7 +61,6 @@ export class LoginService implements CanActivate {
 
   hasAnyRole(roles: string[]) {
     return this.currentUserToken().pipe(map(user => user && roles.some(role => user.roles.includes(role))));
-
   }
 
   hasRole(role: string): Observable<boolean> {

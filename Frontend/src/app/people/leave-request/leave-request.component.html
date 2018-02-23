@@ -1,5 +1,5 @@
 <ng-container *appToolbarContent>
-  <button mat-button (click)="showAllPeople()">
+  <button *requireRole="'admin,hr'" mat-button (click)="showAllPeople()">
     <mat-icon mat-list-icon>person_add</mat-icon>
     Show all people
   </button>
@@ -13,7 +13,7 @@
                     [(ngModel)]="leaveRequest.personId"
                     (ngModelChange)="personSelectedChanged($event)"
                     required
-                    [disabled]="!(loginService.hasRole('admin') | async)"
+                    [disabled]="!(loginService.hasAnyRole(['admin', 'hr']) | async)"
                     placeholder="Person Leaving">
           <mat-option>None</mat-option>
           <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
