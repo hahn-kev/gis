@@ -5,6 +5,8 @@ import { TrainingRequirement } from '../../training-requirement/training-require
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/switchMap';
 import { Subscription } from 'rxjs/Subscription';
+import { MatDialog } from '@angular/material';
+import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-staff-training',
@@ -22,7 +24,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private staffIdSubject = new Subject<string>();
 
-  constructor(private trainingService: TrainingRequirementService) {
+  constructor(private trainingService: TrainingRequirementService, private dialog: MatDialog) {
     this.subscription = this.staffIdSubject.switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
       .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList.bind(this));
   }
@@ -76,8 +78,12 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
     return await this.trainingService.saveStaffTraining(training);
   }
 
-  async deleteTraining(training: StaffTraining) {
-
+  async deleteTraining(training: StaffTrainingWithRequirement) {
+    let confirm = await ConfirmDialogComponent.OpenWait(this.dialog,
+      `Delete ${training.requirementName} Training`,
+      'Delete',
+      'Cancel');
+    if (!confirm) return;
     await this.trainingService.deleteStaffTraining(training.id);
     this.training = this.training.filter(value => value.id !== training.id);
   }

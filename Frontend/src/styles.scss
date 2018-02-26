@@ -126,3 +126,14 @@ html, body {
     background-color: currentColor;
   }
 }
+
+.mat-dialog-container {
+  .mat-dialog-actions {
+    &:last-child {
+      margin-right: -24px;
+    }
+    justify-content: flex-end;
+    padding: 8px 8px 8px 0;
+  }
+}
+
