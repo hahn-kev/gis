@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { Person } from '../person';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ActivatedRoute } from '@angular/router';
 import { AppDataSource } from '../../classes/app-data-source';
 
@@ -20,6 +17,11 @@ export class PeopleListComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource = new AppDataSource<Person>();
     this.dataSource.bindToRouteData(this.route, 'people');
+    this.dataSource.filterPredicate = ((data, filter) =>
+      data.firstName.toUpperCase().startsWith(filter) || data.lastName.toUpperCase().startsWith(filter));
   }
 
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toUpperCase();
+  }
 }

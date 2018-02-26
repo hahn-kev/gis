@@ -1,4 +1,10 @@
 <ng-container *appToolbarContent>
+  <button mat-icon-button>
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never">
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+  </mat-form-field>
   <a mat-icon-button routerLink="../report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
@@ -17,7 +23,6 @@
   <mat-row class="hover-overlay" *matRowDef="let row; columns: ['firstName', 'lastName']"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
-
 
 <a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Person" matTooltipPosition="left">
   <mat-icon>add</mat-icon>

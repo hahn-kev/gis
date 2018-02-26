@@ -1,10 +1,8 @@
-import { CollectionViewer, DataSource } from '@angular/cdk/collections';
-import { Person } from '../people/person';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute } from '@angular/router';
+import { MatTableDataSource } from '@angular/material';
 
-export class AppDataSource<T> extends DataSource<T> {
+export class AppDataSource<T> extends MatTableDataSource<T> {
   public ObserverData = new BehaviorSubject<T[]>([]);
 
   constructor() {
@@ -13,14 +11,7 @@ export class AppDataSource<T> extends DataSource<T> {
 
   bindToRouteData(route: ActivatedRoute, dataName: string): void {
     route.data.subscribe((value) => {
-      this.ObserverData.next(value[dataName]);
+      this.data = value[dataName];
     });
-  }
-
-  connect(collectionViewer: CollectionViewer): Observable<T[]> {
-    return this.ObserverData.asObservable();
-  }
-
-  disconnect(collectionViewer: CollectionViewer): void {
   }
 }

@@ -9,6 +9,7 @@ $primary: mat-palette($mat-deep-purple);
 $accent: mat-palette($mat-orange);
 
 $theme: mat-light-theme($primary, $accent);
+$theme-dark: mat-dark-theme($primary, $accent);
 $background: map-get($theme, background);
 
 // Include all theme styles for the components.
@@ -105,4 +106,23 @@ html, body {
 
 .span-2-columns {
   grid-column: span 2;
+}
+
+.mat-toolbar {
+  @include mat-form-field-theme($theme-dark);
+  @include mat-input-theme($theme-dark);
+  .mat-input-element {
+    caret-color: currentColor;
+  }
+
+  .mat-form-field {
+    font-size: 16px;
+    padding-top: 6px;
+    &.mat-focused .mat-form-field-label {
+      color: mat-color(map-get($theme-dark, foreground), secondary-text);
+    }
+  }
+  .mat-form-field-ripple {
+    background-color: currentColor;
+  }
 }
