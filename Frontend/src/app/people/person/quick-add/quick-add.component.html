@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Create a new Person</h2>
+<mat-dialog-content>
+  <form id="quick-add" (submit)="add()">
+    <mat-form-field>
+      <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select [(ngModel)]="person.gender" name="gender"
+                  placeholder="Gender">
+        <mat-option value="Male">Male</mat-option>
+        <mat-option value="Female">Female</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button (click)="cancel()" mat-button>Cancel</button>
+  <button type="submit" form="quick-add" mat-button>Add</button>
+</mat-dialog-actions>

@@ -4,11 +4,14 @@
               name="contact"
               required
               placeholder="Contact">
-    <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName + " " +
-      eachPerson.lastName}}
+    <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
     </mat-option>
   </mat-select>
 </mat-form-field>
+<button type="button" matTooltip="Quick add Person" appQuickAdd (updateSelected)="emergencyContact.contactId = $event"
+        (updateList)="people.push($event)" mat-icon-button>
+  <mat-icon>person_add</mat-icon>
+</button>
 <mat-form-field>
 
   <input matInput name="order" type="number" min="1" [(ngModel)]="emergencyContact.order" placeholder="Order">

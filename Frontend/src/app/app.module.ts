@@ -57,6 +57,8 @@ import { StaffTrainingComponent } from './people/person/staff-training/staff-tra
 import { EmergencyContactComponent } from './people/person/emergency-contact/emergency-contact.component';
 import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
+import { QuickAddComponent } from './people/person/quick-add/quick-add.component';
+import { QuickAddDirective } from './people/person/quick-add/quick-add.directive';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -87,10 +89,13 @@ if (environment.production) {
     TrainingReportComponent,
     StaffTrainingComponent,
     EmergencyContactComponent,
-    SelfComponent
+    SelfComponent,
+    QuickAddComponent,
+    QuickAddDirective
   ],
   entryComponents: [
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    QuickAddComponent
   ],
   imports: [
     LocalStorageModule.withConfig({

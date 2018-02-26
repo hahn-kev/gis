@@ -11,7 +11,7 @@ export class Person {
   }
 
   public preferredName: string;
-  public gender: string;
+  public gender = 'Male';
 }
 
 export class PersonExtended extends Person {

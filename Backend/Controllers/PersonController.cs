@@ -38,7 +38,7 @@ namespace Backend.Controllers
         public IActionResult Update([FromBody] PersonWithStaff person)
         {
             _personService.Save(person);
-            return Ok();
+            return Json(person);
         }
 
         [HttpPost("role")]
