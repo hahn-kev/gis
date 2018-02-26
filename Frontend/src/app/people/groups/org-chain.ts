@@ -17,7 +17,7 @@ export class OrgChainLink {
   }
 
   public static FromPerson(person: Person): OrgChainLink {
-    return new OrgChainLink(LinkType.Person, person.id, `${person.firstName} ${person.lastName}`);
+    return new OrgChainLink(LinkType.Person, person.id, person.preferredName);
   }
 
   constructor(public type: LinkType, public id: string, public title: string) {

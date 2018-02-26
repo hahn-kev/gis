@@ -15,8 +15,7 @@
         <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="refreshOrgChain()"
                     placeholder="Supervisor">
           <mat-option>None</mat-option>
-          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.firstName}}
-            {{eachPerson.lastName}}
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
           </mat-option>
         </mat-select>
       </mat-form-field>

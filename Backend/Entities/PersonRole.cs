@@ -32,8 +32,7 @@ namespace Backend.Entities
 
     public class PersonRoleExtended : PersonRole
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string PreferredName { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

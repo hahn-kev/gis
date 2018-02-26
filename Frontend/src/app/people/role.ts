@@ -20,9 +20,9 @@ export class RoleExtended extends Role {
               startDate: Date,
               active: boolean,
               endDate: Date,
-              personId: string,
-              public firstName: string,
-              public lastName: string) {
+              personId: string) {
     super(id, name, startDate, active, endDate, personId);
   }
+
+  public preferredName: string;
 }

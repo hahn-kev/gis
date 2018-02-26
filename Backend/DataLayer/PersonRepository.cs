@@ -69,8 +69,7 @@ namespace Backend.DataLayer
                 Name = personRole.Name,
                 StartDate = personRole.StartDate,
                 EndDate = personRole.EndDate,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
+                PreferredName = person.PreferredName,
                 IsDirectorPosition = personRole.IsDirectorPosition,
                 IsStaffPosition = personRole.IsStaffPosition,
                 FullHalfTime = personRole.FullHalfTime
