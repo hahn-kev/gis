@@ -92,5 +92,6 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
   async showAllPeople() {
     this.people = await this.leaveRequestService.listPeopleWithLeave(true).toPromise();
+    this.personSelectedChanged(this.leaveRequest.personId);
   }
 }
