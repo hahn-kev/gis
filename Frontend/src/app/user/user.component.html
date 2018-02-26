@@ -51,7 +51,7 @@
           </mat-error>
         </mat-form-field>
       </div>
-      <ng-container *requireRole="'admin'">
+      <ng-container *requireRole="'admin,hr'">
         <mat-form-field>
           <mat-select name="person"
                       [(ngModel)]="user.personId"
@@ -66,19 +66,33 @@
         <div *ngIf="!isNew">
           <button type="button"
                   *ngIf="!user.isAdmin"
-                  (click)="grantAdmin()"
+                  (click)="grantRole('admin')"
                   mat-raised-button
                   color="accent">
             Grant Admin rights
           </button>
           <button type="button"
                   *ngIf="user.isAdmin"
-                  (click)="revokeAdmin()"
+                  (click)="revokeRole('admin')"
                   mat-raised-button
                   color="accent">
             Revoke Admin rights
           </button>
-          <button type="button" (click)="deleteUser()" mat-raised-button color="accent">Delete</button>
+
+          <button type="button"
+                  *ngIf="!user.isHr"
+                  (click)="grantRole('hr')"
+                  mat-raised-button
+                  color="accent">
+            Grant HR rights
+          </button>
+          <button type="button"
+                  *ngIf="user.isHr"
+                  (click)="revokeRole('hr')"
+                  mat-raised-button
+                  color="accent">
+            Revoke HR rights
+          </button>
         </div>
       </ng-container>
 
@@ -94,6 +108,7 @@
         <ng-template #save i18n="save@@save">Save</ng-template>
         <ng-template #register i18n="register@@register">Register</ng-template>
       </button>
+      <button mat-button *ngIf="!isNew" type="button" (click)="deleteUser()" color="warn">Delete</button>
     </mat-card-actions>
   </mat-card>
 </div>

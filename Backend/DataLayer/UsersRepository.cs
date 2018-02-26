@@ -17,9 +17,13 @@ namespace Backend.DataLayer
 
         public IQueryable<UserProfile> Users =>
             from user in _dbConnection.Users
-            from role in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
-            from userRole in _dbConnection.UserRoles
-                .Where(userRole => userRole.RoleId == role.Id && userRole.UserId == user.Id)
+            from adminRole in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
+            from hrRole in _dbConnection.Roles.Where(role => role.Name == "hr").DefaultIfEmpty()
+            from userAdminRole in _dbConnection.UserRoles
+                .Where(userRole => userRole.RoleId == adminRole.Id && userRole.UserId == user.Id)
+                .DefaultIfEmpty()
+            from userHrRole in _dbConnection.UserRoles
+                .Where(userRole => userRole.RoleId == hrRole.Id && userRole.UserId == user.Id)
                 .DefaultIfEmpty()
             select new UserProfile
             {
@@ -27,7 +31,8 @@ namespace Backend.DataLayer
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 UserName = user.UserName,
-                IsAdmin = userRole != null,
+                IsAdmin = userAdminRole != null,
+                IsHr = userHrRole != null,
                 PersonId = user.PersonId,
                 ResetPassword = user.ResetPassword
             };

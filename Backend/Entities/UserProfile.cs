@@ -22,6 +22,7 @@ namespace Backend.Entities
         public string PhoneNumber { get; set; }
         public bool ResetPassword { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsHr { get; set; }
         public Guid? PersonId { get; set; }
     }
 

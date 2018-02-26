@@ -43,14 +43,22 @@ export class UserComponent implements OnInit {
     this.router.navigate([this.isSelf ? '/home' : '/user/admin']);
   }
 
-  async grantAdmin(): Promise<void> {
-    await this.userService.grantAdmin(this.user.id);
-    this.user.isAdmin = true;
+  async grantRole(role: string): Promise<void> {
+    await this.userService.grantRole(role, this.user.id);
+    if (role == 'admin') {
+      this.user.isAdmin = true;
+    } else if (role == 'hr') {
+      this.user.isHr = true;
+    }
   }
 
-  async revokeAdmin(): Promise<void> {
-    await this.userService.revokeAdmin(this.user.id);
-    this.user.isAdmin = false;
+  async revokeRole(role: string): Promise<void> {
+    await this.userService.revokeRole(role, this.user.id);
+    if (role == 'admin') {
+      this.user.isAdmin = false;
+    } else if (role == 'hr') {
+      this.user.isHr = false;
+    }
   }
 
   deleteUser(): void {

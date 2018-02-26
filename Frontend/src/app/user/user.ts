@@ -7,4 +7,6 @@ export class User {
               public resetPassword = false,
               public personId?: string) {
   }
+
+  public isHr: boolean;
 }
