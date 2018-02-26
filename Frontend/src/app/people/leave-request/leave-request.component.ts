@@ -64,6 +64,14 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
   async submit(): Promise<void> {
     if (this.isNew) {
+      if (this.leaveRequestService.isOverUsingLeave(this.leaveRequest, this.selectedPerson.leaveUseages)) {
+
+        const result = await ConfirmDialogComponent.OpenWait(this.dialog,
+          `This leave request is using more leave than you have`,
+          'Continue',
+          'Cancel');
+        if (!result) return;
+      }
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
       this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
     } else {

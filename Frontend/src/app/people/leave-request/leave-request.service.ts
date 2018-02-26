@@ -4,6 +4,7 @@ import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
 import { Person } from '../person';
 import { Observable } from 'rxjs/Observable';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
+import { LeaveUseage } from '../self/self';
 
 @Injectable()
 export class LeaveRequestService {
@@ -38,5 +39,13 @@ export class LeaveRequestService {
   listPeopleWithLeave(listAll: boolean) {
     return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people',
       {params: {listAll: listAll ? 'true' : 'false'}});
+  }
+
+  isOverUsingLeave(leaveRequest: LeaveRequest, leaveUseages: LeaveUseage[]) {
+    let leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
+    if (leaveUsage.left <= 1) return true;
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    let daysOfLeave = Math.round(Math.abs((leaveRequest.startDate.getTime() - leaveRequest.endDate.getTime()) / (oneDayMs)));
+    return leaveUsage.left - daysOfLeave < 0;
   }
 }
