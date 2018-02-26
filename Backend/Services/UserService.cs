@@ -50,7 +50,7 @@ namespace Backend.Services
             if (string.IsNullOrEmpty(user.Email) || user.PersonId.HasValue) return;
             user.PersonId = _personRepository.People
                 .Where(person => person.Email == user.Email)
-                .Select(person => person.Id)
+                .Select(person => (Guid?) person.Id)//casting to Guid? because otherwise if none is found then personId could be an empty guid
                 .SingleOrDefault();
         }
 
