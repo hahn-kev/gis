@@ -28,7 +28,8 @@ namespace Backend.Services
         #region people
 
         public IList<Person> People() =>
-            _personRepository.People.OrderBy(person => person.FirstName)
+            _personRepository.People.Where(person => !person.Deleted)
+                .OrderBy(person => person.FirstName)
                 .ThenBy(person => person.LastName).ToList();
 
         public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
@@ -73,7 +74,6 @@ namespace Backend.Services
                 }
             }
         }
-
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
 
@@ -132,5 +132,10 @@ namespace Backend.Services
         }
 
         #endregion
+
+        public void DeletePerson(Guid id)
+        {
+            _personRepository.People.Where(person => person.Id == id).Set(person => person.Deleted, true).Update();
+        }
     }
 }

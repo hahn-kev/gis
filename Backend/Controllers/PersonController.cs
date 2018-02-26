@@ -41,6 +41,14 @@ namespace Backend.Controllers
             return Json(person);
         }
 
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin,hr")]
+        public IActionResult DeletePerson(Guid id)
+        {
+            _personService.DeletePerson(id);
+            return Ok();
+        }
+
         [HttpPost("role")]
         [Authorize(Roles = "admin,hr")]
         public IActionResult UpdateRole([FromBody] PersonRole role)
@@ -49,7 +57,7 @@ namespace Backend.Controllers
             return Json(role);
         }
 
-        
+
         [HttpDelete("role/{roleId}")]
         [Authorize(Roles = "admin,hr")]
         public IActionResult DeleteRole(Guid roleId)
@@ -78,7 +86,7 @@ namespace Backend.Controllers
         {
             return _personService.GetEmergencyContacts(personId);
         }
-        
+
         [HttpPost("emergency")]
         [Authorize(Roles = "admin,hr")]
         public EmergencyContactExtended UpdateEmergencyContact([FromBody] EmergencyContactExtended emergencyContact)

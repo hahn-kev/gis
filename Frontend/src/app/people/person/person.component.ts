@@ -15,6 +15,7 @@ import { EmergencyContactExtended } from '../emergency-contact';
   styleUrls: ['./person.component.scss']
 })
 export class PersonComponent implements OnInit {
+  public isNew: boolean;
   public person: PersonWithOthers;
   public groups: OrgGroup[];
   public people: Person[];
@@ -33,6 +34,7 @@ export class PersonComponent implements OnInit {
     }) => {
       this.person = value.person;
       this.groups = value.groups;
+      this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
@@ -50,23 +52,36 @@ export class PersonComponent implements OnInit {
       return;
     }
     //deleting?
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(`Deleting staff, data will be lost, this can not be undone`,
-          'Delete',
-          'Cancel')
-      });
-    let result = await dialogRef.afterClosed().toPromise();
-    if (result) {
-      this.person.staff = null;
-    } else {
-      //roll back switch
-      this.isStaffElement.control.setValue(true, {emitEvent: false});
+    if (!this.isNew) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent,
+        {
+          data: ConfirmDialogComponent.Options(`Deleting staff, data will be lost, this can not be undone`,
+            'Delete',
+            'Cancel')
+        });
+      let result = await dialogRef.afterClosed().toPromise();
+      if (!result) {
+        //roll back switch
+        this.isStaffElement.control.setValue(true, {emitEvent: false});
+        return;
+      }
     }
+    this.person.staff = null;
   }
 
   async save(): Promise<void> {
-    await this.personService.updatePerson(this.person);
+    let savedPerson = await this.personService.updatePerson(this.person);
+    if (this.isNew) {
+      this.router.navigate(['people', 'edit', savedPerson.id]);
+    } else {
+      this.router.navigate(['/people/list']);
+    }
+  }
+
+  async deletePerson() {
+    let result = await ConfirmDialogComponent.OpenWait(this.dialog, `Delete person?`, 'Delete', 'Cancel');
+    if (!result) return;
+    await this.personService.deletePerson(this.person.id);
     this.router.navigate(['/people/list']);
   }
 

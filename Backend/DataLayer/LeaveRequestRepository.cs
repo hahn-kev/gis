@@ -20,6 +20,7 @@ namespace Backend.DataLayer
             from l in _connection.LeaveRequests
             from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
             from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById)
+            where !person.Deleted
             select new LeaveRequestWithNames
             {
                 Approved = l.Approved,

@@ -1,7 +1,8 @@
 <mat-accordion>
-  <mat-expansion-panel>
+  <mat-expansion-panel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+                       matTooltip="Adding a new training record is disabled until you save a person for the first time">
     <mat-expansion-panel-header>
-      <mat-panel-title>Submit new Training complete</mat-panel-title>
+      <mat-panel-title>Add new Training record</mat-panel-title>
     </mat-expansion-panel-header>
     <form id="newForm" (submit)="saveNew()">
       <mat-form-field>

@@ -1,11 +1,15 @@
 <ng-container *appToolbarContent>
+  <button *ngIf="!isNew" (click)="deletePerson()" mat-button color="warn">
+    <mat-icon mat-list-icon>delete</mat-icon>
+    Delete
+  </button>
+  <a mat-button *ngIf="!isNew" [routerLink]="'/self/' + person?.id">
+    <mat-icon mat-list-icon>face</mat-icon>
+    Impersonate</a>
   <button type="submit" form="form" [disabled]="!personForm.form.valid" mat-button>
     <mat-icon mat-list-icon>save</mat-icon>
     Save
   </button>
-  <a mat-button [routerLink]="'/self/' + person?.id">
-    <mat-icon mat-list-icon>face</mat-icon>
-    Impersonate</a>
 </ng-container>
 
 <div class="person">
@@ -184,7 +188,8 @@
 
   <mat-accordion class="roles">
     <!--new role-->
-    <mat-expansion-panel #newRolePanel>
+    <mat-expansion-panel #newRolePanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+                         matTooltip="Adding a new Role is disabled until you save a person for the first time">
       <mat-expansion-panel-header>
         <mat-panel-title>Add new Role</mat-panel-title>
       </mat-expansion-panel-header>
@@ -218,7 +223,8 @@
   </mat-accordion>
 
   <mat-accordion>
-    <mat-expansion-panel #newEmergencyContactPanel>
+    <mat-expansion-panel #newEmergencyContactPanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+                         matTooltip="Adding a new Emergency contact is disabled until you save a person for the first time">
       <mat-expansion-panel-header>
         <mat-panel-title>Add new Emergency Contact</mat-panel-title>
       </mat-expansion-panel-header>

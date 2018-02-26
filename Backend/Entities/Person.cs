@@ -13,6 +13,7 @@ namespace Backend.Entities
         public string LastName { get; set; }
         public Guid? StaffId { get; set; }
         public string Email { get; set; }
+        public bool Deleted { get; set; }
 
         public Gender Gender { get; set; }
 

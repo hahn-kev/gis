@@ -25,6 +25,7 @@ namespace Backend.DataLayer
             from person in _dbConnection.PeopleExtended
             from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
             from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+            where !person.Deleted
             select new T_Person
             {
                 Id = person.Id,
@@ -78,6 +79,7 @@ namespace Backend.DataLayer
         public IQueryable<StaffWithName> StaffWithNames =>
             from staff in _dbConnection.Staff
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
+            where !person.Deleted
             select new StaffWithName
             {
                 Id = staff.Id,
@@ -89,6 +91,7 @@ namespace Backend.DataLayer
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
             from emergencyContact in _dbConnection.EmergencyContacts
             join person in PeopleExtended on emergencyContact.ContactId equals person.Id
+            where !person.Deleted
             select new EmergencyContactExtended
             {
                 Id = emergencyContact.Id,

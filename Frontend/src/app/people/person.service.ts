@@ -27,6 +27,10 @@ export class PersonService {
     return this.http.post<PersonWithStaff>('/api/person', person,).toPromise();
   }
 
+  deletePerson(personId: string): Promise<string> {
+    return this.http.delete('/api/person/' + personId, {responseType: 'text'}).toPromise();
+  }
+
   updateRole(role: Role): Promise<Role> {
     return this.http.post<Role>('/api/person/role', role).toPromise();
   }

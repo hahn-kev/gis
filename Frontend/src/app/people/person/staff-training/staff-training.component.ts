@@ -21,6 +21,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   public requirementsList: TrainingRequirement[];
   public newTraining = new StaffTraining();
   public requirement: TrainingRequirement;
+  public isNew: boolean;
   private subscription: Subscription;
   private staffIdSubject = new Subject<string>();
 
@@ -38,6 +39,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   set staffId(staffId: string) {
     this._staffId = staffId;
     this.staffIdSubject.next(staffId);
+    this.isNew = !staffId;
   }
 
   updateTrainingList([training, requirements]: [StaffTraining[], Map<string, TrainingRequirement>]) {
