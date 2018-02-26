@@ -13,122 +13,123 @@
 </ng-container>
 
 <div class="person">
-  <form #personForm="ngForm" id="form" (ngSubmit)="save()">
-    <mat-accordion displayMode="flat" multi="true">
-      <mat-expansion-panel disabled expanded="true" class="two-colum-grid">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Person</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field>
-          <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
-        </mat-form-field>
+  <div class="column-1">
+    <form #personForm="ngForm" id="form" (ngSubmit)="save()">
+      <mat-accordion displayMode="flat" multi="true">
+        <mat-expansion-panel disabled expanded="true" class="two-colum-grid">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Person</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-form-field>
+            <input matInput required name="firstName" [(ngModel)]="person.firstName" placeholder="First Name">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
+          </mat-form-field>
 
-        <mat-form-field>
-          <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
-                      placeholder="Spouse">
-            <mat-option [value]="null">None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field>
+            <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
+                        placeholder="Spouse">
+              <mat-option [value]="null">None</mat-option>
+              <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field>
-          <input name="birthdate" matInput [(ngModel)]="person.birthdate"
-                 [matDatepicker]="birthDatePicker"
-                 placeholder="Birthday">
-          <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #birthDatePicker></mat-datepicker>
-        </mat-form-field>
+          <mat-form-field>
+            <input name="birthdate" matInput [(ngModel)]="person.birthdate"
+                   [matDatepicker]="birthDatePicker"
+                   placeholder="Birthday">
+            <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #birthDatePicker></mat-datepicker>
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-select [(ngModel)]="person.gender" name="gender"
-                      placeholder="Gender">
-            <mat-option value="Male">Male</mat-option>
-            <mat-option value="Female">Female</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.gender" name="gender"
+                        placeholder="Gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <div class="span-2-columns">
-          <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
-          <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
-          <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
-                            (ngModelChange)="isStaffChanged($event)">Is Staff
-          </mat-slide-toggle>
-        </div>
+          <div class="span-2-columns">
+            <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
+            <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
+            <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
+                              (ngModelChange)="isStaffChanged($event)">Is Staff
+            </mat-slide-toggle>
+          </div>
 
 
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.email"
-                 type="email"
-                 name="email"
-                 placeholder="Email">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.phoneNumber"
-                 type="tel"
-                 name="phone"
-                 placeholder="Phone Number">
-        </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.email"
+                   type="email"
+                   name="email"
+                   placeholder="Email">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.phoneNumber"
+                   type="tel"
+                   name="phone"
+                   placeholder="Phone Number">
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-select [(ngModel)]="person.nationality" name="nationality"
-                      placeholder="Nationality">
-            <mat-option value="NorthAmerica">North America</mat-option>
-            <mat-option value="CentralSouthAmerica">Central/South America</mat-option>
-            <mat-option value="Africa">Africa</mat-option>
-            <mat-option value="MiddleEast">Middle East</mat-option>
-            <mat-option value="Europe">Europe</mat-option>
-            <mat-option value="CentralAsia">Central Asia</mat-option>
-            <mat-option value="EastAsia">East Asia</mat-option>
-            <mat-option value="Oceania">Oceania</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-expansion-panel>
+          <mat-form-field>
+            <mat-select [(ngModel)]="person.nationality" name="nationality"
+                        placeholder="Nationality">
+              <mat-option value="NorthAmerica">North America</mat-option>
+              <mat-option value="CentralSouthAmerica">Central/South America</mat-option>
+              <mat-option value="Africa">Africa</mat-option>
+              <mat-option value="MiddleEast">Middle East</mat-option>
+              <mat-option value="Europe">Europe</mat-option>
+              <mat-option value="CentralAsia">Central Asia</mat-option>
+              <mat-option value="EastAsia">East Asia</mat-option>
+              <mat-option value="Oceania">Oceania</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-expansion-panel>
 
-      <!--passport address-->
-      <mat-expansion-panel class="two-colum-grid">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Passport Address</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field class="span-2-columns">
+        <!--passport address-->
+        <mat-expansion-panel class="two-colum-grid">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Passport Address</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="person.passportAddress"
                     name="passportAddress"
                     placeholder="Address"></textarea>
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.passportCity"
-                 name="passportCity"
-                 placeholder="City">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.passportState"
-                 name="passportState"
-                 placeholder="State/Province">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.passportZip"
-                 name="passportZip"
-                 placeholder="Zip">
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput [(ngModel)]="person.passportCountry"
-                 name="passportCountry"
-                 placeholder="Country">
-        </mat-form-field>
-      </mat-expansion-panel>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportCity"
+                   name="passportCity"
+                   placeholder="City">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportState"
+                   name="passportState"
+                   placeholder="State/Province">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportZip"
+                   name="passportZip"
+                   placeholder="Zip">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [(ngModel)]="person.passportCountry"
+                   name="passportCountry"
+                   placeholder="Country">
+          </mat-form-field>
+        </mat-expansion-panel>
 
-      <!--thai address-->
-      <mat-expansion-panel class="two-colum-grid">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Thai Address</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field class="span-2-columns">
+        <!--thai address-->
+        <mat-expansion-panel class="two-colum-grid">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Thai Address</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="person.thaiAddress"
                     name="thaiAddress"
                     placeholder="Address"></textarea>
@@ -163,98 +164,100 @@
                    name="thaiZip"
                    placeholder="Zip">
           </mat-form-field>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </form>
+
+    <!--staff-->
+    <mat-accordion *ngIf="person.staff" class="staff">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Staff</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-form-field>
+          <mat-select name="orgGroup" [(ngModel)]="person.staff.orgGroupId"
+                      placeholder="Department/Devision">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </mat-expansion-panel>
     </mat-accordion>
-  </form>
 
-  <!--staff-->
-  <mat-accordion *ngIf="person.staff" class="staff">
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>Staff</mat-panel-title>
-      </mat-expansion-panel-header>
-      <mat-form-field>
-        <mat-select name="orgGroup" [(ngModel)]="person.staff.orgGroupId"
-                    placeholder="Department/Devision">
-          <mat-option>None</mat-option>
-          <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-expansion-panel>
-  </mat-accordion>
+    <app-staff-training *ngIf="person.staff" [staffId]="person.staffId"></app-staff-training>
+  </div>
 
-  <app-staff-training *ngIf="person.staff" [staffId]="person.staffId"></app-staff-training>
+  <div class="column-2">
+    <mat-accordion class="roles">
+      <!--new role-->
+      <mat-expansion-panel #newRolePanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+                           matTooltip="Adding a new Role is disabled until you save a person for the first time">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Add new Role</mat-panel-title>
+        </mat-expansion-panel-header>
+        <form #newRoleForm="ngForm" id="newRoleForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+          <app-role [role]="newRole"></app-role>
 
+        </form>
+        <mat-action-row>
+          <button type="submit" form="newRoleForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
+        </mat-action-row>
+      </mat-expansion-panel>
 
-  <mat-accordion class="roles">
-    <!--new role-->
-    <mat-expansion-panel #newRolePanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
-                         matTooltip="Adding a new Role is disabled until you save a person for the first time">
-      <mat-expansion-panel-header>
-        <mat-panel-title>Add new Role</mat-panel-title>
-      </mat-expansion-panel-header>
-      <form #newRoleForm="ngForm" id="newRoleForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
-        <app-role [role]="newRole"></app-role>
+      <!--roles list-->
+      <mat-expansion-panel *ngFor="let role of person.roles">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{role.name}}</mat-panel-title>
+          <mat-panel-description>
+            {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <form #roleForm="ngForm" [id]="'form_' + role.id" (submit)="saveRole(role)">
+          <app-role [role]="role"></app-role>
 
-      </form>
-      <mat-action-row>
-        <button type="submit" form="newRoleForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
-      </mat-action-row>
-    </mat-expansion-panel>
+        </form>
+        <mat-action-row>
+          <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
+          <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
 
-    <!--roles list-->
-    <mat-expansion-panel *ngFor="let role of person.roles">
-      <mat-expansion-panel-header>
-        <mat-panel-title>{{role.name}}</mat-panel-title>
-        <mat-panel-description>
-          {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <form #roleForm="ngForm" [id]="'form_' + role.id" (submit)="saveRole(role)">
-        <app-role [role]="role"></app-role>
+    <mat-accordion class="emergency-contact">
+      <mat-expansion-panel #newEmergencyContactPanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+                           matTooltip="Adding a new Emergency contact is disabled until you save a person for the first time">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Add new Emergency Contact</mat-panel-title>
+        </mat-expansion-panel-header>
+        <form #newEmergencyContactForm="ngForm" id="newEmergencyContactForm"
+              (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
+          <app-emergency-contact [emergencyContact]="newEmergencyContact"></app-emergency-contact>
+        </form>
+        <mat-action-row>
+          <button type="submit" form="newEmergencyContactForm" [disabled]="newEmergencyContactForm.form.invalid"
+                  mat-button>Add
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
 
-      </form>
-      <mat-action-row>
-        <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
-        <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
-  </mat-accordion>
-
-  <mat-accordion>
-    <mat-expansion-panel #newEmergencyContactPanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
-                         matTooltip="Adding a new Emergency contact is disabled until you save a person for the first time">
-      <mat-expansion-panel-header>
-        <mat-panel-title>Add new Emergency Contact</mat-panel-title>
-      </mat-expansion-panel-header>
-      <form #newEmergencyContactForm="ngForm" id="newEmergencyContactForm"
-            (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
-        <app-emergency-contact [emergencyContact]="newEmergencyContact"></app-emergency-contact>
-      </form>
-      <mat-action-row>
-        <button type="submit" form="newEmergencyContactForm" [disabled]="newEmergencyContactForm.form.invalid"
-                mat-button>Add
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
-      <mat-expansion-panel-header>
-        <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
-      </mat-expansion-panel-header>
-      <form #contactForm="ngForm" [id]="'contactForm_' + contact.id"
-            (submit)="saveEmergencyContact(contact)">
-        <app-emergency-contact [emergencyContact]="contact"></app-emergency-contact>
-      </form>
-      <mat-action-row>
-        <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
-        <button type="submit"
-                [attr.form]="'contactForm_' + contact.id"
-                [disabled]="contactForm.form.invalid"
-                mat-button>Save
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
-  </mat-accordion>
+      <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <form #contactForm="ngForm" [id]="'contactForm_' + contact.id"
+              (submit)="saveEmergencyContact(contact)">
+          <app-emergency-contact [emergencyContact]="contact"></app-emergency-contact>
+        </form>
+        <mat-action-row>
+          <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
+          <button type="submit"
+                  [attr.form]="'contactForm_' + contact.id"
+                  [disabled]="contactForm.form.invalid"
+                  mat-button>Save
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 </div>

@@ -1,9 +1,9 @@
 .main {
-    height: 100%;
-    display: grid;
-    grid-template-rows: 64px 1fr;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
   grid-template-columns: 1fr;
-    background-color: #FAFAFA;
+  background-color: #FAFAFA;
   .mat-toolbar {
     grid-row: 1 / span 1;
   }
@@ -23,7 +23,6 @@
     margin-bottom: 0px;
   }
 }
-
 
 .activity-indicator {
   position: absolute;
