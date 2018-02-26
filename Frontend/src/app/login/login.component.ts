@@ -46,7 +46,9 @@ export class LoginComponent implements OnInit {
       this.snackBar.open('Password reset required', 'Dissmiss', {duration: 2000});
       return;
     } else {
-      this.router.navigate([this.loginService.redirectTo]);
+      let success = await this.router.navigate([this.loginService.redirectTo]);
+      if (!success) this.router.navigate(['home']);
+
     }
   }
 }
