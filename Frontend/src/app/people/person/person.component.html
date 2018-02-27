@@ -244,6 +244,7 @@
       <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
         <mat-expansion-panel-header>
           <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
+          <mat-panel-description>{{peopleMap[contact.contactId].email}}</mat-panel-description>
         </mat-expansion-panel-header>
         <form #contactForm="ngForm" [id]="'contactForm_' + contact.id"
               (submit)="saveEmergencyContact(contact)">
