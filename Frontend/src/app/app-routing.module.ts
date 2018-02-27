@@ -34,6 +34,7 @@ import { LeaveRequestResolverService } from './people/leave-request/leave-reques
 import { EmergencyContactResolverService } from './people/emergency-contact-resolver.service';
 import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
+import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
 
 const routes: Routes = [
   {
@@ -136,7 +137,8 @@ const routes: Routes = [
             path: 'edit/:id',
             component: LeaveRequestComponent,
             resolve: {
-              leaveRequest: LeaveRequestResolverService
+              leaveRequest: LeaveRequestResolverService,
+              people: PeopleWithLeaveResolverService
             }
           },
 
@@ -242,7 +244,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {enableTracing: true})],
   exports: [RouterModule],
   providers: [
     UserResolveService,
@@ -259,7 +261,8 @@ const routes: Routes = [
     StaffTrainingResolverService,
     StaffResolveService,
     LeaveRequestResolverService,
-    EmergencyContactResolverService
+    EmergencyContactResolverService,
+    PeopleWithLeaveResolverService
   ]
 })
 export class AppRoutingModule {

@@ -253,7 +253,8 @@ namespace Backend.Services
         {
             if (personId != null)
             {
-                var person = _personRepository.People.Single(p => p.Id == personId);
+                var person = _personRepository.People.SingleOrDefault(p => p.Id == personId && p.StaffId != null);
+                if (person == null) return new List<PersonAndLeaveDetails>();
                 return new List<PersonAndLeaveDetails>
                 {
                     new PersonAndLeaveDetails

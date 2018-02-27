@@ -6,7 +6,6 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PersonService } from '../person.service';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/combineLatest';
 import { UserToken } from '../../login/user-token';
 import 'rxjs/add/operator/defaultIfEmpty';
@@ -39,10 +38,9 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     //we're adding an empty list at the beginning of this observable
     //so that we get a result right away, then later update with value
-    const peopleWithLeaveObservable = Observable.of([]).concat(this.leaveRequestService.listPeopleWithLeave(false));
-    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), peopleWithLeaveObservable)
-      .subscribe(([data, user, people]: [{ leaveRequest: LeaveRequest }, UserToken, PersonAndLeaveDetails[]]) => {
-        this.people = people;
+    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken())
+      .subscribe(([data, user]: [{ leaveRequest: LeaveRequest, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
+        this.people = data.people;
         this.leaveRequest = data.leaveRequest;
         if (!this.people) return;
         const person = this.people.find(
@@ -50,9 +48,6 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
         if (person) {
           this.leaveRequest.personId = person.person.id;
           this.selectedPerson = person;
-        } else if (this.people.length > 0) {
-          //todo clean this up so we're not doing it twice
-          this.showAllPeople();
         }
       });
     this.isNew = this.route.snapshot.params['id'] === 'new';
@@ -96,10 +91,5 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
     this.snackBar.open('Request deleted');
     this.router.navigate(['../..', 'list'], {relativeTo: this.route});
-  }
-
-  async showAllPeople() {
-    this.people = await this.leaveRequestService.listPeopleWithLeave(true).toPromise();
-    this.personSelectedChanged(this.leaveRequest.personId);
   }
 }
