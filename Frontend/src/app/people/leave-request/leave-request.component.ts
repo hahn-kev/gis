@@ -21,6 +21,7 @@ import { PersonAndLeaveDetails } from './person-and-leave-details';
 export class LeaveRequestComponent implements OnInit, OnDestroy {
   public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequest;
+  public daysUsed = 0;
   public selectedPerson: PersonAndLeaveDetails;
   public isNew: boolean;
 
@@ -42,15 +43,18 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       .subscribe(([data, user]: [{ leaveRequest: LeaveRequest, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
         this.people = data.people;
         this.leaveRequest = data.leaveRequest;
-        if (!this.people) return;
-        const person = this.people.find(
-          eachPerson => eachPerson.person.id === (this.leaveRequest.personId || user.personId));
+        this.daysUsed = this.leaveRequestService.weekDays(this.leaveRequest);
+        const person = this.people.find(p => p.person.id === (this.leaveRequest.personId || user.personId));
         if (person) {
           this.leaveRequest.personId = person.person.id;
           this.selectedPerson = person;
         }
       });
     this.isNew = this.route.snapshot.params['id'] === 'new';
+  }
+
+  updateDaysUsed() {
+    this.daysUsed = this.leaveRequestService.weekDays(this.leaveRequest);
   }
 
   ngOnDestroy(): void {

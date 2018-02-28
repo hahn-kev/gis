@@ -31,14 +31,19 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <input name="startDate" required matInput [(ngModel)]="leaveRequest.startDate"
+        <input name="startDate" required matInput
+               [(ngModel)]="leaveRequest.startDate"
+               (ngModelChange)="updateDaysUsed()"
                [matDatepicker]="startDatePicker"
                placeholder="Start Date">
         <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
         <mat-datepicker #startDatePicker></mat-datepicker>
       </mat-form-field>
       <mat-form-field>
-        <input name="endDate" required matInput [(ngModel)]="leaveRequest.endDate"
+        <input name="endDate" required matInput
+               [(ngModel)]="leaveRequest.endDate"
+               (ngModelChange)="updateDaysUsed()"
+               [min]="leaveRequest.startDate"
                [matDatepicker]="endDatePicker"
                placeholder="End Date">
         <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
@@ -51,6 +56,7 @@
                     placeholder="Reason"></textarea>
       </mat-form-field>
 
+      <span class="mat-caption">This leave request will use {{daysUsed}} day{{daysUsed == 1 ? 's' : 's'}}</span>
       <div class="span-2-columns">
         <div class="mat-caption">Leave days used/total</div>
         <mat-chip-list>

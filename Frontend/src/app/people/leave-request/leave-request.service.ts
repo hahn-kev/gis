@@ -50,7 +50,13 @@ export class LeaveRequestService {
     return leaveUsage.left - daysOfLeave < 0;
   }
 
+  weekDays(leaveRequest: LeaveRequest) {
+    return this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
+  }
+
   weekDaysBetween(dayOne: Date | string, dayTwo: Date | string): number {
-    return buisness.weekDays(moment(dayOne).startOf('day'), moment(dayTwo).startOf('day')) + 1;
+    //weekDays calc is start inclusive end exclusive so we need to add a day to the end
+    let momentTwo = moment(dayTwo).startOf('day').add(1, 'd');
+    return buisness.weekDays(moment(dayOne).startOf('day'), momentTwo);
   }
 }

@@ -33,6 +33,15 @@ describe('LeaveRequestService', () => {
     });
     it('should count same day as 1 day', () => {
       expect(service.weekDaysBetween('2018-02-22', '2018-02-22')).toBe(1);
-    })
+    });
+    it('should not count saturday when ending on that day', () => {
+      expect(service.weekDaysBetween('2018-02-23', '2018-02-24')).toBe(1);
+    });
+    it('should not count sunday when ending on that day', () => {
+      expect(service.weekDaysBetween('2018-02-23', '2018-02-25')).toBe(1);
+    });
+    it('should not count friday to monday as 2', () => {
+      expect(service.weekDaysBetween('2018-02-23', '2018-02-26')).toBe(2);
+    });
   });
 });
