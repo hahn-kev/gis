@@ -50,10 +50,12 @@
       <mat-grid-tile>Left</mat-grid-tile>
       <mat-grid-tile>Total</mat-grid-tile>
       <ng-container *ngFor="let leaveUsed of self.leaveDetails.leaveUseages">
-        <mat-grid-tile>{{leaveUsed.leaveType}}</mat-grid-tile>
-        <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
-        <mat-grid-tile>{{leaveUsed.left}}</mat-grid-tile>
-        <mat-grid-tile>{{leaveUsed.totalAllowed}}</mat-grid-tile>
+        <ng-container *ngIf="leaveUsed.leaveType != (self.person.gender == 'Male' ? 'Maternity' : 'Paternity')">
+          <mat-grid-tile>{{leaveUsed.leaveType}}</mat-grid-tile>
+          <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
+          <mat-grid-tile>{{leaveUsed.left}}</mat-grid-tile>
+          <mat-grid-tile>{{leaveUsed.totalAllowed}}</mat-grid-tile>
+        </ng-container>
       </ng-container>
     </mat-grid-list>
   </mat-card>
