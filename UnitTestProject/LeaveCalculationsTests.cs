@@ -30,6 +30,10 @@ namespace UnitTestProject
                 yield return (new DateTime(2015, 5, 1), new DateTime(2015, 5, 1, 23, 59, 59), 1);
                 //the second is a satruday, so it's not counted
                 yield return (new DateTime(2015, 5, 1), new DateTime(2015, 5, 2), 1);
+                //the 3rd is a sunday so it's not counted
+                yield return (new DateTime(2015, 5, 1), new DateTime(2015, 5, 3), 1);
+                //the 4th is monday, so it's counted
+                yield return (new DateTime(2015, 5, 1), new DateTime(2015, 5, 4), 2);
                 //this spans the weekend, so we subtract 2 days
                 yield return (new DateTime(2015, 5, 1), new DateTime(2015, 5, 7), 5);
                 //this doesn't span a weekend
