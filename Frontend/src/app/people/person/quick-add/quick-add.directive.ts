@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { QuickAddComponent } from './quick-add.component';
 import { PersonWithStaff } from '../../person';
@@ -8,7 +8,7 @@ import { PersonWithStaff } from '../../person';
 })
 export class QuickAddDirective {
 
-  constructor(el: ElementRef, private dialog: MatDialog) {
+  constructor(private dialog: MatDialog) {
   }
 
   @Output() updateList = new EventEmitter<PersonWithStaff>();
