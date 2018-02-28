@@ -5,6 +5,8 @@ import { Person } from '../person';
 import { Observable } from 'rxjs/Observable';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { LeaveUseage } from '../self/self';
+import * as moment from 'moment';
+import * as buisness from 'moment-business';
 
 @Injectable()
 export class LeaveRequestService {
@@ -44,8 +46,11 @@ export class LeaveRequestService {
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUseages: LeaveUseage[]) {
     let leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
     if (leaveUsage.left <= 1) return true;
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    let daysOfLeave = Math.round(Math.abs((leaveRequest.startDate.getTime() - leaveRequest.endDate.getTime()) / (oneDayMs)));
+    let daysOfLeave = this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
     return leaveUsage.left - daysOfLeave < 0;
+  }
+
+  weekDaysBetween(dayOne: Date | string, dayTwo: Date | string): number {
+    return buisness.weekDays(moment(dayOne).startOf('day'), moment(dayTwo).startOf('day')) + 1;
   }
 }
