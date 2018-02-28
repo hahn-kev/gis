@@ -5,9 +5,9 @@
     <button mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <span i18n="site title@@appTitle">GIS</span>
+    <span>GIS <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container></span>
     <span class="spacer"></span>
-    <ng-container appToolbarTemplate></ng-container>
+    <ng-container appRenderTemplate></ng-container>
   </mat-toolbar>
   <mat-sidenav-container>
     <mat-sidenav #sidenav id="sidenav">

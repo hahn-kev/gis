@@ -42,7 +42,7 @@ import { ActivityIndicatorInterceptorService } from './services/activity-indicat
 import { CdkTableModule } from '@angular/cdk/table';
 import { ToolbarTemplateDirective } from './toolbar/toolbar-template.directive';
 import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
-import { ToolbarService } from './toolbar/toolbar.service';
+import { AppTemplateService } from './toolbar/app-template.service';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { SettingsService } from './services/settings.service';
 import { ClipboardModule } from 'ngx-clipboard/dist';
@@ -77,6 +77,7 @@ import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
 import { QuickAddComponent } from './people/person/quick-add/quick-add.component';
 import { QuickAddDirective } from './people/person/quick-add/quick-add.directive';
+import { AppTemplateContentDirective } from './directives/app-template-content.directive';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -109,7 +110,8 @@ if (environment.production) {
     EmergencyContactComponent,
     SelfComponent,
     QuickAddComponent,
-    QuickAddDirective
+    QuickAddDirective,
+    AppTemplateContentDirective
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -172,7 +174,7 @@ if (environment.production) {
       multi: true
     },
     RoleGuardService,
-    ToolbarService,
+    AppTemplateService,
     {
       provide: ErrorHandler,
       useClass: MyErrorHandlerService

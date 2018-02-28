@@ -1,15 +1,16 @@
 import { Directive, OnDestroy, TemplateRef } from '@angular/core';
-import { ToolbarService } from './toolbar.service';
+import { AppTemplateService } from './app-template.service';
+
 @Directive({
   selector: '[appToolbarContent]'
 })
 export class ToolbarContentDirective implements OnDestroy {
-  constructor(private templateRef: TemplateRef<any>, private toolbarService: ToolbarService) {
+  constructor(private templateRef: TemplateRef<any>, private toolbarService: AppTemplateService) {
 
-    this.toolbarService.setTemplate(this.templateRef);
+    this.toolbarService.setTemplate('toolbar', this.templateRef);
   }
 
   ngOnDestroy() {
-    this.toolbarService.setTemplate(null);
+    this.toolbarService.setTemplate('toolbar', null);
   }
 }

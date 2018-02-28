@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: Observable<string>;
+  hasTitle = false;
   @ViewChild('sidenav')
   private sidenav: MatSidenav;
 

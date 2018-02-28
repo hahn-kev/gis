@@ -1,3 +1,4 @@
+<ng-container *appTemplateContent="'title'">Edit {{person.preferredName}}</ng-container>
 <ng-container *appToolbarContent>
   <button *ngIf="!isNew" (click)="deletePerson()" mat-button color="warn">
     <mat-icon mat-list-icon>delete</mat-icon>

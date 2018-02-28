@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
-import { LeaveRequest } from './leave-request';
+import { LeaveRequestWithNames } from './leave-request';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -20,7 +20,7 @@ import { PersonAndLeaveDetails } from './person-and-leave-details';
 })
 export class LeaveRequestComponent implements OnInit, OnDestroy {
   public people: PersonAndLeaveDetails[];
-  public leaveRequest: LeaveRequest;
+  public leaveRequest: LeaveRequestWithNames;
   public daysUsed = 0;
   public selectedPerson: PersonAndLeaveDetails;
   public isNew: boolean;
@@ -40,7 +40,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     //we're adding an empty list at the beginning of this observable
     //so that we get a result right away, then later update with value
     this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken())
-      .subscribe(([data, user]: [{ leaveRequest: LeaveRequest, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
+      .subscribe(([data, user]: [{ leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
         this.people = data.people;
         this.leaveRequest = data.leaveRequest;
         this.daysUsed = this.leaveRequestService.weekDays(this.leaveRequest);

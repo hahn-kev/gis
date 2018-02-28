@@ -1,3 +1,7 @@
+<ng-container *appTemplateContent="'title'">
+  <ng-container *ngIf="isNew; else elseBlock">Request Leave</ng-container>
+  <ng-template #elseBlock>Edit Leave Request</ng-template>
+</ng-container>
 <div class="main-card">
   <mat-card>
     <form #leaveForm="ngForm" (submit)="submit()" id="form" class="two-colum-grid">
