@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { StaffTraining, StaffTrainingWithRequirement } from '../../training-requirement/staff-training';
 import { TrainingRequirementService } from '../../training-requirement/training-requirement.service';
 import { TrainingRequirement } from '../../training-requirement/training-requirement';
@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import * as moment from 'moment';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-staff-training',
@@ -25,6 +26,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   public isNew: boolean;
   private subscription: Subscription;
   private staffIdSubject = new Subject<string>();
+  @ViewChild('newForm') newForm: NgForm;
 
   constructor(private trainingService: TrainingRequirementService,
               private dialog: MatDialog,
@@ -77,6 +79,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
     ];
 
     this.newTraining = new StaffTraining();
+    this.newForm.resetForm();
     this.snackBar.open(`Training Completed`, null, {duration: 2000});
   }
 
