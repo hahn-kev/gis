@@ -9,6 +9,7 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 import { NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
 import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
+import { RoleComponent } from './role.component';
 
 @Component({
   selector: 'app-person',
@@ -24,6 +25,7 @@ export class PersonComponent implements OnInit {
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
+  @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
 
   constructor(private route: ActivatedRoute,
@@ -98,6 +100,7 @@ export class PersonComponent implements OnInit {
       this.person.roles = [...this.person.roles, role];
       this.newRole = new Role();
       this.newRole.personId = this.person.id;
+      this.newRoleEl.form.resetForm();
     }
   }
 

@@ -196,12 +196,16 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Add new Role</mat-panel-title>
         </mat-expansion-panel-header>
-        <form #newRoleForm="ngForm" id="newRoleForm" (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
-          <app-role [role]="newRole"></app-role>
+        <form>
+          <app-role [role]="newRole"
+                    #newRoleEl
+                    formId="newRoleForm"
+                    (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+          </app-role>
 
         </form>
         <mat-action-row>
-          <button type="submit" form="newRoleForm" [disabled]="newRoleForm.form.invalid" mat-button>Add</button>
+          <button type="submit" form="newRoleForm" [disabled]="newRoleEl.form.invalid" mat-button>Add</button>
         </mat-action-row>
       </mat-expansion-panel>
 
@@ -213,13 +217,14 @@
             {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
           </mat-panel-description>
         </mat-expansion-panel-header>
-        <form #roleForm="ngForm" [id]="'form_' + role.id" (submit)="saveRole(role)">
-          <app-role [role]="role"></app-role>
-
-        </form>
+        <app-role [role]="role"
+                  #roleEl
+                  [formId]="'form_' + role.id"
+                  (submit)="saveRole(role)">
+        </app-role>
         <mat-action-row>
           <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
-          <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleForm.form.invalid" mat-button>Save
+          <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
           </button>
         </mat-action-row>
       </mat-expansion-panel>
