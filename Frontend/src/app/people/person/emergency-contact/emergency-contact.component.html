@@ -1,4 +1,4 @@
-<form #form="ngForm" [id]="formId" (submit)="submit.emit($event)">
+<form #form="ngForm" [id]="formId">
   <mat-form-field>
     <mat-select [(ngModel)]="emergencyContact.contactId"
                 (ngModelChange)="updateContactName($event)"

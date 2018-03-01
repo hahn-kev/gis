@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { EmergencyContactExtended } from '../../emergency-contact';
 import { ActivatedRoute } from '@angular/router';
 import { Person } from '../../person';
@@ -12,7 +12,6 @@ import { NgForm } from '@angular/forms';
 export class EmergencyContactComponent implements OnInit {
   @Input() emergencyContact: EmergencyContactExtended;
   @Input() formId: string;
-  @Output() submit = new EventEmitter();
   @ViewChild('form') form: NgForm;
   public people: Person[];
 
