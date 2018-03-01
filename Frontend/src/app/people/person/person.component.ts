@@ -4,7 +4,7 @@ import { Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
 import { Role } from '../role';
 import { OrgGroup } from '../groups/org-group';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
@@ -31,7 +31,8 @@ export class PersonComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private personService: PersonService,
               private router: Router,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private snackBar: MatSnackBar) {
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       groups: OrgGroup[],
@@ -85,6 +86,7 @@ export class PersonComponent implements OnInit {
     } else {
       this.router.navigate(['/people/list']);
     }
+    this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
   }
 
   async deletePerson() {
@@ -92,6 +94,7 @@ export class PersonComponent implements OnInit {
     if (!result) return;
     await this.personService.deletePerson(this.person.id);
     this.router.navigate(['/people/list']);
+    this.snackBar.open(`${this.person.preferredName} Deleted`, null, {duration: 2000});
   }
 
   async saveRole(role: Role, isNew = false): Promise<void> {
@@ -101,21 +104,25 @@ export class PersonComponent implements OnInit {
       this.newRole = new Role();
       this.newRole.personId = this.person.id;
       this.newRoleEl.form.resetForm();
+      this.snackBar.open(`Role Added`, null, {duration: 2000});
+    } else {
+      this.snackBar.open(`Role Saved`, null, {duration: 2000});
     }
   }
 
   async deleteRole(role: Role) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Deleting role: "${role.name}", data will be lost, this can not be undone`,
+        data: ConfirmDialogComponent.Options(`Delete role ${role.name}?`,
           'Delete',
           'Cancel')
       });
     let result = await dialogRef.afterClosed().toPromise();
-    if (result) {
-      await this.personService.deleteRole(role.id);
-      this.person.roles = this.person.roles.filter(value => value.id != role.id);
-    }
+    if (!result) return;
+    await this.personService.deleteRole(role.id);
+    this.person.roles = this.person.roles.filter(value => value.id != role.id);
+    this.snackBar.open(`Role Deleted`, null, {duration: 2000});
+
   }
 
   async saveEmergencyContact(emergencyContact: EmergencyContactExtended, isNew = false) {
@@ -126,20 +133,23 @@ export class PersonComponent implements OnInit {
       this.newEmergencyContact.personId = this.person.id;
       this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
       this.newEmergencyContactEl.form.resetForm();
+      this.snackBar.open(`Emergency Contact Added`, null, {duration: 2000});
+    } else {
+      this.snackBar.open(`Emergency Contact Saved`, null, {duration: 2000});
     }
   }
 
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Deleting Emergency Contact: "${emergencyContact.contactPreferedName}"?`,
+        data: ConfirmDialogComponent.Options(`Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
           'Delete',
           'Cancel')
       });
     let result = await dialogRef.afterClosed().toPromise();
-    if (result) {
-      await this.personService.deleteEmergencyContact(emergencyContact.id);
-      this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
-    }
+    if (!result) return;
+    await this.personService.deleteEmergencyContact(emergencyContact.id);
+    this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
+    this.snackBar.open(`Emergency Contact Deleted`, null, {duration: 2000});
   }
 }

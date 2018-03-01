@@ -5,8 +5,9 @@ import { TrainingRequirement } from '../../training-requirement/training-require
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/switchMap';
 import { Subscription } from 'rxjs/Subscription';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-staff-training',
@@ -25,7 +26,9 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private staffIdSubject = new Subject<string>();
 
-  constructor(private trainingService: TrainingRequirementService, private dialog: MatDialog) {
+  constructor(private trainingService: TrainingRequirementService,
+              private dialog: MatDialog,
+              private snackBar: MatSnackBar) {
     this.subscription = this.staffIdSubject.switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
       .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList.bind(this));
   }
@@ -67,26 +70,29 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   async saveNew() {
     this.newTraining.staffId = this.staffId;
     this.newTraining.trainingRequirementId = this.requirement.id;
-    const savedTraining = await this.saveTraining(this.newTraining);
+    const savedTraining = await this.trainingService.saveStaffTraining(this.newTraining);
     this.training = [
       this.includeRequirementsInTraining(savedTraining),
       ...this.training
     ];
 
     this.newTraining = new StaffTraining();
+    this.snackBar.open(`Training Completed`, null, {duration: 2000});
   }
 
   async saveTraining(training: StaffTraining) {
-    return await this.trainingService.saveStaffTraining(training);
+    await this.trainingService.saveStaffTraining(training);
+    this.snackBar.open(`Training Updated`, null, {duration: 2000});
   }
 
   async deleteTraining(training: StaffTrainingWithRequirement) {
     let confirm = await ConfirmDialogComponent.OpenWait(this.dialog,
-      `Delete ${training.requirementName} Training`,
+      `Delete ${moment(training.completedDate).format('l')} ${training.requirementName} Training`,
       'Delete',
       'Cancel');
     if (!confirm) return;
     await this.trainingService.deleteStaffTraining(training.id);
     this.training = this.training.filter(value => value.id !== training.id);
+    this.snackBar.open(`Training Deleted`, null, {duration: 2000});
   }
 }
