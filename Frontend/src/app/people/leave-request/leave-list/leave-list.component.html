@@ -32,9 +32,8 @@
     <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row
-    *matHeaderRowDef="['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="filteredByUser ? personColumns : hrColumns"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"
-           *matRowDef="let row; columns: ['requester', 'type', 'approved',  'approvedBy', 'startDate', 'endDate', 'createdDate']">
+           *matRowDef="let row; columns: filteredByUser ? personColumns : hrColumns">
   </mat-row>
 </mat-table>
