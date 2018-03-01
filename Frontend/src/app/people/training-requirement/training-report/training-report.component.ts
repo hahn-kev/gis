@@ -5,7 +5,7 @@ import { TrainingRequirementService } from '../training-requirement.service';
 import { Year } from '../year';
 import { RequirementWithStaff } from './requirement-with-staff';
 import { Observable } from 'rxjs/Observable';
-import { map, pluck } from 'rxjs/operators';
+import { map, pluck, share } from 'rxjs/operators';
 import { PersonService } from '../../person.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -40,10 +40,12 @@ export class TrainingReportComponent implements OnInit {
     this.route.queryParamMap.pipe(map(params => {
       return params.has('showCompleted') ? params.get('showCompleted') == 'true' : true;
     })).subscribe(this.showCompleted);
+    let staff = this.personService.getStaff().pipe(share());
+    let trainingRequirements = this.trainingService.list().pipe(share());
 
     this.route.data.pipe(pluck('staffTraining')).subscribe(this.staffTraining);
-    this.requirementsWithStaff = this.trainingService.buildRequirementsWithStaff(this.personService.getStaff(),
-      this.trainingService.list(),
+    this.requirementsWithStaff = this.trainingService.buildRequirementsWithStaff(staff,
+      trainingRequirements,
       this.staffTraining.asObservable(),
       this.selectedYearSubject.pipe(pluck('value')),
       this.showCompleted);
