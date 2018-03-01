@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { EmergencyContactExtended } from '../../emergency-contact';
 import { ActivatedRoute } from '@angular/router';
 import { Person } from '../../person';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-emergency-contact',
@@ -10,6 +11,9 @@ import { Person } from '../../person';
 })
 export class EmergencyContactComponent implements OnInit {
   @Input() emergencyContact: EmergencyContactExtended;
+  @Input() formId: string;
+  @Output() submit = new EventEmitter();
+  @ViewChild('form') form: NgForm;
   public people: Person[];
 
   constructor(private route: ActivatedRoute) {
@@ -24,6 +28,7 @@ export class EmergencyContactComponent implements OnInit {
   }
 
   updateContactName(contactId: string) {
-    this.emergencyContact.contactPreferedName = this.people.find(person => person.id == contactId).preferredName;
+    let person = this.people.find(person => person.id == contactId);
+    this.emergencyContact.contactPreferedName = person ? person.preferredName : '';
   }
 }

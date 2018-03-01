@@ -231,12 +231,14 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Add new Emergency Contact</mat-panel-title>
         </mat-expansion-panel-header>
-        <form #newEmergencyContactForm="ngForm" id="newEmergencyContactForm"
-              (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
-          <app-emergency-contact [emergencyContact]="newEmergencyContact"></app-emergency-contact>
-        </form>
+        <app-emergency-contact
+          #newEmergencyContactEl
+          formId="newEcForm"
+          [emergencyContact]="newEmergencyContact"
+          (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
+        </app-emergency-contact>
         <mat-action-row>
-          <button type="submit" form="newEmergencyContactForm" [disabled]="newEmergencyContactForm.form.invalid"
+          <button type="submit" form="newEcForm" [disabled]="newEmergencyContactEl.form.invalid"
                   mat-button>Add
           </button>
         </mat-action-row>
@@ -245,12 +247,13 @@
       <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
         <mat-expansion-panel-header>
           <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
-          <mat-panel-description>{{peopleMap[contact.contactId].email}}</mat-panel-description>
+          <mat-panel-description>{{peopleMap[contact.contactId]?.email}}</mat-panel-description>
         </mat-expansion-panel-header>
-        <form #contactForm="ngForm" [id]="'contactForm_' + contact.id"
-              (submit)="saveEmergencyContact(contact)">
-          <app-emergency-contact [emergencyContact]="contact"></app-emergency-contact>
-        </form>
+        <app-emergency-contact #contactForm [emergencyContact]="contact"
+                               [formId]="'contactForm_' + contact.id"
+                               (submit)="saveEmergencyContact(contact)">
+        </app-emergency-contact>
+
         <mat-action-row>
           <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
           <button type="submit"

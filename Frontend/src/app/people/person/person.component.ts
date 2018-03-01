@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
+import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
 
 @Component({
   selector: 'app-person',
@@ -22,6 +23,7 @@ export class PersonComponent implements OnInit {
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
+  @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
 
   constructor(private route: ActivatedRoute,
@@ -120,13 +122,14 @@ export class PersonComponent implements OnInit {
       this.newEmergencyContact = new EmergencyContactExtended();
       this.newEmergencyContact.personId = this.person.id;
       this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
+      this.newEmergencyContactEl.form.resetForm();
     }
   }
 
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Deleting Emergency Contact: "${emergencyContact.contactPreferedName}", data will be lost, this can not be undone`,
+        data: ConfirmDialogComponent.Options(`Deleting Emergency Contact: "${emergencyContact.contactPreferedName}"?`,
           'Delete',
           'Cancel')
       });
