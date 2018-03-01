@@ -177,7 +177,7 @@
         </mat-expansion-panel-header>
         <mat-form-field>
           <mat-select name="orgGroup" [(ngModel)]="person.staff.orgGroupId"
-                      placeholder="Department/Devision">
+                      placeholder="Department/Division">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
           </mat-select>
