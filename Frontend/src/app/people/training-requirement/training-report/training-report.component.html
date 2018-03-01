@@ -4,7 +4,7 @@
   <mat-slide-toggle name="showCompleted" [ngModel]="showCompleted | async"
                     (ngModelChange)="setShowCompleted($event)">Show Completed
   </mat-slide-toggle>
-  <button (click)="setYear(selectedYear.value - 1)" mat-icon-button>
+  <button (click)="setYear(selectedYear.value - 1)" [disabled]="isFirstYear" mat-icon-button>
     <mat-icon>navigate_before</mat-icon>
   </button>
   <button mat-button [matMenuTriggerFor]="yearMenu">
@@ -12,7 +12,7 @@
     <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
   </button>
 
-  <button (click)="setYear(selectedYear.value + 1)" mat-icon-button>
+  <button (click)="setYear(selectedYear.value + 1)" [disabled]="isLastYear" mat-icon-button>
     <mat-icon>navigate_next</mat-icon>
   </button>
   <mat-menu #yearMenu="matMenu" [overlapTrigger]="false">
@@ -65,4 +65,7 @@
   </mat-expansion-panel>
 </mat-accordion>
 
-<h2 class="empty" *ngIf="(requirementsWithStaff | async)?.length == 0">All staff have completed requirements for this year</h2>
+<h2 class="empty" *ngIf="(requirementsWithStaff | async)?.length == 0">All staff have completed requirements for School
+  year {{selectedYear.name}}
+  <mat-icon color="accent">thumb_up</mat-icon>
+</h2>

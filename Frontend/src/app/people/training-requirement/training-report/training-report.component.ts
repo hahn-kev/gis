@@ -18,7 +18,6 @@ export class TrainingReportComponent implements OnInit {
   public years: Year[];
   public selectedYearSubject: BehaviorSubject<Year>;
   public selectedYear: Year;
-  public year: number;
   public expandedRequirementId: string;
   public completedDate = new Date();
   public staffTraining = new BehaviorSubject<Map<string, StaffTraining>>(null);
@@ -56,6 +55,14 @@ export class TrainingReportComponent implements OnInit {
 
   setYear(year: number): void {
     this.updateNavigation(year, this.showCompleted.getValue());
+  }
+
+  get isLastYear(): boolean {
+    return this.years[0].value === this.selectedYear.value;
+  }
+
+  get isFirstYear() {
+    return this.years[this.years.length - 1].value === this.selectedYear.value;
   }
 
   setShowCompleted(show) {
