@@ -63,6 +63,7 @@ export class Staff {
 
   public id: string;
   public orgGroupId: string;
+  public annualSalary: number;
 }
 
 export class StaffWithName extends Staff {
