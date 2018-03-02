@@ -112,7 +112,7 @@ namespace Backend.DataLayer
             {
                 if (!Roles.Any(identityRole => identityRole.Name == role))
                 {
-                    this.InsertId(new LinqToDB.Identity.IdentityRole<int>(role));
+                    this.InsertId(new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
                 }
             }
 #endif

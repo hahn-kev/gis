@@ -80,7 +80,7 @@ namespace Backend.Controllers
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             user.CopyFrom(registerUser);
-            await _userManager.UpdateAsync(user);
+            await _userService.UpdateAsync(user);
             if (string.IsNullOrEmpty(registerUser.Password)) return Ok();
 
             await _userManager.RemovePasswordAsync(user);

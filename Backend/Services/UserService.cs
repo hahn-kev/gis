@@ -50,20 +50,23 @@ namespace Backend.Services
             if (string.IsNullOrEmpty(user.Email) || user.PersonId.HasValue) return;
             user.PersonId = _personRepository.People
                 .Where(person => person.Email == user.Email)
-                .Select(person => (Guid?) person.Id)//casting to Guid? because otherwise if none is found then personId could be an empty guid
+                //casting to Guid? because otherwise if none is found then personId could be an empty guid
+                .Select(person => (Guid?) person.Id)
                 .SingleOrDefault();
         }
 
-        public Task<IdentityResult> CreateAsync(IdentityUser user)
+        public async Task<IdentityResult> CreateAsync(IdentityUser user)
         {
+            var identityResult = await _userManager.CreateAsync(user);
             CheckUpdatePersonId(user);
-            return _userManager.CreateAsync(user);
+            return identityResult;
         }
 
-        public Task<IdentityResult> CreateAsync(IdentityUser user, string password)
+        public async Task<IdentityResult> CreateAsync(IdentityUser user, string password)
         {
+            var identityResult = await _userManager.CreateAsync(user, password);
             CheckUpdatePersonId(user);
-            return _userManager.CreateAsync(user, password);
+            return identityResult;
         }
 
         public Task<IdentityResult> UpdateAsync(IdentityUser user)
@@ -95,6 +98,11 @@ namespace Backend.Services
         public Task<IdentityUser> FindByNameAsync(string userName)
         {
             return _userManager.FindByNameAsync(userName);
+        }
+
+        public Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
+        {
+            return _userManager.AddToRoleAsync(user, role);
         }
     }
 }

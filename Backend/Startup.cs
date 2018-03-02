@@ -229,8 +229,19 @@ namespace Backend
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                var hereForYouConnection = scope.ServiceProvider.GetService<IDbConnection>();
-                hereForYouConnection.Setup();
+                var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
+                dbConnection.Setup();
+                if (!dbConnection.Users.Any())
+                {
+                    var userService = scope.ServiceProvider.GetService<UserService>();
+                    var identityUser = new IdentityUser
+                    {
+                        UserName = "khahn",
+                        ResetPassword = true
+                    };
+                    userService.CreateAsync(identityUser, "password").Wait();
+                    userService.AddToRoleAsync(identityUser, "admin").Wait();
+                }
             }
 #endif
         }
