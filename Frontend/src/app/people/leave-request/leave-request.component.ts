@@ -72,10 +72,14 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
         if (!result) return;
       }
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
-      this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`);
+      if (!notified) {
+        this.snackBar.open(`Leave request created, supervisor not found, no notification was sent`, null, {duration: 2000});
+      } else {
+        this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`, null, {duration: 2000});
+      }
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
-      this.snackBar.open('Leave updated, notification was not sent of changes');
+      this.snackBar.open('Leave updated, notification was not sent of changes', null, {duration: 2000});
     }
   }
 

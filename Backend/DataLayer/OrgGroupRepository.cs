@@ -40,8 +40,8 @@ namespace Backend.DataLayer
         {
             var result =
             (from personOnLeave in _personRepository.PeopleWithStaff.Where(person => person.Id == personId)
-                from department in OrgGroupsWithSupervisor.InnerJoin(@group =>
-                    @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id)
+                from department in OrgGroupsWithSupervisor.LeftJoin(@group =>
+                    @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id).DefaultIfEmpty()
                 from devision in OrgGroupsWithSupervisor.LeftJoin(@group => @group.Id == department.ParentId).DefaultIfEmpty()
                 from supervisorGroup in OrgGroupsWithSupervisor.LeftJoin(@group => @group.Id == devision.ParentId).DefaultIfEmpty()
                 select new
