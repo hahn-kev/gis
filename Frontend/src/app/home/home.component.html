@@ -19,7 +19,7 @@
           <mat-icon mat-list-icon>location_city</mat-icon>
           <span mat-line>Organization</span>
         </a>
-        <a mat-list-item routerLink="/leave-request/list">
+        <a mat-list-item routerLink="/leave-request/report">
           <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
           <span mat-line>Leave</span>
         </a>
@@ -41,7 +41,7 @@
           <p mat-line>Request Leave</p>
         </a>
 
-        <a mat-list-item [routerLink]="'/leave-request/list/' + (userToken | async).personId">
+        <a mat-list-item [routerLink]="'/leave-request/list/mine'">
           <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
           <span mat-line>My Leave</span>
         </a>

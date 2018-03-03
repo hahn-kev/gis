@@ -78,6 +78,7 @@ import { SelfService } from './people/self/self.service';
 import { QuickAddComponent } from './people/person/quick-add/quick-add.component';
 import { QuickAddDirective } from './people/person/quick-add/quick-add.directive';
 import { AppTemplateContentDirective } from './directives/app-template-content.directive';
+import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -111,7 +112,8 @@ if (environment.production) {
     SelfComponent,
     QuickAddComponent,
     QuickAddDirective,
-    AppTemplateContentDirective
+    AppTemplateContentDirective,
+    LeaveReportComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

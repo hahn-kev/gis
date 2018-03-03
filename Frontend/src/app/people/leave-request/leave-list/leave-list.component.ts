@@ -11,12 +11,16 @@ import { AppDataSource } from 'app/classes/app-data-source';
 export class LeaveListComponent implements OnInit {
   public dataSource: AppDataSource<LeaveRequest>;
   public filteredByUser: string | null;
+  public showingMine: boolean;
   public hrColumns = ['requester', 'type', 'approved', 'approvedBy', 'startDate', 'endDate', 'createdDate'];
   public personColumns = ['startDate', 'endDate', 'type', 'approved', 'approvedBy', 'createdDate'];
 
 //todo let non hr people access this, and filter by logged in user
   constructor(private route: ActivatedRoute) {
-    this.route.params.subscribe(value => this.filteredByUser = value['personId']);
+    this.route.params.subscribe(value => {
+      this.filteredByUser = value['personId'];
+      this.showingMine = this.filteredByUser === 'mine';
+    });
   }
 
   ngOnInit(): void {

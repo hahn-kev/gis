@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Leave</ng-container>
+<ng-container *appTemplateContent="'title'">{{showingMine ? 'My Leave' : 'Leave'}}</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="requester">
     <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
@@ -32,8 +32,8 @@
     <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="filteredByUser ? personColumns : hrColumns"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="showingMine ? personColumns : hrColumns"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"
-           *matRowDef="let row; columns: filteredByUser ? personColumns : hrColumns">
+           *matRowDef="let row; columns: showingMine ? personColumns : hrColumns">
   </mat-row>
 </mat-table>

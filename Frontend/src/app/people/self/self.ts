@@ -15,3 +15,16 @@ export class LeaveUseage {
   public totalAllowed: number;
   public left: number;
 }
+
+export enum LeaveType {
+  Vacation = 'Vacation',
+  Sick = 'Sick',
+  Personal = 'Personal',
+  Funeral = 'Funeral',
+  Maternity = 'Maternity',
+  Paternity = 'Paternity',
+  Buisness = 'Buisness',
+  Compensation = 'Compensation',
+  Other = 'Other',
+  NonPaid = 'NonPaid',
+}

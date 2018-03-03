@@ -35,6 +35,7 @@ import { EmergencyContactResolverService } from './people/emergency-contact-reso
 import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
 import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
+import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
 
 const routes: Routes = [
   {
@@ -158,6 +159,13 @@ const routes: Routes = [
             canActivate: [RoleGuardService],
             data: {
               requireRole: ['admin', 'hr']
+            }
+          },
+          {
+            path: 'report',
+            component: LeaveReportComponent,
+            resolve: {
+              people: PeopleWithLeaveResolverService
             }
           }
         ]
