@@ -51,6 +51,7 @@ namespace Backend
         {
             services.AddOptions();
             services.Configure<Settings>(Configuration);
+            var settings = Configuration.Get<Settings>();
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
             AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
                     options =>
@@ -68,12 +69,12 @@ namespace Backend
             
             services.AddSentinel(new SentinelSettings
             {
-                Dsn = Configuration.GetValue<string>("SentryDsn"),
-                Environment = Configuration.GetValue<string>("Environment") ?? "Production",
+                Dsn = settings.SentryDsn,
+                Environment = settings.SentryDsn ?? "Production",
                 IncludeRequestData = true,
                 IncludeCookies = false,
                 Release = GetType().Assembly.GetName().Version.ToString(),
-                ServerName = Configuration.GetValue<string>("BaseUrl"),
+                ServerName = settings.BaseUrl,
                 IgnoreTypes = new List<Type> {typeof(UserError)}
             });
 
