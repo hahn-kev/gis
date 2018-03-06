@@ -68,6 +68,7 @@ namespace Backend.Controllers
         [AllowAnonymous]
         public IActionResult Google(string redirectTo = null)
         {
+            Request.Scheme = new Uri(_settings.BaseUrl).Scheme;
             return Challenge(new AuthenticationProperties
                 {
                     RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
