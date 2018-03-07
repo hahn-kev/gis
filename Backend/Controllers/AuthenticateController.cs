@@ -68,8 +68,6 @@ namespace Backend.Controllers
         [AllowAnonymous]
         public IActionResult Google(string redirectTo = null)
         {
-            Request.Scheme = new Uri(_settings.BaseUrl).Scheme;
-            //todo allow callback to hit an https endpoint, but currently getting 500 errors
             return Challenge(new AuthenticationProperties
             {
                 RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
@@ -83,6 +81,7 @@ namespace Backend.Controllers
         public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
         public const string ClaimPersonId = "personId";
 
+        public const string GisEmailSufix = "@gisthailand.org";
         public async Task GoogleSignIn()
         {
             var googleId = User.FindFirstValue(ClaimTypeId);
@@ -91,7 +90,7 @@ namespace Backend.Controllers
             if (user == null)
             {
                 var email = User.FindFirstValue(ClaimTypeEmail);
-                if (!email.EndsWith("@gisthailand.org") && email != "hahn.kev@gmail.com")
+                if (!email.EndsWith(GisEmailSufix) && email != "hahn.kev@gmail.com")
                 {
                     throw new AuthenticationException("Only gis users or khahn are allowed to login with google sso");
                 }
@@ -102,7 +101,7 @@ namespace Backend.Controllers
                     user = new IdentityUser
                     {
                         Email = email,
-                        UserName = User.Identity.Name.Replace(" ", "_")
+                        UserName = email.Substring(0, email.Length - GisEmailSufix.Length)
                     };
                     var newUserResult = await _userService.CreateAsync(user);
                     if (!newUserResult.Succeeded) throw newUserResult.Errors();
