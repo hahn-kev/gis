@@ -61,19 +61,19 @@ namespace Backend.Controllers
             {
                 throw new ArgumentException("user id not generated error");
             }
-            return Json(new {Status = "Success"});
+            return Json(new { Status = "Success" });
         }
 
         [HttpGet("google")]
         [AllowAnonymous]
         public IActionResult Google(string redirectTo = null)
         {
-//            Request.Scheme = new Uri(_settings.BaseUrl).Scheme;
+            Request.Scheme = new Uri(_settings.BaseUrl).Scheme;
             //todo allow callback to hit an https endpoint, but currently getting 500 errors
             return Challenge(new AuthenticationProperties
-                {
-                    RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
-                },
+            {
+                RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
+            },
                 "Google");
         }
 
