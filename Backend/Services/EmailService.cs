@@ -85,10 +85,10 @@ namespace Backend.Services
 
         public EmailService(IOptions<Settings> options)
         {
-            var apiKey = options.Value.MailgunApiKey;
-            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
-            var value = Convert.ToBase64String(Encoding.ASCII.GetBytes("api:" + apiKey));
-            MailGunApi.Authorization = new AuthenticationHeaderValue("Basic", value);
+//            var apiKey = options.Value.MailgunApiKey;
+//            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
+//            var value = Convert.ToBase64String(Encoding.ASCII.GetBytes("api:" + apiKey));
+//            MailGunApi.Authorization = new AuthenticationHeaderValue("Basic", value);
             _domain = options.Value.MailgunDomain;
             if (string.IsNullOrEmpty(_domain))
                 throw new NullReferenceException("MailgunDomain setting can not be null");
@@ -97,6 +97,7 @@ namespace Backend.Services
 
         public async Task<MailgunReponse> SendEmail(string to, string subject, string body)
         {
+            throw new NotImplementedException("mailgun email isn't implemented yet");
             var mailgunReponse =
                 await MailGunApi.SendEmail(_domain, "GIS GIS@" + _domain, to, subject, body);
             return mailgunReponse;
