@@ -85,7 +85,8 @@ namespace Backend.DataLayer
                 Id = staff.Id,
                 OrgGroupId = staff.OrgGroupId,
                 PersonId = person.Id,
-                PreferredName = person.PreferredName
+                PreferredName = person.PreferredName,
+                AnnualSalary = staff.AnnualSalary
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
