@@ -26,7 +26,7 @@ export class UserToken {
     return [val];
   }
 
-  get personId(): string {
+  get personId(): string | null {
     if (!this.token) return null;
     return this.token['personId'];
   }

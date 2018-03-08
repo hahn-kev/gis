@@ -59,6 +59,10 @@ export class LoginService implements CanActivate {
     });
   }
 
+  isHrOrAdmin() {
+    return this.hasAnyRole(['admin', 'hr']);
+  }
+
   hasAnyRole(roles: string[]) {
     return this.currentUserToken().pipe(map(user => user && roles.some(role => user.roles.includes(role))));
   }
