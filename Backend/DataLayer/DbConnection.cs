@@ -32,7 +32,6 @@ namespace Backend.DataLayer
         IQueryable<LinqToDB.Identity.IdentityUserToken<int>> UserTokens { get; }
         IQueryable<LinqToDB.Identity.IdentityRole<int>> Roles { get; }
         IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> RoleClaims { get; }
-        void Setup();
 
         DataConnectionTransaction BeginTransaction();
         void CommitTransaction();
@@ -87,51 +86,9 @@ namespace Backend.DataLayer
         public IQueryable<Staff> Staff => GetTable<Staff>();
         public IQueryable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
 
-        public void Setup()
-        {
-#if DEBUG
-            TryCreateTable<IdentityUser>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserClaim<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserLogin<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserToken<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserRole<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityRole<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
-            TryCreateTable<ImageInfo>();
-            TryCreateTable<PersonExtended>();
-            TryCreateTable<PersonRole>();
-            TryCreateTable<OrgGroup>();
-            TryCreateTable<LeaveRequest>();
-            TryCreateTable<TrainingRequirement>();
-            TryCreateTable<Staff>();
-            TryCreateTable<StaffTraining>();
-            TryCreateTable<EmergencyContact>();
-
-            var roles = new[] {"admin", "hr"};
-            foreach (var role in roles)
-            {
-                if (!Roles.Any(identityRole => identityRole.Name == role))
-                {
-                    this.InsertId(new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
-                }
-            }
-#endif
-        }
-
         public BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list)
         {
             return DataConnectionExtensions.BulkCopy(this, list);
-        }
-
-        private void TryCreateTable<T>()
-        {
-            try
-            {
-                this.CreateTable<T>();
-            }
-            catch (PostgresException e) when (e.SqlState == "42P07") //already exists code I think
-            {
-            }
         }
     }
 }

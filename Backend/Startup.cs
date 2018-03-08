@@ -231,7 +231,7 @@ namespace Backend
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
-                dbConnection.Setup();
+                //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {
                     var userService = scope.ServiceProvider.GetService<UserService>();

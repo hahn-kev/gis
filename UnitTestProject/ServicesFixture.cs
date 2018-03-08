@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Npgsql;
 using Xunit;
 
 namespace UnitTestProject
@@ -51,7 +52,49 @@ namespace UnitTestProject
             startup.ConfigureDatabase(ServiceProvider);
             DataConnection.DefaultSettings = new MockDbSettings();
             DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message, category);
-            DbConnection.Setup();
+            SetupSchema();
+        }
+
+
+        private void SetupSchema()
+        {
+            TryCreateTable<IdentityUser>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserClaim<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserLogin<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserToken<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityUserRole<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityRole<int>>();
+            TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
+            TryCreateTable<ImageInfo>();
+            TryCreateTable<PersonExtended>();
+            TryCreateTable<PersonRole>();
+            TryCreateTable<OrgGroup>();
+            TryCreateTable<LeaveRequest>();
+            TryCreateTable<TrainingRequirement>();
+            TryCreateTable<Staff>();
+            TryCreateTable<StaffTraining>();
+            TryCreateTable<EmergencyContact>();
+
+            var roles = new[] {"admin", "hr"};
+            foreach (var role in roles)
+            {
+                if (!DbConnection.Roles.Any(identityRole => identityRole.Name == role))
+                {
+                    DbConnection.InsertId(
+                        new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
+                }
+            }
+        }
+
+        private void TryCreateTable<T>()
+        {
+            try
+            {
+                DbConnection.CreateTable<T>();
+            }
+            catch (PostgresException e) when (e.SqlState == "42P07") //already exists code I think
+            {
+            }
         }
 
         public void SetupPeople()
