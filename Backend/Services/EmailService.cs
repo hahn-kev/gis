@@ -89,9 +89,9 @@ namespace Backend.Services
 //            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
 //            var value = Convert.ToBase64String(Encoding.ASCII.GetBytes("api:" + apiKey));
 //            MailGunApi.Authorization = new AuthenticationHeaderValue("Basic", value);
-            _domain = options.Value.MailgunDomain;
-            if (string.IsNullOrEmpty(_domain))
-                throw new NullReferenceException("MailgunDomain setting can not be null");
+//            _domain = options.Value.MailgunDomain;
+//            if (string.IsNullOrEmpty(_domain))
+//                throw new NullReferenceException("MailgunDomain setting can not be null");
             _sendGridClient = new SendGridClient(options.Value.SendGridAPIKey);
         }
 
