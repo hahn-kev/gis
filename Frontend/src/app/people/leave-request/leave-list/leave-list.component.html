@@ -31,6 +31,11 @@
     <mat-header-cell *matHeaderCellDef>Created Date</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
   </ng-container>
+
+  <ng-container matColumnDef="days">
+    <mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.days}}</mat-cell>
+  </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="showingMine ? personColumns : hrColumns"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"

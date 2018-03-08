@@ -33,7 +33,9 @@ namespace Backend.DataLayer
                 RequesterName = person.PreferredName,
                 StartDate = l.StartDate,
                 Type = l.Type,
-                Reason = l.Reason
+                Reason = l.Reason,
+                Days = l.Days,
+                OverrideDays = l.OverrideDays
             };
 
         public bool ApproveLeaveRequest(Guid id, Guid approver)

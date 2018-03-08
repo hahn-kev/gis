@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -348,6 +348,113 @@ namespace UnitTestProject
                 Assert.Equal(expectedApproverId, actualApprover.Id);
             Assert.Equal(expectApprovalEmailSent, actualApprovalEmailSent);
             Assert.Equal(expectedNotifyEmailCount, actualNotifyEmailCount);
+        }
+
+        private LeaveRequest GenerateRequest()
+        {
+            var leaveRequest = AutoFaker.Generate<LeaveRequest>();
+            if (leaveRequest.StartDate > leaveRequest.EndDate)
+            {
+                var tmp = leaveRequest.StartDate;
+                leaveRequest.StartDate = leaveRequest.EndDate;
+                leaveRequest.EndDate = tmp;
+            }
+
+            leaveRequest.Days = leaveRequest.CalculateLength();
+            return leaveRequest;
+        } 
+        
+        [Fact]
+        public void ThrowsErrorWhenPersonIsInvalid()
+        {
+            var personId = Guid.NewGuid();
+            LeaveRequest oldRequest = GenerateRequest();
+            LeaveRequest newRequest = oldRequest.Copy();
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
+            Assert.Contains("modify this leave request", ex.Message);
+
+            personId = oldRequest.PersonId;
+            newRequest.PersonId = Guid.NewGuid();
+            ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
+            Assert.Contains("modify this leave request", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowsWhenChangingTheDays()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.OverrideDays = false;
+            LeaveRequest newRequest = oldRequest.Copy();
+
+            newRequest.Days--;
+
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+
+            Assert.Contains("must match calculated", ex.Message);
+
+            newRequest.Days = newRequest.CalculateLength();
+            newRequest.EndDate += TimeSpan.FromDays(2);
+            ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+
+            Assert.Contains("must match calculated", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowsWhenChangingDaysWhenOverriden()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.OverrideDays = true;
+            LeaveRequest newRequest = oldRequest.Copy();
+            newRequest.Days++;
+            
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+
+            Assert.Contains("modify the length", ex.Message);
+        }
+        
+        [Fact]
+        public void ThrowsWhenChangingStartAndEndForOverridenDays()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.OverrideDays = true;
+            LeaveRequest newRequest = oldRequest.Copy();
+            newRequest.EndDate += TimeSpan.FromDays(2);
+
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+
+            Assert.Contains("modify the start or end", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowsIfChangingApproved()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            LeaveRequest newRequest = oldRequest.Copy();
+            oldRequest.Approved = false;
+            newRequest.Approved = true;
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+            Assert.Contains("approve", ex.Message);
+        }
+
+        [Fact]
+        public void AcceptMissmatchedCalculationForHalfDays()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.OverrideDays = false;
+            oldRequest.StartDate = DateTime.Today;
+            oldRequest.EndDate = DateTime.Today;
+            oldRequest.Days = oldRequest.CalculateLength();
+            LeaveRequest newRequest = oldRequest.Copy();
+            newRequest.Days = 0.5m;
+            //does not throw
+            _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId);
         }
     }
 }

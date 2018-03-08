@@ -12,8 +12,8 @@ export class LeaveListComponent implements OnInit {
   public dataSource: AppDataSource<LeaveRequest>;
   public filteredByUser: string | null;
   public showingMine: boolean;
-  public hrColumns = ['requester', 'type', 'approved', 'approvedBy', 'startDate', 'endDate', 'createdDate'];
-  public personColumns = ['startDate', 'endDate', 'type', 'approved', 'approvedBy', 'createdDate'];
+  public hrColumns = ['requester', 'type', 'approved', 'approvedBy', 'startDate', 'endDate', 'days', 'createdDate'];
+  public personColumns = ['startDate', 'endDate', 'days', 'type', 'approved', 'approvedBy', 'createdDate'];
 
 //todo let non hr people access this, and filter by logged in user
   constructor(private route: ActivatedRoute) {

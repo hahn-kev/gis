@@ -10,8 +10,8 @@ namespace Backend.Entities
     public class LeaveUseage
     {
         public LeaveType LeaveType { get; set; }
-        public int Used { get; set; }
+        public decimal Used { get; set; }
         public int? TotalAllowed { get; set; }
-        public int? Left => TotalAllowed - Used;
+        public decimal? Left => TotalAllowed - Used;
     }
 }

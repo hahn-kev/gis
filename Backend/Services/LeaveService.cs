@@ -58,6 +58,7 @@ namespace Backend.Services
 
         public void UpdateLeave(LeaveRequest leaveRequest)
         {
+            //todo leave days calc validation
             _entityService.Save(leaveRequest);
         }
 
@@ -77,7 +78,7 @@ namespace Backend.Services
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
             var result = _orgGroupRepository.PersonWithOrgGroupChain(leaveRequest.PersonId);
-            if (result.personOnLeave?.StaffId == null) throw new Exception("Person requesting leave must be staff");
+            if (result.personOnLeave?.StaffId == null) throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;
@@ -214,9 +215,9 @@ namespace Backend.Services
             ).Where(useage => useage.TotalAllowed != null).ToList();
         }
 
-        public static int TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
+        public static decimal TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
         {
-            return requests.Sum(request => request.StartDate.BusinessDaysUntil(request.EndDate));
+            return requests.Sum(request => request.Days);
         }
 
         public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRole> personRoles)
@@ -278,6 +279,56 @@ namespace Backend.Services
                     Person = person,
                     LeaveUseages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
                 }).ToList();
+        }
+
+        public void ThrowIfHrRequiredForUpdate(LeaveRequest updatedLeaveRequest, Guid? personMakingChanges)
+        {
+            var oldRequest =
+                _leaveRequestRepository.LeaveRequests.Single(request => request.Id == updatedLeaveRequest.Id);
+            ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest, personMakingChanges);
+        }
+
+        public void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
+            LeaveRequest newRequest,
+            Guid? personMakingChanges)
+        {
+            if (oldRequest.PersonId != personMakingChanges ||
+                oldRequest.PersonId != newRequest.PersonId)
+            {
+                throw new UnauthorizedAccessException("You aren't allowed to modify this leave request");
+            }
+
+            if (!oldRequest.OverrideDays && newRequest.OverrideDays)
+            {
+                throw new UnauthorizedAccessException(
+                    "You aren't allowed to override the length of this leave request, talk to HR");
+            }
+
+            if (!newRequest.OverrideDays && newRequest.Days != newRequest.CalculateLength() && newRequest.Days != newRequest.CalculateLength() - 0.5m)
+            {
+                throw new UnauthorizedAccessException(
+                    "Days of leave request must match calculated when not being overriden");
+            }
+
+            if (oldRequest.OverrideDays && oldRequest.Days != newRequest.Days)
+            {
+                throw new UnauthorizedAccessException(
+                    "You aren't allowed modify the length of this leave request, talk to HR");
+            }
+
+            if (oldRequest.OverrideDays && newRequest.OverrideDays &&
+                oldRequest.CalculateLength() != newRequest.CalculateLength())
+            {
+                throw new UnauthorizedAccessException(
+                    "You aren't allowed modify the start or end dates of this leave request because the calculation has been overriden, talk to HR");
+            }
+
+            if (oldRequest.Approved != newRequest.Approved)
+            {
+                throw new UnauthorizedAccessException(
+                    "You aren't allowed to approve your own leave request, talk to HR");
+                
+            }
         }
     }
 }

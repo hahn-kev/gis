@@ -47,19 +47,16 @@ namespace Backend.Controllers
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] LeaveRequest leaveRequest)
+        public IActionResult Update([FromBody] LeaveRequest updatedLeaveRequest)
         {
-            if (leaveRequest.Id == Guid.Empty)
+            if (updatedLeaveRequest.Id == Guid.Empty)
                 throw new Exception("Trying to create a new request with the update action, use post instead");
-            if (User.IsAdminOrHr() ||
-                (User.PersonId() != null && _leaveService.GetLeavePersonId(leaveRequest.Id) == User.PersonId()))
+            if (!User.IsAdminOrHr())
             {
-                _leaveService.UpdateLeave(leaveRequest);
+                _leaveService.ThrowIfHrRequiredForUpdate(updatedLeaveRequest, User.PersonId());
             }
-            else
-            {
-                throw new UnauthorizedAccessException("Logged in user isn't allowed to modify this leave request");
-            }
+
+            _leaveService.UpdateLeave(updatedLeaveRequest);
 
             return Ok();
         }
@@ -86,6 +83,20 @@ namespace Backend.Controllers
             if (!_leaveService.CanRequestLeave(User, leaveRequest))
             {
                 throw new UnauthorizedAccessException("Logged in user isn't allowed to request leave for this person");
+            }
+
+            if (!User.IsAdminOrHr())
+            {
+                if (leaveRequest.OverrideDays)
+                {
+                    throw new UnauthorizedAccessException(
+                        "You're not allowed to override the leave calculation, talk to HR");
+                }
+
+                if (leaveRequest.Days != leaveRequest.CalculateLength() && leaveRequest.Days != leaveRequest.CalculateLength() - 0.5m)
+                {
+                    leaveRequest.Days = leaveRequest.CalculateLength();
+                }
             }
 
             Person notified = await _leaveService.RequestLeave(leaveRequest);

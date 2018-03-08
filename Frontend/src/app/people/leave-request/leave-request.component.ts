@@ -12,6 +12,8 @@ import 'rxjs/add/operator/defaultIfEmpty';
 import 'rxjs/add/operator/concat';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/share';
 
 @Component({
   selector: 'app-leave-request',
@@ -24,6 +26,8 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   public daysUsed = 0;
   public selectedPerson: PersonAndLeaveDetails;
   public isNew: boolean;
+  public isHr: Observable<boolean>;
+  private myPersonId: string | null;
 
   private subscription: Subscription;
 
@@ -34,6 +38,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
               public loginService: LoginService,
               private personService: PersonService,
               private dialog: MatDialog) {
+    this.isHr = this.loginService.isHrOrAdmin();
   }
 
   ngOnInit(): void {
@@ -43,7 +48,8 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       .subscribe(([data, user]: [{ leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
         this.people = data.people;
         this.leaveRequest = data.leaveRequest;
-        this.daysUsed = this.leaveRequestService.weekDays(this.leaveRequest);
+        this.updateDaysUsed();
+        this.myPersonId = user.personId;
         const person = this.people.find(p => p.person.id === (this.leaveRequest.personId || user.personId));
         if (person) {
           this.leaveRequest.personId = person.person.id;
@@ -54,7 +60,8 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   updateDaysUsed() {
-    this.daysUsed = this.leaveRequestService.weekDays(this.leaveRequest);
+    if (!this.leaveRequest.overrideDays)
+      this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
   }
 
   ngOnDestroy(): void {
@@ -73,10 +80,19 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       }
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
       if (!notified) {
-        this.snackBar.open(`Leave request created, supervisor not found, no notification was sent`, null, {duration: 2000});
+        this.snackBar.open(`Leave request created, supervisor not found, no notification was sent`,
+          null,
+          {duration: 2000});
       } else {
-        this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`, null, {duration: 2000});
+        this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`,
+          null,
+          {duration: 2000});
       }
+      this.router.navigate([
+        'leave-request',
+        'list',
+        this.myPersonId == this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
+      ])
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
       this.snackBar.open('Leave updated, notification was not sent of changes', null, {duration: 2000});
@@ -85,6 +101,13 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
   personSelectedChanged(personId: string): void {
     this.selectedPerson = this.people.find(value => value.person.id === personId);
+  }
+
+  overrideDaysChanged(overrideDays: boolean) {
+
+    if (!overrideDays) {
+      this.updateDaysUsed();
+    }
   }
 
   async deleteRequest(): Promise<void> {
@@ -98,6 +121,10 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     await this.leaveRequestService.deleteRequest(this.leaveRequest.id).toPromise();
 
     this.snackBar.open('Request deleted');
-    this.router.navigate(['../..', 'list'], {relativeTo: this.route});
+    this.router.navigate([
+      'leave-request',
+      'list',
+      this.myPersonId == this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
+    ]);
   }
 }

@@ -10,6 +10,8 @@ export class LeaveRequest {
   }
 
   public reason: string;
+  public days: number;
+  public overrideDays: boolean;
 }
 
 export class LeaveRequestWithNames extends LeaveRequest {

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Backend.Entities;
 using Backend.Services;
+using Backend.Utils;
 using Xunit;
 
 namespace UnitTestProject
@@ -53,8 +55,29 @@ namespace UnitTestProject
         [MemberData(nameof(LeaveMemberData))]
         public void ShouldMatchExpectedLeave(DateTime startDate, DateTime endDate, int expectedDays)
         {
-            var result = LeaveService.TotalLeaveUsed(new[] {new LeaveRequest(startDate, endDate)});
+            var leaveRequest = new LeaveRequest(startDate, endDate);
+            leaveRequest.Days = leaveRequest.CalculateLength();
+            var result = LeaveService.TotalLeaveUsed(new[] {leaveRequest});
             Assert.Equal(expectedDays, result);
+        }
+
+        [Fact]
+        public void ShouldAllowOverridingLeaveUsed()
+        {
+            var startDate = new DateTime(2015, 5, 4);
+            var endDate = new DateTime(2015, 5, 5);
+
+            var result =
+                LeaveService.TotalLeaveUsed(new[]
+                {
+                    new LeaveRequest(startDate, endDate)
+                    {
+                        OverrideDays = true,
+                        Days = 5
+                    }
+                });
+            Assert.Equal(2, startDate.BusinessDaysUntil(endDate));
+            Assert.Equal(5, result);
         }
 
         public static IEnumerable<object[]> RolesMemberData()
@@ -138,6 +161,7 @@ namespace UnitTestProject
             var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles);
             Assert.Equal(expected, result);
         }
+
 
         [Fact]
         public void ListAllLeaveWorks()

@@ -1,4 +1,5 @@
 ﻿using System;
+using Backend.Utils;
 using LinqToDB;
 using LinqToDB.Mapping;
 using Newtonsoft.Json;
@@ -21,6 +22,8 @@ namespace Backend.Entities
         public Guid PersonId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public decimal Days { get; set; }
+        public bool OverrideDays { get; set; }
         public string Reason { get; set; }
         public bool? Approved { get; set; }
 
@@ -33,6 +36,16 @@ namespace Backend.Entities
         public LeaveType Type { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public int CalculateLength()
+        {
+            return StartDate.BusinessDaysUntil(EndDate);
+        }
+
+        public LeaveRequest Copy()
+        {
+            return (LeaveRequest) MemberwiseClone();
+        }
     }
 
     [Table("LeaveRequest", IsColumnAttributeRequired = false)]
