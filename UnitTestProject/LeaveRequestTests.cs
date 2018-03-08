@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -95,15 +95,15 @@ namespace UnitTestProject
             var expectedDepartment = AutoFaker.Generate<OrgGroup>();
             var expectedDevision = AutoFaker.Generate<OrgGroup>();
             var expectedDevisionSupervisor = personFaker.Generate();
-            
+
             expectedPersonOnLeave.Staff.OrgGroupId = expectedDepartment.Id;
-            
+
             expectedDepartment.Supervisor = null;
             expectedDepartment.ParentId = expectedDevision.Id;
-            
+
             expectedDevision.Supervisor = expectedDevisionSupervisor.Id;
             expectedDevision.ParentId = null;
-            
+
             _dbConnection.Insert(expectedPersonOnLeave);
             _dbConnection.Insert(expectedPersonOnLeave.Staff);
             _dbConnection.Insert(expectedDepartment);
@@ -114,11 +114,13 @@ namespace UnitTestProject
             //test method
             (var actualPersonOnLeave, var actualDepartment, var actualDevision, var actualSupervisorGroup) =
                 _orgGroupRepository.PersonWithOrgGroupChain(expectedPersonOnLeave.Id);
-            
-            
+
+            Assert.NotNull(actualPersonOnLeave);
             Assert.Equal(expectedPersonOnLeave.Id, actualPersonOnLeave.Id);
+            Assert.NotNull(actualDepartment);
             Assert.Equal(expectedDepartment.Id, actualDepartment.Id);
             Assert.Null(actualDepartment.SupervisorPerson);
+            Assert.NotNull(actualDevision);
             Assert.Equal(expectedDevision.Id, actualDevision.Id);
             Assert.Equal(expectedDevisionSupervisor.Id, actualDevision.SupervisorPerson.Id);
             Assert.Null(actualSupervisorGroup);
