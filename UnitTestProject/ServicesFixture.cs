@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using AutoBogus;
@@ -10,6 +11,7 @@ using Bogus;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -30,6 +32,14 @@ namespace UnitTestProject
         {
             ServiceCollection = new ServiceCollection();
             IConfigurationBuilder builder = new ConfigurationBuilder();
+            builder.Add(new MemoryConfigurationSource
+            {
+                InitialData = new[]
+                {
+                    new KeyValuePair<string, string>("Environment", "UnitTest"),
+                    new KeyValuePair<string, string>("JWTSettings:SecretKey", "helloWorld"),
+                }
+            });
             var startup = new Startup(builder.Build());
             ServiceCollection.AddLogging(loggingBuilder => loggingBuilder.AddConsole().AddDebug());
             startup.ConfigureServices(ServiceCollection);
@@ -70,6 +80,7 @@ namespace UnitTestProject
 
         public Faker<PersonWithStaff> PersonFaker() =>
             new AutoFaker<PersonWithStaff>()
+                .RuleFor(p => p.Deleted, false)
                 .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
                 .RuleFor(extended => extended.Staff,
                     (f, extended) =>
@@ -82,7 +93,6 @@ namespace UnitTestProject
                     {
                         set.RuleFor(staff => staff.StaffId, (Guid?) null);
                         set.RuleFor(staff => staff.Staff, (Staff) null);
-                        
                     });
 
         public void SetupData()
@@ -112,7 +122,7 @@ namespace UnitTestProject
             var personWithEmergencyContact = personFaker.Generate("default,notStaff");
             _dbConnection.Insert(personWithEmergencyContact);
             var contactPerson = personFaker.Generate("default,notStaff");
-            
+
             _dbConnection.Insert(contactPerson);
             var emergencyContact = AutoFaker.Generate<EmergencyContact>();
             emergencyContact.ContactId = contactPerson.Id;
