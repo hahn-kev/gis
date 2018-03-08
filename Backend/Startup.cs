@@ -70,7 +70,7 @@ namespace Backend
             services.AddSentinel(new SentinelSettings
             {
                 Dsn = settings.SentryDsn,
-                Environment = settings.SentryDsn ?? "Production",
+                Environment = settings.Environment ?? "Production",
                 IncludeRequestData = true,
                 IncludeCookies = false,
                 Release = GetType().Assembly.GetName().Version.ToString(),

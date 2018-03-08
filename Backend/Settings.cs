@@ -17,6 +17,7 @@ namespace Backend
         
         public string MailgunApiKey { get; set; }
         public string MailgunDomain { get; set; }
+        public string Environment { get; set; }
         public string SentryDsn { get; set; }
         public string SendGridAPIKey { get; set; }
 
