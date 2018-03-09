@@ -79,6 +79,7 @@ import { QuickAddComponent } from './people/person/quick-add/quick-add.component
 import { QuickAddDirective } from './people/person/quick-add/quick-add.directive';
 import { AppTemplateContentDirective } from './directives/app-template-content.directive';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
+import { GooglePickerComponent } from './google-picker/google-picker.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -113,7 +114,8 @@ if (environment.production) {
     QuickAddComponent,
     QuickAddDirective,
     AppTemplateContentDirective,
-    LeaveReportComponent
+    LeaveReportComponent,
+    GooglePickerComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

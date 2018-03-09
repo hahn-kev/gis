@@ -23,19 +23,9 @@ namespace Backend.Controllers
         {
             return Json(new
             {
-                version = GetType().Assembly.GetName().Version.ToString()
-//                _settings.DiscourseBaseUrl
+                version = GetType().Assembly.GetName().Version.ToString(),
+                GoogleAPIKey = _settings.GoogleAPIKey
             });
         }
-
-        //todo localization?
-//        [HttpGet("setLanguage/{culture}")]
-//        public IActionResult SetLanguage(string culture)
-//        {
-//            Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName,
-//                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-//                new CookieOptions {Expires = DateTimeOffset.UtcNow.AddYears(1)});
-//            return LocalRedirect("/" + culture);
-//        }
     }
 }

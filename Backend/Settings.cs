@@ -20,6 +20,7 @@ namespace Backend
         public string Environment { get; set; }
         public string SentryDsn { get; set; }
         public string SendGridAPIKey { get; set; }
+        public string GoogleAPIKey { get; set; }
 
         public IEnumerable<IDataProviderSettings> DataProviders
         {
