@@ -32,7 +32,7 @@ namespace Backend.DataLayer
         IQueryable<LinqToDB.Identity.IdentityUserToken<int>> UserTokens { get; }
         IQueryable<LinqToDB.Identity.IdentityRole<int>> Roles { get; }
         IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> RoleClaims { get; }
-
+        void TryCreateTable<T>();
         DataConnectionTransaction BeginTransaction();
         void CommitTransaction();
         void RollbackTransaction();
@@ -65,6 +65,19 @@ namespace Backend.DataLayer
             builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
             builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
             _hasSetupMapping = true;
+        }
+
+
+
+        public void TryCreateTable<T>()
+        {
+            try
+            {
+                this.CreateTable<T>();
+            }
+            catch (PostgresException e) when (e.SqlState == "42P07") //already exists code I think
+            {
+            }
         }
 
         IQueryable<IdentityUser> IDbConnection.Users => Users;
