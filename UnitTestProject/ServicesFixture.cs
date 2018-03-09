@@ -115,7 +115,7 @@ namespace UnitTestProject
             _dbConnection.Insert(jacob.Staff);
             _dbConnection.Insert(bob.Staff);
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
-            jacobGroup.Id = jacob.Staff.OrgGroupId;
+            jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
             jacobGroup.Supervisor = bob.Id;
             jacobGroup.ApproverIsSupervisor = true;
             _dbConnection.Insert(jacobGroup);
@@ -184,7 +184,7 @@ namespace UnitTestProject
             trainingRequirement.Scope = TrainingScope.Department;
 
             var orgGroup = AutoFaker.Generate<OrgGroup>();
-            orgGroup.Id = personWithTraining.Staff.OrgGroupId;
+            orgGroup.Id = personWithTraining.Staff.OrgGroupId ?? Guid.Empty;
             _dbConnection.Insert(orgGroup);
 
             _dbConnection.Insert(personWithTraining);

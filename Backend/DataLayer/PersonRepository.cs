@@ -86,7 +86,12 @@ namespace Backend.DataLayer
                 OrgGroupId = staff.OrgGroupId,
                 PersonId = person.Id,
                 PreferredName = person.PreferredName,
-                AnnualSalary = staff.AnnualSalary
+                AnnualSalary = staff.AnnualSalary,
+                RenwebId = staff.RenwebId,
+                MoeLicenseNumber = staff.MoeLicenseNumber,
+                ContractIssued = staff.ContractIssued,
+                ContractExpireDate = staff.ContractExpireDate,
+                InsuranceNumber = staff.InsuranceNumber
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>

@@ -5,9 +5,13 @@ namespace Backend.Entities
 {
     public class Staff : BaseEntity
     {
-        public Guid OrgGroupId { get; set; }
+        public Guid? OrgGroupId { get; set; }
         public int? AnnualSalary { get; set; }
-        
+        public string RenwebId { get; set; }
+        public string MoeLicenseNumber { get; set; }
+        public bool ContractIssued { get; set; }
+        public DateTime? ContractExpireDate { get; set; }
+        public string InsuranceNumber { get; set; }
     }
 
     [Table("Staff")]

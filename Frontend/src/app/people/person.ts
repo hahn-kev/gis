@@ -56,23 +56,26 @@ export class PersonWithDaysOfLeave extends Person {
 }
 
 export class Staff {
+  public id: string;
+  public orgGroupId: string;
+  public annualSalary: number;
+  public renwebId: string;
+  public moeLicenseNumber: string;
+  public contractIssued: boolean;
+  public contractExpireDate?: Date;
+  public insuranceNumber: string;
 
   constructor(id?: string) {
     this.id = id;
   }
-
-  public id: string;
-  public orgGroupId: string;
-  public annualSalary: number;
 }
 
 export class StaffWithName extends Staff {
+  public preferredName: string;
+  public personId: string;
 
   constructor(id?: string, preferredName?: string) {
     super(id);
     this.preferredName = preferredName;
   }
-
-  public preferredName: string;
-  public personId: string;
 }

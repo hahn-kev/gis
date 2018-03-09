@@ -17,7 +17,7 @@
   <form #personForm="ngForm" class="column-1" id="form" (ngSubmit)="save()">
     <!--person-->
     <mat-accordion displayMode="flat" multi="true">
-      <mat-expansion-panel disabled expanded="true" class="two-colum-grid">
+      <mat-expansion-panel expanded="true" class="two-colum-grid">
         <mat-expansion-panel-header>
           <mat-panel-title>Person</mat-panel-title>
         </mat-expansion-panel-header>
@@ -175,9 +175,10 @@
           <mat-panel-title>Staff</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field>
-          <mat-select name="orgGroup" [(ngModel)]="person.staff.orgGroupId"
+          <mat-select name="orgGroup"
+                      [(ngModel)]="person.staff.orgGroupId"
+                      required
                       placeholder="Department/Division">
-            <mat-option [value]="null">None</mat-option>
             <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -189,6 +190,35 @@
                  [(ngModel)]="person.staff.annualSalary"
                  min="0"
                  placeholder="Annual Salary">
+        </mat-form-field>
+        <mat-slide-toggle name="contactIssued" [(ngModel)]="person.staff.contractIssued">Contract Issued
+        </mat-slide-toggle>
+        <mat-form-field>
+          <input name="contractExpireDate" matInput
+                 [(ngModel)]="person.staff.contractExpireDate"
+                 [matDatepicker]="contractExpireDatePicker"
+                 [disabled]="!person.staff.contractIssued"
+                 placeholder="Contact Expires">
+          <mat-datepicker-toggle matSuffix [for]="contractExpireDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #contractExpireDatePicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="renwebId"
+                 [(ngModel)]="person.staff.renwebId"
+                 placeholder="Renweb Id">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="moeLicenseNumber"
+                 [(ngModel)]="person.staff.moeLicenseNumber"
+                 placeholder="MOE License Number">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="insuranceNumber"
+                 [(ngModel)]="person.staff.insuranceNumber"
+                 placeholder="Insurance Number">
         </mat-form-field>
       </mat-expansion-panel>
     </mat-accordion>
