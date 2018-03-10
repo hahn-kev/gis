@@ -396,7 +396,7 @@ namespace UnitTestProject
             Assert.Contains("must match calculated", ex.Message);
 
             newRequest.Days = newRequest.CalculateLength();
-            newRequest.EndDate += TimeSpan.FromDays(2);
+            newRequest.EndDate += TimeSpan.FromDays(4);
             ex = Assert.Throws<UnauthorizedAccessException>(() =>
                 _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
 
@@ -423,7 +423,7 @@ namespace UnitTestProject
             LeaveRequest oldRequest = GenerateRequest();
             oldRequest.OverrideDays = true;
             LeaveRequest newRequest = oldRequest.Copy();
-            newRequest.EndDate += TimeSpan.FromDays(2);
+            newRequest.EndDate += TimeSpan.FromDays(4);
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
                 _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
