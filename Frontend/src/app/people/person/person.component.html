@@ -270,7 +270,9 @@
     </mat-accordion>
 
     <mat-accordion class="emergency-contact">
-      <mat-expansion-panel #newEmergencyContactPanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+      <mat-expansion-panel #newEmergencyContactPanel
+                           [disabled]="isNew"
+                           [matTooltipDisabled]="!isNew"
                            matTooltip="To add an emergency contract first save the person">
         <mat-expansion-panel-header>
           <mat-panel-title>Add new Emergency Contact</mat-panel-title>

@@ -1,4 +1,5 @@
 .home {
+  //list mode
   display: grid;
   $spacing: 12px;
   grid-template-columns: minmax(250px, 1fr);
@@ -8,6 +9,12 @@
   justify-content: center;
 
   @media (min-width: 320px * 2 + $spacing * 3) {
+    //grid mode
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     height: 100%;
     align-content: center;
     justify-content: space-evenly;
