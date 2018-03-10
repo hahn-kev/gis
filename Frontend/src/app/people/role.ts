@@ -1,4 +1,7 @@
 ﻿export class Role {
+  public isDirectorPosition: boolean;
+  public isStaffPosition: boolean;
+  public fullHalfTime: string;
 
   constructor(public id?: string,
               public name?: string,
@@ -7,13 +10,10 @@
               public endDate?: Date,
               public personId?: string) {
   }
-
-  public isDirectorPosition: boolean;
-  public isStaffPosition: boolean;
-  public fullHalfTime: string;
 }
 
 export class RoleExtended extends Role {
+  public preferredName: string;
 
   constructor(id: string,
               name: string,
@@ -23,6 +23,4 @@ export class RoleExtended extends Role {
               personId: string) {
     super(id, name, startDate, active, endDate, personId);
   }
-
-  public preferredName: string;
 }

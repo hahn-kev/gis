@@ -40,6 +40,8 @@ namespace Backend.Entities
     {
         FullTime,
         HalfTime, 
+        Contractor,
+        DailyWorker,
         Volunteer
     }
 }
