@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
 
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
-  version: Observable<string>;
+  version: string;
   hasTitle = false;
   @ViewChild('sidenav')
   private sidenav: MatSidenav;
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     settings: SettingsService) {
     this.currentUser = loginService.currentUserToken();
     this.indicatorStatus = activityIndicatorService.observeIndicator();
-    this.version = settings.getAsync<string>('version');
+    this.version = settings.get<string>('version');
   }
 
   ngOnInit(): void {

@@ -52,16 +52,19 @@ namespace Backend.Controllers
             {
                 throw new UserError("User email required");
             }
+
             var result = await _userService.CreateAsync(user, registerUser.Password);
             if (!result.Succeeded)
             {
                 throw result.Errors();
             }
+
             if (user.Id <= 0)
             {
                 throw new ArgumentException("user id not generated error");
             }
-            return Json(new { Status = "Success" });
+
+            return Json(new {Status = "Success"});
         }
 
         [HttpGet("google")]
@@ -69,9 +72,9 @@ namespace Backend.Controllers
         public IActionResult Google(string redirectTo = null)
         {
             return Challenge(new AuthenticationProperties
-            {
-                RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
-            },
+                {
+                    RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
+                },
                 "Google");
         }
 
@@ -80,9 +83,11 @@ namespace Backend.Controllers
         public const string ClaimTypeLastName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname";
         public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
         public const string ClaimPersonId = "personId";
+        public const string GoogleOAuthTokenName = "access_token";
 
         public const string GisEmailSufix = "@gisthailand.org";
-        public async Task GoogleSignIn()
+
+        public async Task GoogleSignIn(AuthenticationProperties authProperties)
         {
             var googleId = User.FindFirstValue(ClaimTypeId);
             IdentityUser user = await _userService.FindByLoginAsync("Google", googleId);
@@ -94,6 +99,7 @@ namespace Backend.Controllers
                 {
                     throw new AuthenticationException("Only gis users or khahn are allowed to login with google sso");
                 }
+
                 //check for user by email
                 user = await _userService.FindByEmailAsync(email);
                 if (user == null)
@@ -111,6 +117,12 @@ namespace Backend.Controllers
                     await _userService.AddLoginAsync(user, new UserLoginInfo("Google", googleId, User.Identity.Name));
                 if (!newLoginResult.Succeeded) throw newLoginResult.Errors();
             }
+
+            var authTokenResult = await _signInManager.UserManager.SetAuthenticationTokenAsync(user,
+                "Google",
+                GoogleOAuthTokenName,
+                authProperties.GetTokenValue(GoogleOAuthTokenName));
+            if (!authTokenResult.Succeeded) throw authTokenResult.Errors();
             Response.Cookies.Append(JwtCookieName, _securityTokenHandler.WriteToken(await GetJwtSecurityToken(user)));
         }
 
@@ -135,6 +147,7 @@ namespace Backend.Controllers
             {
                 throw identityResult.Errors();
             }
+
             identityUser.ResetPassword = false;
             await _userService.UpdateAsync(identityUser);
             return await JsonLoginResult(identityUser);
@@ -147,10 +160,12 @@ namespace Backend.Controllers
             {
                 throw new ArgumentException("Account Locked, please contact an administrator");
             }
+
             if (!signInResult.Succeeded)
             {
                 throw ThrowLoginFailed();
             }
+
             return await JsonLoginResult(user);
         }
 
@@ -164,6 +179,7 @@ namespace Backend.Controllers
                     {"user", new UserProfile(user)}
                 });
             }
+
             var token = await GetJwtSecurityToken(user);
             var accessTokenString = _securityTokenHandler.WriteToken(token);
             Response.Cookies.Append(JwtCookieName, accessTokenString);
@@ -176,10 +192,14 @@ namespace Backend.Controllers
         private async Task<JwtSecurityToken> GetJwtSecurityToken(IdentityUser identityUser)
         {
             var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identityUser);
+            var oauthToken =
+                await _signInManager.UserManager.GetAuthenticationTokenAsync(identityUser,
+                    "Google",
+                    GoogleOAuthTokenName);
             return new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
-                claims: GetTokenClaims(identityUser).Union(claimsPrincipal.Claims),
+                claims: GetTokenClaims(identityUser, oauthToken).Union(claimsPrincipal.Claims),
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
@@ -187,13 +207,14 @@ namespace Backend.Controllers
             );
         }
 
-        private static IEnumerable<Claim> GetTokenClaims(IdentityUser identityUser)
+        private static IEnumerable<Claim> GetTokenClaims(IdentityUser identityUser, string googleOauthToken)
         {
             return new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, identityUser.Email ?? string.Empty),
-                new Claim(ClaimPersonId, identityUser.PersonId?.ToString() ?? string.Empty)
+                new Claim(ClaimPersonId, identityUser.PersonId?.ToString() ?? string.Empty),
+                new Claim("oauth", googleOauthToken)
             };
         }
 

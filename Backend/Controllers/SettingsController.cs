@@ -1,8 +1,10 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers
@@ -11,10 +13,12 @@ namespace Backend.Controllers
     [AllowAnonymous]
     public class SettingsController : MyController
     {
+        private readonly IConfigurationSection _googleOptions;
         private readonly Settings _settings;
 
-        public SettingsController(IOptions<Settings> settings)
+        public SettingsController(IOptions<Settings> settings, IConfiguration config)
         {
+            _googleOptions = config.GetSection("web");
             _settings = settings.Value;
         }
 
@@ -24,7 +28,8 @@ namespace Backend.Controllers
             return Json(new
             {
                 version = GetType().Assembly.GetName().Version.ToString(),
-                GoogleAPIKey = _settings.GoogleAPIKey
+                googleAPIKey = _settings.GoogleAPIKey,
+                googleClientId = _googleOptions["client_id"]
             });
         }
     }

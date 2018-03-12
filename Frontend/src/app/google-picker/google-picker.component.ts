@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DrivePickerService } from './drive-picker.service';
 
 @Component({
   selector: 'app-google-picker',
@@ -7,10 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GooglePickerComponent implements OnInit {
 
-  constructor() {
+  public result: any;
+
+  constructor(private driveService: DrivePickerService) {
   }
 
   ngOnInit() {
   }
 
+  async invokePicker() {
+    this.result = await this.driveService.openPicker();
+  }
 }

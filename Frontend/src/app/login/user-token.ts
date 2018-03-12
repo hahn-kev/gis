@@ -30,4 +30,9 @@ export class UserToken {
     if (!this.token) return null;
     return this.token['personId'];
   }
+
+  get oauth(): string | null {
+    if (!this.token) return null;
+    return this.token['oauth'];
+  }
 }
