@@ -1,6 +1,13 @@
 <ng-container *appTemplateContent="'title'">My Info</ng-container>
 <div class="main-card">
-  <mat-card class="two-colum-grid">
+  <ng-template #noPersonFoundBlock>
+    <mat-card>
+      <p>No person was found attached to your account</p>
+      <p>your email is listed as {{(userToken|async).email}} talk to HR about
+        fixing this issue</p>
+    </mat-card>
+  </ng-template>
+  <mat-card class="two-colum-grid" *ngIf="self.person; else noPersonFoundBlock">
     <mat-form-field>
       <input matInput [(ngModel)]="self.person.firstName"
              type="text"

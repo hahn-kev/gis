@@ -25,9 +25,14 @@ namespace Backend.Controllers
             {
                 throw new AuthenticationException("Non admin/hr user's arent allowed to view other users 'Self' page");
             }
+
+            var personId = id ?? User.PersonId() ?? Guid.Empty;
+            if (personId == Guid.Empty)
+            {
+                return Json(new Self());
+            }
             var personWithOthers =
-                _personService.GetById(id ?? User.PersonId() ??
-                                       throw new NullReferenceException("logged in user doesn't have a personId"));
+                _personService.GetById(personId);
             return Json(new Self
             {
                 Person = personWithOthers,

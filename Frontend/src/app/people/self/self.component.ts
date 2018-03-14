@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Self } from './self';
+import { LoginService } from '../../services/auth/login.service';
+import { Observable } from 'rxjs/Observable';
+import { UserToken } from '../../login/user-token';
 
 @Component({
   selector: 'app-self',
@@ -9,8 +12,10 @@ import { Self } from './self';
 })
 export class SelfComponent implements OnInit {
   public self: Self;
+  public userToken: Observable<UserToken>;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private loginService: LoginService) {
+    this.userToken = this.loginService.currentUserToken();
   }
 
   ngOnInit() {
