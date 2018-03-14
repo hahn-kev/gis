@@ -35,6 +35,7 @@ export class LeaveRequestService {
   }
 
   listByPersonId(personId: string): Observable<LeaveRequestWithNames[]> {
+    if (!personId) return Observable.of([]);
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
@@ -44,9 +45,9 @@ export class LeaveRequestService {
   }
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUseages: LeaveUseage[]) {
-    let leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
+    const leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
     if (leaveUsage.left <= 1) return true;
-    let daysOfLeave = this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
+    const daysOfLeave = this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
     return leaveUsage.left - daysOfLeave < 0;
   }
 
@@ -56,7 +57,7 @@ export class LeaveRequestService {
 
   weekDaysBetween(dayOne: Date | string, dayTwo: Date | string): number {
     //weekDays calc is start inclusive end exclusive so we need to add a day to the end
-    let momentTwo = moment(dayTwo).startOf('day').add(1, 'd');
+    const momentTwo = moment(dayTwo).startOf('day').add(1, 'd');
     return buisness.weekDays(moment(dayOne).startOf('day'), momentTwo);
   }
 }

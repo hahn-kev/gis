@@ -45,7 +45,11 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     //we're adding an empty list at the beginning of this observable
     //so that we get a result right away, then later update with value
     this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken())
-      .subscribe(([data, user]: [{ leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] }, UserToken, PersonAndLeaveDetails[]]) => {
+      .subscribe(([data, user]: [
+        { leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] },
+        UserToken,
+        PersonAndLeaveDetails[]
+        ]) => {
         this.people = data.people;
         this.leaveRequest = data.leaveRequest;
         this.updateDaysUsed();
@@ -60,8 +64,9 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   updateDaysUsed() {
-    if (!this.leaveRequest.overrideDays)
+    if (!this.leaveRequest.overrideDays) {
       this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
+    }
   }
 
   ngOnDestroy(): void {
@@ -91,7 +96,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       this.router.navigate([
         'leave-request',
         'list',
-        this.myPersonId == this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
+        this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
       ])
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
@@ -124,7 +129,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     this.router.navigate([
       'leave-request',
       'list',
-      this.myPersonId == this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
+      this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
     ]);
   }
 }

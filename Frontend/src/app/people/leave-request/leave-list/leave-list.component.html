@@ -1,44 +1,53 @@
 <ng-container *appTemplateContent="'title'">{{showingMine ? 'My Leave' : 'Leave'}}</ng-container>
-<mat-table [dataSource]="dataSource">
-  <ng-container matColumnDef="requester">
-    <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
-  </ng-container>
-  <ng-container matColumnDef="type">
-    <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.type}}</mat-cell>
-  </ng-container>
-  <ng-container matColumnDef="approved">
-    <mat-header-cell *matHeaderCellDef>Approved</mat-header-cell>
-    <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.approved"></mat-checkbox>
-    </mat-cell>
-  </ng-container>
-  <ng-container matColumnDef="approvedBy">
-    <mat-header-cell *matHeaderCellDef>Approved by</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.approvedByName}}</mat-cell>
-  </ng-container>
-  <ng-container matColumnDef="startDate">
-    <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{row.startDate | date:'shortDate'}}</mat-cell>
-  </ng-container>
-  <ng-container matColumnDef="endDate">
-    <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{row.endDate | date:'shortDate'}}</mat-cell>
-  </ng-container>
+<div class="main-card" *ngIf="showingMine && !(loginService.currentUserToken() | async).personId; else leaveTable">
+  <mat-card>
+    <p>No person was found attached to your account</p>
+    <p>your email is listed as {{(loginService.currentUserToken()|async).email}} talk to HR about
+      fixing this issue</p>
+  </mat-card>
+</div>
+<ng-template #leaveTable>
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="requester">
+      <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.type}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="approved">
+      <mat-header-cell *matHeaderCellDef>Approved</mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox disabled [checked]="row.approved"></mat-checkbox>
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="approvedBy">
+      <mat-header-cell *matHeaderCellDef>Approved by</mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.approvedByName}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="startDate">
+      <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{row.startDate | date:'shortDate'}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="endDate">
+      <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{row.endDate | date:'shortDate'}}</mat-cell>
+    </ng-container>
 
-  <ng-container matColumnDef="createdDate">
-    <mat-header-cell *matHeaderCellDef>Created Date</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
-  </ng-container>
+    <ng-container matColumnDef="createdDate">
+      <mat-header-cell *matHeaderCellDef>Created Date</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{row.createdDate | date:'shortDate'}}</mat-cell>
+    </ng-container>
 
-  <ng-container matColumnDef="days">
-    <mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{row.days}}</mat-cell>
-  </ng-container>
-  <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="showingMine ? personColumns : hrColumns"></mat-header-row>
-  <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"
-           *matRowDef="let row; columns: showingMine ? personColumns : hrColumns">
-  </mat-row>
-</mat-table>
+    <ng-container matColumnDef="days">
+      <mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{row.days}}</mat-cell>
+    </ng-container>
+    <!-- Header and Row Declarations -->
+    <mat-header-row *matHeaderRowDef="showingMine ? personColumns : hrColumns"></mat-header-row>
+    <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"
+             *matRowDef="let row; columns: showingMine ? personColumns : hrColumns">
+    </mat-row>
+  </mat-table>
+</ng-template>

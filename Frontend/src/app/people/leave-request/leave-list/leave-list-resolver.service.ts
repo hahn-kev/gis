@@ -10,8 +10,8 @@ import { first, switchMap } from 'rxjs/operators';
 export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]> {
   resolve(route: ActivatedRouteSnapshot,
           state: RouterStateSnapshot): Observable<LeaveRequestWithNames[]> | Promise<LeaveRequestWithNames[]> | LeaveRequestWithNames[] {
-    let personId = route.params['personId'];
-    if (personId == 'mine') {
+    const personId = route.params['personId'];
+    if (personId === 'mine') {
       return this.loginService.currentUserToken()
         .pipe(first(),
           switchMap(userToken => this.leaveService.listByPersonId(userToken.personId)));
