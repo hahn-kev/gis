@@ -82,6 +82,8 @@ import { LeaveReportComponent } from './people/leave-request/leave-report/leave-
 import { GooglePickerComponent } from './google-picker/google-picker.component';
 import { GoogleApiModule, NG_GAPI_CONFIG } from 'ng-gapi';
 import { DrivePickerService } from './google-picker/drive-picker.service';
+import { AttachmentsComponent } from './components/attachments/attachments.component';
+import { AttachmentService } from './components/attachments/attachment.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -117,7 +119,8 @@ if (environment.production) {
     QuickAddDirective,
     AppTemplateContentDirective,
     LeaveReportComponent,
-    GooglePickerComponent
+    GooglePickerComponent,
+    AttachmentsComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -202,7 +205,8 @@ if (environment.production) {
       useFactory: configureSettings,
       deps: [HttpClient, SettingsService],
       multi: true
-    }
+    },
+    AttachmentService
   ],
   bootstrap: [AppComponent]
 })
