@@ -17,6 +17,8 @@ export class AttachmentService {
         let idParameter = snapshot.data.hasOwnProperty('idParameter') ? snapshot.data['idParameter'] : 'id';
         let hasAttachments = snapshot.data.hasOwnProperty('hasAttachments') ? snapshot.data['hasAttachments'] : true;
         let id = snapshot.paramMap.has(idParameter) ? snapshot.paramMap.get(idParameter) : null;
+        //guid: 9f830bab-0edb-4170-85f6-1906ab4205c4
+        if (!/.{8}-.{4}-.{4}-.{12}/.test(id)) id = null;
         return {id: id, hasAttachments: hasAttachments && id !== null};
       }).share();
   }
