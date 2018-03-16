@@ -32,6 +32,15 @@
              readonly
              placeholder="Spouse">
     </mat-form-field>
+    <mat-form-field>
+      <input matInput
+             readonly
+             placeholder="Birthday"
+             [ngModel]="self.person.birthdate | date: 'shortDate'">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [ngModel]="self.person.nationality" readonly placeholder="Nationality">
+    </mat-form-field>
     <div>
       <mat-icon matPrefix>email</mat-icon>
       <mat-form-field>
@@ -50,6 +59,12 @@
                placeholder="Phone Number">
       </mat-form-field>
     </div>
+    <mat-form-field class="span-2-columns">
+      <textarea matInput readonly rows="3" [ngModel]="formatPassportAddress()" placeholder="Passport Address"></textarea>
+    </mat-form-field>
+    <mat-form-field class="span-2-columns">
+      <textarea matInput readonly rows="4" [ngModel]="formatThaiAddress()" placeholder="Thai Address"></textarea>
+    </mat-form-field>
     <mat-grid-list class="span-2-columns" cols="4" rowHeight="25px">
       <mat-grid-tile></mat-grid-tile>
       <mat-grid-tile class="hint" matTooltip="Pending leave requests are included in the calculation for used leave">
@@ -66,5 +81,8 @@
         </ng-container>
       </ng-container>
     </mat-grid-list>
+    <mat-list class="span-2-columns">
+      <mat-list-item *ngFor="let ec of self.person.emergencyContacts">{{ec.contactPreferedName}}</mat-list-item>
+    </mat-list>
   </mat-card>
 </div>

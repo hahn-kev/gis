@@ -45,12 +45,8 @@ html, body {
 }
 
 .main-card {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  min-height: 100%;
+  padding: 12px;
   justify-content: center;
   align-content: center;
   display: grid;

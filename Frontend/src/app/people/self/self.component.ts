@@ -22,4 +22,15 @@ export class SelfComponent implements OnInit {
     this.route.data.subscribe((value: { self: Self }) => this.self = value.self);
   }
 
+  formatPassportAddress() {
+    return `${this.self.person.passportAddress}\n`
+      + `${this.self.person.passportCity}, ${this.self.person.passportState}\n`
+      + `${this.self.person.passportZip}, ${this.self.person.passportCountry}`;
+  }
+  formatThaiAddress() {
+    return `${this.self.person.thaiAddress}\n`
+      + `${this.self.person.thaiSoi}, ${this.self.person.thaiMubaan}\n`
+      + `${this.self.person.thaiTambon}, ${this.self.person.thaiAmphur}\n`
+      + `${this.self.person.thaiProvince}, ${this.self.person.thaiZip}`;
+  }
 }
