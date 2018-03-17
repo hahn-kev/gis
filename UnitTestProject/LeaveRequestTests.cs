@@ -362,8 +362,8 @@ namespace UnitTestProject
 
             leaveRequest.Days = leaveRequest.CalculateLength();
             return leaveRequest;
-        } 
-        
+        }
+
         [Fact]
         public void ThrowsErrorWhenPersonIsInvalid()
         {
@@ -410,13 +410,13 @@ namespace UnitTestProject
             oldRequest.OverrideDays = true;
             LeaveRequest newRequest = oldRequest.Copy();
             newRequest.Days++;
-            
+
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
                 _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
 
             Assert.Contains("modify the length", ex.Message);
         }
-        
+
         [Fact]
         public void ThrowsWhenChangingStartAndEndForOverridenDays()
         {
@@ -448,13 +448,31 @@ namespace UnitTestProject
         {
             LeaveRequest oldRequest = GenerateRequest();
             oldRequest.OverrideDays = false;
-            oldRequest.StartDate = DateTime.Today;
-            oldRequest.EndDate = DateTime.Today;
+            //16th is a friday
+            oldRequest.StartDate = new DateTime(2018, 3, 16);
+            oldRequest.EndDate = new DateTime(2018, 3, 16);
             oldRequest.Days = oldRequest.CalculateLength();
             LeaveRequest newRequest = oldRequest.Copy();
             newRequest.Days = 0.5m;
             //does not throw
             _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId);
+        }
+
+
+        [Fact]
+        public void DontMissmatchedCalculationForHalfDaysOnWeeken()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.OverrideDays = false;
+            //17th is a saturday
+            oldRequest.StartDate = new DateTime(2018, 3, 17);
+            oldRequest.EndDate = new DateTime(2018, 3, 17);
+            oldRequest.Days = oldRequest.CalculateLength();
+            LeaveRequest newRequest = oldRequest.Copy();
+            newRequest.Days = 0.5m;
+            //does not throw
+            Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
         }
     }
 }
