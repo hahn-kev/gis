@@ -8,7 +8,13 @@
     <span>GIS <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container></span>
     <span class="spacer"></span>
     <ng-container appRenderTemplate></ng-container>
-    <button *ngIf="hasAttachments | async" mat-button (click)="rightDrawer.toggle()">Attachments</button>
+    <button *ngIf="hasAttachments | async"
+            mat-icon-button
+            matTooltip="Attachments"
+            matTooltipPosition="left"
+            (click)="rightDrawer.toggle()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
   </mat-toolbar>
   <mat-sidenav-container>
     <mat-sidenav position="start" #sidenav>

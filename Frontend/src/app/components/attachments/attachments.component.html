@@ -1,11 +1,14 @@
-<button (click)="newAttachment()" mat-button>Attach</button>
+<button (click)="newAttachment()" mat-button>
+  <mat-icon>attach_file</mat-icon>
+  Attach
+</button>
 <mat-list>
-  <ng-container  *ngFor="let attachment of attachments; let last = last">
+  <ng-container *ngFor="let attachment of attachments; let last = last">
     <mat-list-item>
       {{attachment.name}}
       <span class="spacer"></span>
-      <a [href]="attachment.downloadUrl" mat-button>D</a>
-      <button (click)="removeAttachment(attachment.id)" mat-button>X</button>
+      <a [href]="attachment.downloadUrl" mat-icon-button><mat-icon>file_download</mat-icon></a>
+      <button (click)="removeAttachment(attachment.id)" mat-icon-button><mat-icon>delete</mat-icon></button>
     </mat-list-item>
     <mat-divider *ngIf="!last"></mat-divider>
   </ng-container>
