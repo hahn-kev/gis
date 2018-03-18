@@ -65,7 +65,6 @@ namespace UnitTestProject
             TryCreateTable<LinqToDB.Identity.IdentityUserRole<int>>();
             TryCreateTable<LinqToDB.Identity.IdentityRole<int>>();
             TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
-            TryCreateTable<ImageInfo>();
             TryCreateTable<PersonExtended>();
             TryCreateTable<PersonRole>();
             TryCreateTable<OrgGroup>();

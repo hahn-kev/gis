@@ -62,7 +62,15 @@ namespace Backend.Controllers
             //we're using user and http the right way, not via contexts
             sentryClient.Contexts.Remove("user");
             sentryClient.Contexts.Remove("http");
-            sentryClient.Capture(CreateEvent(context));
+            try
+            {
+                sentryClient.Capture(CreateEvent(context));
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception when reporting an error to sentry");
+            }
         }
 
         private SentryEvent CreateEvent(ExceptionContext context)

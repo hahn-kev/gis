@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
@@ -38,11 +39,13 @@ namespace Backend.Services
         {
             if (entity.Id == Guid.Empty) return;
             _dbConnection.Delete(entity);
+            _dbConnection.Attachments.Where(attachment => attachment.AttachedToId == entity.Id).Delete();
         }
 
         public void Delete<T>(Guid id) where T : BaseEntity
         {
             _dbConnection.GetTable<T>().Delete(arg => arg.Id == id);
+            _dbConnection.Attachments.Where(attachment => attachment.AttachedToId == id).Delete();
         }
     }
 }

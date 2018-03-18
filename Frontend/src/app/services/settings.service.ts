@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 import * as Raven from 'raven-js';
 
 @Injectable()
 export class SettingsService {
-  settings = new BehaviorSubject<any>(null);
+  settings: any;
 
-  constructor(private http: HttpClient) {
-    http.get<any>('/api/settings').subscribe(value => this.settings.next(value));
-    this.getAsync<string>('version').subscribe(version => {
-      Raven.setRelease(version)
-    });
+  constructor() {
   }
 
-  getAsync<T>(name: string, defaultValue?: T): Observable<T> {
-    return this.settings.map(values => values ? values[name] : defaultValue);
+  //this is called by the settingsServiceFunction
+  setSettings(settings: any) {
+    this.settings = settings;
+    Raven.setRelease(this.get<string>('version'));
   }
 
   get<T>(name: string, defaultValue?: T): T {
-    return this.settings.value ? this.settings.value[name] : defaultValue;
+    return this.settings[name] || defaultValue;
   }
+}
+
+export function configureSettings(http: HttpClient, settingsService: SettingsService) {
+  return async () => settingsService.setSettings(await http.get<any>('/api/settings').toPromise());
 }

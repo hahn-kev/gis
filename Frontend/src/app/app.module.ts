@@ -1,7 +1,7 @@
 ﻿import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { ErrorHandler, NgModule } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -44,7 +44,7 @@ import { ToolbarTemplateDirective } from './toolbar/toolbar-template.directive';
 import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { AppTemplateService } from './toolbar/app-template.service';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
-import { SettingsService } from './services/settings.service';
+import { configureSettings, SettingsService } from './services/settings.service';
 import { ClipboardModule } from 'ngx-clipboard/dist';
 import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { MessageComponent } from './message/message.component';
@@ -79,6 +79,11 @@ import { QuickAddComponent } from './people/person/quick-add/quick-add.component
 import { QuickAddDirective } from './people/person/quick-add/quick-add.directive';
 import { AppTemplateContentDirective } from './directives/app-template-content.directive';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
+import { GooglePickerComponent } from './google-picker/google-picker.component';
+import { GoogleApiModule, NG_GAPI_CONFIG } from 'ng-gapi';
+import { DrivePickerService } from './google-picker/drive-picker.service';
+import { AttachmentsComponent } from './components/attachments/attachments.component';
+import { AttachmentService } from './components/attachments/attachment.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -113,7 +118,9 @@ if (environment.production) {
     QuickAddComponent,
     QuickAddDirective,
     AppTemplateContentDirective,
-    LeaveReportComponent
+    LeaveReportComponent,
+    GooglePickerComponent,
+    AttachmentsComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -156,7 +163,12 @@ if (environment.production) {
     FormsModule,
     AppRoutingModule,
     ClipboardModule,
-    CookieModule.forRoot()
+    CookieModule.forRoot(),
+    GoogleApiModule.forRoot({
+      provide: NG_GAPI_CONFIG,
+      deps: [SettingsService],
+      useFactory: (settings: SettingsService) => ({client_id: settings.get<string>('googleClientId')})
+    })
   ],
   providers: [
     UserService,
@@ -186,7 +198,15 @@ if (environment.production) {
     GroupService,
     LeaveRequestService,
     TrainingRequirementService,
-    SelfService
+    SelfService,
+    DrivePickerService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: configureSettings,
+      deps: [HttpClient, SettingsService],
+      multi: true
+    },
+    AttachmentService
   ],
   bootstrap: [AppComponent]
 })

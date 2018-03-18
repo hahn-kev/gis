@@ -2,15 +2,22 @@
                   mode="query"></mat-progress-bar>
 <div class="main">
   <mat-toolbar color="primary">
-    <button mat-icon-button (click)="sidenav.toggle()">
+    <button id="open-menu-button" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
     <span>GIS <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container></span>
     <span class="spacer"></span>
     <ng-container appRenderTemplate></ng-container>
+    <button *ngIf="hasAttachments | async"
+            mat-icon-button
+            matTooltip="Attachments"
+            matTooltipPosition="left"
+            (click)="rightDrawer.toggle()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
   </mat-toolbar>
   <mat-sidenav-container>
-    <mat-sidenav #sidenav id="sidenav">
+    <mat-sidenav position="start" #sidenav>
       <mat-nav-list>
         <div id="user" *ngIf="currentUser | async as user">
           <h2>
@@ -44,7 +51,10 @@
         </ng-container>
 
       </mat-nav-list>
-      <span style="position: absolute; bottom: 0;">Version: {{version | async}}</span>
+      <span style="position: absolute; bottom: 0;">Version: {{version}}</span>
+    </mat-sidenav>
+    <mat-sidenav class="mat-elevation-z2" mode="side" position="end" #rightDrawer>
+      <app-attachments></app-attachments>
     </mat-sidenav>
     <router-outlet></router-outlet>
   </mat-sidenav-container>

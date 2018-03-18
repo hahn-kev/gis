@@ -134,6 +134,8 @@ namespace Backend
                     var google = Configuration.GetSection("web");
                     options.ClientId = google["client_id"];
                     options.ClientSecret = google["client_secret"];
+                    options.Scope.Add("https://www.googleapis.com/auth/drive");
+                    options.SaveTokens = true;
                     options.Events.OnTicketReceived = async context =>
                     {
                         context.HandleResponse();
@@ -142,7 +144,7 @@ namespace Backend
                         var authenticateController =
                             context.HttpContext.RequestServices.GetRequiredService<AuthenticateController>();
                         authenticateController.ControllerContext.HttpContext = context.HttpContext;
-                        await authenticateController.GoogleSignIn();
+                        await authenticateController.GoogleSignIn(context.Properties);
                         context.Response.Redirect(context.ReturnUri);
                     };
                 });

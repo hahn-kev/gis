@@ -16,6 +16,7 @@ namespace Backend.DataLayer
     public interface IDbConnection : IDataContext
     {
         IQueryable<ImageInfo> Images { get; }
+        IQueryable<Attachment> Attachments { get; }
         IQueryable<Person> People { get; }
         IQueryable<PersonExtended> PeopleExtended { get; }
         IQueryable<EmergencyContact> EmergencyContacts { get; }
@@ -43,7 +44,6 @@ namespace Backend.DataLayer
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
         IDbConnection
     {
-
         public DbConnection()
         {
             SetupMappingBuilder(MappingSchema);
@@ -89,6 +89,7 @@ namespace Backend.DataLayer
         IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> IDbConnection.RoleClaims => RoleClaims;
 
         public IQueryable<ImageInfo> Images => GetTable<ImageInfo>();
+        public IQueryable<Attachment> Attachments => GetTable<Attachment>();
         public IQueryable<Person> People => GetTable<Person>();
         public IQueryable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
         public IQueryable<EmergencyContact> EmergencyContacts => GetTable<EmergencyContact>();
