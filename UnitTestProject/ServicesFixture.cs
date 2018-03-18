@@ -171,6 +171,16 @@ namespace UnitTestProject
             emergencyContact.ContactId = contactPerson.Id;
             emergencyContact.PersonId = personWithEmergencyContact.Id;
             _dbConnection.Insert(emergencyContact);
+
+            _dbConnection.Insert(new Attachment()
+            {
+                AttachedToId = Guid.NewGuid(),
+                DownloadUrl = "someurl.com",
+                FileType = "picture",
+                GoogleId = "someRandomId123",
+                Id = Guid.NewGuid(),
+                Name = "hello attachments"
+            });
         }
 
         public void SetupTraining()
