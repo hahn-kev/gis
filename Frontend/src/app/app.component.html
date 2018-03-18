@@ -2,7 +2,7 @@
                   mode="query"></mat-progress-bar>
 <div class="main">
   <mat-toolbar color="primary">
-    <button mat-icon-button (click)="sidenav.toggle()">
+    <button id="open-menu-button" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
     <span>GIS <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container></span>
@@ -53,7 +53,7 @@
       </mat-nav-list>
       <span style="position: absolute; bottom: 0;">Version: {{version}}</span>
     </mat-sidenav>
-    <mat-sidenav mode="side" position="end" #rightDrawer>
+    <mat-sidenav class="mat-elevation-z2" mode="side" position="end" #rightDrawer>
       <app-attachments></app-attachments>
     </mat-sidenav>
     <router-outlet></router-outlet>

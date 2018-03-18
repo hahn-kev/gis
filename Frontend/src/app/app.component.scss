@@ -20,6 +20,12 @@
   }
 }
 
+@media print {
+  #open-menu-button {
+    display: none;
+  }
+}
+
 .mat-subheader {
   margin: 0;
 }
@@ -35,4 +41,3 @@
 .activity-indicator {
   position: absolute;
 }
-

@@ -1,14 +1,11 @@
-<button (click)="newAttachment()" mat-button>
-  <mat-icon>attach_file</mat-icon>
-  Attach
-</button>
+<app-google-picker (fileAttached)="newAttachment($event)"></app-google-picker>
 <mat-list>
   <ng-container *ngFor="let attachment of attachments; let last = last">
     <mat-list-item>
       {{attachment.name}}
       <span class="spacer"></span>
-      <a [href]="attachment.downloadUrl" mat-icon-button><mat-icon>file_download</mat-icon></a>
-      <button (click)="removeAttachment(attachment.id)" mat-icon-button><mat-icon>delete</mat-icon></button>
+      <a [href]="attachment.downloadUrl" matTooltip="Open" target="_blank" mat-icon-button><mat-icon>open_in_new</mat-icon></a>
+      <button (click)="removeAttachment(attachment)" matTooltip="Remove" mat-icon-button><mat-icon>delete</mat-icon></button>
     </mat-list-item>
     <mat-divider *ngIf="!last"></mat-divider>
   </ng-container>

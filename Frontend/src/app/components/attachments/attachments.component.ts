@@ -6,6 +6,8 @@ import 'rxjs/add/operator/filter';
 import { AttachmentService } from './attachment.service';
 import 'rxjs/add/operator/mergeMap';
 import { Attachment } from './attachment';
+import { MatDialog } from '@angular/material';
+import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-attachments',
@@ -16,7 +18,7 @@ export class AttachmentsComponent implements OnInit {
   attachments: Attachment[];
   attachedToId: string;
 
-  constructor(private attachmentService: AttachmentService) {
+  constructor(private attachmentService: AttachmentService, private dialog: MatDialog) {
     this.attachmentService.extractId().subscribe(value => this.attachedToId = value.id);
     attachmentService.extractId().flatMap((value) => {
       if (value.hasAttachments) return attachmentService.attachedOn(value.id);
@@ -30,20 +32,18 @@ export class AttachmentsComponent implements OnInit {
   ngOnInit() {
   }
 
-  async removeAttachment(attachmentId: string) {
-    await this.attachmentService.removeAttachment(attachmentId).toPromise();
-    this.attachments = this.attachments.filter(value => value.id != attachmentId);
+  async removeAttachment(attachment: Attachment) {
+    let result = await ConfirmDialogComponent.OpenWait(this.dialog,
+      `Delete Attachment ${attachment.name}?`,
+      'Delete',
+      'Cancel');
+    if (!result) return;
+    await this.attachmentService.removeAttachment(attachment.id).toPromise();
+    this.attachments = this.attachments.filter(value => value.id != attachment.id);
   }
 
-  async newAttachment() {
-    let attachment = new Attachment();
-    attachment.name = 'some sample name ' + this.getRandomIntInclusive(1, 100);
+  async newAttachment(attachment: Attachment) {
     attachment.attachedToId = this.attachedToId;
-    attachment.googleId = new Array(10).fill(1).map(value => {
-     return String.fromCharCode(this.getRandomIntInclusive(48, 122))
-    }).join("");
-    attachment.downloadUrl = 'google.com/d/' + attachment.googleId;
-    attachment.fileType = 'doc';
     attachment = await this.attachmentService.attach(attachment).toPromise();
     this.attachments = [attachment, ...this.attachments];
   }
