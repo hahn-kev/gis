@@ -73,6 +73,7 @@ namespace UnitTestProject
             TryCreateTable<Staff>();
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
+            TryCreateTable<Attachment>();
 
             var roles = new[] {"admin", "hr"};
             foreach (var role in roles)
