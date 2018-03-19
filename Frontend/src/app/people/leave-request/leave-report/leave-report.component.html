@@ -9,13 +9,13 @@
     <mat-header-cell *matHeaderCellDef>Staff</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.person.preferredName}}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="sick">
-    <mat-header-cell *matHeaderCellDef>Sick</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.sick?.used}}/{{row.sick?.totalAllowed}}</mat-cell>
-  </ng-container>
   <ng-container matColumnDef="vacation">
     <mat-header-cell *matHeaderCellDef>Vacation</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.vacation?.used || 0}}/{{row.vacation?.totalAllowed || 0}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="sick">
+    <mat-header-cell *matHeaderCellDef>Sick</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.sick?.used}}/{{row.sick?.totalAllowed}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="personal">
     <mat-header-cell *matHeaderCellDef>Personal</mat-header-cell>
@@ -26,9 +26,13 @@
     <mat-header-cell *matHeaderCellDef>Maternity/Paternity</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.parental?.used}}/{{row.parental?.totalAllowed}}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="buisness">
-    <mat-header-cell *matHeaderCellDef>Buisness</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.buisness?.used}}/{{row.buisness?.totalAllowed}}</mat-cell>
+  <ng-container matColumnDef="emergency">
+    <mat-header-cell *matHeaderCellDef>Emergency</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.emergency?.used || 0}}/{{row.emergency?.totalAllowed || 0}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="schoolRelated">
+    <mat-header-cell *matHeaderCellDef>School Related</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.schoolRelated?.used || 0}}/{{row.schoolRelated?.totalAllowed || 0}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="other">
     <mat-header-cell *matHeaderCellDef>Other</mat-header-cell>
@@ -36,8 +40,8 @@
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['staff', 'sick', 'vacation', 'personal', 'parental', 'buisness', 'other']"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'other']"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/list/' + row.person.id"
-           *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'buisness', 'other']">
+           *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'other']">
   </mat-row>
 </mat-table>

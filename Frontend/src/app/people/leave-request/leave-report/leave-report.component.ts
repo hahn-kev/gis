@@ -36,7 +36,8 @@ export class PersonLeaveModel {
   public vacation: LeaveUseage;
   public personal: LeaveUseage;
   public parental: LeaveUseage;
-  public buisness: LeaveUseage;
+  public emergency: LeaveUseage;
+  public schoolRelated: LeaveUseage;
   public other: LeaveUseage;
 
   appendLeave(leave: LeaveUseage) {
@@ -50,14 +51,17 @@ export class PersonLeaveModel {
       case LeaveType.Personal:
         this.personal = leave;
         break;
+      case LeaveType.Emergency:
+        this.emergency = leave;
+        break;
       case LeaveType.Maternity:
         if (this.person.gender == 'Female') this.parental = leave;
         break;
       case LeaveType.Paternity:
         if (this.person.gender == 'Male') this.parental = leave;
         break;
-      case LeaveType.Buisness:
-        this.buisness = leave;
+      case LeaveType.SchoolRelated:
+        this.schoolRelated = leave;
         break;
       default:
         if (!this.other) {

@@ -20,17 +20,15 @@
       </mat-form-field>
       <mat-form-field>
         <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
-          <mat-option value="Vacation">Vacation</mat-option>
+          <mat-option *ngIf="selectedPerson?.person.isThai" value="Vacation">Vacation</mat-option>
           <mat-option value="Sick">Sick</mat-option>
           <mat-option value="Personal">Personal</mat-option>
-          <mat-option value="Funeral">Funeral</mat-option>
+          <mat-option value="Emergency">Emergency</mat-option>
 
           <mat-option *ngIf="selectedPerson?.person.gender == 'Female'" value="Maternity">Maternity</mat-option>
           <mat-option *ngIf="selectedPerson?.person.gender == 'Male'" value="Paternity">Paternity</mat-option>
 
-          <mat-option value="Buisness">Buisness</mat-option>
-          <mat-option value="Compensation">Compensation</mat-option>
-          <mat-option value="NonPaid">Non-Paid</mat-option>
+          <mat-option value="SchoolRelated">School Related</mat-option>
           <mat-option value="Other">Other</mat-option>
         </mat-select>
       </mat-form-field>

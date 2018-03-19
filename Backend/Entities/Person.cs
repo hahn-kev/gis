@@ -16,6 +16,7 @@ namespace Backend.Entities
         public bool Deleted { get; set; }
 
         public Gender Gender { get; set; }
+        public bool IsThai { get; set; }
 
         private string _preferredName;
 
@@ -35,7 +36,6 @@ namespace Backend.Entities
     public class PersonExtended : Person
     {
         public bool SpeaksEnglish { get; set; }
-        public bool IsThai { get; set; }
         public string PhoneNumber { get; set; }
         public Guid? SpouseId { get; set; }
 

@@ -20,11 +20,9 @@ export enum LeaveType {
   Vacation = 'Vacation',
   Sick = 'Sick',
   Personal = 'Personal',
-  Funeral = 'Funeral',
   Maternity = 'Maternity',
   Paternity = 'Paternity',
-  Buisness = 'Buisness',
-  Compensation = 'Compensation',
+  Emergency = 'Emergency',
+  SchoolRelated = 'SchoolRelated',
   Other = 'Other',
-  NonPaid = 'NonPaid',
 }

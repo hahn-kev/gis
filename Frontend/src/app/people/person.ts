@@ -12,11 +12,11 @@ export class Person {
 
   public preferredName: string;
   public gender = 'Male';
+  public isThai: boolean;
 }
 
 export class PersonExtended extends Person {
   public speaksEnglish: boolean;
-  public isThai: boolean;
   public phoneNumber: string;
   public spouseId: string;
   public spouseChanged: boolean;

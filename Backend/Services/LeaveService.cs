@@ -226,10 +226,10 @@ namespace Backend.Services
             {
                 case LeaveType.Sick: return 30;
                 case LeaveType.Personal: return 5;
-                case LeaveType.Funeral: return 5;
+                case LeaveType.Emergency: return 5;
                 case LeaveType.Maternity: return 90;
                 case LeaveType.Paternity: return 5;
-                case LeaveType.Buisness: return 0;
+                case LeaveType.SchoolRelated: return null;
                 case LeaveType.Vacation: break;
                 default: return null;
             }

@@ -71,25 +71,19 @@ namespace Backend.Entities
         [MapValue("Personal")]
         Personal,
 
-        [MapValue("Funeral")]
-        Funeral,
-
         [MapValue("Maternity")]
         Maternity,
 
         [MapValue("Paternity")]
         Paternity,
+        
+        [MapValue("Emergency")]
+        Emergency,
 
-        [MapValue("Buisness")]
-        Buisness,
-
-        [MapValue("Compensation")]
-        Compensation,
+        [MapValue("SchoolRelated")]
+        SchoolRelated,
 
         [MapValue("Other")]
         Other,
-
-        [MapValue("NonPaid")]
-        NonPaid,
     }
 }
