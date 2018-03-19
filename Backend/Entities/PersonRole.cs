@@ -42,6 +42,6 @@ namespace Backend.Entities
         HalfTime, 
         Contractor,
         DailyWorker,
-        Volunteer
+        SchoolAid
     }
 }
