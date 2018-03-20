@@ -2,6 +2,8 @@ import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoleExtended } from '../role';
 import { PersonService } from '../person.service';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 @Component({
   selector: 'app-roles-report',
@@ -12,8 +14,8 @@ export class RolesReportComponent {
 
   public roles: RoleExtended[];
   public during: boolean;
-  public beginDate: Date;
-  public endDate: Date;
+  public beginDate: Moment;
+  public endDate: Moment;
   readonly oneYearInMs = 1000 * 60 * 60 * 24 * 365;
 
 
@@ -25,9 +27,14 @@ export class RolesReportComponent {
     });
     this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
     this.route.queryParams.subscribe((params: { begin, end }) => {
-      this.beginDate = new Date(params.begin || Date.now() - this.oneYearInMs / 2);
-      this.endDate = new Date(params.end || Date.now() + this.oneYearInMs / 2);
+      this.beginDate = this.parseDate(params.begin, Date.now() - this.oneYearInMs / 2);
+      this.endDate =  this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
     });
+  }
+
+  parseDate(param: string, fallback: number) {
+    if (param) return moment(param, 'YYYY-M-D');
+    return moment(fallback);
   }
 
   setDuring(during: boolean): void {
@@ -35,12 +42,12 @@ export class RolesReportComponent {
   this.updateRoute();
 }
 
-  async setBeginDate(beginDate: Date): Promise<void> {
+  async setBeginDate(beginDate: Moment): Promise<void> {
   this.beginDate = beginDate;
   this.updateRoute();
 }
 
-  async setEndDate(endDate: Date): Promise<void> {
+  async setEndDate(endDate: Moment): Promise<void> {
   this.endDate = endDate;
   this.updateRoute();
 }
@@ -56,7 +63,7 @@ export class RolesReportComponent {
     });
 }
 
-  static formatDate(date: Date): string {
-    return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+  static formatDate(date: Moment): string {
+    return date.utc().format('YYYY-M-D');
   }
 }

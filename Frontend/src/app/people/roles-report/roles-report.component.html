@@ -15,7 +15,7 @@
     <mat-icon mat-list-icon>today</mat-icon>
     {{beginDate | date: 'shortDate'}}
   </button>
-  <input class="invisible" [ngModel]="beginDate" (ngModelChange)="setBeginDate($event)"
+  <input class="invisible" [max]="endDate" [ngModel]="beginDate" (ngModelChange)="setBeginDate($event)"
          [matDatepicker]="beginDatePicker">
   <mat-datepicker #beginDatePicker></mat-datepicker>
   <span class="mat-body-2">and ending after</span>
@@ -25,7 +25,7 @@
     <mat-icon mat-list-icon>today</mat-icon>
     {{endDate | date: 'shortDate'}}
   </button>
-  <input class="invisible" [ngModel]="endDate" (ngModelChange)="setEndDate($event)"
+  <input class="invisible" [min]="beginDate" [ngModel]="endDate" (ngModelChange)="setEndDate($event)"
          [matDatepicker]="endDatePicker">
   <mat-datepicker #endDatePicker></mat-datepicker>
 </ng-container>
