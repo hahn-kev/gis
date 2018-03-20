@@ -59,8 +59,7 @@ export class PersonComponent implements OnInit {
 
   ngOnInit(): void {
     this.filteredCountries = this.countriesControl.valueChanges
-      .pipe(startWith(''),
-        map(value => countries.filter(country => this.startsWith(country, value)))
+      .pipe(map(value => countries.filter(country => this.startsWith(country, value || '')))
       );
   }
   startsWith(value: string, test: string) {
