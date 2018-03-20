@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 export class JobComponent implements OnInit {
   public job: Job;
   public groups: OrgGroup[];
-  private isNew = false;
+  public isNew = false;
 
   constructor(private jobService: JobService,
               private route: ActivatedRoute,
