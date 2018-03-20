@@ -130,6 +130,7 @@ html, body {
 .mat-toolbar {
   @include mat-form-field-theme($theme-dark);
   @include mat-input-theme($theme-dark);
+  @include mat-select-theme($theme-dark);
   .mat-input-element {
     caret-color: currentColor;
   }
@@ -160,6 +161,10 @@ html, body {
   .mat-row {
     page-break-inside: avoid;
     page-break-after: auto;
+  }
+  .print-hide {
+    display: none;
+    visibility: hidden;
   }
 }
 

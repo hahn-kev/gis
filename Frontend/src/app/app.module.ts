@@ -32,6 +32,7 @@ import {
   MatSidenavModule,
   MatSlideToggleModule,
   MatSnackBarModule,
+  MatSortModule,
   MatTableModule,
   MatToolbarModule,
   MatTooltipModule
@@ -84,6 +85,7 @@ import { GoogleApiModule, NG_GAPI_CONFIG } from 'ng-gapi';
 import { DrivePickerService } from './google-picker/drive-picker.service';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { AttachmentService } from './components/attachments/attachment.service';
+import { StaffReportComponent } from './people/staff/staff-report/staff-report.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -120,7 +122,8 @@ if (environment.production) {
     AppTemplateContentDirective,
     LeaveReportComponent,
     GooglePickerComponent,
-    AttachmentsComponent
+    AttachmentsComponent,
+    StaffReportComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -147,6 +150,7 @@ if (environment.production) {
     MatDatepickerModule,
     MatMomentDateModule,
     MatTableModule,
+    MatSortModule,
     MatIconModule,
     MatCheckboxModule,
     MatSnackBarModule,

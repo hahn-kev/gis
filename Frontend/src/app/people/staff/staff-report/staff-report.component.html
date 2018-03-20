@@ -1,0 +1,62 @@
+<ng-container *appTemplateContent="'title'">Staff</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button class="print-hide">
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never" class="print-hide">
+    <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+  </mat-form-field>
+  <mat-form-field style="padding-left: 8px" class="print-hide">
+    <mat-select [(ngModel)]="selectedColumns"
+                multiple
+                placeholder="Columns">
+      <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{column}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-container>
+<mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="firstName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>First Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.firstName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="lastName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="email">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.email}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="phoneNumber">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Phone #</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.phoneNumber}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="birthdate">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Birthday</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.birthdate | date: 'shortDate'}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="gender">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Gender</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.gender }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="passportCountry">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Country</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.isThai ? 'Thailand' : row.passportCountry }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="staff.endorsementAgency">
+    <mat-header-cell *matHeaderCellDef>Endorsment Agency</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{ row.staff.endorsementAgency }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="age">
+    <mat-header-cell *matHeaderCellDef>Age</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }} </mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="selectedColumns"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: selectedColumns"
+           [routerLink]="'/people/edit/' + row.id"></mat-row>
+</mat-table>
+
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Person" matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

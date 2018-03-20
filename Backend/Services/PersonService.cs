@@ -77,6 +77,9 @@ namespace Backend.Services
 
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
 
+        public IList<PersonWithStaff> StaffAll =>
+            _personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null).ToList();
+
         public void MatchPersonWithUser(Person person)
         {
             if (string.IsNullOrEmpty(person.Email)) return;

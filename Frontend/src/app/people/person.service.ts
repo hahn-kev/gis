@@ -51,6 +51,10 @@ export class PersonService {
     return this.http.get<StaffWithName[]>('/api/person/staff');
   }
 
+  getStaffAll() {
+    return this.http.get<PersonWithStaff[]>('/api/person/staff/all');
+  }
+
   getEmergencyContacts(personId: string) {
     return this.http.get<EmergencyContactExtended[]>(`/api/person/${personId}/emergency`).toPromise();
   }

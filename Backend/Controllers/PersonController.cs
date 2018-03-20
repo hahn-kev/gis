@@ -79,6 +79,12 @@ namespace Backend.Controllers
         {
             return _personService.StaffWithNames;
         }
+        [HttpGet("staff/all")]
+        [Authorize(Roles = "admin,hr")]
+        public IList<PersonWithStaff> StaffAll()
+        {
+            return _personService.StaffAll;
+        }
 
         [HttpGet("{personId}/emergency")]
         [Authorize(Roles = "admin,hr")]

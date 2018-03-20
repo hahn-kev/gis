@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { StaffWithName } from './person';
+import { PersonWithStaff, StaffWithName } from './person';
 import { PersonService } from './person.service';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
-export class StaffResolveService implements Resolve<StaffWithName[]> {
+export class StaffResolveService implements Resolve<PersonWithStaff[]> {
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<StaffWithName[]> | Promise<StaffWithName[]> | StaffWithName[] {
-    return this.personService.getStaff();
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PersonWithStaff[]> | Promise<PersonWithStaff[]> | PersonWithStaff[] {
+    return this.personService.getStaffAll();
   }
 
-  constructor(private personService: PersonService) { }
+  constructor(private personService: PersonService) {
+  }
 
 }

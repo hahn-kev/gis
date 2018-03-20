@@ -36,6 +36,7 @@ import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
 import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
+import { StaffReportComponent } from './people/staff/staff-report/staff-report.component';
 
 const routes: Routes = [
   {
@@ -102,6 +103,22 @@ const routes: Routes = [
             component: PeopleListComponent,
             resolve: {
               people: PeopleResolveService
+            }
+          }
+        ]
+      },
+      {
+        path: 'staff',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
+        children: [
+          {
+            path: 'report',
+            component: StaffReportComponent,
+            resolve: {
+              staff: StaffResolveService
             }
           }
         ]
