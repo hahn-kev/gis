@@ -220,6 +220,19 @@
                  [(ngModel)]="person.staff.insuranceNumber"
                  placeholder="Insurance Number">
         </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="teacherLicenseOrg"
+                 [(ngModel)]="person.staff.teacherLicenseOrg"
+                 placeholder="Teacher License Organization">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="teacherLicenseNo"
+                 [(ngModel)]="person.staff.teacherLicenseNo"
+                 placeholder="Teacher License #">
+        </mat-form-field>
+
       </mat-expansion-panel>
     </mat-accordion>
 

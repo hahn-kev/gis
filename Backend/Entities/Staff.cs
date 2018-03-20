@@ -12,6 +12,8 @@ namespace Backend.Entities
         public bool ContractIssued { get; set; }
         public DateTime? ContractExpireDate { get; set; }
         public string InsuranceNumber { get; set; }
+        public string TeacherLicenseOrg { get; set; }
+        public string TeacherLicenseNo { get; set; }
     }
 
     [Table("Staff")]

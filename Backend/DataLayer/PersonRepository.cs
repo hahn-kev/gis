@@ -91,7 +91,9 @@ namespace Backend.DataLayer
                 MoeLicenseNumber = staff.MoeLicenseNumber,
                 ContractIssued = staff.ContractIssued,
                 ContractExpireDate = staff.ContractExpireDate,
-                InsuranceNumber = staff.InsuranceNumber
+                InsuranceNumber = staff.InsuranceNumber,
+                TeacherLicenseNo = staff.TeacherLicenseNo,
+                TeacherLicenseOrg = staff.TeacherLicenseOrg
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>

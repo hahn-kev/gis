@@ -64,6 +64,8 @@ export class Staff {
   public contractIssued: boolean;
   public contractExpireDate?: Date;
   public insuranceNumber: string;
+  public teacherLicenseOrg: string;
+  public teacherLicenseNo: string;
 
   constructor(id?: string) {
     this.id = id;
