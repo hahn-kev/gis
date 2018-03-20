@@ -12,7 +12,8 @@ import { EmergencyContactComponent } from './emergency-contact/emergency-contact
 import { RoleComponent } from './role.component';
 import { countries } from '../countries';
 import { Observable } from 'rxjs/Observable';
-import { map, startWith } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
+import { endorsments } from '../teacher-endorsements';
 
 @Component({
   selector: 'app-person',
@@ -28,6 +29,7 @@ export class PersonComponent implements OnInit {
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
+  public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;

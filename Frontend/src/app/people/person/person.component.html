@@ -263,8 +263,11 @@
         <mat-form-field>
           <mat-select [(ngModel)]="person.staff.workPermitType"
                       name="workPermitType"
-                      placeholder="Work Permit Type">
+                      placeholder="Legal status type">
             <mat-option [value]="null">None</mat-option>
+            <mat-option value="Teacher">Teacher</mat-option>
+            <mat-option value="EducationalPersonnel">Educational Personnel</mat-option>
+            <mat-option value="Consultant">Consultant</mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field>
@@ -279,9 +282,9 @@
                       multiple
                       name="endorsements"
                       placeholder="Endorsements">
-            <mat-option value="Art">Art</mat-option>
-            <mat-option value="History">History</mat-option>
-            <mat-option value="Math">Math</mat-option>
+            <mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">
+              {{endorsment}}
+            </mat-option>
           </mat-select>
         </mat-form-field>
 
