@@ -33,7 +33,7 @@
 <mat-nav-list>
   <ng-container *ngFor="let role of roles">
     <mat-list-item routerLink="/people/edit/{{role.personId}}">
-      <span mat-line>{{role.preferredName}} as {{role.name}}</span>
+      <span mat-line>{{role.preferredName}} as {{role.job.title}}</span>
       <p mat-line>
         <span class="accent-text">{{role.startDate | date: 'shortDate'}}</span>
         to

@@ -62,18 +62,17 @@ namespace Backend.DataLayer
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
             from personRole in _dbConnection.PersonRoles
             join person in People on personRole.PersonId equals person.Id
+            join job in _dbConnection.Job on personRole.JobId equals job.Id
             select new PersonRoleExtended
             {
                 Id = personRole.Id,
+                JobId = personRole.JobId,
                 PersonId = personRole.PersonId,
                 Active = personRole.Active,
-                Name = personRole.Name,
                 StartDate = personRole.StartDate,
                 EndDate = personRole.EndDate,
                 PreferredName = person.PreferredName,
-                IsDirectorPosition = personRole.IsDirectorPosition,
-                IsStaffPosition = personRole.IsStaffPosition,
-                FullHalfTime = personRole.FullHalfTime
+                Job = job
             };
 
         public IQueryable<StaffWithName> StaffWithNames =>
@@ -127,9 +126,9 @@ namespace Backend.DataLayer
             return person;
         }
 
-        public IQueryable<PersonRole> GetPersonRoles(Guid personId)
+        public IQueryable<PersonRoleExtended> GetPersonRoles(Guid personId)
         {
-            return _dbConnection.PersonRoles.Where(role => role.PersonId == personId);
+            return PersonRolesExtended.Where(role => role.PersonId == personId);
         }
 
         public void DeleteStaff(Guid staffId)

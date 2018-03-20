@@ -1,6 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Role } from '../role';
 import { NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Job } from '../../job/job';
 
 @Component({
   selector: 'app-role',
@@ -11,8 +13,12 @@ export class RoleComponent implements OnInit {
   @Input() role: Role;
   @Input() formId: string;
   @ViewChild('form') form: NgForm;
+  jobs: Job[];
 
-  constructor() {
+  constructor(private route: ActivatedRoute) {
+    this.route.data.subscribe(value => {
+      this.jobs = value.jobs;
+    })
   }
 
   ngOnInit() {

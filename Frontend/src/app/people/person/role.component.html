@@ -1,26 +1,19 @@
 <form #form="ngForm" [id]="formId" class="two-colum-grid">
   <mat-form-field>
-    <input matInput required name="name" [(ngModel)]="role.name" placeholder="Name">
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-select [(ngModel)]="role.fullHalfTime" name="fullHalfTime"
-                placeholder="Type">
-      <mat-option [value]="null">None</mat-option>
-      <mat-option value="FullTime">Full Time</mat-option>
-      <mat-option value="HalfTime">Half Time</mat-option>
-      <mat-option value="Contractor">Contractor</mat-option>
-      <mat-option value="DailyWorker">DailyWorker</mat-option>
-      <mat-option value="SchoolAid">School Aid</mat-option>
+    <mat-select name="job"
+                [(ngModel)]="role.jobId"
+                required
+                placeholder="Job">
+      <mat-option *ngFor="let job of jobs" [value]="job.id">{{job.title}}</mat-option>
     </mat-select>
   </mat-form-field>
+
   <mat-form-field>
     <input name="startDate" required matInput [(ngModel)]="role.startDate" [matDatepicker]="startDatePicker"
            placeholder="Start Date">
     <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
     <mat-datepicker #startDatePicker></mat-datepicker>
   </mat-form-field>
-
   <mat-slide-toggle #activeToggle name="active" [(ngModel)]="role.active">Active</mat-slide-toggle>
   <mat-form-field>
     <input name="endDate"
@@ -33,10 +26,4 @@
     <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
     <mat-datepicker #endDatePicker></mat-datepicker>
   </mat-form-field>
-  <div class="span-2-columns">
-    <mat-slide-toggle name="staff" matTooltip="determines the start date of staff for leave calculations"
-                      [(ngModel)]="role.isStaffPosition">Staff position
-    </mat-slide-toggle>
-    <mat-slide-toggle name="director" [(ngModel)]="role.isDirectorPosition">Director position</mat-slide-toggle>
-  </div>
 </form>

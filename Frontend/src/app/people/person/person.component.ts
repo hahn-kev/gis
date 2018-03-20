@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
-import { Role } from '../role';
+import { Role, RoleExtended } from '../role';
 import { OrgGroup } from '../groups/org-group';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
@@ -14,6 +14,7 @@ import { countries } from '../countries';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 import { endorsments } from '../teacher-endorsements';
+import { Job } from '../../job/job';
 
 @Component({
   selector: 'app-person',
@@ -26,6 +27,7 @@ export class PersonComponent implements OnInit {
   public person: PersonWithOthers;
   public groups: OrgGroup[];
   public people: Person[];
+  public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
@@ -44,13 +46,18 @@ export class PersonComponent implements OnInit {
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       groups: OrgGroup[],
-      people: Person[]
+      people: Person[],
+      jobs: Job[]
     }) => {
       this.person = value.person;
       if (value.person.staff) {
         this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
       }
       this.groups = value.groups;
+      this.jobs = value.jobs.reduce((map, job) => {
+        map[job.id] = job;
+        return map;
+      }, {});
       this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
@@ -68,6 +75,7 @@ export class PersonComponent implements OnInit {
       .pipe(map(value => countries.filter(country => this.startsWith(country, value || '')))
       );
   }
+
   startsWith(value: string, test: string) {
     return value.toLowerCase().indexOf(test.toLowerCase()) === 0;
   }
@@ -116,7 +124,8 @@ export class PersonComponent implements OnInit {
   async saveRole(role: Role, isNew = false): Promise<void> {
     role = await this.personService.updateRole(role);
     if (isNew) {
-      this.person.roles = [...this.person.roles, role];
+
+      this.person.roles = [...this.person.roles, <RoleExtended> role];
       this.newRole = new Role();
       this.newRole.personId = this.person.id;
       this.newRoleEl.form.resetForm();
@@ -129,7 +138,7 @@ export class PersonComponent implements OnInit {
   async deleteRole(role: Role) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete role ${role.name}?`,
+        data: ConfirmDialogComponent.Options(`Delete role ${this.jobs[role.jobId].title}?`,
           'Delete',
           'Cancel')
       });

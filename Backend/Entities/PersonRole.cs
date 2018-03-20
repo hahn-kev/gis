@@ -8,16 +8,11 @@ namespace Backend.Entities
 {
     public class PersonRole : BaseEntity
     {
-        public string Name { get; set; }
+        public Guid JobId { get; set; }
         public Guid PersonId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool Active { get; set; }
-        public bool IsDirectorPosition { get; set; }
-        public bool IsStaffPosition { get; set; }
-        
-        [Column(DataType = DataType.VarChar)]
-        public RoleType? FullHalfTime { get; set; }
 
         public TimeSpan LengthOfService()
         {
@@ -33,15 +28,6 @@ namespace Backend.Entities
     public class PersonRoleExtended : PersonRole
     {
         public string PreferredName { get; set; }
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum RoleType
-    {
-        FullTime,
-        HalfTime, 
-        Contractor,
-        DailyWorker,
-        SchoolAid
+        public Job Job { get; set; }
     }
 }

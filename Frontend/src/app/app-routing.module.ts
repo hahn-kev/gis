@@ -37,6 +37,10 @@ import { SelfService } from './people/self/self.service';
 import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
 import { StaffReportComponent } from './people/staff/staff-report/staff-report.component';
+import { JobResolverService } from './job/job-resolver.service';
+import { JobListComponent } from './job/list/job-list.component';
+import { JobComponent } from './job/job/job.component';
+import { JobListResolverService } from './job/job-list-resolver.service';
 
 const routes: Routes = [
   {
@@ -78,7 +82,8 @@ const routes: Routes = [
             resolve: {
               person: PersonResolverService,
               groups: GroupsResolveService,
-              people: PeopleResolveService
+              people: PeopleResolveService,
+              jobs: JobListResolverService
             }
           },
           {
@@ -122,6 +127,31 @@ const routes: Routes = [
             }
           }
         ]
+      },
+      {
+        path: 'job',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
+        children: [
+          {
+            path: 'list',
+            component: JobListComponent,
+            resolve: {
+              jobs: JobListResolverService
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: JobComponent,
+            resolve: {
+              job: JobResolverService,
+              groups: GroupsResolveService
+            }
+          }
+        ]
+
       },
       {
         path: 'groups',
@@ -287,7 +317,9 @@ const routes: Routes = [
     StaffResolveService,
     LeaveRequestResolverService,
     EmergencyContactResolverService,
-    PeopleWithLeaveResolverService
+    PeopleWithLeaveResolverService,
+    JobResolverService,
+    JobListResolverService
   ]
 })
 export class AppRoutingModule {

@@ -86,6 +86,9 @@ import { DrivePickerService } from './google-picker/drive-picker.service';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { AttachmentService } from './components/attachments/attachment.service';
 import { StaffReportComponent } from './people/staff/staff-report/staff-report.component';
+import { JobListComponent } from './job/list/job-list.component';
+import { JobComponent } from './job/job/job.component';
+import { JobService } from './job/job.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -123,7 +126,9 @@ if (environment.production) {
     LeaveReportComponent,
     GooglePickerComponent,
     AttachmentsComponent,
-    StaffReportComponent
+    StaffReportComponent,
+    JobListComponent,
+    JobComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -210,7 +215,8 @@ if (environment.production) {
       deps: [HttpClient, SettingsService],
       multi: true
     },
-    AttachmentService
+    AttachmentService,
+    JobService
   ],
   bootstrap: [AppComponent]
 })

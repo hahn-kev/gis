@@ -185,7 +185,7 @@ namespace Backend.Services
                 DateTime.Now.SchoolYear());
         }
 
-        public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRole> personRoles, int schoolYear)
+        public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRoleExtended> personRoles, int schoolYear)
         {
             var leaveRequests = _personRepository.LeaveRequests
                 .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear));
@@ -195,7 +195,7 @@ namespace Backend.Services
             };
         }
 
-        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRole> personRoles,
+        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRoleExtended> personRoles,
             IEnumerable<LeaveRequest> leaveRequests)
         {
             var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
@@ -210,7 +210,7 @@ namespace Backend.Services
                     Used = TotalLeaveUsed(requests),
                     TotalAllowed = type == LeaveType.Vacation
                         ? vacationAllowed
-                        : LeaveAllowed(type, Enumerable.Empty<PersonRole>())
+                        : LeaveAllowed(type, Enumerable.Empty<PersonRoleExtended>())
                 }
             ).Where(useage => useage.TotalAllowed != null).ToList();
         }
@@ -220,7 +220,7 @@ namespace Backend.Services
             return requests.Sum(request => request.Days);
         }
 
-        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRole> personRoles)
+        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleExtended> personRoles)
         {
             switch (leaveType)
             {
@@ -238,8 +238,8 @@ namespace Backend.Services
             var totalServiceTime = TimeSpan.Zero;
             foreach (var role in personRoles)
             {
-                if (role.IsDirectorPosition && role.Active) return 20;
-                if (role.IsStaffPosition || role.IsDirectorPosition)
+                if (role.Job.IsDirector && role.Active) return 20;
+                if (role.Job.IsStaff || role.Job.IsDirector)
                     totalServiceTime = totalServiceTime + role.LengthOfService();
             }
 
@@ -271,7 +271,7 @@ namespace Backend.Services
             var peopleIds = people.Select(person => person.Id).ToList();
             var leaveRequests = _personRepository.LeaveRequests.Where(request => peopleIds.Contains(request.PersonId))
                 .ToLookup(request => request.PersonId);
-            var personRoles = _personRepository.PersonRoles.Where(role => peopleIds.Contains(role.PersonId))
+            var personRoles = _personRepository.PersonRolesExtended.Where(role => peopleIds.Contains(role.PersonId))
                 .ToLookup(role => role.PersonId);
             return
                 people.Select(person => new PersonAndLeaveDetails

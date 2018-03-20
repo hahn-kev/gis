@@ -327,7 +327,7 @@
       <!--roles list-->
       <mat-expansion-panel #rolePanel *ngFor="let role of person.roles">
         <mat-expansion-panel-header>
-          <mat-panel-title>{{role.name}}</mat-panel-title>
+          <mat-panel-title>{{ jobs[role.jobId].title}}</mat-panel-title>
           <mat-panel-description>
             {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
           </mat-panel-description>

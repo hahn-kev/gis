@@ -67,6 +67,7 @@ namespace UnitTestProject
             TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
             TryCreateTable<PersonExtended>();
             TryCreateTable<PersonRole>();
+            TryCreateTable<Job>();
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
@@ -157,7 +158,9 @@ namespace UnitTestProject
             _dbConnection.Insert(personWithRole);
             _dbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
-            _dbConnection.BulkCopy(personRoleFaker.Generate(5));
+            var personRoles = personRoleFaker.Generate(5);
+            _dbConnection.BulkCopy(personRoles);
+            _dbConnection.BulkCopy(personRoles.Select(role => new AutoFaker<Job>().RuleFor(job => job.Id, role.JobId).Generate()));
             SetupTraining();
             _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now)
                 .Generate());
