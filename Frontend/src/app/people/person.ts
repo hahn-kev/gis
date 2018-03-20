@@ -61,7 +61,7 @@ export class Staff {
   public annualSalary: number;
   public renwebId: string;
   public moeLicenseNumber: string;
-  public contractIssued: boolean;
+  public contractIssued?: Date;
   public contractExpireDate?: Date;
   public insuranceNumber: string;
   public teacherLicenseOrg: string;

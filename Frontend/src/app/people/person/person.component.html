@@ -200,13 +200,22 @@
                  min="0"
                  placeholder="Annual Salary">
         </mat-form-field>
-        <mat-slide-toggle name="contactIssued" [(ngModel)]="person.staff.contractIssued">Contract Issued
-        </mat-slide-toggle>
+
+        <mat-form-field>
+          <input name="contractIssueDate" matInput
+                 [(ngModel)]="person.staff.contractIssued"
+                 [max]="person.staff.contractExpireDate"
+                 [matDatepicker]="contractIssueDatePicker"
+                 placeholder="Contact Issued">
+          <mat-datepicker-toggle matSuffix [for]="contractIssueDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #contractIssueDatePicker></mat-datepicker>
+        </mat-form-field>
+
         <mat-form-field>
           <input name="contractExpireDate" matInput
                  [(ngModel)]="person.staff.contractExpireDate"
+                 [min]="person.staff.contractIssued"
                  [matDatepicker]="contractExpireDatePicker"
-                 [disabled]="!person.staff.contractIssued"
                  placeholder="Contact Expires">
           <mat-datepicker-toggle matSuffix [for]="contractExpireDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #contractExpireDatePicker></mat-datepicker>
