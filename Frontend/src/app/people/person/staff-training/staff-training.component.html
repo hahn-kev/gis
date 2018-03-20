@@ -6,7 +6,7 @@
       <mat-panel-title>Add new Training record</mat-panel-title>
     </mat-expansion-panel-header>
     <form id="newForm" #newForm="ngForm"
-          (submit)="saveNew(); newExpansionPanel.expanded = false;"
+          (submit)="saveNew(); newExpansionPanel.close();"
           class="two-colum-grid">
       <mat-form-field>
         <mat-select name="requirement" required [(ngModel)]="requirement" placeholder="Completed Requirement">
@@ -32,7 +32,7 @@
   </mat-expansion-panel>
 
   <!--completed training list-->
-  <mat-expansion-panel *ngFor="let staffTraining of training">
+  <mat-expansion-panel #trainingPanel *ngFor="let staffTraining of training">
     <mat-expansion-panel-header>
       <mat-panel-title>{{staffTraining.requirementName}} Completed on
         {{staffTraining.completedDate | date: 'shortDate'}}
@@ -40,7 +40,7 @@
     </mat-expansion-panel-header>
     <form [id]="'trainingForm_' + staffTraining.id"
           #trainingForm="ngForm"
-          (submit)="saveTraining(staffTraining)"
+          (submit)="saveTraining(staffTraining); trainingPanel.close()"
           class="two-colum-grid">
 
       <mat-form-field>

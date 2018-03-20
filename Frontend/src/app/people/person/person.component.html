@@ -287,9 +287,8 @@
           <app-role [role]="newRole"
                     #newRoleEl
                     formId="newRoleForm"
-                    (submit)="saveRole(newRole, true); newRolePanel.expanded = false;">
+                    (submit)="saveRole(newRole, true); newRolePanel.close();">
           </app-role>
-
         </form>
         <mat-action-row>
           <button type="submit" form="newRoleForm" [disabled]="newRoleEl.form.invalid" mat-button>Add</button>
@@ -297,7 +296,7 @@
       </mat-expansion-panel>
 
       <!--roles list-->
-      <mat-expansion-panel *ngFor="let role of person.roles">
+      <mat-expansion-panel #rolePanel *ngFor="let role of person.roles">
         <mat-expansion-panel-header>
           <mat-panel-title>{{role.name}}</mat-panel-title>
           <mat-panel-description>
@@ -307,7 +306,7 @@
         <app-role [role]="role"
                   #roleEl
                   [formId]="'form_' + role.id"
-                  (submit)="saveRole(role)">
+                  (submit)="saveRole(role); rolePanel.close();">
         </app-role>
         <mat-action-row>
           <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
@@ -329,7 +328,7 @@
           #newEmergencyContactEl
           formId="newEcForm"
           [emergencyContact]="newEmergencyContact"
-          (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.expanded = false;">
+          (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.close();">
         </app-emergency-contact>
         <mat-action-row>
           <button type="submit" form="newEcForm" [disabled]="newEmergencyContactEl.form.invalid"
@@ -338,14 +337,14 @@
         </mat-action-row>
       </mat-expansion-panel>
 
-      <mat-expansion-panel *ngFor="let contact of person.emergencyContacts">
+      <mat-expansion-panel #ecPanel *ngFor="let contact of person.emergencyContacts">
         <mat-expansion-panel-header>
           <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
           <mat-panel-description>{{peopleMap[contact.contactId]?.email}}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-emergency-contact #contactForm [emergencyContact]="contact"
                                [formId]="'contactForm_' + contact.id"
-                               (submit)="saveEmergencyContact(contact)">
+                               (submit)="saveEmergencyContact(contact); ecPanel.close();">
         </app-emergency-contact>
 
         <mat-action-row>
