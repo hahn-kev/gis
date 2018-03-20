@@ -13,6 +13,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\assets\img" />
-    <Folder Include="src\locale" />
   </ItemGroup>
 </Project>
