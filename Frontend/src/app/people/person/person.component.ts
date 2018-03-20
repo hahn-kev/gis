@@ -28,6 +28,7 @@ export class PersonComponent implements OnInit {
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new Role();
+  public staffEndorsments: Array<string> = [];
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
@@ -44,6 +45,9 @@ export class PersonComponent implements OnInit {
       people: Person[]
     }) => {
       this.person = value.person;
+      if (value.person.staff) {
+        this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
+      }
       this.groups = value.groups;
       this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;

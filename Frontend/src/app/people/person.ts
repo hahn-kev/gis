@@ -70,6 +70,9 @@ export class Staff {
   public visaType: string;
   public workPermitType: string;
 
+  public endorsements: string;
+  public endorsementAgency: string;
+
   constructor(id?: string) {
     this.id = id;
   }

@@ -267,6 +267,23 @@
             <mat-option [value]="null">None</mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field>
+          <input matInput
+                 name="endorsmentAgency"
+                 [(ngModel)]="person.staff.endorsementAgency"
+                 placeholder="Endorsment Agency">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select [(ngModel)]="staffEndorsments"
+                      (ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"
+                      multiple
+                      name="endorsements"
+                      placeholder="Endorsements">
+            <mat-option value="Art">Art</mat-option>
+            <mat-option value="History">History</mat-option>
+            <mat-option value="Math">Math</mat-option>
+          </mat-select>
+        </mat-form-field>
 
       </mat-expansion-panel>
     </mat-accordion>

@@ -96,7 +96,9 @@ namespace Backend.DataLayer
                 TeacherLicenseOrg = staff.TeacherLicenseOrg,
                 ThaiSsn = staff.ThaiSsn,
                 VisaType = staff.VisaType,
-                WorkPermitType = staff.WorkPermitType
+                WorkPermitType = staff.WorkPermitType,
+                EndorsementAgency = staff.EndorsementAgency,
+                Endorsements = staff.Endorsements
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>

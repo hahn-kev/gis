@@ -17,6 +17,9 @@ namespace Backend.Entities
         public string ThaiSsn { get; set; }
         public string VisaType { get; set; }
         public string WorkPermitType { get; set; }
+        
+        public string Endorsements { get; set; }
+        public string EndorsementAgency { get; set; }
     }
 
     [Table("Staff")]
