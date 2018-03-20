@@ -66,6 +66,9 @@ export class Staff {
   public insuranceNumber: string;
   public teacherLicenseOrg: string;
   public teacherLicenseNo: string;
+  public thaiSsn: string;
+  public visaType: string;
+  public workPermitType: string;
 
   constructor(id?: string) {
     this.id = id;

@@ -93,7 +93,10 @@ namespace Backend.DataLayer
                 ContractExpireDate = staff.ContractExpireDate,
                 InsuranceNumber = staff.InsuranceNumber,
                 TeacherLicenseNo = staff.TeacherLicenseNo,
-                TeacherLicenseOrg = staff.TeacherLicenseOrg
+                TeacherLicenseOrg = staff.TeacherLicenseOrg,
+                ThaiSsn = staff.ThaiSsn,
+                VisaType = staff.VisaType,
+                WorkPermitType = staff.WorkPermitType
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
