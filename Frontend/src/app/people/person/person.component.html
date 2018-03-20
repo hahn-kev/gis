@@ -119,10 +119,19 @@
                  placeholder="Zip">
         </mat-form-field>
         <mat-form-field>
-          <input matInput [(ngModel)]="person.passportCountry"
+          <input matInput
+                 #countriesControl="ngModel"
+                 [(ngModel)]="person.passportCountry"
                  name="passportCountry"
+                 [matAutocomplete]="countryAuto"
                  placeholder="Country">
         </mat-form-field>
+
+        <mat-autocomplete #countryAuto="matAutocomplete" autoActiveFirstOption>
+          <mat-option *ngFor="let country of filteredCountries | async" [value]="country">
+            {{ country }}
+          </mat-option>
+        </mat-autocomplete>
       </mat-expansion-panel>
 
       <!--thai address-->

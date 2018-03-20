@@ -10,6 +10,9 @@ import { NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
 import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
 import { RoleComponent } from './role.component';
+import { countries } from '../countries';
+import { Observable } from 'rxjs/Observable';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-person',
@@ -18,6 +21,7 @@ import { RoleComponent } from './role.component';
 })
 export class PersonComponent implements OnInit {
   public isNew: boolean;
+  public filteredCountries: Observable<string[]>;
   public person: PersonWithOthers;
   public groups: OrgGroup[];
   public people: Person[];
@@ -27,6 +31,7 @@ export class PersonComponent implements OnInit {
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
+  @ViewChild('countriesControl') countriesControl: NgModel;
 
   constructor(private route: ActivatedRoute,
               private personService: PersonService,
@@ -53,7 +58,13 @@ export class PersonComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.filteredCountries = this.countriesControl.valueChanges
+      .pipe(startWith(''),
+        map(value => countries.filter(country => this.startsWith(country, value)))
+      );
+  }
+  startsWith(value: string, test: string) {
+    return value.toLowerCase().indexOf(test.toLowerCase()) === 0;
   }
 
   async isStaffChanged(isStaff: boolean): Promise<void> {
