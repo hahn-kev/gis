@@ -8,6 +8,7 @@ namespace Backend.Entities
         public Guid PersonId { get; set; }
         public Guid ContactId { get; set; }
         public int Order { get; set; }
+        public string Relationship { get; set; }
     }
 
     public class EmergencyContactExtended : EmergencyContact

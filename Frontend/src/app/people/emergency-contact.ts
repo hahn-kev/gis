@@ -3,6 +3,7 @@ export class EmergencyContact {
   public personId: string;
   public contactId: string;
   public order: number;
+  public relationship: string;
 }
 
 export class EmergencyContactExtended extends EmergencyContact {

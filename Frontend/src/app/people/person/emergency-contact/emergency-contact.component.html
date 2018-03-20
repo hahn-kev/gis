@@ -22,4 +22,15 @@
     <input matInput name="order" type="number" min="1" [(ngModel)]="emergencyContact.order" placeholder="Order">
   </mat-form-field>
 
+  <mat-form-field>
+    <mat-select [(ngModel)]="emergencyContact.relationship"
+                name="relationship"
+                placeholder="Relationship">
+      <mat-option [value]="null">None</mat-option>
+      <mat-option value="Parent">Parent</mat-option>
+      <mat-option value="Sibling">Sibling</mat-option>
+      <mat-option value="Friend">Friend</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
 </form>

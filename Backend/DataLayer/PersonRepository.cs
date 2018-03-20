@@ -111,7 +111,8 @@ namespace Backend.DataLayer
                 ContactId = emergencyContact.ContactId,
                 Order = emergencyContact.Order,
                 PersonId = emergencyContact.PersonId,
-                ContactPreferedName = person.PreferredName
+                ContactPreferedName = person.PreferredName,
+                Relationship = emergencyContact.Relationship
             };
 
         public PersonWithOthers GetById(Guid id)
