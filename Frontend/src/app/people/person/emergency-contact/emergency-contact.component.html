@@ -6,7 +6,7 @@
                   name="contact"
                   required
                   placeholder="Contact">
-        <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+        <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}} {{eachPerson.lastName}}
         </mat-option>
       </mat-select>
     </mat-form-field>

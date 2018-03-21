@@ -7,7 +7,7 @@
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="staff">
     <mat-header-cell *matHeaderCellDef>Staff</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.person.preferredName}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.preferredName}} {{eachPerson.lastName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="vacation">
     <mat-header-cell *matHeaderCellDef>Vacation</mat-header-cell>

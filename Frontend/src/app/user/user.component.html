@@ -57,7 +57,7 @@
                       [(ngModel)]="user.personId"
                       placeholder="Person">
             <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachPerson of people | async" [value]="eachPerson.id">{{eachPerson.preferredName}}
+            <mat-option *ngFor="let eachPerson of people | async" [value]="eachPerson.id">{{eachPerson.preferredName}} {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>

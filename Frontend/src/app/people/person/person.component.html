@@ -35,7 +35,7 @@
           <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
                       placeholder="Spouse">
             <mat-option [value]="null">None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}} {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>

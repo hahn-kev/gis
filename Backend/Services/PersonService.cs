@@ -29,7 +29,7 @@ namespace Backend.Services
 
         public IList<Person> People() =>
             _personRepository.People.Where(person => !person.Deleted)
-                .OrderBy(person => person.FirstName)
+                .OrderBy(person => person.PreferredName)
                 .ThenBy(person => person.LastName).ToList();
 
         public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
@@ -38,7 +38,7 @@ namespace Backend.Services
         {
             if (string.IsNullOrEmpty(person.PreferredName))
             {
-                person.PreferredName = $"{person.FirstName} {person.LastName}";
+                person.PreferredName = $"{person.FirstName}";
             }
 
             if (person.Staff != null)
