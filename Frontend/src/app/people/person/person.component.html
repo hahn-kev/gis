@@ -206,7 +206,7 @@
                  [(ngModel)]="person.staff.contractIssued"
                  [max]="person.staff.contractExpireDate"
                  [matDatepicker]="contractIssueDatePicker"
-                 placeholder="Contact Issued">
+                 placeholder="Contract Issued">
           <mat-datepicker-toggle matSuffix [for]="contractIssueDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #contractIssueDatePicker></mat-datepicker>
         </mat-form-field>
@@ -216,7 +216,7 @@
                  [(ngModel)]="person.staff.contractExpireDate"
                  [min]="person.staff.contractIssued"
                  [matDatepicker]="contractExpireDatePicker"
-                 placeholder="Contact Expires">
+                 placeholder="Contract Expires">
           <mat-datepicker-toggle matSuffix [for]="contractExpireDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #contractExpireDatePicker></mat-datepicker>
         </mat-form-field>
