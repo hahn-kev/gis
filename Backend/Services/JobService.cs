@@ -19,7 +19,7 @@ namespace Backend.Services
 
         public IList<Job> Jobs()
         {
-            return _jobRepository.Job.ToList();
+            return _jobRepository.Job.OrderBy(job => job.Title).ToList();
         }
 
         public Job GetById(Guid id)
