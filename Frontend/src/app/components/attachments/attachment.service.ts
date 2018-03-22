@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ActivationEnd, ChildActivationEnd, Resolve, Router } from '@angular/router';
+import { ActivationEnd, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/share';
+import 'rxjs/add/operator/shareReplay';
 import { HttpClient } from '@angular/common/http';
 import { Attachment } from './attachment';
 
@@ -20,7 +20,7 @@ export class AttachmentService {
         //guid: 9f830bab-0edb-4170-85f6-1906ab4205c4
         if (!/.{8}-.{4}-.{4}-.{12}/.test(id)) id = null;
         return {id: id, hasAttachments: hasAttachments && id !== null};
-      }).share();
+      }).shareReplay();
   }
 
 

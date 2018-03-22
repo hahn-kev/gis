@@ -54,7 +54,7 @@
       <span style="position: absolute; bottom: 0;">Version: {{version}}</span>
     </mat-sidenav>
     <mat-sidenav class="mat-elevation-z2" mode="side" position="end" #rightDrawer>
-      <app-attachments></app-attachments>
+      <app-attachments *ngIf="rightDrawer.opened"></app-attachments>
     </mat-sidenav>
     <router-outlet></router-outlet>
   </mat-sidenav-container>
