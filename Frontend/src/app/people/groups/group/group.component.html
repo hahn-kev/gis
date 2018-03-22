@@ -39,8 +39,23 @@
       </div>
     </form>
 
+
+
     <mat-card-actions>
       <button type="submit" form="form" [disabled]="!groupForm.form.valid" mat-button>Save</button>
+      <button type="button" *ngIf="!isNew" color="warn" (click)="deleteGroup()" mat-button>Delete</button>
     </mat-card-actions>
+  </mat-card>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Children</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-nav-list>
+        <a mat-list-item *ngFor="let child of children" [routerLink]="'/groups/edit/' + child.id">
+          <span mat-line>{{child.groupName}} | {{child.type}}</span>
+        </a>
+      </mat-nav-list>
+    </mat-card-content>
   </mat-card>
 </div>

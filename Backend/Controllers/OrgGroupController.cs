@@ -12,12 +12,10 @@ namespace Backend.Controllers
     public class OrgGroupController : MyController
     {
         private readonly OrgGroupService _orgGroupService;
-        private readonly IEntityService _entityService;
 
-        public OrgGroupController(OrgGroupService orgGroupService, IEntityService entityService)
+        public OrgGroupController(OrgGroupService orgGroupService)
         {
             _orgGroupService = orgGroupService;
-            _entityService = entityService;
         }
 
         [HttpGet("{id}")]
@@ -32,8 +30,15 @@ namespace Backend.Controllers
         [HttpPost]
         public OrgGroup Save([FromBody] OrgGroup orgGroup)
         {
-            _entityService.Save(orgGroup);
+            _orgGroupService.Save(orgGroup);
             return orgGroup;
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            _orgGroupService.Delete(id);
+            return Ok();
         }
     }
 }

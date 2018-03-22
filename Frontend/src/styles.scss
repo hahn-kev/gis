@@ -47,16 +47,12 @@ html, body {
 .main-card {
   min-height: 100%;
   padding: 12px;
+  grid-gap: 12px;
   justify-content: center;
   align-content: center;
   display: grid;
-  grid-template-rows: auto;
+  grid-template-rows: auto auto;
   grid-template-columns: auto;
-  grid-template-areas: 'main-card';
-}
-
-.main-card > .mat-card {
-  grid-area: main-card;
 }
 
 .md-link {

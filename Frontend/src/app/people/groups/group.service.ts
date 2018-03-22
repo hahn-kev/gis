@@ -27,6 +27,10 @@ export class GroupService {
     return this.http.post<OrgGroup>('/api/orggroup', group).toPromise();
   }
 
+  deleteGroup(groupId: string) {
+    return this.http.delete('/api/orggroup/' + groupId, {responseType: 'text'}).toPromise();
+  }
+
   buildOrgChain(orgGroup: OrgGroup, people: Person[], groups: OrgGroup[]): OrgChain {
     let chainList: OrgChainLink[] = [];
     let currentGroup = orgGroup;
@@ -49,7 +53,7 @@ export class GroupService {
   isChildOf(childOrgId: string, parentOrgId: string, orgGroups: OrgGroup[] | Map<string, OrgGroup>) {
     if (childOrgId == parentOrgId) return true;
     if (orgGroups instanceof Array) {
-      orgGroups = new Map<string, OrgGroup>(orgGroups.map((group):[string, OrgGroup] => [group.id, group]));
+      orgGroups = new Map<string, OrgGroup>(orgGroups.map((group): [string, OrgGroup] => [group.id, group]));
     }
     let map = (<Map<string, OrgGroup>>orgGroups);
     let groupId = childOrgId;
