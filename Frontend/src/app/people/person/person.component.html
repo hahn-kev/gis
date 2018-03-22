@@ -375,7 +375,7 @@
 
       <mat-expansion-panel #ecPanel *ngFor="let contact of person.emergencyContacts">
         <mat-expansion-panel-header>
-          <mat-panel-title>{{contact.contactPreferedName}}</mat-panel-title>
+          <mat-panel-title>{{contact.contactPreferedName}} {{contact.contactLastName}}</mat-panel-title>
           <mat-panel-description>{{peopleMap[contact.contactId]?.email}}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-emergency-contact #contactForm [emergencyContact]="contact"
@@ -384,6 +384,13 @@
         </app-emergency-contact>
 
         <mat-action-row>
+          <a [routerLink]="'/people/edit/' + contact.contactId"
+             [matTooltip]="'View ' + contact.contactPreferedName + ' ' + contact.contactLastName"
+             matTooltipPosition="after"
+             mat-icon-button>
+            <mat-icon>person</mat-icon>
+          </a>
+          <span class="spacer"></span>
           <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
           <button type="submit"
                   [attr.form]="'contactForm_' + contact.id"

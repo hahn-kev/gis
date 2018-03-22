@@ -13,7 +13,7 @@ namespace Backend.Entities
 
     public class EmergencyContactExtended : EmergencyContact
     {
-        [Column(IsColumn = false, SkipOnUpdate = true, SkipOnInsert = true)]
         public string ContactPreferedName { get; set; }
+        public string ContactLastName { get; set; }
     }
 }

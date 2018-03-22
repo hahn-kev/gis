@@ -113,6 +113,7 @@ namespace Backend.DataLayer
                 Order = emergencyContact.Order,
                 PersonId = emergencyContact.PersonId,
                 ContactPreferedName = person.PreferredName,
+                ContactLastName = person.LastName,
                 Relationship = emergencyContact.Relationship
             };
 

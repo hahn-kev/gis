@@ -29,5 +29,6 @@ export class EmergencyContactComponent implements OnInit {
   updateContactName(contactId: string) {
     let person = this.people.find(person => person.id == contactId);
     this.emergencyContact.contactPreferedName = person ? person.preferredName : '';
+    this.emergencyContact.contactLastName = person ? person.lastName : '';
   }
 }

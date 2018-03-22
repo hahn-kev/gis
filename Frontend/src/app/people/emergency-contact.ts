@@ -8,4 +8,5 @@ export class EmergencyContact {
 
 export class EmergencyContactExtended extends EmergencyContact {
   public contactPreferedName: string;
+  public contactLastName: string;
 }
