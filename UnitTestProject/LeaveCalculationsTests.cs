@@ -82,13 +82,13 @@ namespace UnitTestProject
 
         public static IEnumerable<object[]> RolesMemberData()
         {
-            IEnumerable<(int?, IList<PersonRoleExtended> )> MakeValues()
+            IEnumerable<(int?, IList<PersonRoleWithJob> )> MakeValues()
             {
                 var twoYearsAgo = DateTime.Now - TimeSpan.FromDays(2 * 366);
                 yield return (10,
-                    new List<PersonRoleExtended>
+                    new List<PersonRoleWithJob>
                     {
-                        new PersonRoleExtended
+                        new PersonRoleWithJob
                         {
                             Active = true,
                             Job = new Job {IsStaff = true},
@@ -96,16 +96,16 @@ namespace UnitTestProject
                         }
                     });
                 yield return (10,
-                    new List<PersonRoleExtended>
+                    new List<PersonRoleWithJob>
                     {
-                        new PersonRoleExtended
+                        new PersonRoleWithJob
                         {
                             Active = true,
                             Job = new Job {IsStaff = true},
                             StartDate = twoYearsAgo
                         },
                         //director position doesn't count to the 20 days because it's not active
-                        new PersonRoleExtended
+                        new PersonRoleWithJob
                         {
                             Active = false,
                             Job = new Job {IsDirector = true},
@@ -113,67 +113,67 @@ namespace UnitTestProject
                             EndDate = new DateTime(2002, 1, 1)
                         },
                     });
-                yield return (20, new List<PersonRoleExtended>
+                yield return (20, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Active = true,
                         Job = new Job {IsDirector = true},
                         StartDate = twoYearsAgo
                     }
                 });
-                yield return (15, new List<PersonRoleExtended>
+                yield return (15, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Active = true,
                         Job = new Job {IsStaff = true},
                         StartDate = twoYearsAgo
                     },
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Job = new Job {IsStaff = true},
                         StartDate = new DateTime(2000, 1, 1),
                         EndDate = new DateTime(2002, 1, 1)
                     },
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Job = new Job {IsStaff = true},
                         StartDate = new DateTime(2002, 1, 2),
                         EndDate = new DateTime(2013, 1, 1)
                     }
                 });
-                yield return (20, new List<PersonRoleExtended>
+                yield return (20, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Active = true,
                         Job = new Job {IsStaff = true},
                         StartDate = twoYearsAgo
                     },
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Job = new Job {IsStaff = true},
                         StartDate = new DateTime(2000, 1, 1),
                         EndDate = new DateTime(2002, 1, 1)
                     },
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Job = new Job {IsStaff = true},
                         StartDate = new DateTime(2002, 1, 2),
                         EndDate = new DateTime(2013, 1, 1)
                     },
-                    new PersonRoleExtended
+                    new PersonRoleWithJob
                     {
                         Job = new Job {IsStaff = true},
                         StartDate = new DateTime(1995, 1, 1),
                         EndDate = new DateTime(2000, 1, 1)
                     }
                 });
-                yield return (null, new List<PersonRoleExtended>());
-                yield return (null, new List<PersonRoleExtended>
+                yield return (null, new List<PersonRoleWithJob>());
+                yield return (null, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleExtended {Active = true, StartDate = twoYearsAgo, Job = new Job()},
+                    new PersonRoleWithJob {Active = true, StartDate = twoYearsAgo, Job = new Job()},
                 });
             }
 
@@ -182,7 +182,7 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(RolesMemberData))]
-        public void ShouldCalculateLeaveAllowed(int? expected, IList<PersonRoleExtended> personRoles)
+        public void ShouldCalculateLeaveAllowed(int? expected, IList<PersonRoleWithJob> personRoles)
         {
             var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles);
             Assert.Equal(expected, result);

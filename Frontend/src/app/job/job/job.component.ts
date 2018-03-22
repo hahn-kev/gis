@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { JobService } from '../job.service';
-import { Job } from '../job';
+import { Job, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { OrgGroup } from '../../people/groups/org-group';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { Role, RoleExtended, RoleWithJob } from '../../people/role';
+import { PersonService } from '../../people/person.service';
 
 @Component({
   selector: 'app-job',
@@ -12,11 +14,12 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
   styleUrls: ['./job.component.scss']
 })
 export class JobComponent implements OnInit {
-  public job: Job;
+  public job: JobWithRoles;
   public groups: OrgGroup[];
   public isNew = false;
 
   constructor(private jobService: JobService,
+              private personService: PersonService,
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
@@ -43,6 +46,25 @@ export class JobComponent implements OnInit {
     await this.jobService.delete(this.job.id).toPromise();
     this.router.navigate(['/job/list']);
     this.snackBar.open(`${this.job.title} Deleted`, null, {duration: 2000});
+  }
+
+  async saveRole(role: Role): Promise<void> {
+    await this.personService.updateRole(role);
+    this.snackBar.open(`Role Saved`, null, {duration: 2000});
+  }
+
+  async deleteRole(role: RoleExtended) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(`Delete role for ${role.preferredName} ${role.lastName}?`,
+          'Delete',
+          'Cancel')
+      });
+    let result = await dialogRef.afterClosed().toPromise();
+    if (!result) return;
+    await this.personService.deleteRole(role.id);
+    this.job.roles = this.job.roles.filter(value => value.id != role.id);
+    this.snackBar.open(`Role Deleted`, null, {duration: 2000});
 
   }
 }

@@ -56,4 +56,35 @@
       <button type="button" *ngIf="!isNew" color="warn" (click)="deleteJob()" mat-button>Delete</button>
     </mat-card-actions>
   </mat-card>
+
+
+  <mat-accordion class="roles">
+    <!--roles list-->
+    <mat-expansion-panel #rolePanel *ngFor="let role of job.roles">
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{role.preferredName}} {{role.lastName}}</mat-panel-title>
+        <mat-panel-description>
+          {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-role [role]="role"
+                [hideJob]="true"
+                #roleEl
+                [formId]="'form_' + role.id"
+                (submit)="saveRole(role); rolePanel.close();">
+      </app-role>
+      <mat-action-row>
+        <a [routerLink]="'/people/edit/' + role.personId"
+           [matTooltip]="'View ' + role.preferredName + ' ' + role.lastName"
+           matTooltipPosition="after"
+           mat-icon-button>
+          <mat-icon>person</mat-icon>
+        </a>
+        <span class="spacer"></span>
+        <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
+        <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
+        </button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </mat-accordion>
 </form>

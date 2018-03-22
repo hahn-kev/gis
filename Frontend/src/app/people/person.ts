@@ -1,4 +1,4 @@
-import { Role, RoleExtended } from './role';
+import { Role, RoleExtended, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 
 export class Person {
@@ -46,7 +46,7 @@ export class PersonWithStaff extends PersonExtended {
 
 export class PersonWithOthers extends PersonWithStaff {
 
-  public roles: RoleExtended[] = [];
+  public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
 }
 

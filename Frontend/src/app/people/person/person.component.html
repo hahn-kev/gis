@@ -338,6 +338,13 @@
                   (submit)="saveRole(role); rolePanel.close();">
         </app-role>
         <mat-action-row>
+          <a [routerLink]="'/job/edit/' + role.jobId"
+             [matTooltip]="'View ' + jobs[role.jobId].title + ' Job'"
+             matTooltipPosition="after"
+             mat-icon-button>
+            <mat-icon>work</mat-icon>
+          </a>
+          <span class="spacer"></span>
           <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
           <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
           </button>

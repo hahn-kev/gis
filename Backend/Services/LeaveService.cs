@@ -181,11 +181,11 @@ namespace Backend.Services
         public LeaveDetails GetCurrentLeaveDetails(Guid personId)
         {
             return GetLeaveDetails(personId,
-                _personRepository.GetPersonRoles(personId),
+                _personRepository.GetPersonRolesWithJob(personId),
                 DateTime.Now.SchoolYear());
         }
 
-        public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRoleExtended> personRoles, int schoolYear)
+        public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRoleWithJob> personRoles, int schoolYear)
         {
             var leaveRequests = _personRepository.LeaveRequests
                 .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear));
@@ -195,7 +195,7 @@ namespace Backend.Services
             };
         }
 
-        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRoleExtended> personRoles,
+        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRoleWithJob> personRoles,
             IEnumerable<LeaveRequest> leaveRequests)
         {
             var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
@@ -210,7 +210,7 @@ namespace Backend.Services
                     Used = TotalLeaveUsed(requests),
                     TotalAllowed = type == LeaveType.Vacation
                         ? vacationAllowed
-                        : LeaveAllowed(type, Enumerable.Empty<PersonRoleExtended>())
+                        : LeaveAllowed(type, Enumerable.Empty<PersonRoleWithJob>())
                 }
             ).Where(useage => useage.TotalAllowed != null).ToList();
         }
@@ -220,7 +220,7 @@ namespace Backend.Services
             return requests.Sum(request => request.Days);
         }
 
-        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleExtended> personRoles)
+        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles)
         {
             switch (leaveType)
             {
@@ -271,7 +271,7 @@ namespace Backend.Services
             var peopleIds = people.Select(person => person.Id).ToList();
             var leaveRequests = _personRepository.LeaveRequests.Where(request => peopleIds.Contains(request.PersonId))
                 .ToLookup(request => request.PersonId);
-            var personRoles = _personRepository.PersonRolesExtended.Where(role => peopleIds.Contains(role.PersonId))
+            var personRoles = _personRepository.PersonRolesWithJob.Where(role => peopleIds.Contains(role.PersonId))
                 .ToLookup(role => role.PersonId);
             return
                 people.Select(person => new PersonAndLeaveDetails

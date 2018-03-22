@@ -1,4 +1,6 @@
-﻿export class Job {
+﻿import { RoleExtended } from '../people/role';
+
+export class Job {
   public id: string;
   public title: string;
   public type: string;
@@ -12,4 +14,8 @@
   constructor() {
     this.current = true;
   }
+}
+
+export class JobWithRoles extends Job {
+  public roles: RoleExtended[];
 }

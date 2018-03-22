@@ -28,6 +28,11 @@ namespace Backend.Entities
     public class PersonRoleExtended : PersonRole
     {
         public string PreferredName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class PersonRoleWithJob : PersonRoleExtended
+    {
         public Job Job { get; set; }
     }
 }

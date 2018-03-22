@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { PersonService } from '../person.service';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { RoleExtended } from '../role';
+import { RoleWithJob } from '../role';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
-export class RolesResolverService implements Resolve<RoleExtended[]> {
+export class RolesResolverService implements Resolve<RoleWithJob[]> {
   resolve(route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<RoleExtended[]> | Promise<RoleExtended[]> | RoleExtended[] {
+    state: RouterStateSnapshot): Observable<RoleWithJob[]> | Promise<RoleWithJob[]> | RoleWithJob[] {
     const oneYearInMs = 1000 * 60 * 60 * 24 * 365;
     return this.personService.getRoles(route.params['start'] == 'during',
 

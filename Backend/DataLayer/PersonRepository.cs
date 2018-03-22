@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Backend.Entities;
 using LinqToDB;
@@ -59,11 +60,11 @@ namespace Backend.DataLayer
 
         public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
-        public IQueryable<PersonRoleExtended> PersonRolesExtended =>
+        public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>
             from personRole in _dbConnection.PersonRoles
             join person in People on personRole.PersonId equals person.Id
             join job in _dbConnection.Job on personRole.JobId equals job.Id
-            select new PersonRoleExtended
+            select new PersonRoleWithJob
             {
                 Id = personRole.Id,
                 JobId = personRole.JobId,
@@ -72,6 +73,7 @@ namespace Backend.DataLayer
                 StartDate = personRole.StartDate,
                 EndDate = personRole.EndDate,
                 PreferredName = person.PreferredName,
+                LastName = person.LastName,
                 Job = job
             };
 
@@ -119,16 +121,16 @@ namespace Backend.DataLayer
             var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
             if (person != null)
             {
-                person.Roles = GetPersonRoles(id).ToList();
+                person.Roles = GetPersonRolesWithJob(id).ToList();
                 person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
             }
 
             return person;
         }
 
-        public IQueryable<PersonRoleExtended> GetPersonRoles(Guid personId)
+        public IQueryable<PersonRoleWithJob> GetPersonRolesWithJob(Guid personId)
         {
-            return PersonRolesExtended.Where(role => role.PersonId == personId);
+            return PersonRolesWithJob.Where(role => role.PersonId == personId);
         }
 
         public void DeleteStaff(Guid staffId)

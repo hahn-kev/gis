@@ -73,7 +73,7 @@ namespace Backend.Entities
 
     public class PersonWithOthers : PersonWithStaff
     {
-        public IList<PersonRoleExtended> Roles { get; set; }
+        public IList<PersonRoleWithJob> Roles { get; set; }
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; }
     }
 

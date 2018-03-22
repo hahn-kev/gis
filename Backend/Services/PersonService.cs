@@ -38,7 +38,7 @@ namespace Backend.Services
         {
             if (string.IsNullOrEmpty(person.PreferredName))
             {
-                person.PreferredName = $"{person.FirstName}";
+                person.PreferredName = person.FirstName;
             }
 
             if (person.Staff != null)
@@ -105,9 +105,9 @@ namespace Backend.Services
             _entityService.Delete<PersonRole>(id);
         }
 
-        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
+        public IList<PersonRoleWithJob> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
         {
-            return _personRepository.PersonRolesExtended
+            return _personRepository.PersonRolesWithJob
                 .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
                                (role.Active || role.EndDate > endRange)).ToList();
         }

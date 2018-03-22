@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Job } from './job';
+import { Job, JobWithRoles } from './job';
 
 @Injectable()
 export class JobService {
@@ -13,7 +13,7 @@ export class JobService {
   }
 
   get(id: string) {
-    return this.http.get<Job>('/api/job/' + id);
+    return this.http.get<JobWithRoles>('/api/job/' + id);
   }
 
   save(job: Job) {

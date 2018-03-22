@@ -68,7 +68,7 @@ namespace Backend.Controllers
 
         [HttpGet("role")]
         [Authorize(Roles = "admin,hr")]
-        public IList<PersonRoleExtended> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
+        public IList<PersonRoleWithJob> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
         {
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }

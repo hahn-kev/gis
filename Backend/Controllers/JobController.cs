@@ -23,7 +23,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public Job GetById(Guid id)
+        public JobWithRoles GetById(Guid id)
         {
             return _jobService.GetById(id);
         }

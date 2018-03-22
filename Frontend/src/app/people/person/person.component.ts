@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
-import { Role, RoleExtended } from '../role';
+import { Role, RoleExtended, RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
@@ -125,7 +125,7 @@ export class PersonComponent implements OnInit {
     role = await this.personService.updateRole(role);
     if (isNew) {
 
-      this.person.roles = [...this.person.roles, <RoleExtended> role];
+      this.person.roles = [...this.person.roles, <RoleWithJob> role];
       this.newRole = new Role();
       this.newRole.personId = this.person.id;
       this.newRoleEl.form.resetForm();

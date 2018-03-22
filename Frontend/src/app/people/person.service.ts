@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Person, PersonWithDaysOfLeave, PersonWithOthers, PersonWithStaff, StaffWithName } from './person';
 import { Observable } from 'rxjs/Observable';
-import { Role, RoleExtended } from './role';
+import { Role, RoleExtended, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 
 @Injectable()
@@ -39,12 +39,12 @@ export class PersonService {
     return this.http.delete('/api/person/role/' + roleId, {responseType: 'text'}).toPromise();
   }
 
-  getRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleExtended[]> {
+  getRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleWithJob[]> {
     const params = new HttpParams()
       .append('canStartDuringRange', canStartDuringRange.toString())
       .append('beginRange', beginRange.toISOString())
       .append('endRange', endRange.toISOString());
-    return this.http.get<RoleExtended[]>('/api/person/role', {params: params}).toPromise();
+    return this.http.get<RoleWithJob[]>('/api/person/role', {params: params}).toPromise();
   }
 
   getStaff(): Observable<StaffWithName[]> {

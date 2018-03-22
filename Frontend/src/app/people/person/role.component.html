@@ -1,5 +1,5 @@
 <form #form="ngForm" [id]="formId" class="two-colum-grid">
-  <mat-form-field>
+  <mat-form-field *ngIf="!hideJob">
     <mat-select name="job"
                 [(ngModel)]="role.jobId"
                 required

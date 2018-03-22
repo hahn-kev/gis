@@ -1,6 +1,6 @@
 import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoleExtended } from '../role';
+import { RoleExtended, RoleWithJob } from '../role';
 import { PersonService } from '../person.service';
 import * as moment from 'moment';
 import { Moment } from 'moment';
@@ -12,7 +12,7 @@ import { Moment } from 'moment';
 })
 export class RolesReportComponent {
 
-  public roles: RoleExtended[];
+  public roles: RoleWithJob[];
   public during: boolean;
   public beginDate: Moment;
   public endDate: Moment;
@@ -22,7 +22,7 @@ export class RolesReportComponent {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private personService: PersonService) {
-    this.route.data.subscribe((data: { roles: RoleExtended[] }) => {
+    this.route.data.subscribe((data: { roles: RoleWithJob[] }) => {
       this.roles = data.roles;
     });
     this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');

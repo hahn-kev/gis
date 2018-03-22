@@ -8,13 +8,15 @@ namespace Backend.Services
 {
     public class JobService
     {
-        private JobRepository _jobRepository;
-        private IEntityService _entityService;
+        private readonly JobRepository _jobRepository;
+        private readonly IEntityService _entityService;
+        private readonly PersonRepository _personRepository;
 
-        public JobService(JobRepository jobRepository, IEntityService entityService)
+        public JobService(JobRepository jobRepository, IEntityService entityService, PersonRepository personRepository)
         {
             _jobRepository = jobRepository;
             _entityService = entityService;
+            _personRepository = personRepository;
         }
 
         public IList<Job> Jobs()
@@ -22,9 +24,9 @@ namespace Backend.Services
             return _jobRepository.Job.OrderBy(job => job.Title).ToList();
         }
 
-        public Job GetById(Guid id)
+        public JobWithRoles GetById(Guid id)
         {
-            return _jobRepository.Job.SingleOrDefault(job => job.Id == id);
+            return _jobRepository.GetById(id);
         }
 
         public void Save(Job job)
