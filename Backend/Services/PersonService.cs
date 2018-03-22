@@ -15,14 +15,17 @@ namespace Backend.Services
         private readonly PersonRepository _personRepository;
         private readonly UsersRepository _usersRepository;
         private readonly IEntityService _entityService;
+        private readonly JobRepository _jobRepository;
 
         public PersonService(PersonRepository personRepository,
             IEntityService entityService,
-            UsersRepository usersRepository)
+            UsersRepository usersRepository,
+            JobRepository jobRepository)
         {
             _personRepository = personRepository;
             _entityService = entityService;
             _usersRepository = usersRepository;
+            _jobRepository = jobRepository;
         }
 
         #region people
@@ -97,7 +100,18 @@ namespace Backend.Services
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
-            _entityService.Save(role);
+            _entityService.Save(role, out var isNew);
+            if (isNew && role.Active)
+            {
+                //when a new job is active, take the org group from the job and put it on the staff
+                _personRepository.Staff
+                    .Where(staff => staff.Id == _personRepository.People
+                                        .Where(person => person.Id == role.PersonId && person.StaffId != null)
+                                        .Select(person => (Guid) person.StaffId).SingleOrDefault())
+                    .Set(staff => staff.OrgGroupId,
+                        () => _jobRepository.Job.Where(job => job.Id == role.JobId).Select(job => job.OrgGroupId)
+                            .SingleOrDefault()).Update();
+            }
         }
 
         public void DeleteRole(Guid id)

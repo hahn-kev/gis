@@ -77,6 +77,8 @@ namespace Backend.DataLayer
                 Job = job
             };
 
+        public IQueryable<Staff> Staff => _dbConnection.Staff;
+
         public IQueryable<StaffWithName> StaffWithNames =>
             from staff in _dbConnection.Staff
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)

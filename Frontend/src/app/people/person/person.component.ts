@@ -124,8 +124,11 @@ export class PersonComponent implements OnInit {
   async saveRole(role: Role, isNew = false): Promise<void> {
     role = await this.personService.updateRole(role);
     if (isNew) {
-
       this.person.roles = [...this.person.roles, <RoleWithJob> role];
+      if (role.active && this.person.staff) {
+        //back end will have done this already, just updating the front end
+        this.person.staff.orgGroupId = this.jobs[role.jobId].orgGroupId;
+      }
       this.newRole = new Role();
       this.newRole.personId = this.person.id;
       this.newRoleEl.form.resetForm();
