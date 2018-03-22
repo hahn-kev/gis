@@ -35,7 +35,8 @@
           <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
                       placeholder="Spouse">
             <mat-option [value]="null">None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}} {{eachPerson.lastName}}
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+              {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -183,6 +184,19 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Staff</mat-panel-title>
         </mat-expansion-panel-header>
+        <ng-container *ngIf="person.isThai">
+          <mat-form-field>
+            <span matPrefix>$</span>
+            <input matInput
+                   name="annualSalary"
+                   type="number"
+                   [(ngModel)]="person.staff.annualSalary"
+                   min="0"
+                   placeholder="Annual Salary">
+          </mat-form-field>
+          <span></span>
+
+        </ng-container>
         <mat-form-field>
           <mat-select name="orgGroup"
                       [(ngModel)]="person.staff.orgGroupId"
@@ -199,17 +213,6 @@
             <mat-option *ngFor="let org of missionOrgs" [value]="org.id">{{org.name}}</mat-option>
           </mat-select>
         </mat-form-field>
-        <div class="span-2-columns">
-          <mat-form-field>
-            <span matPrefix>$</span>
-            <input matInput
-                   name="annualSalary"
-                   type="number"
-                   [(ngModel)]="person.staff.annualSalary"
-                   min="0"
-                   placeholder="Annual Salary">
-          </mat-form-field>
-        </div>
 
         <mat-form-field>
           <input name="contractIssueDate" matInput
