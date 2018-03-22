@@ -7,6 +7,7 @@ using Backend;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace UnitTestProject
@@ -21,6 +22,23 @@ namespace UnitTestProject
             _servicesFixture = new ServicesFixture();
             _servicesFixture.SetupData();
             _personRepository = _servicesFixture.Get<PersonRepository>();
+        }
+
+        [Fact]
+        public void JsonDateWithoutKindHasCorrectFormat()
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc
+            };
+
+            var utcDate = new DateTime(30000, DateTimeKind.Utc);
+            var unspecDate = new DateTime(30000, DateTimeKind.Unspecified);
+            Assert.Equal(JsonConvert.SerializeObject(utcDate),
+                JsonConvert.SerializeObject(unspecDate));
+            Assert.Equal(utcDate, unspecDate);
+            Assert.True(utcDate == unspecDate);
+            Assert.True(Equals(utcDate, unspecDate));
         }
 
         [Fact]

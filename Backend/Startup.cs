@@ -29,6 +29,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Npgsql;
 using Sentinel.Sdk.Extensions;
 using Sentinel.Sdk.Middleware;
@@ -66,7 +67,7 @@ namespace Backend
                     })
                 .AddLinqToDBStores<int>(new DefaultConnectionFactory())
                 .AddDefaultTokenProviders();
-            
+
             services.AddSentinel(new SentinelSettings
             {
                 Dsn = settings.SentryDsn,
@@ -79,17 +80,21 @@ namespace Backend
             });
 
             services.AddMvc(options =>
-            {
-                options.InputFormatters.Add(new TextPlainInputFormatter());
+                {
+                    options.InputFormatters.Add(new TextPlainInputFormatter());
 #if DEBUG
-                options.Filters.Add(typeof(AllowAnonymousFilter));
+                    options.Filters.Add(typeof(AllowAnonymousFilter));
 #else
 //require auth on every controller by default
                 options.Filters.Add(
                     new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 #endif
-                options.Filters.Add(typeof(GlobalExceptionHandler));
-            });
+                    options.Filters.Add(typeof(GlobalExceptionHandler));
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                });
             //todo response caching?
 //            services.AddResponseCaching();
             services.AddLocalization();
@@ -167,6 +172,7 @@ namespace Backend
                     services.AddScoped(type);
                 }
             }
+
             services.AddScoped<AuthenticateController>();
             services.AddScoped<IDbConnection, DbConnection>();
             services.AddScoped(provider =>
