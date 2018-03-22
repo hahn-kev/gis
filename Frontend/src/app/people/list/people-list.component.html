@@ -11,17 +11,17 @@
   </a>
 </ng-container>
 <mat-table [dataSource]="dataSource">
-  <ng-container matColumnDef="firstName">
-    <mat-header-cell *matHeaderCellDef>First Name</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.firstName}}</mat-cell>
+  <ng-container matColumnDef="preferredName">
+    <mat-header-cell *matHeaderCellDef>Preferred Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="lastName">
     <mat-header-cell *matHeaderCellDef>Last Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['firstName', 'lastName']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['firstName', 'lastName']"
+  <mat-header-row *matHeaderRowDef="['preferredName', 'lastName']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['preferredName', 'lastName']"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 

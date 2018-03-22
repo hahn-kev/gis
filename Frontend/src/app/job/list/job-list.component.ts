@@ -17,7 +17,13 @@ export class JobListComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource = new AppDataSource<Job>();
     this.dataSource.bindToRouteData(this.route, 'jobs');
+    this.dataSource.filterPredicate = ((data, filter) =>
+      data.title.toUpperCase().startsWith(filter) || data.jobDescription.toUpperCase().startsWith(filter));
   }
 
+
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toUpperCase();
+  }
 
 }
