@@ -192,14 +192,24 @@
           </mat-select>
         </mat-form-field>
         <mat-form-field>
-          <span matPrefix>$</span>
-          <input matInput
-                 name="annualSalary"
-                 type="number"
-                 [(ngModel)]="person.staff.annualSalary"
-                 min="0"
-                 placeholder="Annual Salary">
+          <mat-select name="missionOrg"
+                      [(ngModel)]="person.staff.missionOrgId"
+                      placeholder="Mission Org">
+            <mat-option [value]="null">None</mat-option>
+            <mat-option *ngFor="let org of missionOrgs" [value]="org.id">{{org.name}}</mat-option>
+          </mat-select>
         </mat-form-field>
+        <div class="span-2-columns">
+          <mat-form-field>
+            <span matPrefix>$</span>
+            <input matInput
+                   name="annualSalary"
+                   type="number"
+                   [(ngModel)]="person.staff.annualSalary"
+                   min="0"
+                   placeholder="Annual Salary">
+          </mat-form-field>
+        </div>
 
         <mat-form-field>
           <input name="contractIssueDate" matInput

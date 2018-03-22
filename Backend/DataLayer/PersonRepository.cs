@@ -87,6 +87,7 @@ namespace Backend.DataLayer
             {
                 Id = staff.Id,
                 OrgGroupId = staff.OrgGroupId,
+                MissionOrgId = staff.MissionOrgId,
                 PersonId = person.Id,
                 PreferredName = person.PreferredName,
                 AnnualSalary = staff.AnnualSalary,

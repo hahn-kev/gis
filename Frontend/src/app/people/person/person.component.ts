@@ -15,6 +15,7 @@ import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 import { endorsments } from '../teacher-endorsements';
 import { Job } from '../../job/job';
+import { MissionOrg } from '../../mission-org/mission-org';
 
 @Component({
   selector: 'app-person',
@@ -26,6 +27,7 @@ export class PersonComponent implements OnInit {
   public filteredCountries: Observable<string[]>;
   public person: PersonWithOthers;
   public groups: OrgGroup[];
+  public missionOrgs: MissionOrg[];
   public people: Person[];
   public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
@@ -47,13 +49,15 @@ export class PersonComponent implements OnInit {
       person: PersonWithOthers,
       groups: OrgGroup[],
       people: Person[],
-      jobs: Job[]
+      jobs: Job[],
+      missionOrgs: MissionOrg[]
     }) => {
       this.person = value.person;
       if (value.person.staff) {
         this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
       }
       this.groups = value.groups;
+      this.missionOrgs = value.missionOrgs;
       this.jobs = value.jobs.reduce((map, job) => {
         map[job.id] = job;
         return map;

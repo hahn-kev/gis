@@ -89,6 +89,9 @@ import { StaffReportComponent } from './people/staff/staff-report/staff-report.c
 import { JobListComponent } from './job/list/job-list.component';
 import { JobComponent } from './job/job/job.component';
 import { JobService } from './job/job.service';
+import { MissionOrgListComponent } from './mission-org/list/mission-org-list.component';
+import { MissionOrgComponent } from './mission-org/edit/mission-org.component';
+import { MissionOrgService } from './mission-org/mission-org.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -128,7 +131,9 @@ if (environment.production) {
     AttachmentsComponent,
     StaffReportComponent,
     JobListComponent,
-    JobComponent
+    JobComponent,
+    MissionOrgListComponent,
+    MissionOrgComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -216,7 +221,8 @@ if (environment.production) {
       multi: true
     },
     AttachmentService,
-    JobService
+    JobService,
+    MissionOrgService
   ],
   bootstrap: [AppComponent]
 })

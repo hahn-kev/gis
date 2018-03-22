@@ -41,6 +41,10 @@ import { JobResolverService } from './job/job-resolver.service';
 import { JobListComponent } from './job/list/job-list.component';
 import { JobComponent } from './job/job/job.component';
 import { JobListResolverService } from './job/job-list-resolver.service';
+import { MissionOrgListComponent } from './mission-org/list/mission-org-list.component';
+import { MissionOrgResolverService } from './mission-org/edit/mission-org-resolver.service';
+import { MissionOrgListResolverService } from './mission-org/list/mission-org-list-resolver.service';
+import { MissionOrgComponent } from './mission-org/edit/mission-org.component';
 
 const routes: Routes = [
   {
@@ -83,7 +87,8 @@ const routes: Routes = [
               person: PersonResolverService,
               groups: GroupsResolveService,
               people: PeopleResolveService,
-              jobs: JobListResolverService
+              jobs: JobListResolverService,
+              missionOrgs: MissionOrgListResolverService
             }
           },
           {
@@ -255,6 +260,30 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'mission-org',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
+        children: [
+          {
+            path: 'list',
+            component: MissionOrgListComponent,
+            resolve: {
+              missionOrgs: MissionOrgListResolverService
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: MissionOrgComponent,
+            resolve: {
+              missionOrg: MissionOrgResolverService,
+              people: PeopleResolveService
+            }
+          }
+        ]
+      },
+      {
         path: 'self',
         children: [
           {
@@ -319,7 +348,9 @@ const routes: Routes = [
     EmergencyContactResolverService,
     PeopleWithLeaveResolverService,
     JobResolverService,
-    JobListResolverService
+    JobListResolverService,
+    MissionOrgResolverService,
+    MissionOrgListResolverService
   ]
 })
 export class AppRoutingModule {

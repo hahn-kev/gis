@@ -1,0 +1,44 @@
+<form class="main-card" id="form" (submit)="save()">
+  <mat-card>
+    <mat-card-content class="two-colum-grid">
+
+      <mat-form-field>
+        <input matInput required name="name" [(ngModel)]="missionOrg.name" placeholder="Name">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="orgRep"
+                    [(ngModel)]="missionOrg.repId"
+                    required
+                    placeholder="Org Rep">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+            {{eachPerson.lastName}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="missionOrg.email"
+               type="email"
+               name="email"
+               placeholder="Email">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="missionOrg.phone"
+               type="tel"
+               name="phone"
+               placeholder="Phone Number">
+      </mat-form-field>
+      <mat-form-field class="span-2-columns">
+          <textarea matInput [(ngModel)]="missionOrg.address"
+                    name="address"
+                    placeholder="Address"></textarea>
+      </mat-form-field>
+      <mat-slide-toggle name="inThailand" [(ngModel)]="missionOrg.officeInThailand">Office is in Thailand
+      </mat-slide-toggle>
+    </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" form="form" mat-button>Save</button>
+      <button type="button" *ngIf="!isNew" color="warn" (click)="delete()" mat-button>Delete</button>
+    </mat-card-actions>
+  </mat-card>
+</form>

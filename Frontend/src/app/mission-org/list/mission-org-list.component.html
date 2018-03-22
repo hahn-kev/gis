@@ -1,0 +1,32 @@
+<ng-container *appTemplateContent="'title'">Mission Orgs</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button>
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never">
+    <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+  </mat-form-field>
+</ng-container>
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="phone">
+    <mat-header-cell *matHeaderCellDef>Phone</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.phone}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="email">
+    <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.email}}</mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['name', 'phone', 'email']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['name', 'phone', 'email']"
+           [routerLink]="'../edit/' + row.id"></mat-row>
+</mat-table>
+
+
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Mission Org" matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

@@ -58,6 +58,7 @@ export class PersonWithDaysOfLeave extends Person {
 export class Staff {
   public id: string;
   public orgGroupId: string;
+  public missionOrgId: string;
   public annualSalary: number;
   public renwebId: string;
   public moeLicenseNumber: string;

@@ -21,6 +21,7 @@ namespace Backend.DataLayer
         IQueryable<PersonExtended> PeopleExtended { get; }
         IQueryable<EmergencyContact> EmergencyContacts { get; }
         IQueryable<OrgGroup> OrgGroups { get; }
+        IQueryable<MissionOrg> MissionOrgs { get; }
         IQueryable<PersonRole> PersonRoles { get; }
         IQueryable<Job> Job { get; }
         IQueryable<LeaveRequest> LeaveRequests { get; }
@@ -69,7 +70,6 @@ namespace Backend.DataLayer
         }
 
 
-
         public void TryCreateTable<T>()
         {
             try
@@ -95,6 +95,7 @@ namespace Backend.DataLayer
         public IQueryable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
         public IQueryable<EmergencyContact> EmergencyContacts => GetTable<EmergencyContact>();
         public IQueryable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
+        public IQueryable<MissionOrg> MissionOrgs => GetTable<MissionOrg>();
         public IQueryable<PersonRole> PersonRoles => GetTable<PersonRole>();
         public IQueryable<Job> Job => GetTable<Job>();
         public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();

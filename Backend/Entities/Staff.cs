@@ -6,6 +6,7 @@ namespace Backend.Entities
     public class Staff : BaseEntity
     {
         public Guid? OrgGroupId { get; set; }
+        public Guid? MissionOrgId { get; set; }
         public int? AnnualSalary { get; set; }
         public string RenwebId { get; set; }
         public string MoeLicenseNumber { get; set; }
