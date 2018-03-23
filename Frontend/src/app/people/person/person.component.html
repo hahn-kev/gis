@@ -316,8 +316,10 @@
       </mat-expansion-panel>
     </mat-accordion>
 
-    <span class="mat-caption">Staff Training</span>
-    <app-staff-training *ngIf="person.staff && !isSelf" [staffId]="person.staffId"></app-staff-training>
+    <ng-container *ngIf="person.staff && !isSelf">
+      <span class="mat-caption">Staff Training</span>
+      <app-staff-training [staffId]="person.staffId"></app-staff-training>
+    </ng-container>
 
   </form>
 
