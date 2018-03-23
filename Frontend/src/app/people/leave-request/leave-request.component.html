@@ -87,6 +87,13 @@
                     name="reason"
                     placeholder="Reason"></textarea>
       </mat-form-field>
+      <mat-form-field *ngIf="(isHr | async)">
+        <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
+          <mat-option [value]="null">Unknown</mat-option>
+          <mat-option [value]="true">Approved</mat-option>
+          <mat-option [value]="false">Unapproved</mat-option>
+        </mat-select>
+      </mat-form-field>
       <div class="span-2-columns">
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
