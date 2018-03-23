@@ -11,6 +11,7 @@ export class GroupResolveService implements Resolve<OrgGroup> {
     if (route.params['id'] === 'new') {
       return new OrgGroup();
     }
+
     return this.orgGroupService.getGroup(route.params['id']);
   }
 
