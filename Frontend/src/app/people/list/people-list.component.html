@@ -6,9 +6,6 @@
   <mat-form-field floatLabel="never">
     <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
   </mat-form-field>
-  <a mat-icon-button matTooltip="Role Report" matTooltipPosition="before" routerLink="../report/roles">
-    <mat-icon>insert_chart</mat-icon>
-  </a>
 </ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="preferredName">

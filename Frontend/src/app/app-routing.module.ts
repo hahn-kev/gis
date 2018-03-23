@@ -92,23 +92,6 @@ const routes: Routes = [
             }
           },
           {
-            path: 'report',
-            children: [
-              {
-                path: 'roles/:start',
-                component: RolesReportComponent,
-                runGuardsAndResolvers: 'paramsOrQueryParamsChange',
-                resolve: {
-                  roles: RolesResolverService
-                }
-              },
-              {
-                path: 'roles',
-                redirectTo: 'roles/during'
-              }
-            ]
-          },
-          {
             path: 'list',
             component: PeopleListComponent,
             resolve: {
@@ -154,7 +137,24 @@ const routes: Routes = [
               job: JobResolverService,
               groups: GroupsResolveService
             }
-          }
+          },
+          {
+            path: 'report',
+            children: [
+              {
+                path: 'roles/:start',
+                component: RolesReportComponent,
+                runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+                resolve: {
+                  roles: RolesResolverService
+                }
+              },
+              {
+                path: 'roles',
+                redirectTo: 'roles/during'
+              }
+            ]
+          },
         ]
 
       },
