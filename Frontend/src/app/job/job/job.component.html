@@ -1,48 +1,55 @@
 <ng-container *appTemplateContent="'title'">Edit {{job?.title}}</ng-container>
 <form (submit)="save()" id="form" class="main-card">
-  <mat-card class="two-colum-grid">
-    <mat-form-field>
-      <input matInput [(ngModel)]="job.title"
-             type="text"
-             name="title"
-             required
-             placeholder="Title">
-    </mat-form-field>
-    <mat-form-field>
-      <mat-select [(ngModel)]="job.type" name="type"
-                  placeholder="Type">
-        <mat-option [value]="null">None</mat-option>
-        <mat-option value="FullTime">Full Time</mat-option>
-        <mat-option value="HalfTime">Half Time</mat-option>
-        <mat-option value="Contractor">Contractor</mat-option>
-        <mat-option value="DailyWorker">DailyWorker</mat-option>
-        <mat-option value="SchoolAid">School Aid</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <div class="span-2-columns">
-      <mat-slide-toggle name="current" [(ngModel)]="job.current">Current</mat-slide-toggle>
-    </div>
-    <mat-form-field class="span-2-columns">
+  <mat-card>
+    <mat-card-content class="two-colum-grid">
+      <mat-form-field>
+        <input matInput [(ngModel)]="job.title"
+               type="text"
+               name="title"
+               required
+               placeholder="Title">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select [(ngModel)]="job.type" name="type"
+                    placeholder="Type">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option value="FullTime">Full Time</mat-option>
+          <mat-option value="HalfTime">Half Time</mat-option>
+          <mat-option value="Contractor">Contractor</mat-option>
+          <mat-option value="DailyWorker">DailyWorker</mat-option>
+          <mat-option value="SchoolAid">School Aid</mat-option>
+        </mat-select>
+      </mat-form-field>
+        <mat-slide-toggle name="current" [(ngModel)]="job.current">Current</mat-slide-toggle>
+      <mat-form-field>
+        <mat-select [(ngModel)]="job.gradeId" name="grade"
+                    placeholder="Grade">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let grade of grades" [value]="grade.id">Grade # {{grade.gradeNo}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="span-2-columns">
       <textarea matInput [(ngModel)]="job.jobDescription"
                 type="text"
                 name="jobDescription"
                 placeholder="Job Description Summary"></textarea>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-select name="orgGroup"
-                  [(ngModel)]="job.orgGroupId"
-                  required
-                  placeholder="Department/Division">
-        <mat-option [value]="null">None</mat-option>
-        <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput [(ngModel)]="job.positions"
-             type="number"
-             name="positions"
-             placeholder="# of Positions">
-    </mat-form-field>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="orgGroup"
+                    [(ngModel)]="job.orgGroupId"
+                    required
+                    placeholder="Department/Division">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="job.positions"
+               type="number"
+               name="positions"
+               placeholder="# of Positions">
+      </mat-form-field>
+    </mat-card-content>
     <mat-card-actions>
       <button type="submit" form="form" mat-button>Save</button>
       <button type="button" *ngIf="!isNew" color="warn" (click)="deleteJob()" mat-button>Delete</button>

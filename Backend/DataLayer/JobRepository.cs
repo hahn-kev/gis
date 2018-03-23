@@ -15,6 +15,7 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Job> Job => _dbConnection.Job;
+        public IQueryable<Grade> JobGrades => _dbConnection.JobGrades;
 
         public JobWithRoles GetById(Guid jobId)
         {
@@ -33,6 +34,7 @@ namespace Backend.DataLayer
                 Id = job.Id,
                 Current = job.Current,
                 JobDescription = job.JobDescription,
+                GradeId = job.GradeId,
                 OrgGroupId = job.OrgGroupId,
                 Positions = job.Positions,
                 Title = job.Title,

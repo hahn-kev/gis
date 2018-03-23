@@ -24,6 +24,7 @@ namespace Backend.DataLayer
         IQueryable<MissionOrg> MissionOrgs { get; }
         IQueryable<PersonRole> PersonRoles { get; }
         IQueryable<Job> Job { get; }
+        IQueryable<Grade> JobGrades { get; }
         IQueryable<LeaveRequest> LeaveRequests { get; }
         IQueryable<TrainingRequirement> TrainingRequirements { get; }
         IQueryable<Staff> Staff { get; }
@@ -98,6 +99,7 @@ namespace Backend.DataLayer
         public IQueryable<MissionOrg> MissionOrgs => GetTable<MissionOrg>();
         public IQueryable<PersonRole> PersonRoles => GetTable<PersonRole>();
         public IQueryable<Job> Job => GetTable<Job>();
+        public IQueryable<Grade> JobGrades => GetTable<Grade>();
         public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
         public IQueryable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
         public IQueryable<Staff> Staff => GetTable<Staff>();

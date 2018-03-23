@@ -45,6 +45,10 @@ import { MissionOrgListComponent } from './mission-org/list/mission-org-list.com
 import { MissionOrgResolverService } from './mission-org/edit/mission-org-resolver.service';
 import { MissionOrgListResolverService } from './mission-org/list/mission-org-list-resolver.service';
 import { MissionOrgComponent } from './mission-org/edit/mission-org.component';
+import { GradeListComponent } from './job/grade/list/grade-list.component';
+import { GradeListResolverService } from './job/grade/grade-list-resolver.service';
+import { GradeResolverService } from './job/grade/grade-resolver.service';
+import { GradeComponent } from 'app/job/grade/edit/grade.component';
 
 const routes: Routes = [
   {
@@ -135,7 +139,8 @@ const routes: Routes = [
             component: JobComponent,
             resolve: {
               job: JobResolverService,
-              groups: GroupsResolveService
+              groups: GroupsResolveService,
+              grades: GradeListResolverService
             }
           },
           {
@@ -155,6 +160,25 @@ const routes: Routes = [
               }
             ]
           },
+          {
+            path: 'grade',
+            children: [
+              {
+                path: 'list',
+                component: GradeListComponent,
+                resolve: {
+                  grades: GradeListResolverService
+                }
+              },
+              {
+                path: 'edit/:id',
+                component: GradeComponent,
+                resolve: {
+                  grade: GradeResolverService
+                }
+              }
+            ]
+          }
         ]
 
       },
@@ -348,7 +372,9 @@ const routes: Routes = [
     JobResolverService,
     JobListResolverService,
     MissionOrgResolverService,
-    MissionOrgListResolverService
+    MissionOrgListResolverService,
+    GradeResolverService,
+    GradeListResolverService
   ]
 })
 export class AppRoutingModule {

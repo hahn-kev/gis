@@ -1,0 +1,21 @@
+<ng-container *appTemplateContent="'title'">Edit Job Grade # {{grade?.gradeNo}}</ng-container>
+<form class="main-card" id="form" (submit)="save()">
+  <mat-card>
+    <mat-card-content class="two-colum-grid">
+      <mat-form-field>
+        <input matInput name="no" required type="number" [(ngModel)]="grade.gradeNo" placeholder="Grade #">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput name="min" [max]="grade.maxPay" required type="number" [(ngModel)]="grade.minPay" placeholder="Min Pay">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput name="max" [min]="grade.minPay" type="number" [(ngModel)]="grade.maxPay" placeholder="Max Pay">
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button type="submit" form="form" mat-button>Save</button>
+      <button type="button" *ngIf="!isNew" color="warn" (click)="deleteGrade()" mat-button>Delete</button>
+    </mat-card-actions>
+  </mat-card>
+</form>

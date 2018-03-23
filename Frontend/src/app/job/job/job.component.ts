@@ -7,6 +7,7 @@ import { OrgGroup } from '../../people/groups/org-group';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { Role, RoleExtended, RoleWithJob } from '../../people/role';
 import { PersonService } from '../../people/person.service';
+import { Grade } from '../grade/grade';
 
 @Component({
   selector: 'app-job',
@@ -16,6 +17,7 @@ import { PersonService } from '../../people/person.service';
 export class JobComponent implements OnInit {
   public job: JobWithRoles;
   public groups: OrgGroup[];
+  public grades: Grade[];
   public isNew = false;
 
   constructor(private jobService: JobService,
@@ -30,6 +32,7 @@ export class JobComponent implements OnInit {
     this.route.data.subscribe((value) => {
       this.job = value.job;
       this.groups = value.groups;
+      this.grades = value.grades;
       this.isNew = !this.job.id;
     });
   }

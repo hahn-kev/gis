@@ -1,0 +1,24 @@
+<ng-container *appTemplateContent="'title'">Job Grades</ng-container>
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="grade">
+    <mat-header-cell *matHeaderCellDef>Grade</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.gradeNo}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="minPay">
+    <mat-header-cell *matHeaderCellDef>Min Pay</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.minPay}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="maxPay">
+    <mat-header-cell *matHeaderCellDef>Max Pay</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.maxPay}}</mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['grade', 'minPay', 'maxPay']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['grade', 'minPay', 'maxPay']"
+           [routerLink]="'../edit/' + row.id"></mat-row>
+</mat-table>
+
+
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Grade" matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

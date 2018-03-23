@@ -24,9 +24,19 @@ namespace Backend.Services
             return _jobRepository.Job.OrderBy(job => job.Title).ToList();
         }
 
+        public IList<Grade> JobGrades()
+        {
+            return _jobRepository.JobGrades.OrderBy(grade => grade.GradeNo).ToList();
+        }
+
         public JobWithRoles GetById(Guid id)
         {
             return _jobRepository.GetById(id);
+        }
+
+        public Grade GetGradeById(Guid id)
+        {
+            return _jobRepository.JobGrades.SingleOrDefault(grade => grade.Id == id);
         }
 
         public void Save(Job job)
@@ -34,9 +44,19 @@ namespace Backend.Services
             _entityService.Save(job);
         }
 
-        public void Delete(Guid jobId)
+        public void Save(Grade grade)
+        {
+            _entityService.Save(grade);
+        }
+
+        public void DeleteJob(Guid jobId)
         {
             _entityService.Delete<Job>(jobId);
+        }
+
+        public void DeleteGrade(Guid id)
+        {
+            _entityService.Delete<Grade>(id);
         }
     }
 }

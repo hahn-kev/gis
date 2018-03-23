@@ -92,6 +92,9 @@ import { JobService } from './job/job.service';
 import { MissionOrgListComponent } from './mission-org/list/mission-org-list.component';
 import { MissionOrgComponent } from './mission-org/edit/mission-org.component';
 import { MissionOrgService } from './mission-org/mission-org.service';
+import { GradeListComponent } from './job/grade/list/grade-list.component';
+import { GradeComponent } from './job/grade/edit/grade.component';
+import { GradeService } from './job/grade/grade.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -133,7 +136,9 @@ if (environment.production) {
     JobListComponent,
     JobComponent,
     MissionOrgListComponent,
-    MissionOrgComponent
+    MissionOrgComponent,
+    GradeListComponent,
+    GradeComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -222,7 +227,8 @@ if (environment.production) {
     },
     AttachmentService,
     JobService,
-    MissionOrgService
+    MissionOrgService,
+    GradeService
   ],
   bootstrap: [AppComponent]
 })

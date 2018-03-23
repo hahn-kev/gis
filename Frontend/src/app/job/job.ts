@@ -5,6 +5,7 @@ export class Job extends BaseEntity {
   public title: string;
   public type: string;
   public jobDescription: string;
+  public gradeId: string;
   public orgGroupId: string;
   public current: boolean;
   public positions: number;

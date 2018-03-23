@@ -12,6 +12,7 @@ namespace Backend.Entities
         public string Title { get; set; }
         [Column(DataType = DataType.VarChar)] public JobType Type { get; set; }
         public string JobDescription { get; set; }
+        public Guid? GradeId { get; set; }
         public Guid OrgGroupId { get; set; }
         public bool Current { get; set; }
         public int Positions { get; set; }

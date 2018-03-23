@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
+using Backend.Entities;
 using Backend.Services;
 using LinqToDB.Common;
 using LinqToDB.Data;

@@ -66,6 +66,7 @@ namespace Backend.DataLayer
             {
                 Current = job.Current,
                 Id = job.Id,
+                GradeId = job.GradeId,
                 OrgGroupId = job.OrgGroupId,
                 JobDescription = job.JobDescription,
                 Title = job.Title,

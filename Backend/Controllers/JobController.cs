@@ -38,7 +38,35 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-            _jobService.Delete(id);
+            _jobService.DeleteJob(id);
+            return Ok();
+        }
+        
+        
+
+        [HttpGet("grade")]
+        public IList<Grade> Grades()
+        {
+            return _jobService.JobGrades();
+        }
+
+        [HttpGet("grade/{id}")]
+        public Grade GetGradeById(Guid id)
+        {
+            return _jobService.GetGradeById(id);
+        }
+
+        [HttpPost("grade")]
+        public Grade Save([FromBody] Grade grade)
+        {
+            _jobService.Save(grade);
+            return grade;
+        }
+
+        [HttpDelete("grade/{id}")]
+        public IActionResult DeleteGrade(Guid id)
+        {
+            _jobService.DeleteGrade(id);
             return Ok();
         }
     }

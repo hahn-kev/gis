@@ -67,6 +67,7 @@ namespace UnitTestProject
             TryCreateTable<PersonExtended>();
             TryCreateTable<PersonRole>();
             TryCreateTable<Job>();
+            TryCreateTable<Grade>();
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
@@ -223,6 +224,8 @@ namespace UnitTestProject
                 Id = Guid.NewGuid(),
                 Name = "hello attachments"
             });
+
+            _dbConnection.Insert(AutoFaker.Generate<Grade>());
         }
 
         public void SetupTraining()
