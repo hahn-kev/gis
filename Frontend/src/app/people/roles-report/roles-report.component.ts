@@ -20,15 +20,15 @@ export class RolesReportComponent {
 
 
   constructor(private route: ActivatedRoute,
-    private router: Router,
-    private personService: PersonService) {
+              private router: Router,
+              private personService: PersonService) {
     this.route.data.subscribe((data: { roles: RoleWithJob[] }) => {
       this.roles = data.roles;
     });
     this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
     this.route.queryParams.subscribe((params: { begin, end }) => {
       this.beginDate = this.parseDate(params.begin, Date.now() - this.oneYearInMs / 2);
-      this.endDate =  this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
+      this.endDate = this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
     });
   }
 
@@ -38,32 +38,32 @@ export class RolesReportComponent {
   }
 
   setDuring(during: boolean): void {
-  this.during = during;
-  this.updateRoute();
-}
+    this.during = during;
+    this.updateRoute();
+  }
 
   async setBeginDate(beginDate: Moment): Promise<void> {
-  this.beginDate = beginDate;
-  this.updateRoute();
-}
+    this.beginDate = beginDate;
+    this.updateRoute();
+  }
 
   async setEndDate(endDate: Moment): Promise<void> {
-  this.endDate = endDate;
-  this.updateRoute();
-}
+    this.endDate = endDate;
+    this.updateRoute();
+  }
 
   updateRoute(): void {
-  this.router.navigate(['..', this.during ? 'during' : 'before'],
-    {
-      relativeTo: this.route,
-      queryParams: {
-        begin: RolesReportComponent.formatDate(this.beginDate),
-        end: RolesReportComponent.formatDate(this.endDate)
-      },
-    });
-}
+    this.router.navigate(['..', this.during ? 'during' : 'before'],
+      {
+        relativeTo: this.route,
+        queryParams: {
+          begin: RolesReportComponent.formatDate(this.beginDate),
+          end: RolesReportComponent.formatDate(this.endDate)
+        },
+      });
+  }
 
   static formatDate(date: Moment): string {
-    return date.utc().format('YYYY-M-D');
+    return date.format('YYYY-M-D');
   }
 }
