@@ -22,7 +22,7 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    & > * {
+    & > .mat-accordion {
       margin-bottom: $spacing;
       &:last-child {
         margin-bottom: 0;

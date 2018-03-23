@@ -19,25 +19,15 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id?}")]
-        public IActionResult Get(Guid? id = null)
+        public PersonWithOthers Get()
         {
-            if (!User.IsAdminOrHr() && id.HasValue)
-            {
-                throw new AuthenticationException("Non admin/hr user's arent allowed to view other users 'Self' page");
-            }
 
-            var personId = id ?? User.PersonId() ?? Guid.Empty;
+            var personId = User.PersonId() ?? Guid.Empty;
             if (personId == Guid.Empty)
             {
-                return Json(new Self());
+                return new PersonWithOthers();
             }
-            var personWithOthers =
-                _personService.GetById(personId);
-            return Json(new Self
-            {
-                Person = personWithOthers,
-                LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers)
-            });
+            return _personService.GetById(personId);
         }
     }
 }

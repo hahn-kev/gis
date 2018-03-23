@@ -287,16 +287,14 @@ const routes: Routes = [
         path: 'self',
         children: [
           {
-            path: ':id', component: SelfComponent,
-            resolve: {
-              self: SelfService
-            }
-          },
-          {
             path: '',
-            component: SelfComponent,
+            component: PersonComponent,
             resolve: {
-              self: SelfService
+              person: SelfService,
+              groups: GroupsResolveService,
+              people: PeopleResolveService,
+              jobs: JobListResolverService,
+              missionOrgs: MissionOrgListResolverService
             }
           }
         ]

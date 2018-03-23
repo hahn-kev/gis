@@ -3,17 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Self } from './self';
 import { Observable } from 'rxjs/Observable';
+import { PersonWithOthers } from '../person';
 
 @Injectable()
-export class SelfService implements Resolve<Self> {
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Self> | Promise<Self> | Self {
-    return this.getSelf(route.params['id']);
+export class SelfService implements Resolve<PersonWithOthers> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PersonWithOthers> | Promise<PersonWithOthers> | PersonWithOthers {
+    return this.http.get<PersonWithOthers>('/api/self/');
   }
 
   constructor(private http: HttpClient) {
-  }
-
-  getSelf(id?: string) {
-    return this.http.get<Self>('/api/self/' + (id || ''));
   }
 }

@@ -10,6 +10,7 @@ import { Job } from '../../job/job';
   styleUrls: ['./role.component.scss']
 })
 export class RoleComponent implements OnInit {
+  @Input() readonly = false;
   @Input() hideJob = false;
   @Input() role: Role;
   @Input() formId: string;

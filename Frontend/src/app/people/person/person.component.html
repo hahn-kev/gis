@@ -4,9 +4,6 @@
     <mat-icon mat-list-icon>delete</mat-icon>
     Delete
   </button>
-  <a mat-button *ngIf="!isNew" [routerLink]="'/self/' + person?.id">
-    <mat-icon mat-list-icon>face</mat-icon>
-    Impersonate</a>
   <button type="submit" form="form" [disabled]="!personForm.form.valid" mat-button>
     <mat-icon mat-list-icon>save</mat-icon>
     Save
@@ -32,7 +29,10 @@
           <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
         </mat-form-field>
         <mat-form-field>
-          <mat-select [(ngModel)]="person.spouseId" (ngModelChange)="person.spouseChanged = true" name="spouse"
+          <mat-select [(ngModel)]="person.spouseId"
+                      [disabled]="isSelf"
+                      (ngModelChange)="person.spouseChanged = true"
+                      name="spouse"
                       placeholder="Spouse">
             <mat-option [value]="null">None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
@@ -60,7 +60,10 @@
         <div class="span-2-columns">
           <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
           <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
-          <mat-slide-toggle name="isStaff" #isStaff="ngModel" [ngModel]="person.staff"
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="isStaff"
+                            #isStaff="ngModel"
+                            [ngModel]="person.staff"
                             (ngModelChange)="isStaffChanged($event)">Is Staff
           </mat-slide-toggle>
         </div>
@@ -179,7 +182,7 @@
     </mat-accordion>
 
     <!--staff-->
-    <mat-accordion *ngIf="person.staff" class="staff">
+    <mat-accordion *ngIf="person.staff && !isSelf" class="staff">
       <mat-expansion-panel class="two-colum-grid">
         <mat-expansion-panel-header>
           <mat-panel-title>Staff</mat-panel-title>
@@ -313,14 +316,19 @@
       </mat-expansion-panel>
     </mat-accordion>
 
-    <app-staff-training *ngIf="person.staff" [staffId]="person.staffId"></app-staff-training>
+    <span class="mat-caption">Staff Training</span>
+    <app-staff-training *ngIf="person.staff && !isSelf" [staffId]="person.staffId"></app-staff-training>
 
   </form>
 
   <div class="column-2">
+    <span class="mat-caption">Roles</span>
     <mat-accordion class="roles">
       <!--new role-->
-      <mat-expansion-panel #newRolePanel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+      <mat-expansion-panel #newRolePanel
+                           *ngIf="!isSelf"
+                           [disabled]="isNew"
+                           [matTooltipDisabled]="!isNew"
                            matTooltip="To add a role first save the person">
         <mat-expansion-panel-header>
           <mat-panel-title>Add new Role</mat-panel-title>
@@ -346,12 +354,14 @@
           </mat-panel-description>
         </mat-expansion-panel-header>
         <app-role [role]="role"
+                  [readonly]="isSelf"
                   #roleEl
                   [formId]="'form_' + role.id"
                   (submit)="saveRole(role); rolePanel.close();">
         </app-role>
         <mat-action-row>
           <a [routerLink]="'/job/edit/' + role.jobId"
+             *ngIf="!isSelf"
              [matTooltip]="'View ' + jobs[role.jobId].title + ' Job'"
              matTooltipPosition="after"
              mat-icon-button>
@@ -365,8 +375,10 @@
       </mat-expansion-panel>
     </mat-accordion>
 
+    <span class="mat-caption">Emergency Contacts</span>
     <mat-accordion class="emergency-contact">
       <mat-expansion-panel #newEmergencyContactPanel
+                           *ngIf="!isSelf"
                            [disabled]="isNew"
                            [matTooltipDisabled]="!isNew"
                            matTooltip="To add an emergency contract first save the person">
@@ -398,6 +410,7 @@
 
         <mat-action-row>
           <a [routerLink]="'/people/edit/' + contact.contactId"
+             *ngIf="!isSelf"
              [matTooltip]="'View ' + contact.contactPreferedName + ' ' + contact.contactLastName"
              matTooltipPosition="after"
              mat-icon-button>

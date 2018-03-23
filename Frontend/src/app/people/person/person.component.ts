@@ -24,6 +24,7 @@ import { MissionOrg } from '../../mission-org/mission-org';
 })
 export class PersonComponent implements OnInit {
   public isNew: boolean;
+  public isSelf: boolean;
   public filteredCountries: Observable<string[]>;
   public person: PersonWithOthers;
   public groups: OrgGroup[];
@@ -45,6 +46,7 @@ export class PersonComponent implements OnInit {
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar) {
+    this.isSelf = this.router.url.indexOf('self') != -1;
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       groups: OrgGroup[],
@@ -109,11 +111,13 @@ export class PersonComponent implements OnInit {
 
   async save(): Promise<void> {
     let savedPerson = await this.personService.updatePerson(this.person);
+    let commands: Array<any> = ['/people/list'];
     if (this.isNew) {
-      this.router.navigate(['people', 'edit', savedPerson.id]);
-    } else {
-      this.router.navigate(['/people/list']);
+      commands = ['people', 'edit', savedPerson.id];
+    } else if (this.isSelf) {
+      commands = ['home'];
     }
+    this.router.navigate(commands);
     this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
   }
 

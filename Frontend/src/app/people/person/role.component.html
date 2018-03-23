@@ -1,6 +1,7 @@
 <form #form="ngForm" [id]="formId" class="two-colum-grid">
   <mat-form-field *ngIf="!hideJob">
     <mat-select name="job"
+                [disabled]="readonly"
                 [(ngModel)]="role.jobId"
                 required
                 placeholder="Job">
@@ -9,21 +10,25 @@
   </mat-form-field>
 
   <mat-form-field>
-    <input name="startDate" required matInput [(ngModel)]="role.startDate" [matDatepicker]="startDatePicker"
+    <input name="startDate"
+           required matInput
+           [readonly]="readonly"
+           [(ngModel)]="role.startDate"
+           [matDatepicker]="startDatePicker"
            placeholder="Start Date">
     <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #startDatePicker></mat-datepicker>
+    <mat-datepicker [disabled]="readonly" #startDatePicker></mat-datepicker>
   </mat-form-field>
-  <mat-slide-toggle #activeToggle name="active" [(ngModel)]="role.active">Active</mat-slide-toggle>
+  <mat-slide-toggle #activeToggle [disabled]="readonly" name="active" [(ngModel)]="role.active">Active</mat-slide-toggle>
   <mat-form-field>
     <input name="endDate"
            [disabled]="role.active"
-           required
-           matInput
+           required matInput
+           [readonly]="readonly"
            [(ngModel)]="role.endDate"
            [matDatepicker]="endDatePicker"
            placeholder="End Date">
     <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #endDatePicker></mat-datepicker>
+    <mat-datepicker [disabled]="readonly" #endDatePicker></mat-datepicker>
   </mat-form-field>
 </form>

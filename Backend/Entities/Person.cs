@@ -73,8 +73,8 @@ namespace Backend.Entities
 
     public class PersonWithOthers : PersonWithStaff
     {
-        public IList<PersonRoleWithJob> Roles { get; set; }
-        public IList<EmergencyContactExtended> EmergencyContacts { get; set; }
+        public IList<PersonRoleWithJob> Roles { get; set; } = new List<PersonRoleWithJob>(0);
+        public IList<EmergencyContactExtended> EmergencyContacts { get; set; } = new List<EmergencyContactExtended>(0);
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
