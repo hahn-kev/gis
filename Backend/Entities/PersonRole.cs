@@ -33,6 +33,6 @@ namespace Backend.Entities
 
     public class PersonRoleWithJob : PersonRoleExtended
     {
-        public Job Job { get; set; }
+        public JobWithOrgGroup Job { get; set; }
     }
 }

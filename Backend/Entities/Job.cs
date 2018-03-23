@@ -14,9 +14,12 @@ namespace Backend.Entities
         public string JobDescription { get; set; }
         public Guid OrgGroupId { get; set; }
         public bool Current { get; set; }
-        public bool IsDirector { get; set; }
-        public bool IsStaff { get; set; }
         public int Positions { get; set; }
+    }
+
+    public class JobWithOrgGroup : Job
+    {
+        public OrgGroup OrgGroup { get; set; }
     }
 
     public class JobWithRoles : Job

@@ -78,7 +78,8 @@ namespace Backend.Services
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
             var result = _orgGroupRepository.PersonWithOrgGroupChain(leaveRequest.PersonId);
-            if (result.personOnLeave?.StaffId == null) throw new UnauthorizedAccessException("Person requesting leave must be staff");
+            if (result.personOnLeave?.StaffId == null)
+                throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;
@@ -238,8 +239,9 @@ namespace Backend.Services
             var totalServiceTime = TimeSpan.Zero;
             foreach (var role in personRoles)
             {
-                if (role.Job.IsDirector && role.Active) return 20;
-                if (role.Job.IsStaff || role.Job.IsDirector)
+                if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
+                    role.Active) return 20;
+                if (role.Job.Type == JobType.FullTime || role.Job.Type == JobType.HalfTime)
                     totalServiceTime = totalServiceTime + role.LengthOfService();
             }
 
@@ -304,7 +306,8 @@ namespace Backend.Services
                     "You aren't allowed to override the length of this leave request, talk to HR");
             }
 
-            if (!newRequest.OverrideDays && newRequest.Days != newRequest.CalculateLength() && newRequest.Days != newRequest.CalculateLength() - 0.5m)
+            if (!newRequest.OverrideDays && newRequest.Days != newRequest.CalculateLength() &&
+                newRequest.Days != newRequest.CalculateLength() - 0.5m)
             {
                 throw new UnauthorizedAccessException(
                     "Days of leave request must match calculated when not being overriden");
@@ -327,7 +330,6 @@ namespace Backend.Services
             {
                 throw new UnauthorizedAccessException(
                     "You aren't allowed to approve your own leave request, talk to HR");
-                
             }
         }
     }

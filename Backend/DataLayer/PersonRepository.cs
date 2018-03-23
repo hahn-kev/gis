@@ -60,10 +60,24 @@ namespace Backend.DataLayer
 
         public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
+        private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job
+            join orgGroup in _dbConnection.OrgGroups on job.OrgGroupId equals orgGroup.Id
+            select new JobWithOrgGroup
+            {
+                Current = job.Current,
+                Id = job.Id,
+                OrgGroupId = job.OrgGroupId,
+                JobDescription = job.JobDescription,
+                Title = job.Title,
+                Positions = job.Positions,
+                Type = job.Type,
+                OrgGroup = orgGroup
+            };
+
         public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>
             from personRole in _dbConnection.PersonRoles
             join person in People on personRole.PersonId equals person.Id
-            join job in _dbConnection.Job on personRole.JobId equals job.Id
+            join job in JobsWithOrgGroup on personRole.JobId equals job.Id
             select new PersonRoleWithJob
             {
                 Id = personRole.Id,

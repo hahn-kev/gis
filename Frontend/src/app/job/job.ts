@@ -7,8 +7,6 @@ export class Job {
   public jobDescription: string;
   public orgGroupId: string;
   public current: boolean;
-  public isStaff: boolean;
-  public isDirector: boolean;
   public positions: number;
 
   constructor() {

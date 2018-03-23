@@ -21,14 +21,6 @@
     </mat-form-field>
     <div class="span-2-columns">
       <mat-slide-toggle name="current" [(ngModel)]="job.current">Current</mat-slide-toggle>
-
-      <mat-slide-toggle name="staff" [(ngModel)]="job.isStaff"
-                        matTooltip="This job counts toward leave calculations">
-        Staff position
-      </mat-slide-toggle>
-      <mat-slide-toggle name="director" [(ngModel)]="job.isDirector">
-        Director position
-      </mat-slide-toggle>
     </div>
     <mat-form-field class="span-2-columns">
       <textarea matInput [(ngModel)]="job.jobDescription"

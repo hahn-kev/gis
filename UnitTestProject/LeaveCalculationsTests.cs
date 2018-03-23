@@ -82,98 +82,74 @@ namespace UnitTestProject
 
         public static IEnumerable<object[]> RolesMemberData()
         {
+            Guid personId = Guid.NewGuid();
+
+            PersonRoleWithJob Role(bool active = true,
+                DateTime startDate = default(DateTime),
+                DateTime? endDate = null,
+                JobType jobType = JobType.FullTime,
+                Guid? supervisorId = null,
+                GroupType groupType = GroupType.Division)
+            {
+                return new PersonRoleWithJob
+                {
+                    PersonId = personId,
+                    Active = active,
+                    Job = new JobWithOrgGroup
+                    {
+                        Type = jobType,
+                        OrgGroup = new OrgGroup {Supervisor = supervisorId ?? Guid.NewGuid(), Type = groupType}
+                    },
+                    StartDate = startDate,
+                    EndDate = endDate
+                };
+            }
+
             IEnumerable<(int?, IList<PersonRoleWithJob> )> MakeValues()
             {
                 var twoYearsAgo = DateTime.Now - TimeSpan.FromDays(2 * 366);
                 yield return (10,
                     new List<PersonRoleWithJob>
                     {
-                        new PersonRoleWithJob
-                        {
-                            Active = true,
-                            Job = new Job {IsStaff = true},
-                            StartDate = twoYearsAgo
-                        }
+                        Role(startDate: twoYearsAgo)
                     });
                 yield return (10,
                     new List<PersonRoleWithJob>
                     {
-                        new PersonRoleWithJob
-                        {
-                            Active = true,
-                            Job = new Job {IsStaff = true},
-                            StartDate = twoYearsAgo
-                        },
+                        Role(startDate: twoYearsAgo),
                         //director position doesn't count to the 20 days because it's not active
-                        new PersonRoleWithJob
-                        {
-                            Active = false,
-                            Job = new Job {IsDirector = true},
-                            StartDate = new DateTime(2000, 1, 1),
-                            EndDate = new DateTime(2002, 1, 1)
-                        },
+                        Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1),
+                            supervisorId: personId)
                     });
                 yield return (20, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleWithJob
-                    {
-                        Active = true,
-                        Job = new Job {IsDirector = true},
-                        StartDate = twoYearsAgo
-                    }
+                    Role(startDate: twoYearsAgo, supervisorId: personId)
+                });
+                //don't get extra leave if supervisor isn't me
+                yield return (10, new List<PersonRoleWithJob>
+                {
+                    Role(startDate: twoYearsAgo, supervisorId: Guid.NewGuid())
                 });
                 yield return (15, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleWithJob
-                    {
-                        Active = true,
-                        Job = new Job {IsStaff = true},
-                        StartDate = twoYearsAgo
-                    },
-                    new PersonRoleWithJob
-                    {
-                        Job = new Job {IsStaff = true},
-                        StartDate = new DateTime(2000, 1, 1),
-                        EndDate = new DateTime(2002, 1, 1)
-                    },
-                    new PersonRoleWithJob
-                    {
-                        Job = new Job {IsStaff = true},
-                        StartDate = new DateTime(2002, 1, 2),
-                        EndDate = new DateTime(2013, 1, 1)
-                    }
+                    Role(startDate: twoYearsAgo),
+                    Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1)),
+                    Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1))
                 });
                 yield return (20, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleWithJob
-                    {
-                        Active = true,
-                        Job = new Job {IsStaff = true},
-                        StartDate = twoYearsAgo
-                    },
-                    new PersonRoleWithJob
-                    {
-                        Job = new Job {IsStaff = true},
-                        StartDate = new DateTime(2000, 1, 1),
-                        EndDate = new DateTime(2002, 1, 1)
-                    },
-                    new PersonRoleWithJob
-                    {
-                        Job = new Job {IsStaff = true},
-                        StartDate = new DateTime(2002, 1, 2),
-                        EndDate = new DateTime(2013, 1, 1)
-                    },
-                    new PersonRoleWithJob
-                    {
-                        Job = new Job {IsStaff = true},
-                        StartDate = new DateTime(1995, 1, 1),
-                        EndDate = new DateTime(2000, 1, 1)
-                    }
+                    Role(startDate: twoYearsAgo),
+                    Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1)),
+                    Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1)),
+                    Role(false, new DateTime(1995, 1, 1), new DateTime(2000, 1, 1)),
                 });
                 yield return (null, new List<PersonRoleWithJob>());
+                //non fulltime/half don't get leave
                 yield return (null, new List<PersonRoleWithJob>
                 {
-                    new PersonRoleWithJob {Active = true, StartDate = twoYearsAgo, Job = new Job()},
+                    Role(startDate: twoYearsAgo, jobType: JobType.Contractor),
+                    Role(startDate: twoYearsAgo, jobType: JobType.DailyWorker),
+                    Role(startDate: twoYearsAgo, jobType: JobType.SchoolAid)
                 });
             }
 

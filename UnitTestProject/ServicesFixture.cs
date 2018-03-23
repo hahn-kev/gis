@@ -124,7 +124,7 @@ namespace UnitTestProject
         public Faker<PersonWithStaff> PersonFaker() =>
             new AutoFaker<PersonWithStaff>()
                 .RuleFor(p => p.Deleted, false)
-                .RuleFor(extended => extended.StaffId, f => Guid.NewGuid())
+                .RuleFor(extended => extended.StaffId, () => Guid.NewGuid())
                 .RuleFor(extended => extended.Staff,
                     (f, extended) =>
                     {
@@ -138,10 +138,24 @@ namespace UnitTestProject
                         set.RuleFor(staff => staff.Staff, (Staff) null);
                     });
 
+        public Faker<JobWithOrgGroup> JobFaker()
+        {
+            return new AutoFaker<JobWithOrgGroup>()
+                .RuleFor(job => job.OrgGroupId, Guid.NewGuid)
+                .RuleFor(
+                    job => job.OrgGroup, (faker, job) =>
+                    {
+                        var org = AutoFaker.Generate<OrgGroup>();
+                        org.Id = job.OrgGroupId;
+                        return org;
+                    });
+        }
+
         public Job InsertJob()
         {
-            var job = AutoFaker.Generate<Job>();
-            _dbConnection.Insert(job);
+            var job = JobFaker().Generate();
+            _dbConnection.Insert<Job>(job);
+            _dbConnection.Insert(job.OrgGroup);
             return job;
         }
 
@@ -182,8 +196,10 @@ namespace UnitTestProject
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
             _dbConnection.BulkCopy(personRoles);
-            _dbConnection.BulkCopy(personRoles.Select(role =>
-                new AutoFaker<Job>().RuleFor(job => job.Id, role.JobId).Generate()));
+            var jobs = personRoles.Select(role => JobFaker().RuleFor(job => job.Id, role.JobId).Generate()).ToList();
+
+            _dbConnection.BulkCopy<Job>(jobs);
+            _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();
             _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now)
                 .Generate());

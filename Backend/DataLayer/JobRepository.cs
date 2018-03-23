@@ -32,8 +32,6 @@ namespace Backend.DataLayer
             {
                 Id = job.Id,
                 Current = job.Current,
-                IsDirector = job.IsDirector,
-                IsStaff = job.IsStaff,
                 JobDescription = job.JobDescription,
                 OrgGroupId = job.OrgGroupId,
                 Positions = job.Positions,
