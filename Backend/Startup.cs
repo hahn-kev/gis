@@ -239,6 +239,14 @@ namespace Backend
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
+                var roleManager = scope.ServiceProvider.GetService<RoleManager<LinqToDB.Identity.IdentityRole<int>>>();
+                var missingRoles =
+                    new[] {"admin", "hr", "hrsalary"}.Except(roleManager.Roles.Select(role => role.Name));
+                foreach (var missingRole in missingRoles)
+                {
+                    roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();
+                }
+
                 //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {

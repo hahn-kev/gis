@@ -23,6 +23,7 @@ namespace Backend.Entities
         public bool ResetPassword { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsHr { get; set; }
+        public bool IsHrSalary { get; set; }
         public Guid? PersonId { get; set; }
     }
 

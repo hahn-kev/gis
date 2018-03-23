@@ -20,6 +20,28 @@ export class UserComponent implements OnInit {
   public password: string;
   public errorMessage: string;
   public people: Observable<Person[]>;
+  public roles = [
+    {
+      title: 'Admin',
+      name: 'admin',
+      update: (user: User, value: boolean) => user.isAdmin = value,
+      value: (user: User) => user.isAdmin,
+      show: (user: User) => true
+    },
+    {
+      title: 'HR',
+      name: 'hr',
+      update: (user: User, value: boolean) => user.isHr = value,
+      value: (user: User) => user.isHr,
+      show: (user: User) => !user.isHrSalary
+    },
+    {
+      title: 'HR Salary',
+      name: 'hr,hrsalary',
+      update: (user: User, value: boolean) => user.isHrSalary = user.isHr = value,
+      value: (user: User) => user.isHrSalary,
+      show: (user: User) => true
+    }];
 
   constructor(private route: ActivatedRoute,
               private userService: UserService,
@@ -43,22 +65,14 @@ export class UserComponent implements OnInit {
     this.router.navigate([this.isSelf ? '/home' : '/user/admin']);
   }
 
-  async grantRole(role: string): Promise<void> {
-    await this.userService.grantRole(role, this.user.id);
-    if (role == 'admin') {
-      this.user.isAdmin = true;
-    } else if (role == 'hr') {
-      this.user.isHr = true;
-    }
+  async grantRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
+    await this.userService.grantRole(role.name, this.user.id);
+    role.update(this.user, true);
   }
 
-  async revokeRole(role: string): Promise<void> {
-    await this.userService.revokeRole(role, this.user.id);
-    if (role == 'admin') {
-      this.user.isAdmin = false;
-    } else if (role == 'hr') {
-      this.user.isHr = false;
-    }
+  async revokeRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
+    await this.userService.revokeRole(role.name, this.user.id);
+    role.update(this.user, false);
   }
 
   deleteUser(): void {

@@ -19,11 +19,15 @@ namespace Backend.DataLayer
             from user in _dbConnection.Users
             from adminRole in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
             from hrRole in _dbConnection.Roles.Where(role => role.Name == "hr").DefaultIfEmpty()
+            from hrSalaryRole in _dbConnection.Roles.Where(role => role.Name == "hrsalary").DefaultIfEmpty()
             from userAdminRole in _dbConnection.UserRoles
                 .Where(userRole => userRole.RoleId == adminRole.Id && userRole.UserId == user.Id)
                 .DefaultIfEmpty()
             from userHrRole in _dbConnection.UserRoles
                 .Where(userRole => userRole.RoleId == hrRole.Id && userRole.UserId == user.Id)
+                .DefaultIfEmpty()
+            from userHrSalaryRole in _dbConnection.UserRoles
+                .Where(userRole => userRole.RoleId == hrSalaryRole.Id && userRole.UserId == user.Id)
                 .DefaultIfEmpty()
             select new UserProfile
             {
@@ -33,6 +37,7 @@ namespace Backend.DataLayer
                 UserName = user.UserName,
                 IsAdmin = userAdminRole != null,
                 IsHr = userHrRole != null,
+                IsHrSalary = userHrSalaryRole != null,
                 PersonId = user.PersonId,
                 ResetPassword = user.ResetPassword
             };

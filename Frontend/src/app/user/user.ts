@@ -9,4 +9,5 @@ export class User {
   }
 
   public isHr: boolean;
+  public isHrSalary: boolean;
 }

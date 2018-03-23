@@ -57,41 +57,31 @@
                       [(ngModel)]="user.personId"
                       placeholder="Person">
             <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachPerson of people | async" [value]="eachPerson.id">{{eachPerson.preferredName}} {{eachPerson.lastName}}
+            <mat-option *ngFor="let eachPerson of people | async" [value]="eachPerson.id">{{eachPerson.preferredName}}
+              {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>
 
         <div *ngIf="!isNew">
-          <button type="button"
-                  *ngIf="!user.isAdmin"
-                  (click)="grantRole('admin')"
-                  mat-raised-button
-                  color="accent">
-            Grant Admin rights
-          </button>
-          <button type="button"
-                  *ngIf="user.isAdmin"
-                  (click)="revokeRole('admin')"
-                  mat-raised-button
-                  color="accent">
-            Revoke Admin rights
-          </button>
-
-          <button type="button"
-                  *ngIf="!user.isHr"
-                  (click)="grantRole('hr')"
-                  mat-raised-button
-                  color="accent">
-            Grant HR rights
-          </button>
-          <button type="button"
-                  *ngIf="user.isHr"
-                  (click)="revokeRole('hr')"
-                  mat-raised-button
-                  color="accent">
-            Revoke HR rights
-          </button>
+          <ng-container *ngFor="let role of roles">
+            <ng-container *ngIf="role.show(user)">
+              <button type="button"
+                      *ngIf="!role.value(user)"
+                      (click)="grantRole(role)"
+                      mat-raised-button
+                      color="accent">
+                Grant {{role.title}} rights
+              </button>
+              <button type="button"
+                      *ngIf="role.value(user)"
+                      (click)="revokeRole(role)"
+                      mat-raised-button
+                      color="accent">
+                Revoke {{role.title}} rights
+              </button>
+            </ng-container>
+          </ng-container>
         </div>
       </ng-container>
 

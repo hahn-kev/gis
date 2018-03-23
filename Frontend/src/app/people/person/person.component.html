@@ -188,17 +188,18 @@
           <mat-panel-title>Staff</mat-panel-title>
         </mat-expansion-panel-header>
         <ng-container *ngIf="person.isThai">
-          <mat-form-field>
-            <span matPrefix>$</span>
-            <input matInput
-                   name="annualSalary"
-                   type="number"
-                   [(ngModel)]="person.staff.annualSalary"
-                   min="0"
-                   placeholder="Annual Salary">
-          </mat-form-field>
-          <span></span>
-
+          <ng-container *requireRole="'admin,hrsalary'">
+            <mat-form-field>
+              <span matPrefix>$</span>
+              <input matInput
+                     name="annualSalary"
+                     type="number"
+                     [(ngModel)]="person.staff.annualSalary"
+                     min="0"
+                     placeholder="Annual Salary">
+            </mat-form-field>
+            <span></span>
+          </ng-container>
         </ng-container>
         <mat-form-field>
           <mat-select name="orgGroup"
