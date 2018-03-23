@@ -1,5 +1,6 @@
-﻿export class MissionOrg {
-  public id: string;
+﻿import { BaseEntity } from '../classes/base-entity';
+
+export class MissionOrg extends BaseEntity {
   public name: string;
   public repId: string;
   public phone: string;

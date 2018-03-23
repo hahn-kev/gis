@@ -1,5 +1,6 @@
-export class StaffTraining {
-  public id: string;
+import { BaseEntity } from '../../classes/base-entity';
+
+export class StaffTraining extends BaseEntity {
   public staffId: string;
   public trainingRequirementId: string;
   public completedDate: Date;

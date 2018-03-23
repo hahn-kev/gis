@@ -1,7 +1,7 @@
 ﻿import { Job } from '../job/job';
+import { BaseEntity } from '../classes/base-entity';
 
-export class Role {
-  public id: string;
+export class Role extends BaseEntity {
   public startDate?: Date;
   public active: boolean;
   public endDate?: Date;

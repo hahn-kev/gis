@@ -1,7 +1,7 @@
 ﻿import { RoleExtended } from '../people/role';
+import { BaseEntity } from '../classes/base-entity';
 
-export class Job {
-  public id: string;
+export class Job extends BaseEntity {
   public title: string;
   public type: string;
   public jobDescription: string;
@@ -10,6 +10,7 @@ export class Job {
   public positions: number;
 
   constructor() {
+    super();
     this.current = true;
   }
 }

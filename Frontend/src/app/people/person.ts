@@ -1,14 +1,12 @@
 import { Role, RoleExtended, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
+import { BaseEntity } from '../classes/base-entity';
 
-export class Person {
-
-  constructor(public firstName?: string,
-              public lastName?: string,
-              public id?: string,
-              public email?: string,
-              public staffId?: string) {
-  }
+export class Person extends BaseEntity {
+  public firstName: string;
+  public lastName: string;
+  public email: string;
+  public staffId?: string;
 
   public preferredName: string;
   public gender = 'Male';
@@ -55,8 +53,7 @@ export class PersonWithDaysOfLeave extends Person {
   public vacationDaysOfLeaveUsed: number;
 }
 
-export class Staff {
-  public id: string;
+export class Staff extends BaseEntity {
   public orgGroupId: string;
   public missionOrgId: string;
   public annualSalary: number;
@@ -70,11 +67,11 @@ export class Staff {
   public thaiSsn: string;
   public visaType: string;
   public workPermitType: string;
-
   public endorsements: string;
   public endorsementAgency: string;
 
   constructor(id?: string) {
+    super();
     this.id = id;
   }
 }

@@ -1,5 +1,6 @@
-export class EmergencyContact {
-  public id: string;
+import { BaseEntity } from '../classes/base-entity';
+
+export class EmergencyContact extends BaseEntity {
   public personId: string;
   public contactId: string;
   public order: number;
