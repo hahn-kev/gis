@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
 import { PersonWithStaff } from '../../person';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSort } from '@angular/material';
 import * as moment from 'moment';
 
@@ -12,8 +12,8 @@ import * as moment from 'moment';
 })
 export class StaffReportComponent implements OnInit {
   public dataSource: AppDataSource<PersonWithStaff>;
-  public avalibleColumns: Array<string> = [
-    'firstName',
+  public avalibleColumns = [
+    'preferredName',
     'lastName',
     'email',
     'phoneNumber',
@@ -23,10 +23,11 @@ export class StaffReportComponent implements OnInit {
     'passportCountry',
     'staff.endorsementAgency'
   ];
-  public selectedColumns: Array<string> = ['firstName', 'lastName'];
+  public selectedColumns: string[];
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private router: Router) {
+    this.selectedColumns = this.route.snapshot.queryParams['columns'] || ['preferredName', 'lastName'];
   }
 
   ngOnInit(): void {
@@ -35,6 +36,13 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = ((data, filter) =>
       data.firstName.toUpperCase().startsWith(filter) || data.lastName.toUpperCase().startsWith(filter));
+  }
+
+  updateSelectedColumns(columns: string[]) {
+    this.router.navigate(['.'], {
+      relativeTo: this.route,
+      queryParams: {'columns': columns}
+    });
   }
 
   applyFilter(filterValue: string) {

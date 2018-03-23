@@ -8,6 +8,7 @@
   </mat-form-field>
   <mat-form-field style="padding-left: 8px" class="print-hide">
     <mat-select [(ngModel)]="selectedColumns"
+                (ngModelChange)="updateSelectedColumns($event)"
                 multiple
                 placeholder="Columns">
       <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{column}}</mat-option>
@@ -15,9 +16,9 @@
   </mat-form-field>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
-  <ng-container matColumnDef="firstName">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>First Name</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.firstName}}</mat-cell>
+  <ng-container matColumnDef="preferredName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="lastName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
