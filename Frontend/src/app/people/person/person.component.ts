@@ -110,7 +110,7 @@ export class PersonComponent implements OnInit {
   }
 
   async save(): Promise<void> {
-    let savedPerson = await this.personService.updatePerson(this.person);
+    let savedPerson = await this.personService.updatePerson(this.person, this.isSelf);
     let commands: Array<any> = ['/people/list'];
     if (this.isNew) {
       commands = ['people', 'edit', savedPerson.id];

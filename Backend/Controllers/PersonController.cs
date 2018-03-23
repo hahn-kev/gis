@@ -33,6 +33,17 @@ namespace Backend.Controllers
             return _personService.GetById(id);
         }
 
+        [HttpPost("self")]
+        public IActionResult UpdateSelf([FromBody] PersonWithStaff person)
+        {
+            if (User.PersonId() != person.Id)
+            {
+                throw new UnauthorizedAccessException("You're only allowed to modify your own details ");
+            }
+            _personService.Save(person);
+            return Json(person);
+        }
+        
         [HttpPost]
         [Authorize(Roles = "admin,hr")]
         public IActionResult Update([FromBody] PersonWithStaff person)

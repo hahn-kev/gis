@@ -23,7 +23,8 @@ export class PersonService {
     return this.http.get<PersonWithDaysOfLeave[]>('/api/person/leave');
   }
 
-  updatePerson(person: PersonWithStaff): Promise<PersonWithStaff> {
+  updatePerson(person: PersonWithStaff, isSelf = false): Promise<PersonWithStaff> {
+    if (isSelf) return this.http.post<PersonWithStaff>('/api/person/self', person,).toPromise();
     return this.http.post<PersonWithStaff>('/api/person', person,).toPromise();
   }
 
