@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { User } from './user';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from './user.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonService } from '../people/person.service';
 import { Observable } from 'rxjs/Observable';
@@ -47,7 +47,8 @@ export class UserComponent implements OnInit {
               private userService: UserService,
               private router: Router,
               private dialog: MatDialog,
-              private personService: PersonService) {
+              private personService: PersonService,
+              private snackBar: MatSnackBar) {
     this.people = this.personService.getAll();
   }
 
@@ -68,11 +69,13 @@ export class UserComponent implements OnInit {
   async grantRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
     await this.userService.grantRole(role.name, this.user.id);
     role.update(this.user, true);
+    this.snackBar.open(`Role granted, user must logout and login to use new role`, null, {duration: 2000});
   }
 
   async revokeRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
     await this.userService.revokeRole(role.name, this.user.id);
     role.update(this.user, false);
+    this.snackBar.open(`Role revoked, user must logout and login to lose the role`, null, {duration: 2000});
   }
 
   deleteUser(): void {
