@@ -44,15 +44,15 @@
         <h3 mat-subheader>Me!</h3>
         <ng-container  appRenderTemplate="sidenav:me"></ng-container>
         <ng-container *appTemplateContent="'sidenav:me'">
-          <a mat-list-item routerLink="/leave-request/edit/new">
+          <a mat-list-item routerLink="/leave-request/edit/new" routerLinkActive="active-link">
             <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
             <p mat-line>Request Leave</p>
           </a>
-          <a mat-list-item [routerLink]="'/leave-request/list/mine'">
+          <a mat-list-item routerLink="/leave-request/list/mine" routerLinkActive="active-link">
             <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
             <span mat-line>My Leave</span>
           </a>
-          <a mat-list-item routerLink="/self">
+          <a mat-list-item routerLink="/self" routerLinkActive="active-link">
             <mat-icon mat-list-icon>face</mat-icon>
             <span mat-line>My Details</span>
           </a>
@@ -63,31 +63,31 @@
           <h3 mat-subheader>HR</h3>
           <ng-container  appRenderTemplate="sidenav:hr"></ng-container>
           <ng-container *appTemplateContent="'sidenav:hr'">
-            <a mat-list-item routerLink="/job/list">
+            <a mat-list-item routerLink="/job/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>work</mat-icon>
               <span mat-line>Jobs</span>
             </a>
-            <a mat-list-item routerLink="/leave-request/report">
+            <a mat-list-item routerLink="/leave-request/report" routerLinkActive="active-link">
               <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
               <span mat-line>Leave</span>
             </a>
-            <a mat-list-item routerLink="/mission-org/list">
+            <a mat-list-item routerLink="/mission-org/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>account_balance</mat-icon>
               <span mat-line>Mission Org</span>
             </a>
-            <a mat-list-item routerLink="/groups/list">
+            <a mat-list-item routerLink="/groups/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>location_city</mat-icon>
               <span mat-line>Organization</span>
             </a>
-            <a mat-list-item routerLink="/people/list">
+            <a mat-list-item routerLink="/people/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>supervisor_account</mat-icon>
               <span mat-line>People</span>
             </a>
-            <a mat-list-item routerLink="/staff/report">
+            <a mat-list-item routerLink="/staff/report" routerLinkActive="active-link">
               <mat-icon mat-list-icon>business</mat-icon>
               <span mat-line>Staff</span>
             </a>
-            <a mat-list-item routerLink="/training/list">
+            <a mat-list-item routerLink="/training/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>school</mat-icon>
               <span mat-line>Required Training</span>
             </a>

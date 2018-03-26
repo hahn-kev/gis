@@ -4,11 +4,11 @@
 @include mat-core();
 
 // Define a theme.
-$primary: mat-palette($mat-deep-purple);
+$primary: mat-palette($mat-indigo, 900, 500, 900);
 $accent: mat-palette($mat-orange);
 
 $theme: mat-light-theme($primary, $accent);
-$theme-dark: mat-dark-theme($primary, $accent);
+$theme-contrast: mat-dark-theme($primary, $accent);
 $background: map-get($theme, background);
 
 // Include all theme styles for the components.
@@ -124,9 +124,9 @@ html, body {
 }
 
 .mat-toolbar {
-  @include mat-form-field-theme($theme-dark);
-  @include mat-input-theme($theme-dark);
-  @include mat-select-theme($theme-dark);
+  @include mat-form-field-theme($theme-contrast);
+  @include mat-input-theme($theme-contrast);
+  @include mat-select-theme($theme-contrast);
   .mat-input-element {
     caret-color: currentColor;
   }
@@ -135,7 +135,7 @@ html, body {
     font-size: 16px;
     padding-top: 6px;
     &.mat-focused .mat-form-field-label {
-      color: mat-color(map-get($theme-dark, foreground), secondary-text);
+      color: mat-color(map-get($theme-contrast, foreground), secondary-text);
     }
   }
   .mat-form-field-ripple {
