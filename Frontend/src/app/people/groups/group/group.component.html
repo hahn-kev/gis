@@ -30,7 +30,7 @@
         <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
       </mat-select>
     </mat-form-field>
-    <div class="org-chain" *ngIf="orgChain">
+    <div class="org-chain span-2-columns" *ngIf="orgChain">
       <ng-container *ngFor="let link of orgChain.links; last as isLast">
         <a mat-button [disabled]="!link.id"
            [routerLink]="'/' + (link.type) + '/edit/' + link.id">{{link.title}}</a>

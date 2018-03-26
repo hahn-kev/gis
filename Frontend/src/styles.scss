@@ -121,6 +121,16 @@ html, body {
   }
 }
 
+.org-chain {
+  .mat-icon {
+    vertical-align: middle;
+  }
+
+  [disabled] {
+    pointer-events: none;
+  }
+}
+
 .form-field-button {
   display: flex;
   .mat-form-field {

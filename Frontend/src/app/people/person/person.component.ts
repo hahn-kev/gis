@@ -16,6 +16,8 @@ import { map } from 'rxjs/operators';
 import { endorsments } from '../teacher-endorsements';
 import { Job } from '../../job/job';
 import { MissionOrg } from '../../mission-org/mission-org';
+import { GroupService } from '../groups/group.service';
+import { OrgChain } from '../groups/org-chain';
 
 @Component({
   selector: 'app-person',
@@ -28,6 +30,7 @@ export class PersonComponent implements OnInit {
   public filteredCountries: Observable<string[]>;
   public person: PersonWithOthers;
   public groups: OrgGroup[];
+  public orgChain: OrgChain;
   public missionOrgs: MissionOrg[];
   public people: Person[];
   public jobs: { [key: string]: Job };
@@ -43,6 +46,7 @@ export class PersonComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private personService: PersonService,
+              private groupService: GroupService,
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar) {
@@ -73,6 +77,7 @@ export class PersonComponent implements OnInit {
         return map;
       }, {});
       this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
+      this.refreshOrgChain();
     });
   }
 
@@ -84,6 +89,12 @@ export class PersonComponent implements OnInit {
 
   startsWith(value: string, test: string) {
     return value.toLowerCase().indexOf(test.toLowerCase()) === 0;
+  }
+
+  refreshOrgChain(): void {
+    if (this.person.staff == null) return;
+    let orgGroup = this.groups.find(value => value.id == this.person.staff.orgGroupId);
+    this.orgChain = this.groupService.buildOrgChain(orgGroup, this.people, this.groups);
   }
 
   async isStaffChanged(isStaff: boolean): Promise<void> {

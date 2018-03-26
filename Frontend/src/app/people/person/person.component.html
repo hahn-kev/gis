@@ -214,6 +214,7 @@
           <mat-select name="orgGroup"
                       [disabled]="isSelf"
                       [(ngModel)]="person.staff.orgGroupId"
+                      (ngModelChange)="refreshOrgChain()"
                       placeholder="Reports to Department/Division">
             <mat-option [value]="null">None</mat-option>
             <mat-option *ngFor="let eachGroup of groups" [value]="eachGroup.id">{{eachGroup.groupName}}</mat-option>
@@ -228,7 +229,14 @@
             <mat-option *ngFor="let org of missionOrgs" [value]="org.id">{{org.name}}</mat-option>
           </mat-select>
         </mat-form-field>
-
+        <div *ngIf="person.staff.orgGroupId" class="span-2-columns org-chain">
+          <span class="mat-caption">Department Hierarchy</span>
+          <ng-container *ngFor="let link of orgChain.links; last as isLast">
+            <a mat-button [disabled]="!link.id"
+               [routerLink]="['/' + link.type, 'edit', link.id]">{{link.title}}</a>
+            <mat-icon *ngIf="!isLast">arrow_forward</mat-icon>
+          </ng-container>
+        </div>
         <mat-form-field>
           <input name="contractIssueDate" matInput
                  [readonly]="isSelf"
