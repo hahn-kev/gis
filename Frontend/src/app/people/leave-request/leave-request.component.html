@@ -87,19 +87,34 @@
                     name="reason"
                     placeholder="Reason"></textarea>
       </mat-form-field>
-      <mat-form-field *ngIf="(isHr | async)">
+      <ng-container *ngIf="(isHr | async)">
+
+      <mat-form-field>
         <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
           <mat-option [value]="null">Unknown</mat-option>
           <mat-option [value]="true">Approved</mat-option>
           <mat-option [value]="false">Unapproved</mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field>
+        <mat-select name="approver"
+                    [(ngModel)]="leaveRequest.approvedById"
+                    placeholder="Approved By">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
+            {{eachPerson.person.preferredName}} {{eachPerson.person.lastName}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      </ng-container>
+
       <div class="span-2-columns">
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
           <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">
-            <!--the if is here to hide paternity when the person is female and maternity when person is male-->
-            <mat-chip *ngIf="leave.leaveType != (selectedPerson.person.gender == 'Male' ? 'Maternity' : 'Paternity')"
+            <!--the if is here to hide paternity when the person is female and maternity when person is male, or if not thai to hide vacation-->
+            <mat-chip *ngIf="leave.leaveType != (selectedPerson.person.gender == 'Male' ? 'Maternity' : 'Paternity') && (selectedPerson.person.isThai || leave.leaveType != 'Vacation')"
                       color="accent" selected="true">
               {{leave.leaveType}} {{leave.used}}/{{leave.totalAllowed}}
             </mat-chip>
