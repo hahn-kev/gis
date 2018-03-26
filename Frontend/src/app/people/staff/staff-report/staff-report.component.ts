@@ -4,6 +4,7 @@ import { PersonWithStaff } from '../../person';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSort } from '@angular/material';
 import * as moment from 'moment';
+import { MomentInput } from 'moment';
 
 @Component({
   selector: 'app-staff-report',
@@ -20,6 +21,7 @@ export class StaffReportComponent implements OnInit {
     'phoneNumber',
     'birthdate',
     'age',
+    'untilBirthday',
     'gender',
     'country',
     'staff.endorsementAgency'
@@ -55,7 +57,11 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toUpperCase();
   }
 
-  age(date: moment.MomentInput) {
+  age(date: MomentInput) {
     return moment().diff(moment(date), 'years');
+  }
+
+  timeToBirthday(date: MomentInput) {
+    return moment(date).year(moment().year()).fromNow();
   }
 }

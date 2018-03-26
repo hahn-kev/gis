@@ -56,6 +56,10 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Age</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }} </mat-cell>
   </ng-container>
+  <ng-container matColumnDef="untilBirthday">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Time to Birthday</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{ row.birthdate ? timeToBirthday(row.birthdate) : '' }} </mat-cell>
+  </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="selectedColumns"></mat-header-row>
   <mat-row class="hover-overlay" *matRowDef="let row; columns: selectedColumns"
