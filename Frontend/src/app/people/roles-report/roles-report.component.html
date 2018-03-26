@@ -30,17 +30,37 @@
   <mat-datepicker #endDatePicker></mat-datepicker>
 </ng-container>
 
-<mat-nav-list>
-  <ng-container *ngFor="let role of roles">
-    <mat-list-item routerLink="/people/edit/{{role.personId}}">
-      <span mat-line>{{role.preferredName}} as {{role.job.title}}</span>
-      <p mat-line>
-        <span class="accent-text">{{role.startDate | date: 'shortDate'}}</span>
-        to
-        <span class="accent-text">{{role.active ? 'now' : (role.endDate | date: 'shortDate')}}</span>
-      </p>
-    </mat-list-item>
-    <mat-divider></mat-divider>
+<mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="job.title">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.job.title}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="preferredName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="lastName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="active">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Active</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.active"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="startDate">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.startDate | date: 'shortDate'}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="endDate">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>End Date</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.endDate | date: 'shortDate'}}</mat-cell>
   </ng-container>
 
-</mat-nav-list>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['job.title', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: ['job.title', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           [routerLink]="'/people/edit/' + row.personId"></mat-row>
+</mat-table>

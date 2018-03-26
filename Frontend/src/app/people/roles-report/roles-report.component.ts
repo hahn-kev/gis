@@ -1,17 +1,20 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoleExtended, RoleWithJob } from '../role';
 import { PersonService } from '../person.service';
 import * as moment from 'moment';
 import { Moment } from 'moment';
+import { AppDataSource } from '../../classes/app-data-source';
+import { MatSort } from '@angular/material';
 
 @Component({
   selector: 'app-roles-report',
   templateUrl: './roles-report.component.html',
   styleUrls: ['./roles-report.component.scss']
 })
-export class RolesReportComponent {
-
+export class RolesReportComponent implements OnInit{
+  public dataSource: AppDataSource<RoleWithJob>;
+  @ViewChild(MatSort) sort: MatSort;
   public roles: RoleWithJob[];
   public during: boolean;
   public beginDate: Moment;
@@ -20,17 +23,20 @@ export class RolesReportComponent {
 
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private personService: PersonService) {
-    this.route.data.subscribe((data: { roles: RoleWithJob[] }) => {
-      this.roles = data.roles;
-    });
+              private router: Router) {
+    this.dataSource = new AppDataSource<RoleWithJob>();
+    this.dataSource.bindToRouteData(this.route, 'roles');
     this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
     this.route.queryParams.subscribe((params: { begin, end }) => {
       this.beginDate = this.parseDate(params.begin, Date.now() - this.oneYearInMs / 2);
       this.endDate = this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
     });
   }
+
+  ngOnInit(): void {
+    this.dataSource.sort = this.sort;
+  }
+
 
   parseDate(param: string, fallback: number) {
     if (param) return moment(param, 'YYYY-M-D');

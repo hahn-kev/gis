@@ -13,6 +13,7 @@
     <input name="startDate"
            required matInput
            [readonly]="readonly"
+           [max]="role.endDate"
            [(ngModel)]="role.startDate"
            [matDatepicker]="startDatePicker"
            placeholder="Start Date">
@@ -25,6 +26,7 @@
            [disabled]="role.active"
            required matInput
            [readonly]="readonly"
+           [min]="role.startDate"
            [(ngModel)]="role.endDate"
            [matDatepicker]="endDatePicker"
            placeholder="End Date">
