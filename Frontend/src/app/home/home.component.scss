@@ -18,7 +18,12 @@
     height: 100%;
     align-content: center;
     justify-content: space-evenly;
-    grid-template-columns: 320px 320px;
+    grid-template-columns: auto;
+    grid-auto-flow: column;
     padding: 0;
+
+    mat-card {
+      width: 320px;
+    }
   }
 }
