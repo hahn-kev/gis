@@ -23,40 +23,40 @@ namespace Backend.DataLayer
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
         private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonWithStaff, new() =>
-            from person in _dbConnection.PeopleExtended
-            from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
-            from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
-            where !person.Deleted
-            select new T_Person
-            {
-                Id = person.Id,
-                Email = person.Email,
-                FirstName = person.FirstName,
-                IsThai = person.IsThai,
-                LastName = person.LastName,
-                PreferredName = person.PreferredName,
-                SpeaksEnglish = person.SpeaksEnglish,
-                Staff = staff,
-                StaffId = person.StaffId,
-                PhoneNumber = person.PhoneNumber,
-                SpouseId = person.SpouseId,
-                SpousePreferedName = spouse.PreferredName,
-                Birthdate = person.Birthdate,
-                Gender = person.Gender,
-                Nationality = person.Nationality,
-                PassportAddress = person.PassportAddress,
-                PassportCity = person.PassportCity,
-                PassportCountry = person.PassportCountry,
-                PassportState = person.PassportState,
-                PassportZip = person.PassportZip,
-                ThaiAddress = person.ThaiAddress,
-                ThaiAmphur = person.ThaiAmphur,
-                ThaiMubaan = person.ThaiMubaan,
-                ThaiProvince = person.ThaiProvince,
-                ThaiSoi = person.ThaiSoi,
-                ThaiTambon = person.ThaiTambon,
-                ThaiZip = person.ThaiZip
-            };
+            (from person in _dbConnection.PeopleExtended
+                from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
+                from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+                where !person.Deleted
+                select new T_Person
+                {
+                    Id = person.Id,
+                    Email = person.Email,
+                    FirstName = person.FirstName,
+                    IsThai = person.IsThai,
+                    LastName = person.LastName,
+                    PreferredName = person.PreferredName,
+                    SpeaksEnglish = person.SpeaksEnglish,
+                    Staff = staff,
+                    StaffId = person.StaffId,
+                    PhoneNumber = person.PhoneNumber,
+                    SpouseId = person.SpouseId,
+                    SpousePreferedName = spouse.PreferredName,
+                    Birthdate = person.Birthdate,
+                    Gender = person.Gender,
+                    Nationality = person.Nationality,
+                    PassportAddress = person.PassportAddress,
+                    PassportCity = person.PassportCity,
+                    PassportCountry = person.PassportCountry,
+                    PassportState = person.PassportState,
+                    PassportZip = person.PassportZip,
+                    ThaiAddress = person.ThaiAddress,
+                    ThaiAmphur = person.ThaiAmphur,
+                    ThaiMubaan = person.ThaiMubaan,
+                    ThaiProvince = person.ThaiProvince,
+                    ThaiSoi = person.ThaiSoi,
+                    ThaiTambon = person.ThaiTambon,
+                    ThaiZip = person.ThaiZip
+                }).OrderBy(_ => _.PreferredName).ThenBy(_ => _.LastName);
 
         public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
