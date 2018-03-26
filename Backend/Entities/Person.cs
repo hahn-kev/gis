@@ -22,8 +22,8 @@ namespace Backend.Entities
 
         public string PreferredName
         {
-            get { return _preferredName ?? FirstName + " " + LastName; }
-            set { _preferredName = value; }
+            get => _preferredName ?? FirstName;
+            set => _preferredName = value;
         }
 
         public override string ToString()
