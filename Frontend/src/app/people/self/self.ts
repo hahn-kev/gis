@@ -10,7 +10,7 @@ export class LeaveDetails {
 }
 
 export class LeaveUseage {
-  public leaveType: string;
+  public leaveType: LeaveType;
   public used: number;
   public totalAllowed: number;
   public left: number;
@@ -24,5 +24,6 @@ export enum LeaveType {
   Paternity = 'Paternity',
   Emergency = 'Emergency',
   SchoolRelated = 'SchoolRelated',
+  MissionRelated = 'MissionRelated',
   Other = 'Other',
 }

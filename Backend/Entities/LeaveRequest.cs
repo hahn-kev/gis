@@ -82,6 +82,9 @@ namespace Backend.Entities
 
         [MapValue("SchoolRelated")]
         SchoolRelated,
+        
+        [MapValue(nameof(MissionRelated))]
+        MissionRelated,
 
         [MapValue("Other")]
         Other,

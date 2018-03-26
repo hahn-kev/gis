@@ -38,6 +38,7 @@ export class PersonLeaveModel {
   public parental: LeaveUseage;
   public emergency: LeaveUseage;
   public schoolRelated: LeaveUseage;
+  public missionRelated: LeaveUseage;
   public other: LeaveUseage;
 
   appendLeave(leave: LeaveUseage) {
@@ -62,6 +63,9 @@ export class PersonLeaveModel {
         break;
       case LeaveType.SchoolRelated:
         this.schoolRelated = leave;
+        break;
+      case LeaveType.MissionRelated:
+        this.missionRelated = leave;
         break;
       default:
         if (!this.other) {

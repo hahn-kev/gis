@@ -9,8 +9,13 @@ export class Person extends BaseEntity {
   public staffId?: string;
 
   public preferredName: string;
-  public gender = 'Male';
+  public gender = Gender.Male;
   public isThai: boolean;
+}
+
+export enum Gender {
+  Male = 'Male',
+  Female = 'Female'
 }
 
 export class PersonExtended extends Person {

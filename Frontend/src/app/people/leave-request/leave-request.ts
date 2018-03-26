@@ -1,10 +1,11 @@
 import { BaseEntity } from '../../classes/base-entity';
+import { LeaveType } from '../self/self';
 
 export class LeaveRequest extends BaseEntity {
   public personId: string;
   public startDate: Date;
   public endDate: Date;
-  public type: string;
+  public type: LeaveType;
   public approved: boolean;
   public approvedById: string;
   public createdDate: Date;

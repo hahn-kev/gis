@@ -14,6 +14,8 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/share';
+import { LeaveType } from '../self/self';
+import { Gender } from '../person';
 
 @Component({
   selector: 'app-leave-request',
@@ -21,6 +23,7 @@ import 'rxjs/add/operator/share';
   styleUrls: ['./leave-request.component.scss']
 })
 export class LeaveRequestComponent implements OnInit, OnDestroy {
+  public typesOfLeave = Object.keys(LeaveType);
   public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequestWithNames;
   public daysUsed = 0;
@@ -109,7 +112,6 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
   }
 
   overrideDaysChanged(overrideDays: boolean) {
-
     if (!overrideDays) {
       this.updateDaysUsed();
     }
@@ -131,5 +133,18 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       'list',
       this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
     ]);
+  }
+
+  showLeaveType(leaveType: LeaveType) {
+    switch (leaveType) {
+      case LeaveType.Vacation:
+        return this.selectedPerson.person.isThai;
+      case LeaveType.Paternity:
+        return this.selectedPerson.person.gender == Gender.Male;
+      case LeaveType.Maternity:
+        return this.selectedPerson.person.gender == Gender.Female;
+      default:
+        return true;
+    }
   }
 }

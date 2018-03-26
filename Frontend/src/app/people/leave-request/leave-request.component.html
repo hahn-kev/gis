@@ -20,16 +20,9 @@
       </mat-form-field>
       <mat-form-field>
         <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
-          <mat-option *ngIf="selectedPerson?.person.isThai" value="Vacation">Vacation</mat-option>
-          <mat-option value="Sick">Sick</mat-option>
-          <mat-option value="Personal">Personal</mat-option>
-          <mat-option value="Emergency">Emergency</mat-option>
-
-          <mat-option *ngIf="selectedPerson?.person.gender == 'Female'" value="Maternity">Maternity</mat-option>
-          <mat-option *ngIf="selectedPerson?.person.gender == 'Male'" value="Paternity">Paternity</mat-option>
-
-          <mat-option value="SchoolRelated">School Related</mat-option>
-          <mat-option value="Other">Other</mat-option>
+          <ng-container *ngFor="let type of typesOfLeave">
+            <mat-option [value]="type" *ngIf="showLeaveType(type)">{{type}}</mat-option>
+          </ng-container>
         </mat-select>
       </mat-form-field>
       <mat-form-field>
@@ -89,24 +82,24 @@
       </mat-form-field>
       <ng-container *ngIf="(isHr | async)">
 
-      <mat-form-field>
-        <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
-          <mat-option [value]="null">Unknown</mat-option>
-          <mat-option [value]="true">Approved</mat-option>
-          <mat-option [value]="false">Unapproved</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field>
+          <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
+            <mat-option [value]="null">Unknown</mat-option>
+            <mat-option [value]="true">Approved</mat-option>
+            <mat-option [value]="false">Unapproved</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-select name="approver"
-                    [(ngModel)]="leaveRequest.approvedById"
-                    placeholder="Approved By">
-          <mat-option>None</mat-option>
-          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
-            {{eachPerson.person.preferredName}} {{eachPerson.person.lastName}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field>
+          <mat-select name="approver"
+                      [(ngModel)]="leaveRequest.approvedById"
+                      placeholder="Approved By">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
+              {{eachPerson.person.preferredName}} {{eachPerson.person.lastName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </ng-container>
 
       <div class="span-2-columns">
@@ -114,7 +107,7 @@
         <mat-chip-list>
           <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">
             <!--the if is here to hide paternity when the person is female and maternity when person is male, or if not thai to hide vacation-->
-            <mat-chip *ngIf="leave.leaveType != (selectedPerson.person.gender == 'Male' ? 'Maternity' : 'Paternity') && (selectedPerson.person.isThai || leave.leaveType != 'Vacation')"
+            <mat-chip *ngIf="showLeaveType(leave.leaveType)"
                       color="accent" selected="true">
               {{leave.leaveType}} {{leave.used}}/{{leave.totalAllowed}}
             </mat-chip>
