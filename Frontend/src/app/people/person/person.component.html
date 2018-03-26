@@ -362,9 +362,8 @@
                   [formId]="'form_' + role.id"
                   (submit)="saveRole(role); rolePanel.close();">
         </app-role>
-        <mat-action-row>
+        <mat-action-row *ngIf="!isSelf">
           <a [routerLink]="'/job/edit/' + role.jobId"
-             *ngIf="!isSelf"
              [matTooltip]="'View ' + jobs[role.jobId].title + ' Job'"
              matTooltipPosition="after"
              mat-icon-button>
