@@ -15,19 +15,23 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public IQueryable<Person> People => _dbConnection.People;
+        public IQueryable<Person> People => _dbConnection.People
+            .OrderBy(person => person.PreferredName)
+            .ThenBy(person => person.LastName);
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
-        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended;
+        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended
+            .OrderBy(person => person.PreferredName)
+            .ThenBy(person => person.LastName);
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
-        private IQueryable<T_Person> PeopleGeneric<T_Person>() where T_Person : PersonWithStaff, new() =>
+        private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
                 from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
                 from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
                 where !person.Deleted
-                select new T_Person
+                select new TPerson
                 {
                     Id = person.Id,
                     Email = person.Email,
@@ -57,8 +61,6 @@ namespace Backend.DataLayer
                     ThaiTambon = person.ThaiTambon,
                     ThaiZip = person.ThaiZip
                 }).OrderBy(_ => _.PreferredName).ThenBy(_ => _.LastName);
-
-        public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job
             join orgGroup in _dbConnection.OrgGroups on job.OrgGroupId equals orgGroup.Id
