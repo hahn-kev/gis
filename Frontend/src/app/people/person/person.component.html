@@ -58,13 +58,22 @@
         </mat-form-field>
 
         <div class="span-2-columns">
-          <mat-slide-toggle name="english" [(ngModel)]="person.speaksEnglish">Speaks English</mat-slide-toggle>
-          <mat-slide-toggle name="thai" [(ngModel)]="person.isThai">Is Thai</mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="english"
+                            [(ngModel)]="person.speaksEnglish">
+            Speaks English
+          </mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="thai"
+                            [(ngModel)]="person.isThai">
+            Is Thai
+          </mat-slide-toggle>
           <mat-slide-toggle [disabled]="isSelf"
                             name="isStaff"
                             #isStaff="ngModel"
                             [ngModel]="person.staff"
-                            (ngModelChange)="isStaffChanged($event)">Is Staff
+                            (ngModelChange)="isStaffChanged($event)">
+            Is Staff
           </mat-slide-toggle>
         </div>
 
