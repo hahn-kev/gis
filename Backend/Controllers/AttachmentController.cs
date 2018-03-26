@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Backend.Entities;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -23,6 +24,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin,hr")]
         public Attachment Attach([FromBody] Attachment attachment)
         {
             _attachmentService.Save(attachment);
@@ -30,6 +32,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public IActionResult Delete(Guid id)
         {
             _attachmentService.Delete(id);

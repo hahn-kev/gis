@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin,hr")]
     public class OrgGroupController : MyController
     {
         private readonly OrgGroupService _orgGroupService;
@@ -19,6 +18,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public OrgGroup Get(Guid id)
         {
             return _orgGroupService.GetById(id);
@@ -28,6 +28,7 @@ namespace Backend.Controllers
         public List<OrgGroup> OrgGroups() => _orgGroupService.OrgGroups;
 
         [HttpPost]
+        [Authorize(Roles = "admin,hr")]
         public OrgGroup Save([FromBody] OrgGroup orgGroup)
         {
             _orgGroupService.Save(orgGroup);
@@ -35,6 +36,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public IActionResult Delete(Guid id)
         {
             _orgGroupService.Delete(id);

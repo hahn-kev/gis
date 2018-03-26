@@ -20,7 +20,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin,hr")]
+//        [Authorize(Roles = "admin,hr")]
         public IList<Person> List()
         {
             return _personService.People();

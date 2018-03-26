@@ -4,6 +4,7 @@ using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -27,12 +28,14 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public MissionOrg GetOrg(Guid id)
         {
             return _dbConnection.MissionOrgs.SingleOrDefault(org => org.Id == id);
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin,hr")]
         public MissionOrg Save([FromBody] MissionOrg org)
         {
             _entityService.Save(org);
@@ -40,6 +43,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin,hr")]
         public IActionResult Delete(Guid id)
         {
             _entityService.Delete<MissionOrg>(id);

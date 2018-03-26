@@ -182,7 +182,7 @@
     </mat-accordion>
 
     <!--staff-->
-    <mat-accordion *ngIf="person.staff && !isSelf" class="staff">
+    <mat-accordion *ngIf="person.staff" class="staff">
       <mat-expansion-panel class="two-colum-grid">
         <mat-expansion-panel-header>
           <mat-panel-title>Staff</mat-panel-title>
@@ -203,6 +203,7 @@
         </ng-container>
         <mat-form-field>
           <mat-select name="orgGroup"
+                      [disabled]="isSelf"
                       [(ngModel)]="person.staff.orgGroupId"
                       placeholder="Reports to Department/Division">
             <mat-option [value]="null">None</mat-option>
@@ -211,6 +212,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-select name="missionOrg"
+                      [disabled]="isSelf"
                       [(ngModel)]="person.staff.missionOrgId"
                       placeholder="Mission Org">
             <mat-option [value]="null">None</mat-option>
@@ -220,61 +222,70 @@
 
         <mat-form-field>
           <input name="contractIssueDate" matInput
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.contractIssued"
                  [max]="person.staff.contractExpireDate"
                  [matDatepicker]="contractIssueDatePicker"
                  placeholder="Contract Issued">
-          <mat-datepicker-toggle matSuffix [for]="contractIssueDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker-toggle matSuffix [disabled]="isSelf" [for]="contractIssueDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #contractIssueDatePicker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field>
           <input name="contractExpireDate" matInput
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.contractExpireDate"
                  [min]="person.staff.contractIssued"
                  [matDatepicker]="contractExpireDatePicker"
                  placeholder="Contract Expires">
-          <mat-datepicker-toggle matSuffix [for]="contractExpireDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker-toggle matSuffix [disabled]="isSelf" [for]="contractExpireDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #contractExpireDatePicker></mat-datepicker>
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="renwebId"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.renwebId"
                  placeholder="Renweb Id">
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="moeLicenseNumber"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.moeLicenseNumber"
                  placeholder="MOE License Number">
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="insuranceNumber"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.insuranceNumber"
                  placeholder="Insurance Number">
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="thaiSsn"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.thaiSsn"
                  placeholder="Thai Social Security">
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="teacherLicenseOrg"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.teacherLicenseOrg"
                  placeholder="Teacher License Organization">
         </mat-form-field>
         <mat-form-field>
           <input matInput
                  name="teacherLicenseNo"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.teacherLicenseNo"
                  placeholder="Teacher License #">
         </mat-form-field>
         <mat-form-field>
           <mat-select [(ngModel)]="person.staff.visaType"
+                      [disabled]="isSelf"
                       name="visaType"
                       placeholder="Visa Type">
             <mat-option [value]="null">None</mat-option>
@@ -288,6 +299,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-select [(ngModel)]="person.staff.workPermitType"
+                      [disabled]="isSelf"
                       name="workPermitType"
                       placeholder="Legal status type">
             <mat-option [value]="null">None</mat-option>
@@ -299,12 +311,14 @@
         <mat-form-field>
           <input matInput
                  name="endorsmentAgency"
+                 [readonly]="isSelf"
                  [(ngModel)]="person.staff.endorsementAgency"
                  placeholder="Endorsment Agency">
         </mat-form-field>
         <mat-form-field>
           <mat-select [(ngModel)]="staffEndorsments"
                       (ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"
+                      [disabled]="isSelf"
                       multiple
                       name="endorsements"
                       placeholder="Endorsements">
