@@ -232,7 +232,7 @@
         <div *ngIf="person.staff.orgGroupId" class="span-2-columns org-chain">
           <span class="mat-caption">Department Hierarchy</span>
           <ng-container *ngFor="let link of orgChain.links; last as isLast">
-            <a mat-button [disabled]="!link.id"
+            <a mat-button [disabled]="!link.id || isSelf"
                [routerLink]="['/' + link.type, 'edit', link.id]">{{link.title}}</a>
             <mat-icon *ngIf="!isLast">arrow_forward</mat-icon>
           </ng-container>
