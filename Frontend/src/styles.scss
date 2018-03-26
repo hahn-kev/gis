@@ -8,6 +8,7 @@ $primary: mat-palette($mat-indigo, 900, 500, 900);
 $accent: mat-palette($mat-orange);
 
 $theme: mat-light-theme($primary, $accent);
+$warn: map-get($theme, warn);
 $theme-contrast: mat-dark-theme($primary, $accent);
 $background: map-get($theme, background);
 
@@ -16,6 +17,10 @@ $background: map-get($theme, background);
 
 .active-link {
   color: mat-color($accent) !important;
+}
+
+.warn {
+  color: mat-color($warn);
 }
 
 .hover-overlay {
