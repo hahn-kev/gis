@@ -186,7 +186,7 @@ const routes: Routes = [
         path: 'groups',
         canActivate: [RoleGuardService],
         data: {
-          requireRole: ['admin', 'hr']
+          requireRole: ['admin', 'hradmin']
         },
         children: [
           {

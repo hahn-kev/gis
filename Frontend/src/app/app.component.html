@@ -75,7 +75,7 @@
               <mat-icon mat-list-icon>account_balance</mat-icon>
               <span mat-line>Mission Org</span>
             </a>
-            <a mat-list-item routerLink="/groups/list" routerLinkActive="active-link">
+            <a mat-list-item *requireRole="'admin,hradmin'" routerLink="/groups/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>location_city</mat-icon>
               <span mat-line>Organization</span>
             </a>
