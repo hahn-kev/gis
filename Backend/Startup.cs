@@ -242,7 +242,7 @@ namespace Backend
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
                 var roleManager = scope.ServiceProvider.GetService<RoleManager<LinqToDB.Identity.IdentityRole<int>>>();
                 var missingRoles =
-                    new[] {"admin", "hr", "hrsalary"}.Except(roleManager.Roles.Select(role => role.Name));
+                    new[] {"admin", "hr", "hradmin"}.Except(roleManager.Roles.Select(role => role.Name));
                 foreach (var missingRole in missingRoles)
                 {
                     roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();

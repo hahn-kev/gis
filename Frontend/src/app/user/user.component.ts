@@ -37,13 +37,13 @@ export class UserComponent implements OnInit {
       name: 'hr',
       update: (user: User, value: boolean) => user.isHr = value,
       value: (user: User) => user.isHr,
-      show: (user: User) => !user.isHrSalary
+      show: (user: User) => !user.isHrAdmin
     },
     {
-      title: 'HR Salary',
-      name: 'hr,hrsalary',
-      update: (user: User, value: boolean) => user.isHrSalary = user.isHr = value,
-      value: (user: User) => user.isHrSalary,
+      title: 'HR Admin',
+      name: 'hr,hradmin',
+      update: (user: User, value: boolean) => user.isHrAdmin = user.isHr = value,
+      value: (user: User) => user.isHrAdmin,
       show: (user: User) => true
     }];
 
