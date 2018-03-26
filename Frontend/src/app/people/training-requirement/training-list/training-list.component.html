@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Training Requirements</ng-container>
+<ng-container *appTemplateContent="'title'">Required Training</ng-container>
 <ng-container *appToolbarContent>
   <a mat-icon-button matTooltip="Training Report" matTooltipPosition="before" routerLink="../report">
     <mat-icon>insert_chart</mat-icon>
@@ -24,7 +24,7 @@
            *matRowDef="let row; columns: ['name', 'firstYear',  'lastYear']"></mat-row>
 </mat-table>
 
-<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Training Requirement"
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Required Training"
    matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>
