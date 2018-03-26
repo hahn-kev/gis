@@ -46,9 +46,9 @@ export class LeaveRequestService {
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUseages: LeaveUseage[]) {
     const leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
+    if (leaveUsage == null) return true;
     if (leaveUsage.left <= 1) return true;
-    const daysOfLeave = this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
-    return leaveUsage.left - daysOfLeave < 0;
+    return leaveUsage.left - leaveRequest.days < 0;
   }
 
   weekDays(leaveRequest: LeaveRequest) {

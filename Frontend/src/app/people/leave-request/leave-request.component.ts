@@ -16,6 +16,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/share';
 import { LeaveType } from '../self/self';
 import { Gender } from '../person';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-leave-request',
@@ -78,11 +79,14 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
 
   async submit(): Promise<void> {
     if (this.isNew) {
-      if (this.leaveRequestService.isOverUsingLeave(this.leaveRequest, this.selectedPerson.leaveUseages)) {
+      let overUsingLeave = this.leaveRequestService.isOverUsingLeave(this.leaveRequest, this.selectedPerson.leaveUseages);
+      let doctorsNote = this.leaveRequest.type == LeaveType.Sick && (this.leaveRequest.days > 2);
+      if (overUsingLeave || doctorsNote) {
 
         const result = await ConfirmDialogComponent.OpenWait(this.dialog,
-          `This leave request is using more leave than you have`,
-          'Continue',
+          (overUsingLeave ? `This leave request is using more leave than you have\n` : '')
+          + (doctorsNote ? `You must email a doctors note to HR` : ''),
+          'Request Leave',
           'Cancel');
         if (!result) return;
       }
