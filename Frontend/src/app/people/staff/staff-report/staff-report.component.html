@@ -41,7 +41,7 @@
     <mat-cell *matCellDef="let row"> {{row.gender }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="passportCountry">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Country</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef>Country</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.isThai ? 'Thailand' : row.passportCountry }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="staff.endorsementAgency">
