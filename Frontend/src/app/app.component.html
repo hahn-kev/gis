@@ -41,17 +41,71 @@
         </a>
 
         <mat-divider></mat-divider>
+        <h3 mat-subheader>Me!</h3>
+        <ng-container  appRenderTemplate="sidenav:me"></ng-container>
+        <ng-container *appTemplateContent="'sidenav:me'">
+          <a mat-list-item routerLink="/leave-request/edit/new">
+            <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+            <p mat-line>Request Leave</p>
+          </a>
+          <a mat-list-item [routerLink]="'/leave-request/list/mine'">
+            <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+            <span mat-line>My Leave</span>
+          </a>
+          <a mat-list-item routerLink="/self">
+            <mat-icon mat-list-icon>face</mat-icon>
+            <span mat-line>My Details</span>
+          </a>
+        </ng-container>
+
+        <ng-container *requireRole="'admin,hr'">
+          <mat-divider></mat-divider>
+          <h3 mat-subheader>HR</h3>
+          <ng-container  appRenderTemplate="sidenav:hr"></ng-container>
+          <ng-container *appTemplateContent="'sidenav:hr'">
+            <a mat-list-item routerLink="/job/list">
+              <mat-icon mat-list-icon>work</mat-icon>
+              <span mat-line>Jobs</span>
+            </a>
+            <a mat-list-item routerLink="/leave-request/report">
+              <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+              <span mat-line>Leave</span>
+            </a>
+            <a mat-list-item routerLink="/mission-org/list">
+              <mat-icon mat-list-icon>account_balance</mat-icon>
+              <span mat-line>Mission Org</span>
+            </a>
+            <a mat-list-item routerLink="/groups/list">
+              <mat-icon mat-list-icon>location_city</mat-icon>
+              <span mat-line>Organization</span>
+            </a>
+            <a mat-list-item routerLink="/people/list">
+              <mat-icon mat-list-icon>supervisor_account</mat-icon>
+              <span mat-line>People</span>
+            </a>
+            <a mat-list-item routerLink="/staff/report">
+              <mat-icon mat-list-icon>business</mat-icon>
+              <span mat-line>Staff</span>
+            </a>
+            <a mat-list-item routerLink="/training/list">
+              <mat-icon mat-list-icon>school</mat-icon>
+              <span mat-line>Training Requirements</span>
+            </a>
+          </ng-container>
+        </ng-container>
 
         <ng-container *requireRole="'admin'">
+          <mat-divider></mat-divider>
           <h3 mat-subheader>Admin</h3>
           <a mat-list-item routerLink="/user/admin" routerLinkActive="active-link">
             <mat-icon mat-list-icon>face</mat-icon>
             <a mat-line>User Managment</a>
           </a>
         </ng-container>
+        <mat-divider></mat-divider>
 
       </mat-nav-list>
-      <span style="position: absolute; bottom: 0;">Version: {{version}}</span>
+      <span mat-subheader>Version: {{version}}</span>
     </mat-sidenav>
     <mat-sidenav class="mat-elevation-z2" mode="side" position="end" #rightDrawer>
       <app-attachments *ngIf="rightDrawer.opened"></app-attachments>
