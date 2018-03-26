@@ -1,7 +1,7 @@
 <ng-container *appTemplateContent="'title'">Edit Required Training</ng-container>
 <div class="main-card">
   <mat-card>
-    <form (submit)="save()" #form="ngForm" id="form">
+    <form (submit)="save()" class="two-colum-grid" #form="ngForm" id="form">
       <mat-form-field>
         <input matInput required name="name" [(ngModel)]="training.name" placeholder="Name">
       </mat-form-field>
@@ -10,20 +10,17 @@
           <mat-option value="AllStaff">All Staff</mat-option>
         </mat-select>
       </mat-form-field>
-      <div>
-        <mat-form-field>
-          <mat-select name="firstYear" required [(ngModel)]="training.firstYear" placeholder="First year of training">
-            <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-select name="lastYear" [(ngModel)]="training.lastYear" placeholder="Last year of training">
-            <mat-option>Unknown</mat-option>
-            <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
+      <mat-form-field>
+        <mat-select name="firstYear" required [(ngModel)]="training.firstYear" placeholder="First year of training">
+          <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select name="lastYear" [(ngModel)]="training.lastYear" placeholder="Last year of training">
+          <mat-option>Unknown</mat-option>
+          <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
     </form>
 
     <mat-card-actions>
