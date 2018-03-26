@@ -5,17 +5,26 @@
       <mat-form-field>
         <input matInput required name="name" [(ngModel)]="missionOrg.name" placeholder="Name">
       </mat-form-field>
-      <mat-form-field>
-        <mat-select name="orgRep"
-                    [(ngModel)]="missionOrg.repId"
-                    required
-                    placeholder="Org Rep">
-          <mat-option>None</mat-option>
-          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
-            {{eachPerson.lastName}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="form-field-button">
+        <mat-form-field>
+          <mat-select name="orgRep"
+                      [(ngModel)]="missionOrg.repId"
+                      required
+                      placeholder="Org Rep">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+              {{eachPerson.lastName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button type="button" matTooltip="Quick add Person"
+                appQuickAdd
+                (updateSelected)="missionOrg.repId = $event"
+                (updateList)="people.push($event)"
+                mat-icon-button>
+          <mat-icon>person_add</mat-icon>
+        </button>
+      </div>
       <mat-form-field>
         <input matInput [(ngModel)]="missionOrg.email"
                type="email"
