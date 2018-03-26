@@ -21,7 +21,7 @@ export class StaffReportComponent implements OnInit {
     'birthdate',
     'age',
     'gender',
-    'passportCountry',
+    'country',
     'staff.endorsementAgency'
   ];
   public selectedColumns: string[];
@@ -33,6 +33,8 @@ export class StaffReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new AppDataSource<PersonWithStaff>();
+    this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
+    this.dataSource.customColumnAccessor('age', data => this.age(data.birthdate));
     this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
@@ -53,7 +55,7 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toUpperCase();
   }
 
-  age(date: string) {
+  age(date: moment.MomentInput) {
     return moment().diff(moment(date), 'years');
   }
 }

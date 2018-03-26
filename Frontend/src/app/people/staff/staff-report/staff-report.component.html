@@ -44,16 +44,16 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Gender</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.gender }}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="passportCountry">
-    <mat-header-cell *matHeaderCellDef>Country</mat-header-cell>
+  <ng-container matColumnDef="country">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Country</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.isThai ? 'Thailand' : row.passportCountry }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="staff.endorsementAgency">
-    <mat-header-cell *matHeaderCellDef>Endorsment Agency</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Endorsment Agency</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.staff.endorsementAgency }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="age">
-    <mat-header-cell *matHeaderCellDef>Age</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Age</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }} </mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
