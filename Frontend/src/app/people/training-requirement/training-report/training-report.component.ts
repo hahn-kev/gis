@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Observable';
 import { map, pluck, share } from 'rxjs/operators';
 import { PersonService } from '../../person.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-training-report',
@@ -19,7 +20,7 @@ export class TrainingReportComponent implements OnInit {
   public selectedYearSubject: BehaviorSubject<Year>;
   public selectedYear: Year;
   public expandedRequirementId: string;
-  public completedDate = new Date();
+  public completedDate = moment();
   public staffTraining = new BehaviorSubject<Map<string, StaffTraining>>(null);
   public requirementsWithStaff: Observable<RequirementWithStaff[]>;
   public showCompleted = new BehaviorSubject<boolean>(true);
@@ -32,10 +33,13 @@ export class TrainingReportComponent implements OnInit {
     this.selectedYearSubject = new BehaviorSubject(null);
     this.route.params.pipe(
       pluck('year'),
-      map(value => value || new Date().getUTCFullYear()),
+      map(value => value || Year.CurrentSchoolYear()),
       map(yearValue => this.years.find(year => year.value == yearValue))
     ).subscribe(this.selectedYearSubject);
-    this.selectedYearSubject.subscribe(year => this.selectedYear = year);
+    this.selectedYearSubject.subscribe(year => {
+      this.selectedYear = year;
+      this.completedDate = year.convertToSchoolYear(this.completedDate);
+    });
     this.route.queryParamMap.pipe(map(params => {
       return params.has('showCompleted') ? params.get('showCompleted') == 'true' : true;
     })).subscribe(this.showCompleted);
@@ -82,7 +86,7 @@ export class TrainingReportComponent implements OnInit {
     const staffTraining = new StaffTraining();
     staffTraining.trainingRequirementId = reqObject.requirement.id;
     staffTraining.staffId = staffWithTraining.staff.id;
-    staffTraining.completedDate = this.completedDate;
+    staffTraining.completedDate = this.completedDate.toDate();
     await this.trainingService.saveStaffTraining(staffTraining);
     this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
   }
@@ -91,7 +95,7 @@ export class TrainingReportComponent implements OnInit {
     const staffIds = reqObject.staffsWithTraining
       .filter(value => !value.training.completedDate)
       .map(value => value.staff.id);
-    await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate);
+    await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate.toDate());
     this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
   }
 }
