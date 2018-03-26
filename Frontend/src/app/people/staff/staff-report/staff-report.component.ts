@@ -14,6 +14,7 @@ export class StaffReportComponent implements OnInit {
   public dataSource: AppDataSource<PersonWithStaff>;
   public avalibleColumns = [
     'preferredName',
+    'firstName',
     'lastName',
     'email',
     'phoneNumber',
@@ -34,8 +35,11 @@ export class StaffReportComponent implements OnInit {
     this.dataSource = new AppDataSource<PersonWithStaff>();
     this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'staff');
-    this.dataSource.filterPredicate = ((data, filter) =>
-      data.firstName.toUpperCase().startsWith(filter) || data.lastName.toUpperCase().startsWith(filter));
+    this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
+      return data.preferredName.toUpperCase().startsWith(filter)
+        || data.lastName.toUpperCase().startsWith(filter)
+        || data.firstName.toUpperCase().startsWith(filter);
+    };
   }
 
   updateSelectedColumns(columns: string[]) {
