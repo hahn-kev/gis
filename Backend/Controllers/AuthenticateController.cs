@@ -66,7 +66,16 @@ namespace Backend.Controllers
 
             return Json(new {Status = "Success"});
         }
-
+#if DEBUG
+        [HttpGet("impersonate/{email}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Impersonate(string email)
+        {
+            var identityUser = await _userService.FindByEmailAsync(email);
+            identityUser.ResetPassword = false;
+            return await JsonLoginResult(identityUser);
+        }
+#endif
         [HttpGet("google")]
         [AllowAnonymous]
         public IActionResult Google(string redirectTo = null)
@@ -214,7 +223,7 @@ namespace Backend.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, identityUser.Email ?? string.Empty),
                 new Claim(ClaimPersonId, identityUser.PersonId?.ToString() ?? string.Empty),
-                new Claim("oauth", googleOauthToken)
+                new Claim("oauth", googleOauthToken ?? string.Empty)
             };
         }
 

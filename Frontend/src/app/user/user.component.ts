@@ -7,6 +7,9 @@ import { ConfirmDialogComponent } from '../dialog/confirm-dialog/confirm-dialog.
 import { PersonService } from '../people/person.service';
 import { Observable } from 'rxjs/Observable';
 import { Person } from '../people/person';
+import { environment } from '../../environments/environment';
+import { LoginService } from '../services/auth/login.service';
+import { AuthenticateService } from '../services/auth/authenticate.service';
 
 @Component({
   selector: 'app-user',
@@ -14,6 +17,7 @@ import { Person } from '../people/person';
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent implements OnInit {
+  public isDev = !environment.production;
   public user: User;
   public isNew: boolean;
   public isSelf: boolean;
@@ -45,6 +49,7 @@ export class UserComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private userService: UserService,
+              private authService: AuthenticateService,
               private router: Router,
               private dialog: MatDialog,
               private personService: PersonService,
@@ -87,6 +92,12 @@ export class UserComponent implements OnInit {
         this.router.navigate(['/user/admin']);
       }
     });
+  }
+
+  async impersonate() {
+    await this.authService.impersonate(this.user.email);
+    this.snackBar.open(`You're now logged in as ${this.user.userName} just logout to stop impersonating them`, null, {duration: 2000});
+    this.router.navigate(['/home']);
   }
 
 }

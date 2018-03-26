@@ -1,57 +1,64 @@
+<ng-container *appToolbarContent>
+  <ng-container *ngIf="!isNew && isDev">
+
+    <button *requireRole="'admin'" (click)="impersonate()" mat-button>
+      <mat-icon mat-list-icon>face</mat-icon>
+      Impersonate
+    </button>
+  </ng-container>
+</ng-container>
+
 <div class="main-card">
   <mat-card>
-    <form #userForm="ngForm" id="userForm" (ngSubmit)="saveUser()">
-      <div>
-        <mat-form-field>
-          <input matInput required [disabled]="isSelf" name="name" [(ngModel)]="user.userName" placeholder="Username"
-                 i18n-placeholder="username input field@@username">
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <input matInput required name="email" [(ngModel)]="user.email" type="email" email #emailElement="ngModel"
-                 placeholder="Email" i18n-placeholder="user email address@@email">
-          <mat-error *ngIf="emailElement.invalid && (emailElement.dirty || emailElement.touched)"
-                     i18n="email validation error@@emailValidation">
-            Email invalid
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <input matInput name="phoneNumber" [(ngModel)]="user.phoneNumber" type="tel"
-                 placeholder="Phone Number" i18n-placeholder="user phone number@@phoneNumber">
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <input matInput [required]="isNew" #passwordElement="ngModel" name="password" minlength="8" autocomplete="off"
-                 [(ngModel)]="password" type="password"
-                 placeholder="Password"
-                 i18n-placeholder="user password@@password">
-          <mat-error *ngIf="passwordElement.invalid && (passwordElement.dirty || passwordElement.touched)"
-                     i18n="password error@@passwordLengthWrong">
-            Password must be at least 8 characters long
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <input matInput [required]="isNew || (passwordElement.value != '' && passwordElement.value)"
-                 #passwordElement2="ngModel" name="password2" minlength="8" autocomplete="off"
-                 ngModel
-                 [pattern]="passwordElement.value"
-                 type="password"
-                 placeholder="Confirm Password"
-                 i18n-placeholder="user password confirm@@passwordConfirm">
-          <mat-error
-            *ngIf="passwordElement2.invalid && (passwordElement2.dirty || passwordElement2.touched || passwordElement.touched)"
-            i18n="password matching error@@passwordsMustMatch">
-            Passwords must match
-          </mat-error>
-        </mat-form-field>
-      </div>
+    <form #userForm="ngForm" class="two-colum-grid" id="userForm" (ngSubmit)="saveUser()">
+
+      <mat-form-field>
+        <input matInput required [disabled]="isSelf" name="name" [(ngModel)]="user.userName" placeholder="Username"
+               i18n-placeholder="username input field@@username">
+      </mat-form-field>
+      <span></span>
+      <mat-form-field>
+        <input matInput required name="email" [(ngModel)]="user.email" type="email" email #emailElement="ngModel"
+               placeholder="Email" i18n-placeholder="user email address@@email">
+        <mat-error *ngIf="emailElement.invalid && (emailElement.dirty || emailElement.touched)"
+                   i18n="email validation error@@emailValidation">
+          Email invalid
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput name="phoneNumber" [(ngModel)]="user.phoneNumber" type="tel"
+               placeholder="Phone Number" i18n-placeholder="user phone number@@phoneNumber">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [required]="isNew" #passwordElement="ngModel" name="password" minlength="8" autocomplete="off"
+               [(ngModel)]="password" type="password"
+               placeholder="Password"
+               i18n-placeholder="user password@@password">
+        <mat-error *ngIf="passwordElement.invalid && (passwordElement.dirty || passwordElement.touched)"
+                   i18n="password error@@passwordLengthWrong">
+          Password must be at least 8 characters long
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [required]="isNew || (passwordElement.value != '' && passwordElement.value)"
+               #passwordElement2="ngModel" name="password2" minlength="8" autocomplete="off"
+               ngModel
+               [pattern]="passwordElement.value"
+               type="password"
+               placeholder="Confirm Password"
+               i18n-placeholder="user password confirm@@passwordConfirm">
+        <mat-error
+          *ngIf="passwordElement2.invalid && (passwordElement2.dirty || passwordElement2.touched || passwordElement.touched)"
+          i18n="password matching error@@passwordsMustMatch">
+          Passwords must match
+        </mat-error>
+      </mat-form-field>
       <ng-container *requireRole="'admin,hr'">
+        <mat-slide-toggle name="resetPassword"
+                          [(ngModel)]="user.resetPassword"
+                          matTooltip="Next time a user logs in with a password, they will be required to change it">
+          Require password reset
+        </mat-slide-toggle>
         <mat-form-field>
           <mat-select name="person"
                       [(ngModel)]="user.personId"
@@ -63,7 +70,7 @@
           </mat-select>
         </mat-form-field>
 
-        <div *ngIf="!isNew">
+        <div class="span-2-columns" *ngIf="!isNew">
           <ng-container *ngFor="let role of roles">
             <ng-container *ngIf="role.show(user)">
               <button type="button"

@@ -16,7 +16,16 @@ export class AuthenticateService {
       Password: currentPassword
     };
     if (newPassword) body['NewPassword'] = newPassword;
-    let json = await this.http.post<any>(`/api/authenticate/${newPassword ? 'reset' : 'signin'}`, body).toPromise();
+    let json: { user: User, access_token: string } =
+      await this.http.post<any>(`/api/authenticate/${newPassword ? 'reset' : 'signin'}`, body).toPromise();
+    return this.postLogin(json);
+  }
+
+  async impersonate(email: string) {
+    return this.postLogin(await this.http.get<any>('/api/authenticate/impersonate/' + encodeURI(email)).toPromise());
+  }
+
+  private postLogin(json: { user: User, access_token: string }): User {
     let user = Object.assign(new User(), json.user);
     if (!user.resetPassword) {
       //we won't get an access token back if the users password needs to be reset
