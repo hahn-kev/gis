@@ -52,6 +52,13 @@
       {{row.schoolRelated?.used || 0}}/{{row.schoolRelated?.totalAllowed || 0}}
     </mat-cell>
   </ng-container>
+  <ng-container matColumnDef="missionRelated">
+    <mat-header-cell *matHeaderCellDef>Mission Related</mat-header-cell>
+    <mat-cell *matCellDef="let row"
+              [class.warn]="row.missionRelated?.used > row.missionRelated?.totalAllowed">
+      {{row.missionRelated?.used || 0}}/{{row.missionRelated?.totalAllowed || 0}}
+    </mat-cell>
+  </ng-container>
   <ng-container matColumnDef="other">
     <mat-header-cell *matHeaderCellDef>Other</mat-header-cell>
     <mat-cell *matCellDef="let row"
@@ -62,8 +69,8 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'other']"></mat-header-row>
+    *matHeaderRowDef="['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/list/' + row.person.id"
-           *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'other']">
+           *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']">
   </mat-row>
 </mat-table>
