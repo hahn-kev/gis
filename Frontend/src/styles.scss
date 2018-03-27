@@ -168,6 +168,14 @@ html, body {
   }
 }
 
+.foreground-text {
+  color: mat-color(map-get($theme, foreground), text) !important;
+}
+
+.secondary-text {
+  color: mat-color(map-get($theme, foreground), secondary-text) !important;
+}
+
 @media print {
   .mat-row {
     page-break-inside: avoid;

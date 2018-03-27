@@ -437,11 +437,23 @@
           </button>
         </mat-action-row>
       </mat-expansion-panel>
-
+      <mat-expansion-panel *ngIf="person.spouseId" disabled expanded="false" hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="foreground-text" style="align-items: center">Spouse</mat-panel-title>
+          <mat-panel-description class="secondary-text">{{peopleMap[person.spouseId]?.email || 'Email unknown'}}
+            <a mat-icon-button [routerLink]="'/people/edit/' + person.spouseId">
+              <mat-icon class="foreground-text"
+                        [matTooltip]="'View Spouse'"
+                        matTooltipPosition="before">person
+              </mat-icon>
+            </a>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
       <mat-expansion-panel #ecPanel *ngFor="let contact of person.emergencyContacts">
         <mat-expansion-panel-header>
           <mat-panel-title>{{contact.contactPreferedName}} {{contact.contactLastName}}</mat-panel-title>
-          <mat-panel-description>{{peopleMap[contact.contactId]?.email}}</mat-panel-description>
+          <mat-panel-description>{{peopleMap[contact.contactId]?.email || 'Email unknown'}}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-emergency-contact #contactForm [emergencyContact]="contact"
                                [formId]="'contactForm_' + contact.id"
