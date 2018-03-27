@@ -137,6 +137,7 @@ namespace Backend.Services
         {
             var substituions = new Dictionary<string, string>
             {
+                {":type", leaveRequest.Type.ToString()},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
                 {":time", $"{leaveRequest.Days} Day(s)"}
@@ -179,6 +180,7 @@ namespace Backend.Services
         {
             var substituions = new Dictionary<string, string>
             {
+                {":type", leaveRequest.Type.ToString()},
                 {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
