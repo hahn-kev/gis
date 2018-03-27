@@ -40,7 +40,7 @@ import {
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { ActivityIndicatorInterceptorService } from './services/activity-indicator-interceptor.service';
-import { CdkTableModule } from '@angular/cdk/table';
+import {ObserversModule} from '@angular/cdk/observers';
 import { ToolbarTemplateDirective } from './toolbar/toolbar-template.directive';
 import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { AppTemplateService } from './toolbar/app-template.service';
@@ -171,7 +171,7 @@ if (environment.production) {
     MatSnackBarModule,
     MatProgressBarModule,
     MatTableModule,
-    CdkTableModule,
+    ObserversModule,
     MatButtonToggleModule,
     MatChipsModule,
     MatMenuModule,

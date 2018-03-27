@@ -15,14 +15,13 @@ import { Title } from '@angular/platform-browser';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
 
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: string;
   hasAttachments: Observable<boolean>;
   hasTitle = false;
-  titleChange: MutationObserver;
   @ViewChild('sidenav')
   private sidenav: MatSidenav;
   @ViewChild('rightDrawer')
@@ -48,8 +47,6 @@ export class AppComponent implements OnInit, OnDestroy {
       if (this.rightDrawer) this.rightDrawer.close();
     });
     this.hasAttachments = this.attachmentService.extractId().map(value => value.hasAttachments);
-    this.titleChange = new MutationObserver(mutations => this.updateTitle());
-    this.titleChange.observe(this.titleElement.nativeElement, {childList: true})
   }
 
   logout(): void {
@@ -60,10 +57,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   updateTitle() {
     this.titleService.setTitle(this.titleElement.nativeElement.innerText);
-  }
-
-  ngOnDestroy(): void {
-    this.titleChange.disconnect();
   }
 
 }

@@ -5,7 +5,9 @@
     <button id="open-menu-button" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <span #titleElement>GIS <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container></span>
+    <span #titleElement (cdkObserveContent)="updateTitle()">GIS
+      <ng-container appRenderTemplate="title" (onHasView)="hasTitle = $event"></ng-container>
+    </span>
     <span class="spacer"></span>
     <ng-container appRenderTemplate></ng-container>
     <button *ngIf="hasAttachments | async"
@@ -42,7 +44,7 @@
 
         <mat-divider></mat-divider>
         <h3 mat-subheader>Me!</h3>
-        <ng-container  appRenderTemplate="sidenav:me"></ng-container>
+        <ng-container appRenderTemplate="sidenav:me"></ng-container>
         <ng-container *appTemplateContent="'sidenav:me'">
           <a mat-list-item routerLink="/leave-request/edit/new" routerLinkActive="active-link">
             <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
@@ -61,7 +63,7 @@
         <ng-container *requireRole="'admin,hr'">
           <mat-divider></mat-divider>
           <h3 mat-subheader>HR</h3>
-          <ng-container  appRenderTemplate="sidenav:hr"></ng-container>
+          <ng-container appRenderTemplate="sidenav:hr"></ng-container>
           <ng-container *appTemplateContent="'sidenav:hr'">
             <a mat-list-item routerLink="/job/list" routerLinkActive="active-link">
               <mat-icon mat-list-icon>work</mat-icon>
