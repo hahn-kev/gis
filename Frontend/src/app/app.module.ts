@@ -95,6 +95,7 @@ import { MissionOrgService } from './mission-org/mission-org.service';
 import { GradeListComponent } from './job/grade/list/grade-list.component';
 import { GradeComponent } from './job/grade/edit/grade.component';
 import { GradeService } from './job/grade/grade.service';
+import { RenderTemplateDialogComponent } from './components/render-template-dialog/render-template-dialog.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -138,11 +139,13 @@ if (environment.production) {
     MissionOrgListComponent,
     MissionOrgComponent,
     GradeListComponent,
-    GradeComponent
+    GradeComponent,
+    RenderTemplateDialogComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
-    QuickAddComponent
+    QuickAddComponent,
+    RenderTemplateDialogComponent
   ],
   imports: [
     LocalStorageModule.withConfig({

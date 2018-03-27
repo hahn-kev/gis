@@ -30,7 +30,18 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
 
   bindToRouteData(route: ActivatedRoute, dataName: string): void {
     route.data.subscribe((value) => {
-      this.data = value[dataName];
+      this.unfilteredData = value[dataName];
+      this.filterUpdated();
     });
+  }
+
+  private unfilteredData: T[];
+  _customFilter = (data:T) => true;
+  set customFilter(value) {
+    this._customFilter = value;
+  }
+
+  filterUpdated(){
+    this.data = this.unfilteredData.filter(value => this._customFilter(value));
   }
 }

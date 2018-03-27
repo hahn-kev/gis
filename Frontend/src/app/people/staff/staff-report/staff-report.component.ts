@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { PersonWithStaff } from '../../person';
+import { Gender, PersonWithStaff } from '../../person';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSort } from '@angular/material';
+import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
 import { MomentInput } from 'moment';
+import { RenderTemplateDialogComponent } from '../../../components/render-template-dialog/render-template-dialog.component';
 
 @Component({
   selector: 'app-staff-report',
@@ -27,10 +28,19 @@ export class StaffReportComponent implements OnInit {
     'staff.endorsementAgency'
   ];
   public selectedColumns: string[];
+  showThai = true;
+  showNonThai = true;
+  showMen = true;
+  showWomen = true;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor(private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {
     this.selectedColumns = this.route.snapshot.queryParams['columns'] || ['preferredName', 'lastName'];
+  }
+
+  async openFilterDialog() {
+    await RenderTemplateDialogComponent.OpenWait(this.dialog, 'Filters', 'filter');
+    this.dataSource.filterUpdated();
   }
 
   ngOnInit(): void {
@@ -39,12 +49,21 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => moment(data.birthdate).unix());
     this.dataSource.sort = this.sort;
+    this.dataSource.customFilter = (data: PersonWithStaff) => this.matchesFilters(data);
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
-      return data.preferredName.toUpperCase().startsWith(filter)
+      return (data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
-        || data.firstName.toUpperCase().startsWith(filter);
+        || data.firstName.toUpperCase().startsWith(filter));
     };
+  }
+
+  matchesFilters(person: PersonWithStaff) {
+    if (!this.showThai && person.isThai) return false;
+    if (!this.showNonThai && !person.isThai) return false;
+    if (!this.showMen && person.gender == Gender.Male) return false;
+    if (!this.showWomen && person.gender == Gender.Female) return false;
+    return true;
   }
 
   updateSelectedColumns(columns: string[]) {
