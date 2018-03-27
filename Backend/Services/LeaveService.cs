@@ -143,6 +143,8 @@ namespace Backend.Services
                 {":type", leaveRequest.Type.ToString()},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
+                {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
+                {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
                 {":left", $"{leaveUseage.Left} Day(s)"}
             };
@@ -160,7 +162,10 @@ namespace Backend.Services
             {
                 {":type", leaveRequest.Type.ToString()},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
-                {":time", $"{leaveRequest.Days} Day(s)"}
+                {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
+                {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
+                {":time", $"{leaveRequest.Days} Day(s)"},
+                {":left", $"{leaveUseage.Left} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
@@ -186,6 +191,8 @@ namespace Backend.Services
                 {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
+                {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
+                {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
                 {":left", $"{leaveUseage.Left} Day(s)"}
             };
