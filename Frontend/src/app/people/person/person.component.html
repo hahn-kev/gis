@@ -439,7 +439,9 @@
       </mat-expansion-panel>
       <mat-expansion-panel *ngIf="person.spouseId" disabled expanded="false" hideToggle="true">
         <mat-expansion-panel-header>
-          <mat-panel-title class="foreground-text" style="align-items: center">Spouse</mat-panel-title>
+          <mat-panel-title class="foreground-text" style="align-items: center">
+            {{peopleMap[person.spouseId]?.preferredName}} {{peopleMap[person.spouseId]?.lastName}}
+          </mat-panel-title>
           <mat-panel-description class="secondary-text">{{peopleMap[person.spouseId]?.email || 'Email unknown'}}
             <a mat-icon-button [routerLink]="'/people/edit/' + person.spouseId">
               <mat-icon class="foreground-text"
