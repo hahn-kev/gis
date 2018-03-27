@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -62,8 +63,8 @@ namespace UnitTestProject
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
                 It.IsAny<EmailService.Template>(),
-                It.IsAny<PersonExtended>(),
-                It.IsAny<PersonExtended>())).Returns(Task.CompletedTask);
+                It.IsAny<PersonWithStaff>(),
+                It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
             Setup(collection => collection.RemoveAll<IEmailService>().AddSingleton(emailMock.Object));
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
@@ -74,16 +75,16 @@ namespace UnitTestProject
                         It.IsAny<string>(),
                         It.Is<EmailService.Template>(template =>
                             template == EmailService.Template.RequestLeaveApproval),
-                        It.Is<PersonExtended>(extended => extended.FirstName == "Jacob"),
-                        It.Is<PersonExtended>(extended => extended.FirstName == "Bob")),
+                        It.Is<PersonWithStaff>(extended => extended.FirstName == "Jacob"),
+                        It.Is<PersonWithStaff>(extended => extended.FirstName == "Bob")),
                 Times.Once);
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                         It.IsAny<string>(),
                         It.Is<EmailService.Template>(template => template == EmailService.Template.NotifyLeaveRequest),
-                        It.IsAny<PersonExtended>(),
-                        It.IsAny<PersonExtended>()),
+                        It.IsAny<PersonWithStaff>(),
+                        It.IsAny<PersonWithStaff>()),
                 Times.Never);
         }
 
@@ -126,6 +127,71 @@ namespace UnitTestProject
             Assert.Null(actualSupervisorGroup);
         }
 
+        public static IEnumerable<object[]> GetExpectedNotifyHrValues()
+        {
+            Guid personId = Guid.NewGuid();
+
+            PersonWithStaff P()
+            {
+                Guid staffId = Guid.NewGuid();
+                return new PersonWithStaff
+                {
+                    IsThai = true,
+                    Id = personId,
+                    StaffId = staffId,
+                    Staff = new Staff {Id = staffId}
+                };
+            }
+
+            LeaveRequest LR(LeaveType type, decimal days = 1)
+            {
+                personId = Guid.NewGuid();
+                return new LeaveRequest
+                {
+                    Type = type,
+                    PersonId = personId,
+                    Days = days,
+                    OverrideDays = true,
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now + TimeSpan.FromDays((double) days)
+                };
+            }
+
+            IEnumerable<(LeaveRequest, PersonWithStaff, int usedLeave, int totalYears, bool sendEmail)> GetValues()
+            {
+                yield return (LR(LeaveType.Sick), P(), 10, 2, false);
+                yield return (LR(LeaveType.Emergency, 5), P(), 1, 2, true);
+                yield return (LR(LeaveType.Other), P(), 0, 2, true);
+                yield return (LR(LeaveType.SchoolRelated), P(), 0, 2, true);
+                yield return (LR(LeaveType.Vacation, 5), P(), 10, 9, true);
+                yield return (LR(LeaveType.Vacation, 5), P(), 10, 14, false);
+                yield return (LR(LeaveType.Vacation, 5), P(), 1, 10, false);
+            }
+
+            return GetValues().Select(tuple => tuple.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetExpectedNotifyHrValues))]
+        public void NotifiesHrWhenAppropriate(LeaveRequest request, PersonWithStaff personWithStaff, int usedLeave,
+            int totalYears, bool expectedEmailed)
+        {
+            var job = _servicesFixture.InsertJob(j =>
+            {
+                //force job to provide time off
+                j.Type = JobType.FullTime;
+                j.OrgGroup.Type = GroupType.Department;
+            });
+            _dbConnection.Insert(personWithStaff);
+            _dbConnection.Insert(personWithStaff.Staff);
+            //create roles for # of years
+            _servicesFixture.InsertRole(job.Id, personWithStaff.Id, totalYears);
+            //insert used leave
+            _servicesFixture.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
+            var actualEmailed = _leaveService.ShouldNotifyHr(request, personWithStaff);
+            Assert.Equal(expectedEmailed, actualEmailed);
+        }
+
         public static IEnumerable<object[]> GetExpectedEmailValues()
         {
             var person1Id = Guid.NewGuid();
@@ -136,8 +202,17 @@ namespace UnitTestProject
             var devisionId = Guid.NewGuid();
             var supervisorGroupId = Guid.NewGuid();
 
+            PersonWithStaff Person(Guid id)
+            {
+                return new PersonWithStaff
+                {
+                    Id = id,
+                    Staff = new Staff()
+                };
+            }
+
             IEnumerable<(string reason, LeaveRequest request,
-                PersonExtended requestedBy,
+                PersonWithStaff requestedBy,
                 OrgGroupWithSupervisor department,
                 OrgGroupWithSupervisor devision,
                 OrgGroupWithSupervisor supervisorGroup,
@@ -146,7 +221,7 @@ namespace UnitTestProject
                 int expectedNotifyEmailCount)> MakeValues()
             {
                 yield return ("Person with a single supervisor", new LeaveRequest {PersonId = person1Id},
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor {Id = departmentId},
                     new OrgGroupWithSupervisor {Id = devisionId},
                     new OrgGroupWithSupervisor
@@ -154,68 +229,68 @@ namespace UnitTestProject
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
                     0);
 
                 yield return ("Person with a supervisor to notify", new LeaveRequest {PersonId = person1Id},
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor {Id = departmentId},
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
-                        SupervisorPerson = new PersonExtended {Id = person3Id}
+                        SupervisorPerson = Person(person3Id)
                     },
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
                     1);
 
                 yield return ("Person with 2 supervisors to notify", new LeaveRequest {PersonId = person1Id},
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
                         ApproverIsSupervisor = false,
                         Supervisor = person4Id,
-                        SupervisorPerson = new PersonExtended {Id = person4Id}
+                        SupervisorPerson = Person(person4Id)
                     },
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
-                        SupervisorPerson = new PersonExtended {Id = person3Id}
+                        SupervisorPerson = Person(person3Id)
                     },
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
                     2);
 
                 yield return ("person with a group inbetween to not notify", new LeaveRequest {PersonId = person1Id},
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
                         ApproverIsSupervisor = false,
                         Supervisor = person4Id,
-                        SupervisorPerson = new PersonExtended {Id = person4Id}
+                        SupervisorPerson = Person(person4Id)
                     },
                     new OrgGroupWithSupervisor {Id = devisionId},
                     new OrgGroupWithSupervisor
@@ -223,7 +298,7 @@ namespace UnitTestProject
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
@@ -233,13 +308,13 @@ namespace UnitTestProject
                     {
                         PersonId = person1Id
                     },
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
                         ApproverIsSupervisor = true,
                         Supervisor = person4Id,
-                        SupervisorPerson = new PersonExtended {Id = person4Id}
+                        SupervisorPerson = Person(person4Id)
                     },
                     new OrgGroupWithSupervisor {Id = devisionId},
                     new OrgGroupWithSupervisor
@@ -247,20 +322,20 @@ namespace UnitTestProject
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person4Id,
                     true,
                     0);
 
                 yield return ("supervisor requesting leave, no one to notify", new LeaveRequest {PersonId = person1Id},
-                    new PersonExtended {Id = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
                         ApproverIsSupervisor = true,
                         Supervisor = person1Id,
-                        SupervisorPerson = new PersonExtended {Id = person1Id}
+                        SupervisorPerson = Person(person1Id)
                     },
                     new OrgGroupWithSupervisor {Id = devisionId},
                     new OrgGroupWithSupervisor
@@ -268,35 +343,35 @@ namespace UnitTestProject
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
                     0);
 
-                yield return ("supervisor requesting leave, 1 person to notify", new LeaveRequest {PersonId = person1Id}
-                    ,
-                    new PersonExtended {Id = person1Id},
+                yield return ("supervisor requesting leave, 1 person to notify",
+                    new LeaveRequest {PersonId = person1Id},
+                    Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
                         ApproverIsSupervisor = true,
                         Supervisor = person1Id,
-                        SupervisorPerson = new PersonExtended {Id = person1Id}
+                        SupervisorPerson = Person(person1Id)
                     },
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
-                        SupervisorPerson = new PersonExtended {Id = person3Id}
+                        SupervisorPerson = Person(person3Id)
                     },
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
                         ApproverIsSupervisor = true,
                         Supervisor = person2Id,
-                        SupervisorPerson = new PersonExtended {Id = person2Id}
+                        SupervisorPerson = Person(person2Id)
                     },
                     person2Id,
                     true,
@@ -306,11 +381,12 @@ namespace UnitTestProject
             return MakeValues().Select(tuple => tuple.ToArray());
         }
 
+
         [Theory]
         [MemberData(nameof(GetExpectedEmailValues))]
         public async Task SendsExpectedEmails(string reason,
             LeaveRequest request,
-            PersonExtended requestedBy,
+            PersonWithStaff requestedBy,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
             OrgGroupWithSupervisor supervisorGroup,
@@ -325,10 +401,10 @@ namespace UnitTestProject
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
                     It.IsAny<EmailService.Template>(),
-                    It.IsAny<PersonExtended>(),
-                    It.IsAny<PersonExtended>()))
+                    It.IsAny<PersonWithStaff>(),
+                    It.IsAny<PersonWithStaff>()))
                 .Returns(Task.CompletedTask)
-                .Callback<Dictionary<string, string>, string, EmailService.Template, PersonExtended, PersonExtended>(
+                .Callback<Dictionary<string, string>, string, EmailService.Template, PersonWithStaff, PersonWithStaff>(
                     (dictionary, subject, template, to, from) =>
                     {
                         if (template == EmailService.Template.RequestLeaveApproval) actualApprovalEmailSent = true;

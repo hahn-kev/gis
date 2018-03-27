@@ -86,6 +86,7 @@ namespace Backend.Services
             _entityService.Save(leaveRequest);
             try
             {
+                await NotifyHr(leaveRequest, result.personOnLeave);
                 return await ResolveLeaveRequestChain(leaveRequest,
                     result.personOnLeave,
                     result.department,
@@ -100,7 +101,7 @@ namespace Backend.Services
         }
 
         public async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
-            PersonExtended requestedBy,
+            PersonWithStaff requestedBy,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
             OrgGroupWithSupervisor supervisorGroup)
@@ -110,8 +111,8 @@ namespace Backend.Services
                    await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup);
         }
 
-        private async ValueTask<PersonExtended> DoNotifyWork(LeaveRequest leaveRequest,
-            PersonExtended requestedBy,
+        private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
+            PersonWithStaff requestedBy,
             OrgGroupWithSupervisor orgGroup)
         {
             //super and requested by will be the same if the requester is a supervisor
@@ -131,15 +132,14 @@ namespace Backend.Services
         }
 
         private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
-            PersonExtended requestedBy,
-            PersonExtended supervisor)
+            PersonWithStaff requestedBy,
+            PersonWithStaff supervisor)
         {
-            var leaveTimespan = (leaveRequest.StartDate - leaveRequest.EndDate).Duration();
             var substituions = new Dictionary<string, string>
             {
-                {":firstName", supervisor.FirstName},
-                {":requester", requestedBy.FirstName},
-                {":time", $"{leaveTimespan.Days} Day(s)"}
+                {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
+                {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
+                {":time", $"{leaveRequest.Days} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
@@ -148,17 +148,41 @@ namespace Backend.Services
                 supervisor);
         }
 
-        private async Task SendRequestApproval(LeaveRequest leaveRequest,
-            PersonExtended requestedBy,
-            PersonExtended supervisor)
+        private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy)
         {
-            var leaveTimespan = (leaveRequest.StartDate - leaveRequest.EndDate).Duration();
+            if (!ShouldNotifyHr(leaveRequest, requestedBy)) return;
+            var substituions = new Dictionary<string, string>
+            {
+                {":type", leaveRequest.Type.ToString()},
+                {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
+                {":time", $"{leaveRequest.Days} Day(s)"}
+            };
+            await _emailService.SendTemplateEmail(substituions,
+                $"{requestedBy.PreferredName} has requested leave",
+                EmailService.Template.NotifyHrLeaveRequest,
+                requestedBy,
+                _personRepository.GetHrAdminStaff());
+        }
+
+        public bool ShouldNotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy)
+        {
+            var type = leaveRequest.Type;
+            if (type == LeaveType.Other) return true;
+            if (type != LeaveType.Vacation && LeaveAllowed(type, requestedBy.Id).GetValueOrDefault() == 0) return true;
+            var currentLeaveUseage = GetCurrentLeaveUseage(type, requestedBy.Id);
+            return currentLeaveUseage.Left < leaveRequest.Days;
+        }
+
+        private async Task SendRequestApproval(LeaveRequest leaveRequest,
+            PersonWithStaff requestedBy,
+            PersonWithStaff supervisor)
+        {
             var substituions = new Dictionary<string, string>
             {
                 {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
-                {":firstName", supervisor.FirstName},
-                {":requester", requestedBy.FirstName},
-                {":time", $"{leaveTimespan.Days} Day(s)"}
+                {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
+                {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
+                {":time", $"{leaveRequest.Days} Day(s)"}
             };
 
             await _emailService.SendTemplateEmail(substituions,
@@ -216,9 +240,40 @@ namespace Backend.Services
             ).Where(useage => useage.TotalAllowed != null).ToList();
         }
 
+        private LeaveUseage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
+        {
+            return GetLeaveUseage(leaveType, personId, DateTime.Now.SchoolYear());
+        }
+
+        private LeaveUseage GetLeaveUseage(LeaveType leaveType, Guid personId, int schoolYear)
+        {
+            return new LeaveUseage
+            {
+                LeaveType = leaveType,
+                TotalAllowed = LeaveAllowed(leaveType, personId),
+                Used = TotalLeaveUsed(leaveType, personId, schoolYear)
+            };
+        }
+
         public static decimal TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
         {
             return requests.Sum(request => request.Days);
+        }
+
+        public decimal TotalLeaveUsed(LeaveType leaveType, Guid personId, int schoolYear)
+        {
+            return _personRepository.LeaveRequests
+                .Where(request => request.PersonId == personId
+                                  && request.StartDate.InSchoolYear(schoolYear)
+                                  && request.Type == leaveType)
+                .Sum(request => request.Days);
+        }
+
+        public int? LeaveAllowed(LeaveType leaveType, Guid personId)
+        {
+            if (leaveType != LeaveType.Vacation) return LeaveAllowed(leaveType, Enumerable.Empty<PersonRoleWithJob>());
+            //fetch personRoles
+            return LeaveAllowed(leaveType, _personRepository.GetPersonRolesWithJob(personId));
         }
 
         public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles)

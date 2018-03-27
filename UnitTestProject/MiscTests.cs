@@ -76,22 +76,31 @@ namespace UnitTestProject
             var repo = _servicesFixture.ServiceProvider.GetService(repoType);
             var list = (IQueryable) info.GetValue(repo);
 
-            var value = list.Cast<object>().FirstOrDefault();
-            Assert.NotNull(value);
-            Assert.Empty(NotPopulatedValues(value));
+            var value = list.Cast<object>()
+                .ToList()
+                .Select(o => NotPopulatedValues(o, list.ElementType).ToList())
+                .OrderBy(properties => properties.Count).First();
+            Assert.Empty(value);
         }
 
-        private IEnumerable<(PropertyInfo, object)> NotPopulatedValues(object o)
+        private IEnumerable<string> NotPopulatedValues(object o, Type listElementType)
         {
-            return o.GetType().GetProperties().Select(info => (info: info, val: info.GetValue(o)))
-                .Where(t =>
-                    {
-                        if (t.info.PropertyType == typeof(Guid)) return Guid.Empty == (Guid) t.val;
-                        return t.val == (t.info.PropertyType.IsPrimitive
-                                   ? Activator.CreateInstance(t.info.PropertyType)
-                                   : null);
-                    }
-                );
+            IEnumerable<PropertyInfo> propertyInfos;
+            if (o == null) propertyInfos = listElementType.GetProperties();
+            else
+            {
+                propertyInfos = listElementType.GetProperties().Select(info => (info: info, val: info.GetValue(o)))
+                    .Where(t =>
+                        {
+                            if (t.info.PropertyType == typeof(Guid)) return Guid.Empty == (Guid) t.val;
+                            return t.val == (t.info.PropertyType.IsPrimitive
+                                       ? Activator.CreateInstance(t.info.PropertyType)
+                                       : null);
+                        }
+                    ).Select(tuple => tuple.info);
+            }
+
+            return propertyInfos.Select(val => val.DeclaringType.ToString() + "." + val.Name);
         }
     }
 }

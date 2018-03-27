@@ -165,5 +165,25 @@ namespace Backend.DataLayer
                 transaction.Commit();
             }
         }
+
+        public IQueryable<PersonWithStaff> GetHrStaff()
+        {
+            return GetStaffWithUserRole("HR");
+        }
+
+        public IQueryable<PersonWithStaff> GetHrAdminStaff()
+        {
+            return GetStaffWithUserRole("HRADMIN");
+        }
+
+        private IQueryable<PersonWithStaff> GetStaffWithUserRole(string roleName)
+        {
+            return from person in PeopleWithStaff.Where(staff => staff.StaffId != null)
+                from user in _dbConnection.Users.InnerJoin(u => person.Id == u.PersonId)
+                from userRole in _dbConnection.UserRoles.InnerJoin(u => u.UserId == user.Id) 
+                from role in _dbConnection.Roles.InnerJoin(role => role.Id == userRole.RoleId)
+                where role.NormalizedName == roleName.ToUpper()
+                select person;
+        }
     }
 }

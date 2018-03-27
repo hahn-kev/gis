@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
+using LinqToDB.Common;
 using Microsoft.Extensions.Options;
 using RestEase;
 using SendGrid;
@@ -16,6 +18,18 @@ namespace Backend.Services
     public interface IEmailService
     {
         Task<MailgunReponse> SendEmail(string to, string subject, string body);
+
+        Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
+            EmailService.Template template,
+            PersonWithStaff from,
+            PersonWithStaff to);
+
+        Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
+            EmailService.Template template,
+            PersonWithStaff from,
+            IEnumerable<PersonWithStaff> tos);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
@@ -50,6 +64,7 @@ namespace Backend.Services
             public string Name { get; }
             public static Template NotifyLeaveRequest => new Template("5aa3038a-6c0d-4e6c-bc57-311c87916a0c");
             public static Template RequestLeaveApproval => new Template("70b6165d-f367-401f-9ae4-56814033b720");
+            public static Template NotifyHrLeaveRequest => new Template("14aa52db-f802-4e62-82db-6a3391bcf8a2");
 
             public bool Equals(Template other)
             {
@@ -103,6 +118,28 @@ namespace Backend.Services
             return mailgunReponse;
         }
 
+        public Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+            PersonWithStaff @from,
+            PersonWithStaff to)
+        {
+            return SendTemplateEmail(substituions,
+                subject, template,
+                from.Staff.Email,
+                from.PreferredName,
+                to.Staff.Email,
+                to.PreferredName);
+        }
+
+        public Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+            PersonWithStaff @from,
+            IEnumerable<PersonWithStaff> tos)
+        {
+            return SendTemplateEmail(substituions, subject, template,
+                from.Staff.Email,
+                from.PreferredName,
+                tos.Select(person => new EmailAddress(person.Staff.Email, person.PreferredName)).ToList());
+        }
+
         public Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
             Template template,
@@ -118,7 +155,7 @@ namespace Backend.Services
                 to.PreferredName);
         }
 
-        public async Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
             Template template,
             string fromEmail,
@@ -126,11 +163,28 @@ namespace Backend.Services
             string toEmail,
             string toName)
         {
+            if (toEmail == null)
+                throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
+            return SendTemplateEmail(substituions, subject, template, fromEmail, fromName,
+                new List<EmailAddress> {new EmailAddress(toEmail, toName)});
+        }
+
+        public async Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
+            Template template,
+            string fromEmail,
+            string fromName,
+            List<EmailAddress> tos)
+        {
 #if DEBUG
             return;
 #endif
-            if (toEmail == null)
-                throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
+            foreach (var emailAddress in tos)
+            {
+                if (string.IsNullOrEmpty(emailAddress.Email))
+                    throw new ArgumentNullException(nameof(emailAddress.Email), $"{emailAddress.Name} does not have an email assigned");
+            }
+            if (!tos.Any()) return;
             if (fromEmail == null)
                 throw new ArgumentNullException(nameof(fromEmail), $"{fromName} does not have an email assigned");
             var msg = new SendGridMessage
@@ -139,7 +193,7 @@ namespace Backend.Services
                 {
                     new Personalization
                     {
-                        Tos = new List<EmailAddress> {new EmailAddress(toEmail, toName)},
+                        Tos = tos,
                         Substitutions = substituions
                     }
                 },
@@ -158,8 +212,7 @@ namespace Backend.Services
 
     public interface IMailGunApi
     {
-        [Header("Authorization")]
-        AuthenticationHeaderValue Authorization { get; set; }
+        [Header("Authorization")] AuthenticationHeaderValue Authorization { get; set; }
 
         [Post("{domain}/messages")]
         Task<MailgunReponse> SendEmail([Path] string domain, string from, string to, string subject, string text);

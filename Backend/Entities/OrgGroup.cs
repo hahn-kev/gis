@@ -18,7 +18,7 @@ namespace Backend.Entities
     public class OrgGroupWithSupervisor : OrgGroup
     {
         [Column(SkipOnInsert = true, SkipOnUpdate = true)]
-        public PersonExtended SupervisorPerson { get; set; }
+        public PersonWithStaff SupervisorPerson { get; set; }
     }
     
     

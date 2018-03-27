@@ -10,6 +10,7 @@ using Backend.Services;
 using Bogus;
 using LinqToDB;
 using LinqToDB.Data;
+using LinqToDB.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
 using Xunit;
+using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
 {
@@ -76,14 +78,12 @@ namespace UnitTestProject
             TryCreateTable<EmergencyContact>();
             TryCreateTable<Attachment>();
 
-            var roles = new[] {"admin", "hr"};
-            foreach (var role in roles)
+            var roles = new[] {"admin", "hr", "hradmin"};
+            var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
+            foreach (var role in roles.Except(existingRoles))
             {
-                if (!DbConnection.Roles.Any(identityRole => identityRole.Name == role))
-                {
-                    DbConnection.InsertId(
-                        new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
-                }
+                DbConnection.InsertId(
+                    new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
         }
 
@@ -152,9 +152,10 @@ namespace UnitTestProject
                     });
         }
 
-        public Job InsertJob()
+        public Job InsertJob(Action<JobWithOrgGroup> action = null)
         {
             var job = JobFaker().Generate();
+            action?.Invoke(job);
             _dbConnection.Insert<Job>(job);
             _dbConnection.Insert(job.OrgGroup);
             return job;
@@ -164,16 +165,67 @@ namespace UnitTestProject
         {
             var person = PersonFaker().Generate(includeStaff ? "default" : "default,notStaff");
             _dbConnection.Insert(person);
-            _dbConnection.Insert(person.Staff);
+            if (includeStaff)
+                _dbConnection.Insert(person.Staff);
 
             return person;
         }
 
-        public PersonRole InsertRole()
+        public PersonRole InsertRole(Guid jobId, Guid personId, int years = 2)
+        {
+            return InsertRole(role =>
+            {
+                role.JobId = jobId;
+                role.PersonId = personId;
+                role.StartDate = DateTime.Now - TimeSpan.FromDays(years * 366);
+                role.Active = true;
+            });
+        }
+
+        public LeaveRequest InsertLeaveRequest(LeaveType leaveType, Guid personId, int days)
+        {
+            var leaveRequest = AutoFaker.Generate<LeaveRequest>();
+            leaveRequest.Type = leaveType;
+            leaveRequest.PersonId = personId;
+            leaveRequest.Days = days;
+            leaveRequest.OverrideDays = true;
+            leaveRequest.StartDate = DateTime.Now;
+            leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4); 
+            _dbConnection.Insert(leaveRequest);
+            return leaveRequest;
+        }
+
+        public PersonRole InsertRole(Action<PersonRole> action = null)
         {
             var role = AutoFaker.Generate<PersonRole>();
+            action?.Invoke(role);
             _dbConnection.Insert(role);
             return role;
+        }
+
+        public IdentityUser InsertUser(Action<IdentityUser> modify = null, params string[] roles)
+        {
+            var user = new AutoFaker<IdentityUser>()
+                .RuleFor(identityUser => identityUser.LockoutEnd, DateTimeOffset.Now)
+                .RuleFor(identityUser => identityUser.Id, 0)
+                .Generate();
+            modify?.Invoke(user);
+            user.Id = _dbConnection.InsertId(user);
+            Assert.True(user.Id > 0, $"{user.Id} > 0");
+            if (roles.Any())
+            {
+                roles = roles.Select(s => s.ToUpper()).ToArray();
+                var roleIds = _dbConnection.Roles
+                    .Where(role => roles.Contains(role.NormalizedName))
+                    .Select(role => role.Id)
+                    .ToList();
+                foreach (var roleId in roleIds)
+                {
+                    _dbConnection.InsertId(new IdentityUserRole<int> {RoleId = roleId, UserId = user.Id});
+                }
+            }
+
+            return user;
         }
 
         public void SetupData()
@@ -202,8 +254,7 @@ namespace UnitTestProject
             _dbConnection.BulkCopy<Job>(jobs);
             _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();
-            _dbConnection.Insert(new AutoFaker<IdentityUser>().RuleFor(user => user.LockoutEnd, DateTimeOffset.Now)
-                .Generate());
+            InsertUser();
 
             var personWithEmergencyContact = personFaker.Generate("default,notStaff");
             _dbConnection.Insert(personWithEmergencyContact);
