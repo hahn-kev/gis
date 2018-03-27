@@ -32,6 +32,10 @@ export class StaffReportComponent implements OnInit {
   showNonThai = true;
   showMen = true;
   showWomen = true;
+  filterOlderThan = false;
+  olderThanFilter = 0;
+  filterYoungerThan = false;
+  youngerThanFilter = 0;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {
@@ -63,6 +67,10 @@ export class StaffReportComponent implements OnInit {
     if (!this.showNonThai && !person.isThai) return false;
     if (!this.showMen && person.gender == Gender.Male) return false;
     if (!this.showWomen && person.gender == Gender.Female) return false;
+    let yearsOld = this.age(person.birthdate);
+    if ((this.filterYoungerThan || this.filterOlderThan) && Number.isNaN(yearsOld)) return false;
+    if (this.filterOlderThan && this.olderThanFilter >= yearsOld) return false;
+    if (this.filterYoungerThan && this.youngerThanFilter <= yearsOld) return false;
     return true;
   }
 

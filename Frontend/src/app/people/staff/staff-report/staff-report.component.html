@@ -25,6 +25,14 @@
   <mat-checkbox [(ngModel)]="showNonThai">Show Non Thai Staff</mat-checkbox>
   <mat-checkbox [(ngModel)]="showMen">Show Men Staff</mat-checkbox>
   <mat-checkbox [(ngModel)]="showWomen">Show Women Staff</mat-checkbox>
+  <mat-checkbox [(ngModel)]="filterOlderThan">Older than</mat-checkbox>
+  <mat-form-field>
+    <input type="number" matInput [(ngModel)]="olderThanFilter" placeholder="Years">
+  </mat-form-field>
+  <mat-checkbox [(ngModel)]="filterYoungerThan">Younger than</mat-checkbox>
+  <mat-form-field>
+    <input type="number" matInput [(ngModel)]="youngerThanFilter" placeholder="Years">
+  </mat-form-field>
 </div>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
