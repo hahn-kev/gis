@@ -83,15 +83,17 @@ namespace Backend.Services
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;
+            var leaveUsage = GetCurrentLeaveUseage(leaveRequest.Type, result.personOnLeave.Id);
             _entityService.Save(leaveRequest);
             try
             {
-                await NotifyHr(leaveRequest, result.personOnLeave);
+                await NotifyHr(leaveRequest, result.personOnLeave, leaveUsage);
                 return await ResolveLeaveRequestChain(leaveRequest,
                     result.personOnLeave,
                     result.department,
                     result.devision,
-                    result.supervisorGroup);
+                    result.supervisorGroup,
+                    leaveUsage);
             }
             catch
             {
@@ -104,28 +106,29 @@ namespace Backend.Services
             PersonWithStaff requestedBy,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup)
+            OrgGroupWithSupervisor supervisorGroup,
+            LeaveUseage leaveUseage)
         {
-            return await DoNotifyWork(leaveRequest, requestedBy, department) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, devision) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup);
+            return await DoNotifyWork(leaveRequest, requestedBy, department, leaveUseage) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, devision, leaveUseage) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup, leaveUseage);
         }
 
         private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor orgGroup)
+            OrgGroupWithSupervisor orgGroup, LeaveUseage leaveUseage)
         {
             //super and requested by will be the same if the requester is a supervisor
             if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor) return null;
             if (orgGroup.ApproverIsSupervisor && orgGroup.SupervisorPerson != null)
             {
-                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
+                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUseage);
                 return orgGroup.SupervisorPerson;
             }
 
             if (orgGroup.SupervisorPerson != null)
             {
-                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson);
+                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUseage);
             }
 
             return null;
@@ -133,14 +136,15 @@ namespace Backend.Services
 
         private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            PersonWithStaff supervisor)
+            PersonWithStaff supervisor, LeaveUseage leaveUseage)
         {
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
-                {":time", $"{leaveRequest.Days} Day(s)"}
+                {":time", $"{leaveRequest.Days} Day(s)"},
+                {":left", $"{leaveUseage.Left} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
@@ -149,9 +153,9 @@ namespace Backend.Services
                 supervisor);
         }
 
-        private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy)
+        private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy, LeaveUseage leaveUseage)
         {
-            if (!ShouldNotifyHr(leaveRequest, requestedBy)) return;
+            if (!ShouldNotifyHr(leaveRequest, leaveUseage)) return;
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
@@ -165,18 +169,16 @@ namespace Backend.Services
                 _personRepository.GetHrAdminStaff());
         }
 
-        public bool ShouldNotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy)
+        public bool ShouldNotifyHr(LeaveRequest leaveRequest, LeaveUseage leaveUseage)
         {
-            var type = leaveRequest.Type;
-            if (type == LeaveType.Other) return true;
-            if (type != LeaveType.Vacation && LeaveAllowed(type, requestedBy.Id) == 0) return true;
-            var currentLeaveUseage = GetCurrentLeaveUseage(type, requestedBy.Id);
-            return currentLeaveUseage.Left < leaveRequest.Days;
+            if (leaveRequest.Type == LeaveType.Other) return true;
+            return leaveUseage.Left < leaveRequest.Days;
         }
 
         private async Task SendRequestApproval(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            PersonWithStaff supervisor)
+            PersonWithStaff supervisor,
+            LeaveUseage leaveUseage)
         {
             var substituions = new Dictionary<string, string>
             {
@@ -184,7 +186,8 @@ namespace Backend.Services
                 {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
-                {":time", $"{leaveRequest.Days} Day(s)"}
+                {":time", $"{leaveRequest.Days} Day(s)"},
+                {":left", $"{leaveUseage.Left} Day(s)"}
             };
 
             await _emailService.SendTemplateEmail(substituions,
@@ -242,7 +245,7 @@ namespace Backend.Services
             ).ToList();
         }
 
-        private LeaveUseage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
+        public LeaveUseage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
         {
             return GetLeaveUseage(leaveType, personId, DateTime.Now.SchoolYear());
         }

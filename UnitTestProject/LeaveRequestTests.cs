@@ -188,7 +188,8 @@ namespace UnitTestProject
             _servicesFixture.InsertRole(job.Id, personWithStaff.Id, totalYears);
             //insert used leave
             _servicesFixture.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
-            var actualEmailed = _leaveService.ShouldNotifyHr(request, personWithStaff);
+            var actualEmailed = _leaveService.ShouldNotifyHr(request,
+                _leaveService.GetCurrentLeaveUseage(request.Type, personWithStaff.Id));
             Assert.Equal(expectedEmailed, actualEmailed);
         }
 
@@ -418,7 +419,7 @@ namespace UnitTestProject
                 requestedBy,
                 department,
                 devision,
-                supervisorGroup);
+                supervisorGroup, new LeaveUseage(){LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
                 Assert.Equal(expectedApproverId, actualApprover.Id);
