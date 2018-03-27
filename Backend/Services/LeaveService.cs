@@ -168,7 +168,7 @@ namespace Backend.Services
         {
             var type = leaveRequest.Type;
             if (type == LeaveType.Other) return true;
-            if (type != LeaveType.Vacation && LeaveAllowed(type, requestedBy.Id).GetValueOrDefault() == 0) return true;
+            if (type != LeaveType.Vacation && LeaveAllowed(type, requestedBy.Id) == 0) return true;
             var currentLeaveUseage = GetCurrentLeaveUseage(type, requestedBy.Id);
             return currentLeaveUseage.Left < leaveRequest.Days;
         }
@@ -237,7 +237,7 @@ namespace Backend.Services
                         ? vacationAllowed
                         : LeaveAllowed(type, Enumerable.Empty<PersonRoleWithJob>())
                 }
-            ).Where(useage => useage.TotalAllowed != null).ToList();
+            ).ToList();
         }
 
         private LeaveUseage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
@@ -269,14 +269,14 @@ namespace Backend.Services
                 .Sum(request => request.Days);
         }
 
-        public int? LeaveAllowed(LeaveType leaveType, Guid personId)
+        public int LeaveAllowed(LeaveType leaveType, Guid personId)
         {
             if (leaveType != LeaveType.Vacation) return LeaveAllowed(leaveType, Enumerable.Empty<PersonRoleWithJob>());
             //fetch personRoles
             return LeaveAllowed(leaveType, _personRepository.GetPersonRolesWithJob(personId));
         }
 
-        public static int? LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles)
+        public static int LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles)
         {
             switch (leaveType)
             {
@@ -285,9 +285,8 @@ namespace Backend.Services
                 case LeaveType.Emergency: return 5;
                 case LeaveType.Maternity: return 90;
                 case LeaveType.Paternity: return 5;
-                case LeaveType.SchoolRelated: return null;
                 case LeaveType.Vacation: break;
-                default: return null;
+                default: return 0;
             }
 
             //calculation for vacation time is done here
@@ -301,7 +300,7 @@ namespace Backend.Services
             }
 
             //no time has been spent as staff or a director, therefore no vacation time is allowed
-            if (totalServiceTime == TimeSpan.Zero) return null;
+            if (totalServiceTime == TimeSpan.Zero) return 0;
             var yearsOfService = totalServiceTime.Days / 365;
             if (yearsOfService < 10) return 10;
             if (yearsOfService < 20) return 15;

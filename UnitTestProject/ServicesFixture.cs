@@ -152,7 +152,17 @@ namespace UnitTestProject
                     });
         }
 
-        public Job InsertJob(Action<JobWithOrgGroup> action = null)
+        public JobWithOrgGroup InsertStaffJob(Action<JobWithOrgGroup> action = null)
+        {
+            return InsertJob(job =>
+            {
+                job.Type = JobType.FullTime;
+                job.OrgGroup.Type = GroupType.Department;
+                action?.Invoke(job);
+            });
+        }
+
+        public JobWithOrgGroup InsertJob(Action<JobWithOrgGroup> action = null)
         {
             var job = JobFaker().Generate();
             action?.Invoke(job);
@@ -161,9 +171,14 @@ namespace UnitTestProject
             return job;
         }
 
-        public PersonWithStaff InsertPerson(bool includeStaff = true)
+        public PersonWithStaff InsertPerson(bool includeStaff)
+        {
+            return InsertPerson(null, includeStaff);
+        }
+        public PersonWithStaff InsertPerson(Action<PersonWithStaff> action = null, bool includeStaff = true)
         {
             var person = PersonFaker().Generate(includeStaff ? "default" : "default,notStaff");
+            action?.Invoke(person);
             _dbConnection.Insert(person);
             if (includeStaff)
                 _dbConnection.Insert(person.Staff);
@@ -190,7 +205,7 @@ namespace UnitTestProject
             leaveRequest.Days = days;
             leaveRequest.OverrideDays = true;
             leaveRequest.StartDate = DateTime.Now;
-            leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4); 
+            leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4);
             _dbConnection.Insert(leaveRequest);
             return leaveRequest;
         }

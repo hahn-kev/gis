@@ -11,7 +11,7 @@ namespace Backend.Entities
     {
         public LeaveType LeaveType { get; set; }
         public decimal Used { get; set; }
-        public int? TotalAllowed { get; set; }
-        public decimal? Left => TotalAllowed - Used;
+        public int TotalAllowed { get; set; }
+        public decimal Left => TotalAllowed - Used;
     }
 }

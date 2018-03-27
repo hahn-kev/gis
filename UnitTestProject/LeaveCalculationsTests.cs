@@ -80,6 +80,20 @@ namespace UnitTestProject
             Assert.Equal(5, result);
         }
 
+        [Fact]
+        public void LeaveDetailsShouldIncludeOtherLeaveTypes()
+        {
+            var personWithStaff = _servicesFixture.InsertPerson(person => person.IsThai = true);
+            var job = _servicesFixture.InsertJob();
+            var expectedDays = 5;
+            var leaveRequest = _servicesFixture.InsertLeaveRequest(LeaveType.Other, personWithStaff.Id, expectedDays);
+
+            var currentLeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithStaff.Id);
+            var leaveUseage = currentLeaveDetails.LeaveUseages.SingleOrDefault(useage => useage.LeaveType == LeaveType.Other);
+            Assert.NotNull(leaveUseage);
+            Assert.Equal(expectedDays, leaveUseage.Used);
+        }
+
         public static IEnumerable<object[]> RolesMemberData()
         {
             Guid personId = Guid.NewGuid();
@@ -143,9 +157,9 @@ namespace UnitTestProject
                     Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1)),
                     Role(false, new DateTime(1995, 1, 1), new DateTime(2000, 1, 1)),
                 });
-                yield return (null, new List<PersonRoleWithJob>());
+                yield return (0, new List<PersonRoleWithJob>());
                 //non fulltime/half don't get leave
-                yield return (null, new List<PersonRoleWithJob>
+                yield return (0, new List<PersonRoleWithJob>
                 {
                     Role(startDate: twoYearsAgo, jobType: JobType.Contractor),
                     Role(startDate: twoYearsAgo, jobType: JobType.DailyWorker),
@@ -158,7 +172,7 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(RolesMemberData))]
-        public void ShouldCalculateLeaveAllowed(int? expected, IList<PersonRoleWithJob> personRoles)
+        public void ShouldCalculateLeaveAllowed(int expected, IList<PersonRoleWithJob> personRoles)
         {
             var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles);
             Assert.Equal(expected, result);
