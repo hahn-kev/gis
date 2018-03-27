@@ -5,6 +5,7 @@ namespace Backend.Entities
 {
     public class Staff : BaseEntity
     {
+        public string Email { get; set; }
         public Guid? OrgGroupId { get; set; }
         public Guid? MissionOrgId { get; set; }
         public int? AnnualSalary { get; set; }
@@ -23,10 +24,10 @@ namespace Backend.Entities
         public string EndorsementAgency { get; set; }
     }
 
-    [Table("Staff")]
     public class StaffWithName : Staff
     {
         public string PreferredName { get; set; }
+        public string LastName { get; set; }
         public Guid PersonId { get; set; }
     }
 }

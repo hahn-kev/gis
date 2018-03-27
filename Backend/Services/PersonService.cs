@@ -56,7 +56,8 @@ namespace Backend.Services
             }
 
             _entityService.Save(person);
-            MatchPersonWithUser(person);
+            if (person.Staff != null)
+            MatchStaffWithUser(person.Staff, person.Id);
 
             if (person.SpouseChanged)
             {
@@ -83,13 +84,13 @@ namespace Backend.Services
         public IList<PersonWithStaff> StaffAll =>
             _personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null).ToList();
 
-        public void MatchPersonWithUser(Person person)
+        public void MatchStaffWithUser(Staff staff, Guid personId)
         {
-            if (string.IsNullOrEmpty(person.Email)) return;
+            if (string.IsNullOrEmpty(staff.Email)) return;
             var user = _usersRepository.Users.SingleOrDefault(profile =>
-                profile.PersonId == null && profile.Email == person.Email);
+                profile.PersonId == null && profile.Email == staff.Email);
             if (user != null)
-                _usersRepository.UpdatePersonId(user.Id, person.Id);
+                _usersRepository.UpdatePersonId(user.Id, personId);
         }
 
         #endregion

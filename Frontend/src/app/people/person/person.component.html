@@ -82,7 +82,7 @@
           <input matInput [(ngModel)]="person.email"
                  type="email"
                  name="email"
-                 placeholder="Email">
+                 placeholder="Personal Email">
         </mat-form-field>
         <mat-form-field>
           <input matInput [(ngModel)]="person.phoneNumber"
@@ -210,6 +210,13 @@
             <span></span>
           </ng-container>
         </ng-container>
+        <mat-form-field>
+          <input matInput [(ngModel)]="person.staff.email"
+                 type="email"
+                 name="staffEmail"
+                 placeholder="Staff Email">
+        </mat-form-field>
+        <span></span>
         <mat-form-field>
           <mat-select name="orgGroup"
                       [disabled]="isSelf"

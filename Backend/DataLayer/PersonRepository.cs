@@ -103,10 +103,12 @@ namespace Backend.DataLayer
             select new StaffWithName
             {
                 Id = staff.Id,
+                Email = staff.Email,
                 OrgGroupId = staff.OrgGroupId,
                 MissionOrgId = staff.MissionOrgId,
                 PersonId = person.Id,
                 PreferredName = person.PreferredName,
+                LastName = person.LastName,
                 AnnualSalary = staff.AnnualSalary,
                 RenwebId = staff.RenwebId,
                 MoeLicenseNumber = staff.MoeLicenseNumber,

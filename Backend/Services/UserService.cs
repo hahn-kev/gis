@@ -48,10 +48,10 @@ namespace Backend.Services
         private void CheckUpdatePersonId(IUser user)
         {
             if (string.IsNullOrEmpty(user.Email) || user.PersonId.HasValue) return;
-            user.PersonId = _personRepository.People
-                .Where(person => person.Email == user.Email)
+            user.PersonId = _personRepository.StaffWithNames
+                .Where(staff => staff.Email == user.Email)
                 //casting to Guid? because otherwise if none is found then personId could be an empty guid
-                .Select(person => (Guid?) person.Id)
+                .Select(staff => (Guid?) staff.PersonId)
                 .SingleOrDefault();
         }
 

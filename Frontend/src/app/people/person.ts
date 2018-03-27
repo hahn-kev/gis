@@ -59,6 +59,7 @@ export class PersonWithDaysOfLeave extends Person {
 }
 
 export class Staff extends BaseEntity {
+  public email: string;
   public orgGroupId: string;
   public missionOrgId: string;
   public annualSalary: number;
@@ -83,6 +84,7 @@ export class Staff extends BaseEntity {
 
 export class StaffWithName extends Staff {
   public preferredName: string;
+  public lastName: string;
   public personId: string;
 
   constructor(id?: string, preferredName?: string) {
