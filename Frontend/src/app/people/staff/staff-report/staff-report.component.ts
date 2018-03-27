@@ -36,7 +36,8 @@ export class StaffReportComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource = new AppDataSource<PersonWithStaff>();
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
-    this.dataSource.customColumnAccessor('age', data => this.age(data.birthdate));
+    this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
+    this.dataSource.customColumnAccessor('untilBirthday', data => moment(data.birthdate).unix());
     this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
