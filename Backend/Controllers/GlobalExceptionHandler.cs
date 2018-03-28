@@ -35,8 +35,7 @@ namespace Backend.Controllers
         {
             ReportToSentry(context);
 
-            var jsonMediaType = MediaTypeHeaderValue.Parse("application/json");
-            if (context.HttpContext.Request.GetTypedHeaders().Accept.Any(value => value.IsSubsetOf(jsonMediaType)))
+            if (context.HttpContext.IsJsonRequest())
             {
                 context.Result = new ObjectResult(new ErrorResponse {Message = context.Exception.Message})
                 {
@@ -48,7 +47,7 @@ namespace Backend.Controllers
             {
                 context.Result =
                     new RedirectResult(
-                        ControllerExtensions.RedirectFrontendPath("Error: " + context.Exception.Message));
+                        ControllerExtensions.RedirectFrontendMessagePath("Error: " + context.Exception.Message));
             }
 
             string userName = context.HttpContext.User.Identity.Name ?? "anonymous";

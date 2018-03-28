@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Inject, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from '../user/user';
 import { MatSnackBar } from '@angular/material';
 import { LoginService } from '../services/auth/login.service';
 import { AuthenticateService } from '../services/auth/authenticate.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -22,9 +23,11 @@ export class LoginComponent implements OnInit {
   }
 
   constructor(private authenticateService: AuthenticateService,
-    private loginService: LoginService,
-    private router: Router,
-    private snackBar: MatSnackBar) {
+              private loginService: LoginService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private snackBar: MatSnackBar,
+              @Inject(DOCUMENT) private document: Document) {
   }
 
   ngOnInit(): void {
@@ -45,10 +48,11 @@ export class LoginComponent implements OnInit {
       this.passwordReset = true;
       this.snackBar.open('Password reset required', 'Dissmiss', {duration: 2000});
       return;
+    } else if (this.route.snapshot.queryParamMap.has('redirect')) {
+      this.document.location.href = this.route.snapshot.queryParamMap.get('redirect');
     } else {
       let success = await this.router.navigate([this.loginService.redirectTo]);
       if (!success) this.router.navigate(['home']);
-
     }
   }
 }
