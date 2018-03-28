@@ -12,7 +12,7 @@
       </mat-select>
     </mat-form-field>
     <mat-form-field>
-      <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="refreshOrgChain()"
+      <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="supervisorChanged()"
                   placeholder="Supervisor">
         <mat-option>None</mat-option>
         <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}

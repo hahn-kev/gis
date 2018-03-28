@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrgGroup } from '../org-group';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService } from '../group.service';
-import { Person } from '../../person';
+import { PersonWithStaff } from '../../person';
 import { OrgChain } from '../org-chain';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-d
 })
 export class GroupComponent implements OnInit {
   public group: OrgGroup;
-  public people: Person[];
+  public people: PersonWithStaff[];
   public groups: OrgGroup[];
   public children: OrgGroup[];
   public orgChain: OrgChain;
@@ -33,20 +33,33 @@ export class GroupComponent implements OnInit {
       this.group = value.group;
       this.isNew = !this.group.id;
       this.groups = value.groups;
-      this.people = value.people;
+      this.people = value.staff;
       this.children = this.isNew ? [] : this.groups.filter(group => group.parentId === this.group.id);
       setTimeout(() => this.refreshOrgChain());
     });
+  }
+
+  supervisorChanged() {
+    let supervisor = this.people.find(p => p.id == this.group.supervisor);
+    if (supervisor != null && supervisor.staff.email == null) {
+      let editSuperSnackbar = this.snackBar.open(`Supervisor won't get leave requests, they don't have a staff email`,
+        'Edit Supervisor',
+        {duration: 20000});
+      editSuperSnackbar.onAction().subscribe(value => {
+        this.save(['people', 'edit', supervisor.id]);
+      });
+    }
+    this.refreshOrgChain();
   }
 
   refreshOrgChain(): void {
     this.orgChain = this.groupService.buildOrgChain(this.group, this.people, this.groups);
   }
 
-  async save(): Promise<void> {
+  async save(navigateTo = ['/groups/list']): Promise<void> {
     await this.groupService.updateGroup(this.group);
-    this.router.navigate(['/groups/list']);
-    this.snackBar.open(`${this.group.type} ${this.isNew ? 'Added' : 'Saved'}`, null, {duration: 2000});
+    this.router.navigate(navigateTo);
+    this.snackBar.open(`${this.group.groupName} ${this.isNew ? 'Added' : 'Saved'}`, null, {duration: 2000});
   }
 
   async deleteGroup() {

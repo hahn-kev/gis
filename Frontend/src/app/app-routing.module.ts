@@ -195,7 +195,7 @@ const routes: Routes = [
             resolve: {
               group: GroupResolveService,
               groups: GroupsResolveService,
-              people: PeopleResolveService
+              staff: StaffResolveService
             }
           },
           {
