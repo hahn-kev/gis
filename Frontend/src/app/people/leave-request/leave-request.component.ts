@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/share';
-import { LeaveType } from '../self/self';
+import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
 import { Gender } from '../person';
 import * as moment from 'moment';
 
@@ -25,6 +25,7 @@ import * as moment from 'moment';
 })
 export class LeaveRequestComponent implements OnInit, OnDestroy {
   public typesOfLeave = Object.keys(LeaveType);
+  public typeName = LeaveTypeName;
   public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequestWithNames;
   public daysUsed = 0;
@@ -137,6 +138,11 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
       'list',
       this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
     ]);
+  }
+
+  showLeaveUsage(leaveUseage: LeaveUseage) {
+    if (!this.showLeaveType(leaveUseage.leaveType)) return false;
+    return leaveUseage.totalAllowed != 0 || leaveUseage.used != 0;
   }
 
   showLeaveType(leaveType: LeaveType) {

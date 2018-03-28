@@ -21,7 +21,7 @@
       <mat-form-field>
         <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
           <ng-container *ngFor="let type of typesOfLeave">
-            <mat-option [value]="type" *ngIf="showLeaveType(type)">{{type}}</mat-option>
+            <mat-option [value]="type" *ngIf="showLeaveType(type)">{{typeName(type)}}</mat-option>
           </ng-container>
         </mat-select>
       </mat-form-field>
@@ -106,10 +106,9 @@
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
           <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">
-            <!--the if is here to hide paternity when the person is female and maternity when person is male, or if not thai to hide vacation-->
-            <mat-chip *ngIf="showLeaveType(leave.leaveType)"
+            <mat-chip *ngIf="showLeaveUsage(leave)"
                       color="accent" selected="true">
-              {{leave.leaveType}} {{leave.used}}/{{leave.totalAllowed}}
+              {{typeName(leave.leaveType)}} {{leave.used}}/{{leave.totalAllowed}}
             </mat-chip>
           </ng-container>
         </mat-chip-list>

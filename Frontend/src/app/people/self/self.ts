@@ -27,3 +27,14 @@ export enum LeaveType {
   MissionRelated = 'MissionRelated',
   Other = 'Other',
 }
+
+export function LeaveTypeName(type: LeaveType): string {
+  switch (type) {
+    case LeaveType.SchoolRelated:
+      return 'School Related';
+    case LeaveType.MissionRelated:
+      return 'Mission Related';
+    default:
+      return type;
+  }
+}
