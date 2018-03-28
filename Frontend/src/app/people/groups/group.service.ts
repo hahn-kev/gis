@@ -42,8 +42,11 @@ export class GroupService {
       if (currentGroup.id == orgGroup.id) currentGroup = orgGroup;
       if (chainList.length > 1 && currentGroup == orgGroup) throw new Error('Circular Orginization chart detected, please resolve');
     }
-    if (currentGroup != null && currentGroup.supervisor != null) {
-      chainList.push(OrgChainLink.FromPerson(people.find(value => currentGroup.supervisor == value.id)));
+    let supervisor = null;
+    if (currentGroup != null && currentGroup.supervisor != null)
+      supervisor = people.find(value => currentGroup.supervisor == value.id);
+    if (supervisor != null) {
+      chainList.push(OrgChainLink.FromPerson(supervisor));
     } else {
       chainList.push(new OrgChainLink(LinkType.Group, '', 'No One'));
     }
