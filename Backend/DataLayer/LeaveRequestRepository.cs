@@ -19,7 +19,7 @@ namespace Backend.DataLayer
         public IQueryable<LeaveRequestWithNames> LeaveRequestWithNames =>
             from l in _connection.LeaveRequests
             from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
-            from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById)
+            from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById).DefaultIfEmpty()
             where !person.Deleted
             select new LeaveRequestWithNames
             {

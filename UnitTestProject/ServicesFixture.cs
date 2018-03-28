@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoBogus;
 using Backend;
 using Backend.DataLayer;
@@ -16,9 +17,12 @@ using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Npgsql;
+using SendGrid.Helpers.Mail;
 using Xunit;
+using Attachment = Backend.Entities.Attachment;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
@@ -30,6 +34,8 @@ namespace UnitTestProject
         public T Get<T>() => ServiceProvider.GetService<T>();
         private IDbConnection _dbConnection;
         public IDbConnection DbConnection => _dbConnection ?? (_dbConnection = Get<IDbConnection>());
+        public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService)Get<IEmailService>());
+        public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService)Get<IEntityService>());
 
         public ServicesFixture(Action<IServiceCollection> configure = null)
         {
@@ -46,8 +52,20 @@ namespace UnitTestProject
             var startup = new Startup(builder.Build());
             ServiceCollection.AddLogging(loggingBuilder => loggingBuilder.AddConsole().AddDebug());
             startup.ConfigureServices(ServiceCollection);
-            ServiceCollection.RemoveAll<IEmailService>().AddSingleton(Mock.Of<IEmailService>());
-            ServiceCollection.Replace(ServiceDescriptor.Singleton(Mock.Of<IEntityService>()));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
+            {
+                var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>());
+                esm.CallBase = true;
+                esm.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>())).Returns(Task.CompletedTask);
+                return esm.Object;
+            }));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IEntityService>(provider =>
+            {
+                var esm = new Mock<EntityService>(provider.GetService<IDbConnection>());
+//                esm.CallBase = true;
+                return esm.Object;
+            }));
+
             configure?.Invoke(ServiceCollection);
             ServiceProvider = ServiceCollection.BuildServiceProvider();
             startup.ConfigureDatabase(ServiceProvider);

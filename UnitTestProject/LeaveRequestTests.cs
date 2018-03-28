@@ -11,6 +11,7 @@ using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using SendGrid.Helpers.Mail;
 using Xunit;
 
 namespace UnitTestProject
@@ -28,25 +29,12 @@ namespace UnitTestProject
             _leaveService = _servicesFixture.Get<LeaveService>();
             _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
             _dbConnection = _servicesFixture.Get<IDbConnection>();
-        }
-
-        private void Setup(Action<IServiceCollection> configure = null)
-        {
-            if (configure != null)
-            {
-                _servicesFixture = new ServicesFixture(configure);
-                _leaveService = _servicesFixture.Get<LeaveService>();
-                _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
-                _dbConnection = _servicesFixture.Get<IDbConnection>();
-            }
-
             _servicesFixture.SetupPeople();
         }
 
         [Fact]
         public async Task FindsSupervisor()
         {
-            _servicesFixture.SetupPeople();
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
@@ -59,13 +47,12 @@ namespace UnitTestProject
         [Fact]
         public async Task SendsEmail()
         {
-            var emailMock = new Mock<IEmailService>();
+            var emailMock = _servicesFixture.EmailServiceMock;
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
                 It.IsAny<EmailService.Template>(),
                 It.IsAny<PersonWithStaff>(),
                 It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
-            Setup(collection => collection.RemoveAll<IEmailService>().AddSingleton(emailMock.Object));
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
@@ -87,6 +74,34 @@ namespace UnitTestProject
                         It.IsAny<PersonWithStaff>()),
                 Times.Never);
         }
+
+        [Fact]
+        public async Task SavesLeaveRequest()
+        {
+            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            Assert.NotNull(jacob);
+            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id};
+            await _leaveService.RequestLeave(expectedLeaveRequest);
+            _servicesFixture.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task EmailThrowingAnErrorWillCauseALeaveRequestToBeDeleted()
+        {
+            var expectedException = new Exception("email test exception");
+            _servicesFixture.EmailServiceMock
+                .Setup(email => email.SendEmail(It.IsAny<SendGridMessage>()))
+                .Throws(expectedException);
+            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            Assert.NotNull(jacob);
+            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id};
+            var actualException =
+                await Assert.ThrowsAsync<Exception>(() => _leaveService.RequestLeave(expectedLeaveRequest));
+            Assert.Same(expectedException, actualException);
+            _servicesFixture.EntityServiceMock.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
+            _servicesFixture.EntityServiceMock.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
+        }
+
 
         [Fact]
         public void OrgGroupChainResolvesAsExpected()
@@ -398,7 +413,7 @@ namespace UnitTestProject
             bool actualApprovalEmailSent = false;
             int actualNotifyEmailCount = 0;
 
-            var emailMock = new Mock<IEmailService>();
+            var emailMock = _servicesFixture.EmailServiceMock.As<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
                     It.IsAny<EmailService.Template>(),
@@ -413,13 +428,12 @@ namespace UnitTestProject
                             actualNotifyEmailCount++;
                     });
 
-            Setup(collection => collection.Replace(ServiceDescriptor.Singleton(emailMock.Object)));
 
             var actualApprover = await _leaveService.ResolveLeaveRequestChain(request,
                 requestedBy,
                 department,
                 devision,
-                supervisorGroup, new LeaveUseage(){LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
+                supervisorGroup, new LeaveUseage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
                 Assert.Equal(expectedApproverId, actualApprover.Id);

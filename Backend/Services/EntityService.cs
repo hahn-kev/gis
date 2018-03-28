@@ -23,12 +23,12 @@ namespace Backend.Services
             _dbConnection = dbConnection;
         }
 
-        public void Save<T>(T entity) where T : BaseEntity
+        public virtual void Save<T>(T entity) where T : BaseEntity
         {
-            Save(entity, out var _);
+            Save(entity, out _);
         }
 
-        public void Save<T>(T entity, out bool isNew) where T : BaseEntity
+        public virtual void Save<T>(T entity, out bool isNew) where T : BaseEntity
         {
             isNew = false;
             if (entity == null) throw new ArgumentNullException(nameof(entity));
@@ -44,14 +44,14 @@ namespace Backend.Services
                 throw new Exception($"{typeof(T).Name} not found for id: {entity.Id}");
         }
 
-        public void Delete<T>(T entity) where T : BaseEntity
+        public virtual void Delete<T>(T entity) where T : BaseEntity
         {
             if (entity.Id == Guid.Empty) return;
             _dbConnection.Delete(entity);
             _dbConnection.Attachments.Where(attachment => attachment.AttachedToId == entity.Id).Delete();
         }
 
-        public void Delete<T>(Guid id) where T : BaseEntity
+        public virtual void Delete<T>(Guid id) where T : BaseEntity
         {
             _dbConnection.GetTable<T>().Delete(arg => arg.Id == id);
             _dbConnection.Attachments.Where(attachment => attachment.AttachedToId == id).Delete();

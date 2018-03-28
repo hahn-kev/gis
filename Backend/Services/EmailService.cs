@@ -44,6 +44,8 @@ namespace Backend.Services
             string fromName,
             string toEmail,
             string toName);
+
+        Task SendEmail(SendGridMessage message);
     }
 
     public class EmailService : IEmailService
@@ -118,7 +120,7 @@ namespace Backend.Services
             return mailgunReponse;
         }
 
-        public Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
             PersonWithStaff @from,
             PersonWithStaff to)
         {
@@ -130,7 +132,7 @@ namespace Backend.Services
                 to.PreferredName);
         }
 
-        public Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
             PersonWithStaff @from,
             IEnumerable<PersonWithStaff> tos)
         {
@@ -140,7 +142,7 @@ namespace Backend.Services
                 tos.Select(person => new EmailAddress(person.Staff.Email, person.PreferredName)).ToList());
         }
 
-        public Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
             Template template,
             PersonExtended from,
@@ -155,7 +157,7 @@ namespace Backend.Services
                 to.PreferredName);
         }
 
-        public Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
             Template template,
             string fromEmail,
@@ -169,22 +171,21 @@ namespace Backend.Services
                 new List<EmailAddress> {new EmailAddress(toEmail, toName)});
         }
 
-        public async Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
             Template template,
             string fromEmail,
             string fromName,
             List<EmailAddress> tos)
         {
-#if DEBUG
-            return;
-#endif
             foreach (var emailAddress in tos)
             {
                 if (string.IsNullOrEmpty(emailAddress.Email))
-                    throw new ArgumentNullException(nameof(emailAddress.Email), $"{emailAddress.Name} does not have an email assigned");
+                    throw new ArgumentNullException(nameof(emailAddress.Email),
+                        $"{emailAddress.Name} does not have an email assigned");
             }
-            if (!tos.Any()) return;
+
+            if (!tos.Any()) return Task.CompletedTask;
             if (fromEmail == null)
                 throw new ArgumentNullException(nameof(fromEmail), $"{fromName} does not have an email assigned");
             var msg = new SendGridMessage
@@ -201,7 +202,16 @@ namespace Backend.Services
                 Subject = subject,
                 TemplateId = template.Id
             };
-            var response = await _sendGridClient.SendEmailAsync(msg);
+            return SendEmail(msg);
+        }
+
+        //this method gets replaced by moq, if it's overloaded that needs to be accounted for
+        public virtual async Task SendEmail(SendGridMessage message)
+        {
+#if DEBUG
+            return;
+#endif
+            var response = await _sendGridClient.SendEmailAsync(message);
             if (response.StatusCode != HttpStatusCode.Accepted)
             {
                 var body = await response.Body.ReadAsStringAsync();
