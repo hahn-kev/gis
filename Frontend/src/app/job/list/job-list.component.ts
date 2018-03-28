@@ -10,6 +10,7 @@ import { Job } from '../job';
 })
 export class JobListComponent implements OnInit {
   public dataSource: AppDataSource<Job>;
+  public typeName = Job.typeName;
 
   constructor(private route: ActivatedRoute) {
   }

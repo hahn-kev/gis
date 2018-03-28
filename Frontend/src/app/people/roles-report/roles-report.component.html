@@ -35,6 +35,10 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.job.title}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="job.type">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Job Type</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{typeName(row.job.type)}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="preferredName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
@@ -59,8 +63,9 @@
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['job.title', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+  <mat-header-row
+    *matHeaderRowDef="['job.title', 'job.type', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['job.title', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           *matRowDef="let row; columns: ['job.title', 'job.type', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
            [routerLink]="'/people/edit/' + row.personId"></mat-row>
 </mat-table>

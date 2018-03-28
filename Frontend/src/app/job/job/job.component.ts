@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { JobService } from '../job.service';
-import { Job, JobWithRoles } from '../job';
+import { Job, JobType, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { OrgGroup } from '../../people/groups/org-group';
@@ -15,6 +15,8 @@ import { Grade } from '../grade/grade';
   styleUrls: ['./job.component.scss']
 })
 export class JobComponent implements OnInit {
+  public jobTypes = Object.keys(JobType);
+  public typeName = Job.typeName;
   public job: JobWithRoles;
   public groups: OrgGroup[];
   public grades: Grade[];
