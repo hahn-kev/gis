@@ -132,7 +132,7 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
     if (!result) return;
     await this.leaveRequestService.deleteRequest(this.leaveRequest.id).toPromise();
 
-    this.snackBar.open('Request deleted');
+    this.snackBar.open('Request deleted', null, {duration: 2000});
     this.router.navigate([
       'leave-request',
       'list',
