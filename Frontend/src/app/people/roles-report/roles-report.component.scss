@@ -2,3 +2,11 @@
   visibility: collapse;
   width: 0;
 }
+
+.mat-column-active {
+  flex: 0.5 4;
+}
+
+.mat-column-startDate, .mat-column-endDate{
+  flex: 0.5 4;
+}
