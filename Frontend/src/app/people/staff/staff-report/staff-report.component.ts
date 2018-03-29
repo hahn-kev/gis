@@ -25,7 +25,11 @@ export class StaffReportComponent implements OnInit {
     'untilBirthday',
     'gender',
     'country',
-    'staff.endorsementAgency'
+    'staff.endorsementAgency',
+    'legalStatus',
+    'isThai',
+    'speaksEnglish',
+    'nationality'
   ];
   public selectedColumns: string[];
   showThai = true;

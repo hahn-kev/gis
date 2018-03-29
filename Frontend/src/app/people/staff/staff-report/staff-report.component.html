@@ -77,12 +77,36 @@
   </ng-container>
   <ng-container matColumnDef="age">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Age</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }} </mat-cell>
+    <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="untilBirthday">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Time to Birthday</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{ row.birthdate ? timeToBirthday(row.birthdate) : '' }} </mat-cell>
+    <mat-cell *matCellDef="let row"> {{ row.birthdate ? timeToBirthday(row.birthdate) : '' }}</mat-cell>
   </ng-container>
+
+
+  <ng-container matColumnDef="legalStatus">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.workPermitType">Legal Status</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{ row.staff.workPermitType }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="isThai">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Thai</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.isThai"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="speaksEnglish">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Speaks English</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.speaksEnglish"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="nationality">
+    <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.nationality}}</mat-cell>
+  </ng-container>
+
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="selectedColumns"></mat-header-row>
   <mat-row class="hover-overlay" *matRowDef="let row; columns: selectedColumns"
