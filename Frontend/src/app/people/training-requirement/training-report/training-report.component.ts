@@ -52,6 +52,7 @@ export class TrainingReportComponent implements OnInit {
       this.staffTraining.asObservable(),
       this.selectedYearSubject.pipe(pluck('value')),
       this.showCompleted);
+
   }
 
   ngOnInit(): void {
@@ -88,7 +89,7 @@ export class TrainingReportComponent implements OnInit {
     staffTraining.staffId = staffWithTraining.staff.id;
     staffTraining.completedDate = this.completedDate.toDate();
     await this.trainingService.saveStaffTraining(staffTraining);
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe((training) => this.staffTraining.next(training));
   }
 
   async markAllComplete(reqObject: RequirementWithStaff): Promise<void> {
@@ -96,6 +97,6 @@ export class TrainingReportComponent implements OnInit {
       .filter(value => !value.training.completedDate)
       .map(value => value.staff.id);
     await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate.toDate());
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe(this.staffTraining);
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe((training) => this.staffTraining.next(training));
   }
 }

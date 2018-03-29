@@ -34,8 +34,8 @@ namespace UnitTestProject
         public T Get<T>() => ServiceProvider.GetService<T>();
         private IDbConnection _dbConnection;
         public IDbConnection DbConnection => _dbConnection ?? (_dbConnection = Get<IDbConnection>());
-        public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService)Get<IEmailService>());
-        public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService)Get<IEntityService>());
+        public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService) Get<IEmailService>());
+        public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService) Get<IEntityService>());
 
         public ServicesFixture(Action<IServiceCollection> configure = null)
         {
@@ -100,7 +100,7 @@ namespace UnitTestProject
             var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
             foreach (var role in roles.Except(existingRoles))
             {
-                DbConnection.InsertId(
+                DbConnection.InsertWithIdentity(
                     new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
         }
@@ -193,6 +193,7 @@ namespace UnitTestProject
         {
             return InsertPerson(null, includeStaff);
         }
+
         public PersonWithStaff InsertPerson(Action<PersonWithStaff> action = null, bool includeStaff = true)
         {
             var person = PersonFaker().Generate(includeStaff ? "default" : "default,notStaff");
@@ -259,6 +260,25 @@ namespace UnitTestProject
             }
 
             return user;
+        }
+
+        public TrainingRequirement InsertRequirement(int firstYear = 2017, int? lastYear = null, int months = 12)
+        {
+            var tr = AutoFaker.Generate<TrainingRequirement>();
+            tr.FirstYear = firstYear;
+            tr.LastYear = lastYear;
+            tr.RenewMonthsCount = months;
+            _dbConnection.Insert(tr);
+            return tr;
+        }
+
+        public StaffTraining InsertTraining(Guid trId, DateTime? completedDate = null)
+        {
+            var tr = AutoFaker.Generate<StaffTraining>();
+            tr.TrainingRequirementId = trId;
+            tr.CompletedDate = completedDate;
+            _dbConnection.Insert(tr);
+            return tr;
         }
 
         public void SetupData()

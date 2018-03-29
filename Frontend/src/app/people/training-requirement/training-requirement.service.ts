@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TrainingRequirement } from './training-requirement';
 import { Observable } from 'rxjs/Observable';
-import { combineLatest, map } from 'rxjs/operators';
+import { combineLatest } from 'rxjs/observable/combineLatest';
+import { debounceTime, map } from 'rxjs/operators';
 import { Year } from './year';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
@@ -98,20 +99,22 @@ export class TrainingRequirementService {
                              staffTrainingObservable: Observable<Map<string, StaffTraining>>,
                              yearObservable: Observable<number>,
                              showCompletedObservable: Observable<boolean>): Observable<RequirementWithStaff[]> {
-    return staffTrainingObservable.pipe(
-      combineLatest(staffObservable,
-        requirementsObservable,
-        yearObservable,
-        showCompletedObservable,
-        Observable.of([])),
-      map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
-        return requirements
-          .filter(this.isInYear.bind(this, year))
-          // .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups, showCompleted))
-          .map(
-            requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
-          .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0))
-      }));
+    return combineLatest(staffTrainingObservable,
+      staffObservable,
+      requirementsObservable,
+      yearObservable,
+      showCompletedObservable,
+      Observable.of([]))
+      .pipe(
+        debounceTime(20),
+        map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
+          return requirements
+            .filter(this.isInYear.bind(this, year))
+            // .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups, showCompleted))
+            .map(
+              requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
+            .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0))
+        }));
   }
 
 

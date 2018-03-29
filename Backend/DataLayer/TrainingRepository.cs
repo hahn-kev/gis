@@ -33,6 +33,14 @@ namespace Backend.DataLayer
                 TrainingRequirementId = training.TrainingRequirementId
             };
 
+        public IQueryable<StaffTraining> GetStaffTrainingByYearMonth(int schoolYear, int schoolMonth)
+        {
+            return from training in StaffTraining
+                from requirement in TrainingRequirements.InnerJoin(r => r.Id == training.TrainingRequirementId)
+                where requirement.RenewMonthsCount == -1 || training.CompletedDate.InMonthBlock(schoolYear, schoolMonth, requirement.RenewMonthsCount)
+                select training;
+        }
+
         public void InsertAll(IEnumerable<StaffTraining> staffTraining)
         {
             _connection.BulkCopy(staffTraining);

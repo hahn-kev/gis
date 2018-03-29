@@ -10,6 +10,20 @@
           <mat-option value="AllStaff">All Staff</mat-option>
         </mat-select>
       </mat-form-field>
+      <mat-slide-toggle name="trainingOnce"
+                        [ngModel]="training.renewMonthsCount == -1"
+                        (ngModelChange)="training.renewMonthsCount = $event ? -1 : 12">
+        Training Only required once
+      </mat-slide-toggle>
+      <mat-form-field *ngIf="training.renewMonthsCount != -1">
+        <input matInput required
+               type="number"
+               [min]="1"
+               name="renewMonths"
+               [(ngModel)]="training.renewMonthsCount"
+               placeholder="Months Between Training">
+      </mat-form-field>
+      <span *ngIf="training.renewMonthsCount == -1"></span>
       <mat-form-field>
         <mat-select name="firstYear" required [(ngModel)]="training.firstYear" placeholder="First year of training">
           <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>

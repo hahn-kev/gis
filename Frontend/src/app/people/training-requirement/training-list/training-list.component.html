@@ -10,6 +10,10 @@
     <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="monthsBetween">
+    <mat-header-cell *matHeaderCellDef>Time between training</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{formatTime(row.renewMonthsCount)}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="firstYear">
     <mat-header-cell *matHeaderCellDef>First Year</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.firstYear}}</mat-cell>
@@ -19,9 +23,9 @@
     <mat-cell *matCellDef="let row">{{row.lastYear}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['name', 'firstYear',  'lastYear']"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="['name', 'monthsBetween', 'firstYear', 'lastYear']"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'../edit/' + row.id"
-           *matRowDef="let row; columns: ['name', 'firstYear',  'lastYear']"></mat-row>
+           *matRowDef="let row; columns: ['name', 'monthsBetween', 'firstYear', 'lastYear']"></mat-row>
 </mat-table>
 
 <a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Required Training"

@@ -23,7 +23,7 @@ namespace Backend.Services
 
         public IList<StaffTraining> GetByYear(int year)
         {
-            return StaffTraining.Where(training => training.CompletedDate.InSchoolYear(year)).ToList();
+            return _trainingRepository.GetStaffTrainingByYearMonth(year, DateTime.Now.Month).ToList();
         }
 
         public IList<StaffTrainingWithRequirement> GetByStaff(Guid staffId)
