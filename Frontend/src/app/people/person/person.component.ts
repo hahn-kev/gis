@@ -97,6 +97,12 @@ export class PersonComponent implements OnInit {
     this.orgChain = this.groupService.buildOrgChain(orgGroup, this.people.concat([this.person]), this.groups);
   }
 
+  findMissionOrg() {
+    if (!this.person.staff) return false;
+    if (!this.person.staff.missionOrgId) return false;
+    return this.missionOrgs.find(value => value.id == this.person.staff.missionOrgId);
+  }
+
   async isStaffChanged(isStaff: boolean): Promise<void> {
     if (isStaff) {
       this.person.staff = new Staff();
