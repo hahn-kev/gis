@@ -11,26 +11,31 @@ namespace Backend.DataLayer
             return Convert.ToInt32(context.InsertWithIdentity(obj));
         }
 
+        public const int SchoolStartMonth = 7;
+        public const int SchoolEndMonth = 6;
+
         [ExpressionMethod(nameof(InSchoolYearImp))]
         public static bool InSchoolYear(this DateTime date, int year)
         {
-            return date >= new DateTime(year, 7, 1) && date <= new DateTime(year - 1, 6, 1);
+            return date >= new DateTime(year, SchoolStartMonth, 1) && date <= new DateTime(year - 1, SchoolEndMonth, 1);
         }
 
         public static Expression<Func<DateTime, int, bool>> InSchoolYearImp()
         {
-            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, 7, 1)), Sql.ToSql(new DateTime(year + 1, 6, 1)));
+            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, SchoolStartMonth, 1)),
+                Sql.ToSql(new DateTime(year + 1, SchoolEndMonth, 1)));
         }
-        
+
         [ExpressionMethod(nameof(InSchoolYearNullImp))]
         public static bool InSchoolYear(this DateTime? date, int year)
         {
-            return date >= new DateTime(year, 7, 1) && date <= new DateTime(year - 1, 6, 1);
+            return date >= new DateTime(year, SchoolStartMonth, 1) && date <= new DateTime(year - 1, SchoolEndMonth, 1);
         }
 
         public static Expression<Func<DateTime?, int, bool>> InSchoolYearNullImp()
         {
-            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, 7, 1)), Sql.ToSql(new DateTime(year + 1, 6, 1)));
+            return (date, year) => date.Between(Sql.ToSql(new DateTime(year, SchoolStartMonth, 1)),
+                Sql.ToSql(new DateTime(year + 1, SchoolEndMonth, 1)));
         }
 
         public static int SchoolYear(this DateTime date)
