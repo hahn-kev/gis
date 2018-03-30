@@ -114,22 +114,6 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public void SqlDatesGetExecutedProperly()
-        {
-            var tr = _sf.InsertRequirement(months: 12);
-            var dateTimes = _sf.DbConnection.TrainingRequirements.Select(requirement => new[]
-            {
-                Sql.AsSql(new DateTime(2018, 3, 1).AddMonths(Sql.AsSql(requirement.RenewMonthsCount / -2))),
-                new DateTime(2018, 3, 1).AddMonths(requirement.RenewMonthsCount / 2)
-            }).First();
-            dateTimes.Length.ShouldBe(2);
-            var subtactTime = dateTimes[0];
-            var addTime = dateTimes[1];
-            subtactTime.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / -2));
-            addTime.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / 2));
-        }
-
-        [Fact]
         public void GetByYearReturnsSomeResults()
         {
             var tr = _sf.InsertRequirement();

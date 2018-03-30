@@ -8,6 +8,7 @@ using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
 using Newtonsoft.Json;
+using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
@@ -20,7 +21,6 @@ namespace UnitTestProject
         public MiscTests()
         {
             _servicesFixture = new ServicesFixture();
-            _servicesFixture.SetupData();
             _personRepository = _servicesFixture.Get<PersonRepository>();
         }
 
@@ -54,6 +54,7 @@ namespace UnitTestProject
         [Fact]
         public void GetStaffDoesntCrash()
         {
+            _servicesFixture.SetupData();
             var list = _personRepository.StaffWithNames.Where(name => name.Id != Guid.Empty).ToList();
             Assert.NotNull(list);
             Assert.NotEmpty(list);
@@ -73,6 +74,7 @@ namespace UnitTestProject
         [MemberData(nameof(GetRepoTypes))]
         public void ShouldEachPropertyResultInAPopulatedObject(Type repoType, PropertyInfo info)
         {
+            _servicesFixture.SetupData();
             var repo = _servicesFixture.ServiceProvider.GetService(repoType);
             var list = (IQueryable) info.GetValue(repo);
 
@@ -101,6 +103,17 @@ namespace UnitTestProject
             }
 
             return propertyInfos.Select(val => val.DeclaringType.ToString() + "." + val.Name);
+        }
+
+        [Fact]
+        public void SqlDatesGetExecutedProperly()
+        {
+            var tr = _servicesFixture.InsertRequirement(months: 12);
+            var actualDate = _servicesFixture.DbConnection.TrainingRequirements.Select(requirement => 
+            
+                Sql.AsSql(new DateTime(2018, 3, 1).AddMonths(requirement.RenewMonthsCount / -2))
+            ).First();
+            actualDate.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / -2));
         }
     }
 }

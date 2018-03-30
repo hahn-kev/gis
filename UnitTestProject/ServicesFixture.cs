@@ -23,6 +23,7 @@ using Npgsql;
 using SendGrid.Helpers.Mail;
 using Xunit;
 using Attachment = Backend.Entities.Attachment;
+using DataExtensions = Backend.DataLayer.DataExtensions;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
@@ -100,9 +101,13 @@ namespace UnitTestProject
             var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
             foreach (var role in roles.Except(existingRoles))
             {
-                DbConnection.InsertWithIdentity(
-                    new LinqToDB.Identity.IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
+                DbConnection.InsertId(
+                    new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
+
+            LinqToDB.Linq.Expressions.MapMember<DateTime, int, DateTime>(ProviderName.SQLiteMS,
+                (date, months) => date.AddMonths(months),
+                (date, months) => DataExtensions.AddMonths(date, months));
         }
 
         private void TryCreateTable<T>()
