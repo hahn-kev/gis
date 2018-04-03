@@ -22,6 +22,6 @@ export class ConfirmDialogComponent {
 
 
   reject() {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 }

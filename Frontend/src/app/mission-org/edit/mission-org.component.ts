@@ -5,13 +5,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MissionOrg } from '../mission-org';
 import { MissionOrgService } from '../mission-org.service';
 import { Person } from '../../people/person';
+import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
   selector: 'app-mission-org',
   templateUrl: './mission-org.component.html',
   styleUrls: ['./mission-org.component.scss']
 })
-export class MissionOrgComponent implements OnInit {
+export class MissionOrgComponent extends BaseEditComponent implements OnInit {
 
   public missionOrg: MissionOrg;
   public people: Person[];
@@ -21,7 +22,8 @@ export class MissionOrgComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              dialog: MatDialog) {
+    super(dialog);
   }
 
   ngOnInit() {
@@ -45,5 +47,4 @@ export class MissionOrgComponent implements OnInit {
     this.router.navigate(['/mission-org/list']);
     this.snackBar.open(`${this.missionOrg.name} Deleted`, null, {duration: 2000});
   }
-
 }

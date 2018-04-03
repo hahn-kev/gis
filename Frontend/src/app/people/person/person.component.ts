@@ -6,7 +6,7 @@ import { Role, RoleExtended, RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { NgModel } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
 import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
 import { RoleComponent } from './role.component';
@@ -18,13 +18,14 @@ import { Job } from '../../job/job';
 import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
 import { OrgChain } from '../groups/org-chain';
+import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
   styleUrls: ['./person.component.scss']
 })
-export class PersonComponent implements OnInit {
+export class PersonComponent implements OnInit, CanComponentDeactivate {
   public isNew: boolean;
   public isSelf: boolean;
   public filteredCountries: Observable<string[]>;
@@ -39,6 +40,7 @@ export class PersonComponent implements OnInit {
   public newRole = new Role();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
+  @ViewChild('personForm') personForm: NgForm;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
@@ -204,5 +206,10 @@ export class PersonComponent implements OnInit {
     await this.personService.deleteEmergencyContact(emergencyContact.id);
     this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
     this.snackBar.open(`Emergency Contact Deleted`, null, {duration: 2000});
+  }
+
+  canDeactivate() {
+    if (this.personForm.untouched || this.personForm.submitted) return true;
+    return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
 }

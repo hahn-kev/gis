@@ -17,13 +17,14 @@ import 'rxjs/add/operator/share';
 import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
 import { Gender } from '../person';
 import * as moment from 'moment';
+import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
   selector: 'app-leave-request',
   templateUrl: './leave-request.component.html',
   styleUrls: ['./leave-request.component.scss']
 })
-export class LeaveRequestComponent implements OnInit, OnDestroy {
+export class LeaveRequestComponent extends BaseEditComponent implements OnInit, OnDestroy {
   public typesOfLeave = Object.keys(LeaveType);
   public typeName = LeaveTypeName;
   public people: PersonAndLeaveDetails[];
@@ -42,7 +43,8 @@ export class LeaveRequestComponent implements OnInit, OnDestroy {
               private snackBar: MatSnackBar,
               public loginService: LoginService,
               private personService: PersonService,
-              private dialog: MatDialog) {
+              dialog: MatDialog) {
+    super(dialog);
     this.isHr = this.loginService.isHrOrAdmin();
   }
 

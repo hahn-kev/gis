@@ -5,13 +5,14 @@ import { TrainingRequirement } from '../training-requirement';
 import { Year } from '../year';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
+import { BaseEditComponent } from '../../../components/base-edit-component';
 
 @Component({
   selector: 'app-training-edit',
   templateUrl: './training-edit.component.html',
   styleUrls: ['./training-edit.component.scss']
 })
-export class TrainingEditComponent implements OnInit {
+export class TrainingEditComponent extends BaseEditComponent implements OnInit {
   public training: TrainingRequirement;
   public years: Year[];
   public isNew = false;
@@ -19,8 +20,9 @@ export class TrainingEditComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private trainingService: TrainingRequirementService,
               private router: Router,
-              private dialog: MatDialog,
+              dialog: MatDialog,
               private snackBar: MatSnackBar) {
+    super(dialog);
   }
 
   ngOnInit(): void {

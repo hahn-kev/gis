@@ -4,13 +4,14 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { GradeService } from '../grade.service';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import { Grade } from '../grade';
+import { BaseEditComponent } from '../../../components/base-edit-component';
 
 @Component({
   selector: 'app-grade',
   templateUrl: './grade.component.html',
   styleUrls: ['./grade.component.scss']
 })
-export class GradeComponent implements OnInit {
+export class GradeComponent extends BaseEditComponent implements OnInit {
   public grade: Grade;
   public isNew: boolean;
 
@@ -18,7 +19,8 @@ export class GradeComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              dialog: MatDialog) {
+    super(dialog);
   }
 
   ngOnInit() {

@@ -6,13 +6,14 @@ import { PersonWithStaff } from '../../person';
 import { OrgChain } from '../org-chain';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
+import { BaseEditComponent } from '../../../components/base-edit-component';
 
 @Component({
   selector: 'app-group',
   templateUrl: './group.component.html',
   styleUrls: ['./group.component.scss']
 })
-export class GroupComponent implements OnInit {
+export class GroupComponent extends BaseEditComponent implements OnInit {
   public group: OrgGroup;
   public people: PersonWithStaff[];
   public groups: OrgGroup[];
@@ -25,7 +26,8 @@ export class GroupComponent implements OnInit {
               private router: Router,
               private groupService: GroupService,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              dialog: MatDialog) {
+    super(dialog);
   }
 
   ngOnInit(): void {

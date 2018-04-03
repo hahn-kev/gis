@@ -10,13 +10,14 @@ import { Person } from '../people/person';
 import { environment } from '../../environments/environment';
 import { LoginService } from '../services/auth/login.service';
 import { AuthenticateService } from '../services/auth/authenticate.service';
+import { BaseEditComponent } from '../components/base-edit-component';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
-export class UserComponent implements OnInit {
+export class UserComponent extends BaseEditComponent implements OnInit {
   public isDev = !environment.production;
   public user: User;
   public isNew: boolean;
@@ -51,9 +52,10 @@ export class UserComponent implements OnInit {
               private userService: UserService,
               private authService: AuthenticateService,
               private router: Router,
-              private dialog: MatDialog,
+              dialog: MatDialog,
               private personService: PersonService,
               private snackBar: MatSnackBar) {
+    super(dialog);
     this.people = this.personService.getAll();
   }
 

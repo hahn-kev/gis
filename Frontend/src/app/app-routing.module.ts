@@ -50,6 +50,7 @@ import { GradeListResolverService } from './job/grade/grade-list-resolver.servic
 import { GradeResolverService } from './job/grade/grade-resolver.service';
 import { GradeComponent } from 'app/job/grade/edit/grade.component';
 import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
+import { CanDeactivateGuard } from './services/can-deactivate.guard';
 
 const routes: Routes = [
   {
@@ -70,6 +71,7 @@ const routes: Routes = [
           {
             path: 'edit/:name',
             component: UserComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               user: UserResolveService,
               isNew: IsNewResolverService,
@@ -88,6 +90,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: PersonComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               person: PersonResolverService,
               groups: GroupsResolveService,
@@ -138,6 +141,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: JobComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               job: JobResolverService,
               groups: GroupsResolveService,
@@ -174,6 +178,7 @@ const routes: Routes = [
               {
                 path: 'edit/:id',
                 component: GradeComponent,
+                canDeactivate: [CanDeactivateGuard],
                 resolve: {
                   grade: GradeResolverService
                 }
@@ -193,6 +198,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: GroupComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               group: GroupResolveService,
               groups: GroupsResolveService,
@@ -214,6 +220,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: LeaveRequestComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               leaveRequest: LeaveRequestResolverService,
               people: PeopleWithLeaveResolverService
@@ -264,6 +271,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: TrainingEditComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               training: TrainingResolverService
             }
@@ -301,6 +309,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: MissionOrgComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               missionOrg: MissionOrgResolverService,
               people: PeopleResolveService
@@ -376,7 +385,8 @@ const routes: Routes = [
     MissionOrgListResolverService,
     GradeResolverService,
     GradeListResolverService,
-    JobFilledListResolverService
+    JobFilledListResolverService,
+    CanDeactivateGuard
   ]
 })
 export class AppRoutingModule {

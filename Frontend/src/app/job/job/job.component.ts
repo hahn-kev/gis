@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { JobService } from '../job.service';
 import { Job, JobType, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,13 +8,14 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 import { Role, RoleExtended, RoleWithJob } from '../../people/role';
 import { PersonService } from '../../people/person.service';
 import { Grade } from '../grade/grade';
+import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
   selector: 'app-job',
   templateUrl: './job.component.html',
   styleUrls: ['./job.component.scss']
 })
-export class JobComponent implements OnInit {
+export class JobComponent extends BaseEditComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
   public typeName = Job.typeName;
   public job: JobWithRoles;
@@ -27,7 +28,8 @@ export class JobComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              dialog: MatDialog) {
+    super(dialog);
   }
 
   ngOnInit() {
@@ -70,6 +72,5 @@ export class JobComponent implements OnInit {
     await this.personService.deleteRole(role.id);
     this.job.roles = this.job.roles.filter(value => value.id != role.id);
     this.snackBar.open(`Role Deleted`, null, {duration: 2000});
-
   }
 }
