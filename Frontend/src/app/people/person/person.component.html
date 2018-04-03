@@ -391,7 +391,7 @@
         <mat-expansion-panel-header>
           <mat-panel-title>{{ jobs[role.jobId].title}}</mat-panel-title>
           <mat-panel-description>
-            {{role.startDate | date: 'shortDate'}} till {{role.active ? 'now' : (role.endDate | date: 'shortDate')}}
+            {{role.startDate | date}} till {{role.active ? 'now' : (role.endDate | date)}}
           </mat-panel-description>
         </mat-expansion-panel-header>
         <app-role [role]="role"

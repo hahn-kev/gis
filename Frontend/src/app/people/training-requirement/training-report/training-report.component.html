@@ -56,7 +56,7 @@
             </a>
             <span class="spacer"></span>
             <ng-container *ngIf="staffObj.training.completedDate">
-              Completed On {{staffObj.training.completedDate | date: 'shortDate'}}
+              Completed On {{staffObj.training.completedDate | date}}
             </ng-container>
             <button mat-button *ngIf="!staffObj.training.completedDate" color="accent"
                     (click)="completeTraining(reqObj, index)">

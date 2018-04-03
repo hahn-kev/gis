@@ -35,7 +35,7 @@
   <mat-expansion-panel #trainingPanel *ngFor="let staffTraining of training">
     <mat-expansion-panel-header>
       <mat-panel-title>{{staffTraining.requirementName}} Completed on
-        {{staffTraining.completedDate | date: 'shortDate'}}
+        {{staffTraining.completedDate | date}}
       </mat-panel-title>
     </mat-expansion-panel-header>
     <form [id]="'trainingForm_' + staffTraining.id"

@@ -61,7 +61,7 @@
   </ng-container>
   <ng-container matColumnDef="birthdate">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Birthday</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.birthdate | date: 'shortDate'}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.birthdate | date}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="gender">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Gender</mat-header-cell>

@@ -13,7 +13,7 @@
   <!--begin date-->
   <button mat-button (click)="beginDatePicker.open()">
     <mat-icon mat-list-icon>today</mat-icon>
-    {{beginDate | date: 'shortDate'}}
+    {{beginDate | date}}
   </button>
   <input class="invisible" [max]="endDate" [ngModel]="beginDate" (ngModelChange)="setBeginDate($event)"
          [matDatepicker]="beginDatePicker">
@@ -23,7 +23,7 @@
   <!--end date-->
   <button mat-button (click)="endDatePicker.open()">
     <mat-icon mat-list-icon>today</mat-icon>
-    {{endDate | date: 'shortDate'}}
+    {{endDate | date}}
   </button>
   <input class="invisible" [min]="beginDate" [ngModel]="endDate" (ngModelChange)="setEndDate($event)"
          [matDatepicker]="endDatePicker">
@@ -55,11 +55,11 @@
   </ng-container>
   <ng-container matColumnDef="startDate">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.startDate | date: 'shortDate'}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.startDate | date}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="endDate">
     <mat-header-cell *matHeaderCellDef mat-sort-header>End Date</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.endDate | date: 'shortDate'}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.endDate | date}}</mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->
