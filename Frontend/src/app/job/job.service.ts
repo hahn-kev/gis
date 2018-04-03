@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Job, JobWithRoles } from './job';
+import { Job, JobWithFilledInfo, JobWithRoles } from './job';
 
 @Injectable()
 export class JobService {
@@ -10,6 +10,10 @@ export class JobService {
 
   list() {
     return this.http.get<Job[]>('/api/job');
+  }
+
+  listWithFilledInfo(){
+    return this.http.get<JobWithFilledInfo[]>('/api/job/filled');
   }
 
   get(id: string) {

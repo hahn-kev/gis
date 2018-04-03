@@ -212,14 +212,14 @@ namespace UnitTestProject
             return person;
         }
 
-        public PersonRole InsertRole(Guid jobId, Guid personId, int years = 2)
+        public PersonRole InsertRole(Guid jobId, Guid personId = default(Guid), int years = 2, bool active = true)
         {
             return InsertRole(role =>
             {
                 role.JobId = jobId;
                 role.PersonId = personId;
                 role.StartDate = DateTime.Now - TimeSpan.FromDays(years * 366);
-                role.Active = true;
+                role.Active = active;
             });
         }
 

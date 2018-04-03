@@ -23,6 +23,12 @@ namespace Backend.Controllers
             return _jobService.Jobs();
         }
 
+        [HttpGet("filled")]
+        public IList<JobWithFilledInfo> JobsFilled()
+        {
+            return _jobService.JobWithFilledInfos();
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,hr")]
         public JobWithRoles GetById(Guid id)
@@ -45,8 +51,7 @@ namespace Backend.Controllers
             _jobService.DeleteJob(id);
             return Ok();
         }
-        
-        
+
 
         [HttpGet("grade")]
         [Authorize(Roles = "admin,hr")]

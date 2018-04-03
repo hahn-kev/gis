@@ -17,6 +17,25 @@ namespace Backend.DataLayer
         public IQueryable<Job> Job => _dbConnection.Job;
         public IQueryable<Grade> JobGrades => _dbConnection.JobGrades;
 
+        public IQueryable<JobWithFilledInfo> JobWithFilledInfos =>
+            from job in Job
+            from role in _dbConnection.PersonRoles.LeftJoin(role => role.JobId == job.Id)
+            where role.Active
+            group role by new {role.JobId, job}
+            into g
+            select new JobWithFilledInfo
+            {
+                Id = g.Key.job.Id,
+                Title = g.Key.job.Title,
+                Current = g.Key.job.Current,
+                GradeId = g.Key.job.GradeId,
+                JobDescription = g.Key.job.JobDescription,
+                OrgGroupId = g.Key.job.OrgGroupId,
+                Positions = g.Key.job.Positions,
+                Type = g.Key.job.Type,
+                Filled = g.Count()
+            };
+
         public JobWithRoles GetById(Guid jobId)
         {
             var job = JobsWithRoles.SingleOrDefault(j => j.Id == jobId);

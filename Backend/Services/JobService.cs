@@ -24,6 +24,11 @@ namespace Backend.Services
             return _jobRepository.Job.OrderBy(job => job.Title).ToList();
         }
 
+        public IList<JobWithFilledInfo> JobWithFilledInfos()
+        {
+            return _jobRepository.JobWithFilledInfos.ToList();
+        }
+
         public IList<Grade> JobGrades()
         {
             return _jobRepository.JobGrades.OrderBy(grade => grade.GradeNo).ToList();

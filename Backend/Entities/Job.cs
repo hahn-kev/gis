@@ -18,6 +18,12 @@ namespace Backend.Entities
         public int Positions { get; set; }
     }
 
+    public class JobWithFilledInfo : Job
+    {
+        public int Filled { get; set; }
+        public int Open => Positions - Filled;
+    }
+
     public class JobWithOrgGroup : Job
     {
         public OrgGroup OrgGroup { get; set; }

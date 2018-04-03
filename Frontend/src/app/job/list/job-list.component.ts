@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute } from '@angular/router';
-import { Job } from '../job';
+import { Job, JobWithFilledInfo } from '../job';
+import { MatSort } from '@angular/material';
 
 @Component({
   selector: 'app-job-list',
@@ -9,15 +10,19 @@ import { Job } from '../job';
   styleUrls: ['./job-list.component.scss']
 })
 export class JobListComponent implements OnInit {
-  public dataSource: AppDataSource<Job>;
+  public dataSource: AppDataSource<JobWithFilledInfo>;
   public typeName = Job.typeName;
+  public showOnlyOpen = false;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    this.dataSource = new AppDataSource<Job>();
+    this.dataSource = new AppDataSource<JobWithFilledInfo>();
+    this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'jobs');
+    this.dataSource.customFilter = row => this.showOnlyOpen ? row.open > 0 : true;
     this.dataSource.filterPredicate = ((data, filter) =>
       (data.title || '').toUpperCase().startsWith(filter) || (data.jobDescription || '').toUpperCase().startsWith(filter));
   }

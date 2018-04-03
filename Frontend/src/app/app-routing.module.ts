@@ -49,6 +49,7 @@ import { GradeListComponent } from './job/grade/list/grade-list.component';
 import { GradeListResolverService } from './job/grade/grade-list-resolver.service';
 import { GradeResolverService } from './job/grade/grade-resolver.service';
 import { GradeComponent } from 'app/job/grade/edit/grade.component';
+import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
 
 const routes: Routes = [
   {
@@ -131,7 +132,7 @@ const routes: Routes = [
             path: 'list',
             component: JobListComponent,
             resolve: {
-              jobs: JobListResolverService
+              jobs: JobFilledListResolverService
             }
           },
           {
@@ -374,7 +375,8 @@ const routes: Routes = [
     MissionOrgResolverService,
     MissionOrgListResolverService,
     GradeResolverService,
-    GradeListResolverService
+    GradeListResolverService,
+    JobFilledListResolverService
   ]
 })
 export class AppRoutingModule {
