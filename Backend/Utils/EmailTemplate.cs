@@ -3,24 +3,30 @@ using System.Runtime.CompilerServices;
 
 namespace Backend.Utils
 {
-
     public struct EmailTemplate
     {
-        private EmailTemplate(string id, [CallerMemberName] string name = null)
+        private EmailTemplate(Func<TemplateSettings, string> idFunc, [CallerMemberName] string name = null)
         {
-            Id = id;
+            _idFunc = idFunc;
             Name = name;
         }
 
-        public string Id { get; }
+        private readonly Func<TemplateSettings, string> _idFunc;
+
+        public string GetId(TemplateSettings settings)
+        {
+            return _idFunc?.Invoke(settings) ??
+                   throw new NullReferenceException("template " + Name + " id not found");
+        }
+
         public string Name { get; }
-        public static EmailTemplate NotifyLeaveRequest => new EmailTemplate("5aa3038a-6c0d-4e6c-bc57-311c87916a0c");
-        public static EmailTemplate RequestLeaveApproval => new EmailTemplate("70b6165d-f367-401f-9ae4-56814033b720");
-        public static EmailTemplate NotifyHrLeaveRequest => new EmailTemplate("14aa52db-f802-4e62-82db-6a3391bcf8a2");
+        public static EmailTemplate NotifyLeaveRequest => new EmailTemplate(_ => _.NotifyLeaveRequest);
+        public static EmailTemplate RequestLeaveApproval => new EmailTemplate(_ => _.RequestLeaveApproval);
+        public static EmailTemplate NotifyHrLeaveRequest => new EmailTemplate(_ => _.NotifyHrLeaveRequest);
 
         public bool Equals(EmailTemplate other)
         {
-            return String.Equals(Id, other.Id);
+            return String.Equals(Name, other.Name);
         }
 
         public override bool Equals(object obj)
@@ -41,7 +47,7 @@ namespace Backend.Utils
 
         public override int GetHashCode()
         {
-            return (Id != null ? Id.GetHashCode() : 0);
+            return (Name != null ? Name.GetHashCode() : 0);
         }
 
         public override string ToString()

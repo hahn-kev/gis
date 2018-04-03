@@ -14,7 +14,7 @@ namespace Backend
             "http://gis.hahn-kev.com";
 #endif
         public string ConnectionString { get; set; }
-        
+
         public string MailgunApiKey { get; set; }
         public string MailgunDomain { get; set; }
         public string Environment { get; set; }
@@ -24,7 +24,7 @@ namespace Backend
 
         public IEnumerable<IDataProviderSettings> DataProviders
         {
-            get {yield break;}
+            get { yield break; }
         }
 
         public string DefaultConfiguration => "PostGreSQL";
@@ -53,12 +53,19 @@ namespace Backend
             return $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={port}";
         }
     }
-    
+
     public class ConnectionStringSettings : IConnectionStringSettings
     {
         public string ConnectionString { get; set; }
         public string Name { get; set; }
         public string ProviderName { get; set; }
         public bool IsGlobal => false;
+    }
+
+    public class TemplateSettings
+    {
+        public string NotifyLeaveRequest { get; set; }
+        public string RequestLeaveApproval { get; set; }
+        public string NotifyHrLeaveRequest { get; set; }
     }
 }

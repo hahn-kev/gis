@@ -56,6 +56,7 @@ namespace Backend
             services.Configure<Settings>(Configuration);
             var settings = Configuration.Get<Settings>();
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
+            services.Configure<TemplateSettings>(Configuration.GetSection("TemplateSettings"));
             AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
                     options =>
                     {

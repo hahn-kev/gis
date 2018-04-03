@@ -53,8 +53,9 @@ namespace Backend.Services
         private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
         private readonly string _domain;
+        private readonly TemplateSettings _templateSettings;
 
-        public EmailService(IOptions<Settings> options)
+        public EmailService(IOptions<Settings> options, IOptions<TemplateSettings> templateSettings)
         {
 //            var apiKey = options.Value.MailgunApiKey;
 //            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
@@ -64,6 +65,7 @@ namespace Backend.Services
 //            if (string.IsNullOrEmpty(_domain))
 //                throw new NullReferenceException("MailgunDomain setting can not be null");
             _sendGridClient = new SendGridClient(options.Value.SendGridAPIKey);
+            _templateSettings = templateSettings.Value;
         }
 
         public async Task<MailgunReponse> SendEmail(string to, string subject, string body)
@@ -154,7 +156,7 @@ namespace Backend.Services
                 },
                 From = new EmailAddress(fromEmail, fromName),
                 Subject = subject,
-                TemplateId = emailTemplate.Id
+                TemplateId = emailTemplate.GetId(_templateSettings)
             };
             return SendEmail(msg);
         }

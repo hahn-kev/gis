@@ -42,20 +42,22 @@ namespace UnitTestProject
         {
             ServiceCollection = new ServiceCollection();
             IConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.Add(new MemoryConfigurationSource
-            {
-                InitialData = new[]
+            builder.AddInMemoryCollection(new[]
                 {
                     new KeyValuePair<string, string>("Environment", "UnitTest"),
                     new KeyValuePair<string, string>("JWTSettings:SecretKey", "helloWorld"),
+                    new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
+                    new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
+                    new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
                 }
-            });
+            );
             var startup = new Startup(builder.Build());
             ServiceCollection.AddLogging(loggingBuilder => loggingBuilder.AddConsole().AddDebug());
             startup.ConfigureServices(ServiceCollection);
             ServiceCollection.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
             {
-                var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>());
+                var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>(),
+                    provider.GetService<IOptions<TemplateSettings>>());
                 esm.CallBase = true;
                 esm.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>())).Returns(Task.CompletedTask);
                 return esm.Object;

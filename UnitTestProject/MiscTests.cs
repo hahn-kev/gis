@@ -7,6 +7,7 @@ using Backend;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
@@ -24,6 +25,14 @@ namespace UnitTestProject
             _personRepository = _servicesFixture.Get<PersonRepository>();
         }
 
+        [Fact]
+        public void CanGetTemplateSettings()
+        {
+            var options = _servicesFixture.Get<IOptions<TemplateSettings>>();
+            options.ShouldNotBeNull();
+            options.Value.NotifyHrLeaveRequest.ShouldNotBeNull();
+        }
+        
         [Fact]
         public void JsonDateWithoutKindHasCorrectFormat()
         {
