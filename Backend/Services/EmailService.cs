@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
+using Backend.Utils;
 using LinqToDB.Common;
 using Microsoft.Extensions.Options;
 using RestEase;
@@ -21,25 +21,25 @@ namespace Backend.Services
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            EmailService.Template template,
+            EmailTemplate emailTemplate,
             PersonWithStaff from,
             PersonWithStaff to);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            EmailService.Template template,
+            EmailTemplate emailTemplate,
             PersonWithStaff from,
             IEnumerable<PersonWithStaff> tos);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            EmailService.Template template,
+            EmailTemplate emailTemplate,
             PersonExtended from,
             PersonExtended to);
 
         Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            EmailService.Template template,
+            EmailTemplate emailTemplate,
             string fromEmail,
             string fromName,
             string toEmail,
@@ -53,52 +53,6 @@ namespace Backend.Services
         private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
         private readonly string _domain;
-
-        public struct Template
-        {
-            private Template(string id, [CallerMemberName] string name = null)
-            {
-                Id = id;
-                Name = name;
-            }
-
-            public string Id { get; }
-            public string Name { get; }
-            public static Template NotifyLeaveRequest => new Template("5aa3038a-6c0d-4e6c-bc57-311c87916a0c");
-            public static Template RequestLeaveApproval => new Template("70b6165d-f367-401f-9ae4-56814033b720");
-            public static Template NotifyHrLeaveRequest => new Template("14aa52db-f802-4e62-82db-6a3391bcf8a2");
-
-            public bool Equals(Template other)
-            {
-                return string.Equals(Id, other.Id);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is Template && Equals((Template) obj);
-            }
-
-            public static bool operator ==(Template a, Template b)
-            {
-                return object.Equals(a, b);
-            }
-
-            public static bool operator !=(Template a, Template b)
-            {
-                return !(a == b);
-            }
-
-            public override int GetHashCode()
-            {
-                return (Id != null ? Id.GetHashCode() : 0);
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
 
         public EmailService(IOptions<Settings> options)
         {
@@ -120,23 +74,23 @@ namespace Backend.Services
             return mailgunReponse;
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, EmailTemplate emailTemplate,
             PersonWithStaff @from,
             PersonWithStaff to)
         {
             return SendTemplateEmail(substituions,
-                subject, template,
+                subject, emailTemplate,
                 from.Staff.Email,
                 from.PreferredName,
                 to.Staff.Email,
                 to.PreferredName);
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, Template template,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, EmailTemplate emailTemplate,
             PersonWithStaff @from,
             IEnumerable<PersonWithStaff> tos)
         {
-            return SendTemplateEmail(substituions, subject, template,
+            return SendTemplateEmail(substituions, subject, emailTemplate,
                 from.Staff.Email,
                 from.PreferredName,
                 tos.Select(person => new EmailAddress(person.Staff.Email, person.PreferredName)).ToList());
@@ -144,13 +98,13 @@ namespace Backend.Services
 
         public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            Template template,
+            EmailTemplate emailTemplate,
             PersonExtended from,
             PersonExtended to)
         {
             return SendTemplateEmail(substituions,
                 subject,
-                template,
+                emailTemplate,
                 from.Email,
                 from.PreferredName,
                 to.Email,
@@ -159,7 +113,7 @@ namespace Backend.Services
 
         public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            Template template,
+            EmailTemplate emailTemplate,
             string fromEmail,
             string fromName,
             string toEmail,
@@ -167,13 +121,13 @@ namespace Backend.Services
         {
             if (toEmail == null)
                 throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
-            return SendTemplateEmail(substituions, subject, template, fromEmail, fromName,
+            return SendTemplateEmail(substituions, subject, emailTemplate, fromEmail, fromName,
                 new List<EmailAddress> {new EmailAddress(toEmail, toName)});
         }
 
         public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
             string subject,
-            Template template,
+            EmailTemplate emailTemplate,
             string fromEmail,
             string fromName,
             List<EmailAddress> tos)
@@ -200,7 +154,7 @@ namespace Backend.Services
                 },
                 From = new EmailAddress(fromEmail, fromName),
                 Subject = subject,
-                TemplateId = template.Id
+                TemplateId = emailTemplate.Id
             };
             return SendEmail(msg);
         }

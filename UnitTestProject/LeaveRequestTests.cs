@@ -7,6 +7,7 @@ using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
+using Backend.Utils;
 using LinqToDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -50,7 +51,7 @@ namespace UnitTestProject
             var emailMock = _servicesFixture.EmailServiceMock;
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
-                It.IsAny<EmailService.Template>(),
+                It.IsAny<EmailTemplate>(),
                 It.IsAny<PersonWithStaff>(),
                 It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
@@ -60,8 +61,8 @@ namespace UnitTestProject
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                         It.IsAny<string>(),
-                        It.Is<EmailService.Template>(template =>
-                            template == EmailService.Template.RequestLeaveApproval),
+                        It.Is<EmailTemplate>(template =>
+                            template == EmailTemplate.RequestLeaveApproval),
                         It.Is<PersonWithStaff>(extended => extended.FirstName == "Jacob"),
                         It.Is<PersonWithStaff>(extended => extended.FirstName == "Bob")),
                 Times.Once);
@@ -69,7 +70,7 @@ namespace UnitTestProject
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                         It.IsAny<string>(),
-                        It.Is<EmailService.Template>(template => template == EmailService.Template.NotifyLeaveRequest),
+                        It.Is<EmailTemplate>(template => template == EmailTemplate.NotifyLeaveRequest),
                         It.IsAny<PersonWithStaff>(),
                         It.IsAny<PersonWithStaff>()),
                 Times.Never);
@@ -416,15 +417,15 @@ namespace UnitTestProject
             var emailMock = _servicesFixture.EmailServiceMock.As<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
-                    It.IsAny<EmailService.Template>(),
+                    It.IsAny<EmailTemplate>(),
                     It.IsAny<PersonWithStaff>(),
                     It.IsAny<PersonWithStaff>()))
                 .Returns(Task.CompletedTask)
-                .Callback<Dictionary<string, string>, string, EmailService.Template, PersonWithStaff, PersonWithStaff>(
+                .Callback<Dictionary<string, string>, string, EmailTemplate, PersonWithStaff, PersonWithStaff>(
                     (dictionary, subject, template, to, from) =>
                     {
-                        if (template == EmailService.Template.RequestLeaveApproval) actualApprovalEmailSent = true;
-                        else if (template == EmailService.Template.NotifyLeaveRequest)
+                        if (template == EmailTemplate.RequestLeaveApproval) actualApprovalEmailSent = true;
+                        else if (template == EmailTemplate.NotifyLeaveRequest)
                             actualNotifyEmailCount++;
                     });
 

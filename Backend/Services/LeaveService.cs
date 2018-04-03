@@ -138,6 +138,9 @@ namespace Backend.Services
             PersonWithStaff requestedBy,
             PersonWithStaff supervisor, LeaveUseage leaveUseage)
         {
+            //this is a list of substitutions avalible in the email template
+            //these are used when notifying non approving supervisors of leave
+            //$LEAVE-SUBSTITUTIONS$
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
@@ -150,7 +153,7 @@ namespace Backend.Services
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
-                EmailService.Template.NotifyLeaveRequest,
+                EmailTemplate.NotifyLeaveRequest,
                 requestedBy,
                 supervisor);
         }
@@ -158,6 +161,9 @@ namespace Backend.Services
         private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy, LeaveUseage leaveUseage)
         {
             if (!ShouldNotifyHr(leaveRequest, leaveUseage)) return;
+            //this is a list of substitutions avalible in the email template
+            //these are used when notifying HR of leave
+            //$LEAVE-SUBSTITUTIONS$
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
@@ -169,7 +175,7 @@ namespace Backend.Services
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
-                EmailService.Template.NotifyHrLeaveRequest,
+                EmailTemplate.NotifyHrLeaveRequest,
                 requestedBy,
                 _personRepository.GetHrAdminStaff());
         }
@@ -185,6 +191,9 @@ namespace Backend.Services
             PersonWithStaff supervisor,
             LeaveUseage leaveUseage)
         {
+            //this is a list of substitutions avalible in the email template
+            //these are used when notifying the approving supervisor of leave
+            //$LEAVE-SUBSTITUTIONS$
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
@@ -199,7 +208,7 @@ namespace Backend.Services
 
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} Leave request approval",
-                EmailService.Template.RequestLeaveApproval,
+                EmailTemplate.RequestLeaveApproval,
                 requestedBy,
                 supervisor);
         }
