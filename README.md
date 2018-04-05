@@ -1,9 +1,16 @@
 ## Gis
-![Build status](https://gisthailand.visualstudio.com/_apis/public/build/definitions/30e4089a-2508-47ae-abc3-ba12087ff8ae/1/badge)
+[![Build status](https://gisthailand.visualstudio.com/_apis/public/build/definitions/30e4089a-2508-47ae-abc3-ba12087ff8ae/1/badge)](https://gisthailand.visualstudio.com/Gis/_build/index?definitionId=1)
 
-### Setup
+This document should explain some of the following for the gis office app
+* [how](#server-setup) the production server is configured
+* [what](#config-files) the config files do
+* [how](#build-info) you might go about updating the server
+* [how](#running-locally) to build/test the application before updating the server
+* [what](#tech-used) technology is used
 
-Server was configured following this guide
+### Server Setup
+
+The server was configured following this guide
 https://docs.microsoft.com/en-us/aspnet/core/publishing/linuxproduction?tabs=aspnetcore2x
 the application was installed in the `/var/aspnetcore/gis` folder on google cloud the office-asia machine
 
@@ -13,26 +20,28 @@ there's also a `Log` folder that has all the logs.
 #### config files
 2 files of interest are the 2 configuration files
 1. `appsettings.json`
-   * base url, this is used when generating emails links
-   * connection string is how we connect to the database
-   * JWTSettings these are used for authentication
+   * `BaseURL`, this is used when generating emails links
+   * `ConnectionString` is how we connect to the database
+   * `JWTSettings` these are used for authentication
      * `SecretKey` if this is changed then any existing logins will get invalidated
-     and everyone will be forced to login again,
-     * issuer and audiance are unimportant, they're just labels, again if they change 
+     and everyone will be forced to log in again,
+     * `Issuer` and `Audience` are unimportant, they're just labels, again if they change 
      logging in again is required
-   * GoogleAPI Key this is the key we use to access things like google drive, ect
-   * SentryDNS this is the key of sorts that lets us post errors to the Sentry error reporting system
-   * Environment mostly informational, used for error reports
-   * SendGridAPIKey allows us to send email using sendgrid
+   * `GoogleAPIKey` this is the key we use to access things like google drive, etc
+   * `SentryDNS` this is the key of sorts that lets us post errors to the Sentry error reporting system
+   * `Environment` mostly informational, used for error reports
+   * `SendGridAPIKey` allows us to send email using sendgrid
+   * `TemplateSettings`, each of these are the SendGrid template id's used when sending notification emails,
+   they'll have to be changed to a new SendGrid account (see below)
    
 2. `client_id.json`
-    this file is auto generated for google OAuth, just click download
-    from the google OAuth screen to get this file, OAuth is what allows
+    this file is auto-generated for Google OAuth, just click download
+    from the Google OAuth screen to get this file, OAuth is what allows
     the application to do google logins
 
 #### Database
 
-The postgres database also lives on this machine,
+The Postgres database also lives on this machine,
 there's no special configuration done with it, if you need to connect to it externally
 you'll want to modify the `allow-postgres` firewall rule in google cloud to allow connections directly.
 Connection information can be taken from the `appsettings.json` file `ConnectionString` property
@@ -48,34 +57,43 @@ at [w3schools](https://www.w3schools.com/sql/)
 #### Helpful commands
 
 * reboot gis application `sudo service kestrel-gis restart`
+* update config file `sudo nano /var/aspnetcore/gis/appsettings.json` to close press ctrl + x,
+the text editor is called `nano` search google for more help on how to use it
 
 ### Build Info
+
+The following will explain how to build the application
+(take the source code, and turn it into a usable application) on your 
+computer, and then deploy to the production server,
+alternatively, you could run the application on your own computer to test out changes
 
 Souce code can be found at [github](https://github.com/hahn-kev/gis)
 Build setup can be found here [VSTS](https://gisthailand.visualstudio.com/Gis/_build)
 
-First you'll need to install the following, a quick google should help you
+First, you'll need to install the following, a quick google search should help you
 try and get around the minor version, if it's too much trouble then just get 
 the same major version.
 * .net core 2.1.1
 * nodejs 9.2.0 (includes npm 5.5.1)
 
 Once you've done this ensure you can access `dotnet` and `npm` from
-the command line. If you get an error that it's not installed or 
-recognized then you might need to restart as those 2 apps should both
-be in your path and accessable from anywhere in commandline.
+the command line. If you get an error that it's not installed or recognized then you might need to restart as those 2 apps should both
+be in your path and accessible from anywhere in the command line.
 
 Once these are both installed you'll need to do the following:
 * build the frontend
 * build the backend
-* copy the frontend resouces to the back end
+* copy the frontend resources to the back end
 * publish the backend
 
-there's a script that will do this all fro you on windows called `build.bat`
+there's a script that will do this all for you on windows called `build.bat`
 just make sure nodejs and .net core are installed first or you might get errors.
-once you've run that (it might take a couple minutes) there should be a folder
-called `website` this will contain a full copy of the site, I reccomend zipping
-it up and copying it to the server, after that extract the zip file like so:
+
+#### Deploy to Server
+
+once you've run the build script (it might take a couple minutes) there should be a folder
+called `website` this will contain a full copy of the site, I recommend zipping
+it up and copying it to the server, after that connect to the server via SSH and extract the zip file like so:
 ```shell
 unzip -o website.zip -d /var/aspnetcore/gis/
 sudo service kestrel-gis restart
@@ -87,42 +105,42 @@ the second command restarts the server so it'll use the new files.
 #### Running locally
 you might want to run the server locally so you can test out a change.
 
-first thing you need to do is copy over the `appsettings.json` and `client_id.json`
-files from the server to your local computer, put them in the `Backend` folder.
+the first thing you need to do is copy over the `appsettings.json` and `client_id.json`
+files from the server to your local computer put them in the `Backend` folder.
 Note, you'll need to update the connection string setting to point at the 
 database running on the server, this will require access from your machine
 so update the google cloud firewall as appropriate and change the host
-in the connection string to domain name of the office server.
+in the connection string to the domain name of the office server.
 
 Now open a command prompt in the `Backend` folder and run
 `dotnet run` once it starts up it should say it's now listening on 
 `http://localhost:1650` (if not update `Frontend/proxy.config.json`
-and replace the above url with the one output by the command), but don't go
+and replace the above URL with the one output by the command), but don't go
 there just yet.
 
-Next open a command prompt in the `Frontend` folder and run `npm start`,
+Next, open a command prompt in the `Frontend` folder and run `npm start`,
 once it's started it should tell you that you can go to
 [`http://localhost:4201`](http://localhost:4201) to view the site. You'll be
-prompted to login as usual. If the google login doesn't work you might
-need to change url and domain authorization for api keys and oauth client ids.
+prompted to log in as usual. If the google login doesn't work you might
+need to change URL and domain authorization for API keys and OAuth client ids.
 
 
 ### Email sending
 
 Email is sent using [SendGrid](https://app.sendgrid.com), there's very little setup required
-However if access is lost to the account that's been configured then a new one will need to be made
+however, if access is lost to the Sendgrid account that's been configured then a new one will need to be made
 and an update will have to be made to the application (this might change in the future).
 
-#### Templates
+#### Email Templates
 
 SendGrid works using transactional templates, you go to their website, configure a template
-and the template will have an ID, I've made a couple templates already and put the ID into the code
+and the template will have an ID, I've made a couple templates already and put the ID into the config file
 that way when an email needs to be sent I send the template Id to SendGrid and it knows what email
-template I'd like to use, these ID's are unique, if a new SendGrid account is needed,
+template I'd like to use, these ID's are unique and if a new SendGrid account is needed,
 then the Id's will have to change.
 
 If you need to modify the template for an email you should be able to login to the SendGrid site
-and see the templates to modify, that should all be fairly straight forward. The templates work 
+and see the templates to modify, that should all be fairly straightforward. The templates work 
 using text substitutions, in the template they might look like some of the following
 * `:firstName`
 * `:type`
@@ -130,9 +148,9 @@ using text substitutions, in the template they might look like some of the follo
 * `:end`
 
 So when I want to send an email I build a list of text that can get substituted
-and in the template you specify where the actual text  goes.
+and in the template you specify where the actual text goes.
 
-##### Example 1
+##### Email Template Example 1
 Substitutions:
 ```
 {
@@ -153,7 +171,7 @@ ___
 ##### Modfy subsitutions
 
 If a template is modified and a new substitution is required
-then a bit of coding will need to be done. At the time of writing all email templates
+then a bit of coding will need to be done. At the time of writing all email, templates
 are sent from [`Backend/Services/LeaveService.cs`](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Services/LeaveService.cs)
 and you can find the substitutions by searching for `$LEAVE-SUBSTITUTIONS$`
 
@@ -161,18 +179,16 @@ Let's look at modifying a leave request email to include the date that the leave
 was created.
 
 Take a look at the code [here](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Services/LeaveService.cs#L183-L205)
-lines 183 through 205 should be highlighted. This is the `SendRequestApproval` function, here we're making a substitution list and sending 
-it to send grid, specifying that we want to send a `RequestLeaveApproval` template, allong with
-a few other things, like sender email, destination email and subject.
+lines 183 through 205 should be highlighted. This is the `SendRequestApproval` function, here we're making a substitution list and sending it to send grid, specifying that we want to send a `RequestLeaveApproval` template, along with
+a few other things, like sender email, destination email, and subject.
 
-Takeing a look at the substitutions you can see that the start and end date are coming 
-from the `leaveRequest`, like so `leaveRequest.StartDate` or `leaveRequest.EndDate`,
-and we want to access the Leave Request created date, so lets find where the `StartDate` and 
+Taking a look at the substitutions you can see that the start and end date are coming from the `leaveRequest`, like so `leaveRequest.StartDate` or `leaveRequest.EndDate`,
+and we want to access the Leave Request created date, so let's find where the `StartDate` and 
 `EndDate` are defined and find the name of the created date. If we search for a file called `leaveRequest`
 we should find [this](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs)
 and at [line 23](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs#L23)
 we can see `StartDate` with `EndDate` right below. If we look down to [line 38](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs#L38)
-we see `CreatedDate`. That means back in the `SendRequestApproval` function we can using the created date
+we see `CreatedDate`. That means back in the `SendRequestApproval` function we can use the created date
 on the leave request. This might look like the following
 ```c#
 {":created", leaveRequest.CreatedDate.ToString("MMM d yyyy")}
@@ -182,25 +198,31 @@ you'll notice the bit on the end we're calling `.ToString("MMM d yyyy")` this ju
 the date into text, [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
 you can read up on the supported formats if those need to be modified.
 
-Next you'll want to build the application and update the server with the new version,
-you should do this before you update the sendGrid template, otherwise an email might get sent
+Next, you'll want to build the application and update the server with the new version,
+you should do this before you update the sendGrid template, otherwise, an email might get sent
 with the substitution not replaced.
 
-Finally you'll want to update the template on send grid to use the `:created`
+Finally, you'll want to update the template on send grid to use the `:created`
 substitution to display the created date.
 
 #### Replace the SendGrid account
 
 If for some reason you've lost access to the send grid account,
-you'll need to update the application to use the new account. 
-Once you create a new account you'll need to get an api key under settings.
-Copy that api key and replace the key in `appsettings.json` `SendGridAPIKey`
+you'll need to update the config file on the server to use the new account. 
 
-
-//todo replace templateds
+1. Create a new [SendGrid Account](https://sendgrid.com/)
+2. Create an api key with access to send emails
+3. Update `appsettings.json` `SendGridAPIKey` with api key
+4. Create template emails ([example](#email-template-example-1)) for 
+   * HR Notification
+   * Request Leave approval
+   * Notify leave request (to let supervisors know of leave when they don't approve it)
+5. Update `appsettings.json` `TemplateSettings` with template id's
+6. reboot gis application `sudo service kestrel-gis restart`
 
 ### Tech used
 
+- Linux server on Google Cloud
 - .Net Core 2.0 (Backend)
 - [PostgreSQL](https://www.postgresql.org/) (Database)
 - [Angular](https://angular.io/) (Frontend framework)
