@@ -24,7 +24,7 @@ export class PersonExtended extends Person {
   public spouseId: string;
   public spouseChanged: boolean;
 
-  public nationality: string;
+  public nationality?: Nationality;
   public birthdate?: Date;
 
   public passportAddress: string;
@@ -90,5 +90,33 @@ export class StaffWithName extends Staff {
   constructor(id?: string, preferredName?: string) {
     super(id);
     this.preferredName = preferredName;
+  }
+}
+
+export enum Nationality {
+  NorthAmerica = 'NorthAmerica',
+  CentralSouthAmerica = 'CentralSouthAmerica',
+  Africa = 'Africa',
+  MiddleEast = 'MiddleEast',
+  Europe = 'Europe',
+  CentralAsia = 'CentralAsia',
+  EastAsia = 'EastAsia',
+  Oceania = 'Oceania',
+}
+
+export function NationalityName(nationality: Nationality): string {
+  switch (nationality) {
+    case Nationality.NorthAmerica:
+      return 'North America';
+    case Nationality.CentralSouthAmerica:
+      return 'Central South America';
+    case Nationality.MiddleEast:
+      return 'Middle East';
+    case Nationality.CentralAsia:
+      return 'Central Asia';
+    case Nationality.EastAsia:
+      return 'East Asia';
+    default:
+      return nationality;
   }
 }

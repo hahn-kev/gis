@@ -94,14 +94,7 @@
         <mat-form-field>
           <mat-select [(ngModel)]="person.nationality" name="nationality"
                       placeholder="Nationality">
-            <mat-option value="NorthAmerica">North America</mat-option>
-            <mat-option value="CentralSouthAmerica">Central/South America</mat-option>
-            <mat-option value="Africa">Africa</mat-option>
-            <mat-option value="MiddleEast">Middle East</mat-option>
-            <mat-option value="Europe">Europe</mat-option>
-            <mat-option value="CentralAsia">Central Asia</mat-option>
-            <mat-option value="EastAsia">East Asia</mat-option>
-            <mat-option value="Oceania">Oceania</mat-option>
+            <mat-option *ngFor="let nat of nationalities" [value]="nat">{{nationalityName(nat)}}</mat-option>
           </mat-select>
         </mat-form-field>
       </mat-expansion-panel>

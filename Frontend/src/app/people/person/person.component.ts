@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Person, PersonWithOthers, Staff } from '../person';
+import { Nationality, NationalityName, Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
 import { Role, RoleExtended, RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
@@ -26,6 +26,8 @@ import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
   styleUrls: ['./person.component.scss']
 })
 export class PersonComponent implements OnInit, CanComponentDeactivate {
+  public nationalities = Object.keys(Nationality);
+  public nationalityName = NationalityName;
   public isNew: boolean;
   public isSelf: boolean;
   public filteredCountries: Observable<string[]>;

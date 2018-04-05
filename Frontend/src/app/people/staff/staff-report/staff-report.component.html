@@ -103,8 +103,8 @@
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="nationality">
-    <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.nationality}}</mat-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Nationality</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{nationalityName(row.nationality)}}</mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->

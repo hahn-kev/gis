@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { Gender, PersonWithStaff } from '../../person';
+import { Gender, NationalityName, PersonWithStaff } from '../../person';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
@@ -13,6 +13,7 @@ import { RenderTemplateDialogComponent } from '../../../components/render-templa
   styleUrls: ['./staff-report.component.scss']
 })
 export class StaffReportComponent implements OnInit {
+  public nationalityName = NationalityName;
   public dataSource: AppDataSource<PersonWithStaff>;
   public avalibleColumns = [
     'preferredName',
