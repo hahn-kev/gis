@@ -26,7 +26,7 @@ export class StaffReportComponent implements OnInit {
     'untilBirthday',
     'gender',
     'country',
-    'staff.endorsementAgency',
+    'endorsementAgency',
     'legalStatus',
     'isThai',
     'speaksEnglish',
@@ -96,5 +96,11 @@ export class StaffReportComponent implements OnInit {
 
   timeToBirthday(date: MomentInput) {
     return moment(date).year(moment().year()).fromNow();
+  }
+
+  camel2title(camelCase: string) {
+    return camelCase
+      .replace(/([A-Z])/g, (match) => ` ${match}`)
+      .replace(/^./, (match) => match.toUpperCase());
   }
 }

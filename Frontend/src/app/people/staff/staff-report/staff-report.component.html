@@ -15,7 +15,7 @@
                 (ngModelChange)="updateSelectedColumns($event)"
                 multiple
                 placeholder="Columns">
-      <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{column}}</mat-option>
+      <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{camel2title(column)}}</mat-option>
     </mat-select>
   </mat-form-field>
   <a mat-icon-button matTooltip="Role Report" matTooltipPosition="before" routerLink="/job/report/roles">
@@ -71,8 +71,8 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Country</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.isThai ? 'Thailand' : row.passportCountry }}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="staff.endorsementAgency">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Endorsment Agency</mat-header-cell>
+  <ng-container matColumnDef="endorsementAgency">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.endorsementAgency">Endorsment Agency</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.staff.endorsementAgency }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="age">
