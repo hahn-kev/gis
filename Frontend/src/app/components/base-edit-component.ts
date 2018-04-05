@@ -12,7 +12,7 @@ export class BaseEditComponent implements CanComponentDeactivate {
   }
 
   canDeactivate() {
-    if (!this.form || this.form.untouched || this.form.submitted) return true;
+    if (!this.form || this.form.pristine || this.form.submitted) return true;
     return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
 }

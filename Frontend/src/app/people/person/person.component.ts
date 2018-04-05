@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Nationality, NationalityName, Person, PersonWithOthers, Staff } from '../person';
 import { PersonService } from '../person.service';
@@ -42,7 +42,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public newRole = new Role();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
-  @ViewChild('personForm') personForm: NgForm;
+  @ViewChildren(NgForm) forms:  QueryList<NgForm>;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
@@ -211,7 +211,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate() {
-    if (this.personForm.untouched || this.personForm.submitted) return true;
+    if (!this.forms.some(value => !value.pristine && !value.submitted )) return true;
     return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
 }
