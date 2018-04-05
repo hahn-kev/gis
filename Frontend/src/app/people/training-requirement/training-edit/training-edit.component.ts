@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TrainingRequirementService } from '../training-requirement.service';
-import { TrainingRequirement } from '../training-requirement';
+import { TrainingRequirement, TrainingScope } from '../training-requirement';
 import { Year } from '../year';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import { BaseEditComponent } from '../../../components/base-edit-component';
+import { Person } from '../../person';
+import { OrgGroup } from '../../groups/org-group';
 
 @Component({
   selector: 'app-training-edit',
@@ -15,6 +17,8 @@ import { BaseEditComponent } from '../../../components/base-edit-component';
 export class TrainingEditComponent extends BaseEditComponent implements OnInit {
   public training: TrainingRequirement;
   public years: Year[];
+  public people: Person[];
+  public groups: OrgGroup[];
   public isNew = false;
 
   constructor(private route: ActivatedRoute,
@@ -26,15 +30,31 @@ export class TrainingEditComponent extends BaseEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe((value: { training: TrainingRequirement }) => {
+    this.route.data.subscribe((value: {
+      training: TrainingRequirement
+      people: Person[],
+      groups: OrgGroup[]
+    }) => {
+      this.groups = value.groups;
+      this.people = value.people;
       this.training = value.training;
       this.isNew = !this.training.id;
-      if (!this.training.id) {
-        this.training.firstYear = new Date().getUTCFullYear();
-        this.training.scope = 'AllStaff';
-      }
     });
     this.years = this.trainingService.years();
+  }
+
+  get for() {
+    if (this.training.scope !== TrainingScope.Department) return this.training.scope;
+    return this.training.departmentId;
+  }
+
+  set for(value: string | TrainingScope) {
+    if (value == TrainingScope.AllStaff) {
+      this.training.scope = value;
+    } else {
+      this.training.scope = TrainingScope.Department;
+      this.training.departmentId = value;
+    }
   }
 
   async save(): Promise<void> {

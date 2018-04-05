@@ -6,10 +6,27 @@
         <input matInput required name="name" [(ngModel)]="training.name" placeholder="Name">
       </mat-form-field>
       <mat-form-field>
-        <mat-select name="scope" required [(ngModel)]="training.scope" placeholder="For">
-          <mat-option value="AllStaff">All Staff</mat-option>
+        <mat-select [(ngModel)]="training.ownerId"
+                    name="owner"
+                    placeholder="Owner">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+            {{eachPerson.lastName}}
+          </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <mat-form-field>
+        <input matInput name="provider" [(ngModel)]="training.provider" placeholder="Provider">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-select name="scope" required [(ngModel)]="for" placeholder="For">
+          <mat-option value="AllStaff">All Staff</mat-option>
+          <mat-option *ngFor="let group of groups" [value]="group.id">{{group.groupName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
       <mat-slide-toggle name="trainingOnce"
                         [ngModel]="training.renewMonthsCount == -1"
                         (ngModelChange)="training.renewMonthsCount = $event ? -1 : 12">

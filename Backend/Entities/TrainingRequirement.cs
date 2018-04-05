@@ -18,7 +18,9 @@ namespace Backend.Entities
 
         [Column(DataType = DataType.VarChar)]
         public TrainingScope Scope { get; set; }
-        public Guid? DepatmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
+        public Guid? OwnerId { get; set; }
+        public string Provider { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

@@ -273,7 +273,9 @@ const routes: Routes = [
             component: TrainingEditComponent,
             canDeactivate: [CanDeactivateGuard],
             resolve: {
-              training: TrainingResolverService
+              training: TrainingResolverService,
+              people: PeopleResolveService,
+              groups: GroupsResolveService,
             }
           },
           {
