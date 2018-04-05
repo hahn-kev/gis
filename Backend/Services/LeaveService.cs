@@ -58,7 +58,7 @@ namespace Backend.Services
 
         public void UpdateLeave(LeaveRequest leaveRequest)
         {
-            //todo leave days calc validation
+            //validation done in ThrowIfHrRequiredForUpdate
             _entityService.Save(leaveRequest);
         }
 

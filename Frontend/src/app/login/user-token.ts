@@ -35,4 +35,16 @@ export class UserToken {
     if (!this.token) return null;
     return this.token['oauth'];
   }
+
+  hasAnyRole(roles: string[]) {
+    return roles.some(value => this.roles.includes(value));
+  }
+
+  hasRole(role) {
+    return this.roles.includes(role);
+  }
+
+  isHrOrAdmin() {
+    return this.hasAnyRole(['admin', 'hr']);
+  }
 }

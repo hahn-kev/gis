@@ -10,7 +10,7 @@
                     [(ngModel)]="leaveRequest.personId"
                     (ngModelChange)="personSelectedChanged($event)"
                     required
-                    [disabled]="!(isHr | async)"
+                    [disabled]="!isHr"
                     placeholder="Person Leaving">
           <mat-option>None</mat-option>
           <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
@@ -30,7 +30,7 @@
                [(ngModel)]="leaveRequest.startDate"
                (ngModelChange)="updateDaysUsed()"
                [max]="leaveRequest.endDate"
-               [disabled]="leaveRequest.overrideDays && !(isHr | async)"
+               [disabled]="leaveRequest.overrideDays && !isHr"
                [matDatepicker]="startDatePicker"
                placeholder="Start Date">
         <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
@@ -41,7 +41,7 @@
                [(ngModel)]="leaveRequest.endDate"
                (ngModelChange)="updateDaysUsed()"
                [min]="leaveRequest.startDate"
-               [disabled]="leaveRequest.overrideDays && !(isHr | async)"
+               [disabled]="leaveRequest.overrideDays && !isHr"
                [matDatepicker]="endDatePicker"
                placeholder="End Date">
         <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
@@ -52,19 +52,19 @@
           <input matInput
                  name="days"
                  type="number"
-                 [readonly]="!leaveRequest.overrideDays || !(isHr | async)"
+                 [readonly]="!leaveRequest.overrideDays || !isHr"
                  [(ngModel)]="leaveRequest.days"
                  min="1"
                  matTooltip="Only HR can Modify Leave calculations"
-                 [matTooltipDisabled]="(isHr | async) || !leaveRequest.overrideDays"
+                 [matTooltipDisabled]="isHr || !leaveRequest.overrideDays"
                  placeholder="Days used">
         </mat-form-field>
         <mat-slide-toggle name="overrideDays"
-                          [disabled]="!(isHr | async) || leaveRequest.days == 0.5"
+                          [disabled]="!isHr || leaveRequest.days == 0.5"
                           [(ngModel)]="leaveRequest.overrideDays"
                           (ngModelChange)="overrideDaysChanged($event)"
                           matTooltip="Only HR can Override leave calculations"
-                          [matTooltipDisabled]="(isHr | async)">Override Leave Calculation
+                          [matTooltipDisabled]="isHr">Override Leave Calculation
         </mat-slide-toggle>
         <mat-slide-toggle name="halfDay"
                           [disabled]="leaveRequest.days !== 0.5 && leaveRequest.days !== 1"
@@ -80,7 +80,7 @@
                     name="reason"
                     placeholder="Reason"></textarea>
       </mat-form-field>
-      <ng-container *ngIf="(isHr | async)">
+      <ng-container *ngIf="isHr">
 
         <mat-form-field>
           <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
@@ -117,7 +117,7 @@
 
     <mat-card-actions>
       <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>
-        {{isNew ? 'Request Leave' : 'Save'}}
+        {{isNew ? (sendNotification ? 'Request Leave' : 'Create Leave') : 'Save'}}
       </button>
       <button mat-button *ngIf="!isNew" color="warn" (click)="deleteRequest()">Delete Request</button>
     </mat-card-actions>

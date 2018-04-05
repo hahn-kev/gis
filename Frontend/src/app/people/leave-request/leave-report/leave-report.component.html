@@ -74,3 +74,11 @@
            *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']">
   </mat-row>
 </mat-table>
+
+<a [routerLink]="['/leave-request','edit','new']"
+   [queryParams]="{noNotification: true}"
+   class="add-button"
+   mat-fab matTooltip="Add new Leave Request"
+   matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

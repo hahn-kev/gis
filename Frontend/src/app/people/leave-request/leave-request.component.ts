@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequestWithNames } from './leave-request';
@@ -12,7 +13,6 @@ import 'rxjs/add/operator/defaultIfEmpty';
 import 'rxjs/add/operator/concat';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/share';
 import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
 import { Gender } from '../person';
@@ -21,6 +21,7 @@ import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
   selector: 'app-leave-request',
+  providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
   templateUrl: './leave-request.component.html',
   styleUrls: ['./leave-request.component.scss']
 })
@@ -32,8 +33,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public daysUsed = 0;
   public selectedPerson: PersonAndLeaveDetails;
   public isNew: boolean;
-  public isHr: Observable<boolean>;
+  public isHr = false;
   private myPersonId: string | null;
+  public sendNotification = true;
 
   private subscription: Subscription;
 
@@ -43,23 +45,29 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
               private snackBar: MatSnackBar,
               public loginService: LoginService,
               private personService: PersonService,
+              private location: Location,
               dialog: MatDialog) {
     super(dialog);
-    this.isHr = this.loginService.isHrOrAdmin();
   }
 
   ngOnInit(): void {
     //we're adding an empty list at the beginning of this observable
     //so that we get a result right away, then later update with value
-    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken())
-      .subscribe(([data, user]: [
+    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), this.route.queryParams)
+      .subscribe(([data, user, queryParams]: [
         { leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] },
         UserToken,
-        PersonAndLeaveDetails[]
+        { noNotification: boolean }
         ]) => {
         this.people = data.people;
         this.leaveRequest = data.leaveRequest;
+        this.isNew = !this.leaveRequest.id;
+        this.isHr = user.isHrOrAdmin();
         this.updateDaysUsed();
+        this.sendNotification = this.isNew && (!this.isHr || !queryParams.noNotification);
+        if (!this.sendNotification && this.isNew) {
+          setTimeout(() => this.snackBar.open(`Notifications won't be sent for this leave request`, 'Dismiss'));
+        }
         this.myPersonId = user.personId;
         const person = this.people.find(p => p.person.id === (this.leaveRequest.personId || user.personId));
         if (person) {
@@ -67,7 +75,6 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           this.selectedPerson = person;
         }
       });
-    this.isNew = this.route.snapshot.params['id'] === 'new';
   }
 
   updateDaysUsed() {
@@ -93,6 +100,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           'Cancel');
         if (!result) return;
       }
+    }
+
+    if (this.sendNotification && this.isNew) {
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
       if (!notified) {
         this.snackBar.open(`Leave request created, supervisor not found, no notification was sent`,
@@ -111,6 +121,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
       this.snackBar.open('Leave updated, notification was not sent of changes', null, {duration: 2000});
+      this.location.back();
     }
   }
 

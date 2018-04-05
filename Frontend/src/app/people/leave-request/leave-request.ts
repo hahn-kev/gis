@@ -12,6 +12,10 @@ export class LeaveRequest extends BaseEntity {
   public reason: string;
   public days: number;
   public overrideDays: boolean;
+  constructor(){
+    super();
+    this.createdDate = new Date();
+  }
 }
 
 

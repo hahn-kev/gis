@@ -47,9 +47,9 @@ namespace Backend.Controllers
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] LeaveRequest updatedLeaveRequest)
+        public LeaveRequest Update([FromBody] LeaveRequest updatedLeaveRequest)
         {
-            if (updatedLeaveRequest.Id == Guid.Empty)
+            if (updatedLeaveRequest.Id == Guid.Empty && !User.IsAdminOrHr())
                 throw new Exception("Trying to create a new request with the update action, use post instead");
             if (!User.IsAdminOrHr())
             {
@@ -58,7 +58,7 @@ namespace Backend.Controllers
 
             _leaveService.UpdateLeave(updatedLeaveRequest);
 
-            return Ok();
+            return updatedLeaveRequest;
         }
 
         [HttpDelete("{id}")]
