@@ -308,6 +308,7 @@ namespace UnitTestProject
             _dbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
+            personRoles[0].Active = true;//always have at least one active
             _dbConnection.BulkCopy(personRoles);
             var jobs = personRoles.Select(role => JobFaker().RuleFor(job => job.Id, role.JobId).Generate()).ToList();
 
