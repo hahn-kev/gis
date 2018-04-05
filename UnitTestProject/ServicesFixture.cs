@@ -346,7 +346,7 @@ namespace UnitTestProject
             var trainingRequirement = AutoFaker.Generate<TrainingRequirement>();
             trainingRequirement.FirstYear = 2015;
             trainingRequirement.LastYear = 2018;
-            trainingRequirement.DepatmentId = personWithTraining.Staff.OrgGroupId;
+            trainingRequirement.DepartmentId = personWithTraining.Staff.OrgGroupId;
             trainingRequirement.Scope = TrainingScope.Department;
 
             var orgGroup = AutoFaker.Generate<OrgGroup>();
