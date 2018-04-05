@@ -20,6 +20,7 @@ export class StaffReportComponent implements OnInit {
     'firstName',
     'lastName',
     'email',
+    'staffEmail',
     'phoneNumber',
     'birthdate',
     'age',
