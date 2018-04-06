@@ -8,7 +8,7 @@ import { ActivityIndicatorService } from './services/activity-indicator.service'
 import { SettingsService } from './services/settings.service';
 import { UserToken } from './login/user-token';
 import { AttachmentService } from './components/attachments/attachment.service';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -35,10 +35,12 @@ export class AppComponent implements OnInit {
               private cookieService: CookieService,
               activityIndicatorService: ActivityIndicatorService,
               settings: SettingsService,
-              private titleService: Title) {
+              private titleService: Title,
+              meta: Meta) {
     this.currentUser = loginService.currentUserToken();
     this.indicatorStatus = activityIndicatorService.observeIndicator();
     this.version = settings.get<string>('version');
+    meta.addTag({name:'theme-color', content: 'rgb(26, 35, 126)'});
   }
 
   ngOnInit(): void {
