@@ -1,7 +1,7 @@
 ## Gis
 [![Build status](https://gisthailand.visualstudio.com/_apis/public/build/definitions/30e4089a-2508-47ae-abc3-ba12087ff8ae/1/badge)](https://gisthailand.visualstudio.com/Gis/_build/index?definitionId=1)
 
-This document should explain some of the following for the gis office app
+This document should explain some of the following for the GIS office app
 * [how](#server-setup) the production server is configured
 * [what](#config-files) the config files do
 * [how](#build-info) you might go about updating the server
@@ -56,7 +56,7 @@ at [w3schools](https://www.w3schools.com/sql/)
 
 #### Helpful commands
 
-* reboot gis application `sudo service kestrel-gis restart`
+* reboot GIS application `sudo service kestrel-gis restart`
 * update config file `sudo nano /var/aspnetcore/gis/appsettings.json` to close press ctrl + x,
 the text editor is called `nano` search google for more help on how to use it
 
@@ -133,22 +133,23 @@ and an update will have to be made to the application (this might change in the 
 
 #### Email Templates
 
-SendGrid works using transactional templates, you go to their website, configure a template
-and the template will have an ID, I've made a couple templates already and put the ID into the config file
-that way when an email needs to be sent I send the template Id to SendGrid and it knows what email
-template I'd like to use, these ID's are unique and if a new SendGrid account is needed,
-then the Id's will have to change.
+SendGrid works using transactional templates. If you need to configure a template, you go to their website,
+configure a template and the template will have an ID.
+I've made a couple templates already and put the ID into the config file.
+That way, when an email needs to be sent, I send the template ID to SendGrid and it knows what email
+template I'd like to use. These ID's are unique to the account. If a different SendGrid account is used,
+then the ID's will be different and need to be updated.
 
-If you need to modify the template for an email you should be able to login to the SendGrid site
-and see the templates to modify, that should all be fairly straightforward. The templates work 
-using text substitutions, in the template they might look like some of the following
+If you need to modify the template for an email, you should be able to login to the SendGrid site
+and find the template. The templates work using text substitutions, in the template they might look
+like some of the following:
 * `:firstName`
 * `:type`
 * `:start`
 * `:end`
 
-So when I want to send an email I build a list of text that can get substituted
-and in the template you specify where the actual text goes.
+When an email is sent the substitutions are replaced with the values specified in the application.
+Below is an example of what that might look like.
 
 ##### Email Template Example 1
 Substitutions:
@@ -170,55 +171,58 @@ ___
 
 ##### Modfy subsitutions
 
-If a template is modified and a new substitution is required
-then a bit of coding will need to be done. At the time of writing all email, templates
+If a template is modified and a new substitution is required,
+then a bit of coding will need to be done. At the time of writing, all email templates
 are sent from [`Backend/Services/LeaveService.cs`](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Services/LeaveService.cs)
 and you can find the substitutions by searching for `$LEAVE-SUBSTITUTIONS$`
 
-Let's look at modifying a leave request email to include the date that the leave request
+Let's look at modifying a `RequestLeaveApproval` template to include the date that the Leave Request
 was created.
 
-Take a look at the code [here](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Services/LeaveService.cs#L183-L205)
-lines 183 through 205 should be highlighted. This is the `SendRequestApproval` function, here we're making a substitution list and sending it to send grid, specifying that we want to send a `RequestLeaveApproval` template, along with
+Take a look at this [code](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Services/LeaveService.cs#L183-L205);
+lines 183 through 205 should be highlighted. This is the `SendRequestApproval` function.
+Here we're making a substitution list and sending it to SendGrid,
+specifying that we want to send a `RequestLeaveApproval` template, along with
 a few other things, like sender email, destination email, and subject.
 
-Taking a look at the substitutions you can see that the start and end date are coming from the `leaveRequest`, like so `leaveRequest.StartDate` or `leaveRequest.EndDate`,
-and we want to access the Leave Request created date, so let's find where the `StartDate` and 
-`EndDate` are defined and find the name of the created date. If we search for a file called `leaveRequest`
+Taking a look at the substitutions you can see that the start and end date are coming from the `leaveRequest`,
+using the `leaveRequest.StartDate` or `leaveRequest.EndDate` properties.
+We want to access the date the Leave Request was created, so let's find where the `StartDate` and 
+`EndDate` are defined, then find the name of the created date. If we search for a file called `leaveRequest.cs`
 we should find [this](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs)
 and at [line 23](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs#L23)
 we can see `StartDate` with `EndDate` right below. If we look down to [line 38](https://github.com/hahn-kev/gis/blob/2018.03.30.1/Backend/Entities/LeaveRequest.cs#L38)
-we see `CreatedDate`. That means back in the `SendRequestApproval` function we can use the created date
-on the leave request. This might look like the following
+we see `CreatedDate` property. Back in the `SendRequestApproval` function, we can use this property
+on the leave request. This might look like the following:
 ```c#
 {":created", leaveRequest.CreatedDate.ToString("MMM d yyyy")}
 ```
 
-you'll notice the bit on the end we're calling `.ToString("MMM d yyyy")` this just formats
-the date into text, [here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
+Note the bit on the end that we're calling `.ToString("MMM d yyyy")`. This formats
+the date into text. [Here](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
 you can read up on the supported formats if those need to be modified.
 
-Next, you'll want to build the application and update the server with the new version,
-you should do this before you update the sendGrid template, otherwise, an email might get sent
-with the substitution not replaced.
+Next, you'll want to build the application and update the server with the new version.
+You should do this before you update the SendGrid template. Otherwise, an email might get sent
+without the substitution being replaced.
 
-Finally, you'll want to update the template on send grid to use the `:created`
+Finally, you'll want to update the template on SendGrid to use the `:created`
 substitution to display the created date.
 
 #### Replace the SendGrid account
 
-If for some reason you've lost access to the send grid account,
+If for some reason you've lost access to the SendGrid account,
 you'll need to update the config file on the server to use the new account. 
 
 1. Create a new [SendGrid Account](https://sendgrid.com/)
-2. Create an api key with access to send emails
-3. Update `appsettings.json` `SendGridAPIKey` with api key
+2. Create an API key with access to send emails
+3. Update `appsettings.json` `SendGridAPIKey` with API key
 4. Create template emails ([example](#email-template-example-1)) for 
-   * HR Notification
+   * HR notification
    * Request Leave approval
-   * Notify leave request (to let supervisors know of leave when they don't approve it)
-5. Update `appsettings.json` `TemplateSettings` with template id's
-6. reboot gis application `sudo service kestrel-gis restart`
+   * Leave Request notification (to let supervisors know of leave when they don't approve it)
+5. Update `appsettings.json` `TemplateSettings` with appropriate template ID's
+6. Reboot the GIS application `sudo service kestrel-gis restart`
 
 ### Tech used
 
