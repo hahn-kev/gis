@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
     this.currentUser = loginService.currentUserToken();
     this.indicatorStatus = activityIndicatorService.observeIndicator();
     this.version = settings.get<string>('version');
-    meta.addTag({name:'theme-color', content: 'rgb(26, 35, 126)'});
+    meta.addTag({name:'theme-color', content: '#283593'});
   }
 
   ngOnInit(): void {
