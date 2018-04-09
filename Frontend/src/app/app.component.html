@@ -109,7 +109,10 @@
         <mat-divider></mat-divider>
 
       </mat-nav-list>
-      <span mat-subheader>Version: {{version}}</span>
+      <span mat-subheader>
+        Version: {{version}}&nbsp;
+        <a class="mat-link" href="https://github.com/hahn-kev/gis">About Application</a>
+      </span>
     </mat-sidenav>
     <mat-sidenav class="mat-elevation-z2" mode="side" position="end" #rightDrawer>
       <app-attachments *ngIf="rightDrawer.opened"></app-attachments>
