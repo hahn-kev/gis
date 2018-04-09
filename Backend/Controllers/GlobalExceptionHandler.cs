@@ -64,7 +64,6 @@ namespace Backend.Controllers
             try
             {
                 sentryClient.Capture(CreateEvent(context));
-
             }
             catch (Exception e)
             {
@@ -80,11 +79,13 @@ namespace Backend.Controllers
                 User = new UserSentryContext(httpContext),
                 Request = new HttpSentryContext(httpContext) {Cookies = null}
             };
+            sentryEvent.Tags.Add("logger", ".NET");
             sentryEvent.Request.Headers.Remove("Cookie");
             if (sentryEvent.User.Username.IsNullOrEmpty())
             {
                 sentryEvent.User.Username = "anonymous";
             }
+
             return sentryEvent;
         }
     }
