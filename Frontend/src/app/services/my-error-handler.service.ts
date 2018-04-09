@@ -9,9 +9,20 @@ export class MyErrorHandlerService implements ErrorHandler {
 
   private original = new ErrorHandler();
   private snackBarService: MatSnackBar;
+  private lastTime: Date;
 
   constructor(private injector: Injector, private ngZone: NgZone) {
 
+  }
+
+  timeSinceLast(){
+    if (this.lastTime == null) {
+      this.lastTime = new Date();
+      return Number.MAX_SAFE_INTEGER;
+    }
+    let previousTime = this.lastTime;
+    this.lastTime = new Date();
+    return this.lastTime.getTime() - previousTime.getTime();
   }
 
   handleError(error: any): void {
@@ -36,7 +47,7 @@ export class MyErrorHandlerService implements ErrorHandler {
     }
     if (NgZone.isInAngularZone()) {
       this.snackBarService.open(message, 'Dismiss');
-    } else {
+    } else if (this.timeSinceLast() > 100) {
       this.ngZone.run(() => {
         this.snackBarService.open(message, 'Dismiss');
       });
