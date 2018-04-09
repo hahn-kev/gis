@@ -1,6 +1,7 @@
 import { Role, RoleExtended, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 import { BaseEntity } from '../classes/base-entity';
+import { LeaveDetails } from './self/self';
 
 export class Person extends BaseEntity {
   public firstName: string;
@@ -48,7 +49,7 @@ export class PersonWithStaff extends PersonExtended {
 }
 
 export class PersonWithOthers extends PersonWithStaff {
-
+  public leaveDetails: LeaveDetails;
   public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
 }

@@ -16,16 +16,18 @@ namespace Backend.Services
         private readonly UsersRepository _usersRepository;
         private readonly IEntityService _entityService;
         private readonly JobRepository _jobRepository;
+        private readonly LeaveService _leaveService;
 
         public PersonService(PersonRepository personRepository,
             IEntityService entityService,
             UsersRepository usersRepository,
-            JobRepository jobRepository)
+            JobRepository jobRepository, LeaveService leaveService)
         {
             _personRepository = personRepository;
             _entityService = entityService;
             _usersRepository = usersRepository;
             _jobRepository = jobRepository;
+            _leaveService = leaveService;
         }
 
         #region people
@@ -35,7 +37,12 @@ namespace Backend.Services
                 .OrderBy(person => person.PreferredName)
                 .ThenBy(person => person.LastName).ToList();
 
-        public PersonWithOthers GetById(Guid id) => _personRepository.GetById(id);
+        public PersonWithOthers GetById(Guid id)
+        {
+            var personWithOthers = _personRepository.GetById(id);
+            personWithOthers.LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers);
+            return personWithOthers;
+        }
 
         public void Save(PersonWithStaff person)
         {
