@@ -52,7 +52,7 @@
         <ng-container *ngFor="let staffObj of reqObj.staffsWithTraining; let isLast = last; let index = index">
           <mat-list-item>
             <a mat-button [routerLink]="['/people', 'edit', staffObj.staff.personId]">
-              {{staffObj.staff.preferredName}}
+              {{staffObj.staff.preferredName}} {{staffObj.staff.lastName}}
             </a>
             <span class="spacer"></span>
             <ng-container *ngIf="staffObj.training.completedDate">
