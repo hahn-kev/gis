@@ -74,7 +74,7 @@ namespace Backend
             services.AddSentinel(new SentinelSettings
             {
                 Dsn = settings.SentryDsn,
-                Environment = settings.Environment ?? "Production",
+                Environment = (settings.Environment ?? "production").ToLower(),
                 IncludeRequestData = true,
                 IncludeCookies = false,
                 Release = GetType().Assembly.GetName().Version.ToString(),
