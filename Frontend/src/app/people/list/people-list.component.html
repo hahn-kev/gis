@@ -6,6 +6,7 @@
   <mat-form-field floatLabel="never">
     <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
   </mat-form-field>
+  <app-export-button [values]="dataSource" fileName="peopleData"></app-export-button>
 </ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="preferredName">

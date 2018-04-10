@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/theming';
+@import "utils";
 
 @include mat-core();
 
@@ -181,9 +182,8 @@ html, body {
     page-break-inside: avoid;
     page-break-after: auto;
   }
-  .print-hide {
-    display: none;
-    visibility: hidden;
-  }
+}
+.print-hide {
+  @include print-hide;
 }
 
