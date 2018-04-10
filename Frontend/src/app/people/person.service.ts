@@ -1,9 +1,10 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Person, PersonWithDaysOfLeave, PersonWithOthers, PersonWithStaff, StaffWithName } from './person';
+import { Person, PersonWithDaysOfLeave, PersonWithOthers, PersonWithStaff} from './person';
 import { Observable } from 'rxjs/Observable';
-import { Role, RoleExtended, RoleWithJob } from './role';
+import { Role, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
+import { StaffWithName } from './staff';
 
 @Injectable()
 export class PersonService {

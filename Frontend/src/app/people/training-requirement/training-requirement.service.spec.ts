@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
-import { StaffWithName } from '../person';
+import { StaffWithName } from '../staff';
 import { TrainingRequirement } from './training-requirement';
 import { StaffTraining } from './staff-training';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';

@@ -1,5 +1,5 @@
 import { TrainingRequirement } from '../training-requirement';
-import { StaffWithName } from '../../person';
+import { StaffWithName } from '../../staff';
 import { StaffTraining } from '../staff-training';
 
 export class RequirementWithStaff {

@@ -1,8 +1,8 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Nationality, NationalityName, Person, PersonWithOthers, Staff } from '../person';
+import { Nationality, NationalityName, Person, PersonWithOthers} from '../person';
 import { PersonService } from '../person.service';
-import { Role, RoleExtended, RoleWithJob } from '../role';
+import { Role, RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
@@ -19,6 +19,7 @@ import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
 import { OrgChain } from '../groups/org-chain';
 import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
+import { Staff } from '../staff';
 
 @Component({
   selector: 'app-person',

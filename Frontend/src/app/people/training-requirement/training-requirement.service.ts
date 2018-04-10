@@ -7,7 +7,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { Year } from './year';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
-import { StaffWithName } from '../person';
+import { StaffWithName } from '../staff';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import { OrgGroup } from 'app/people/groups/org-group';

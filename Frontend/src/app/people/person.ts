@@ -1,7 +1,8 @@
-import { Role, RoleExtended, RoleWithJob } from './role';
+import { RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
+import { Staff } from './staff';
 
 export class Person extends BaseEntity {
   public firstName: string;
@@ -57,41 +58,6 @@ export class PersonWithOthers extends PersonWithStaff {
 export class PersonWithDaysOfLeave extends Person {
   public sickDaysOfLeaveUsed: number;
   public vacationDaysOfLeaveUsed: number;
-}
-
-export class Staff extends BaseEntity {
-  public email: string;
-  public orgGroupId: string;
-  public missionOrgId: string;
-  public annualSalary: number;
-  public renwebId: string;
-  public moeLicenseNumber: string;
-  public contractIssued?: Date;
-  public contractExpireDate?: Date;
-  public insuranceNumber: string;
-  public teacherLicenseOrg: string;
-  public teacherLicenseNo: string;
-  public thaiSsn: string;
-  public visaType: string;
-  public workPermitType: string;
-  public endorsements: string;
-  public endorsementAgency: string;
-
-  constructor(id?: string) {
-    super();
-    this.id = id;
-  }
-}
-
-export class StaffWithName extends Staff {
-  public preferredName: string;
-  public lastName: string;
-  public personId: string;
-
-  constructor(id?: string, preferredName?: string) {
-    super(id);
-    this.preferredName = preferredName;
-  }
 }
 
 export enum Nationality {
