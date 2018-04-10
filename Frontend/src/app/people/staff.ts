@@ -2,6 +2,7 @@ import { BaseEntity } from '../classes/base-entity';
 
 export class Staff extends BaseEntity {
   public email: string;
+  public phoneExt: string;
   public orgGroupId: string;
   public missionOrgId: string;
   public annualSalary: number;

@@ -209,7 +209,11 @@
                  name="staffEmail"
                  placeholder="Staff Email">
         </mat-form-field>
-        <span></span>
+        <mat-form-field>
+          <input matInput [(ngModel)]="person.staff.phoneExt"
+                 name="phoneExt"
+                 placeholder="Phone Ext">
+        </mat-form-field>
         <mat-form-field>
           <mat-select name="orgGroup"
                       [disabled]="isSelf"

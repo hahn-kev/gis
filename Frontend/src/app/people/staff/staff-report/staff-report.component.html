@@ -60,6 +60,10 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header="staff.email">Staff Email</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.staff.email}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="phoneExtension">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.phoneExt">Phone Ext</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.staff.phoneExt}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="phoneNumber">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Phone #</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.phoneNumber}}</mat-cell>
