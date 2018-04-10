@@ -2,6 +2,13 @@
   <ng-container *ngIf="isNew; else elseBlock">Request Leave</ng-container>
   <ng-template #elseBlock>Edit Leave Request</ng-template>
 </ng-container>
+<ng-container *appToolbarContent>
+  <mat-slide-toggle *ngIf="isNew && isHr"
+                    [(ngModel)]="sendNotification"
+  (ngModelChange)="warnNoLeaveNotification($event)">
+    Send Approval Email
+  </mat-slide-toggle>
+</ng-container>
 <div class="main-card">
   <mat-card>
     <form #leaveForm="ngForm" (submit)="submit()" id="form" class="two-colum-grid">

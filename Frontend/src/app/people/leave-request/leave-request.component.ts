@@ -3,7 +3,7 @@ import { Location, LocationStrategy, PathLocationStrategy } from '@angular/commo
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequestWithNames } from './leave-request';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PersonService } from '../person.service';
@@ -36,6 +36,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public isHr = false;
   private myPersonId: string | null;
   public sendNotification = true;
+  private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
 
   private subscription: Subscription;
 
@@ -66,7 +67,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         this.updateDaysUsed();
         this.sendNotification = this.isNew && (!this.isHr || !queryParams.noNotification);
         if (!this.sendNotification && this.isNew) {
-          setTimeout(() => this.snackBar.open(`Notifications won't be sent for this leave request`, 'Dismiss'));
+          setTimeout(() => this.warnNoLeaveNotification());
         }
         this.myPersonId = user.personId;
         const person = this.people.find(p => p.person.id === (this.leaveRequest.personId || user.personId));
@@ -75,6 +76,15 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           this.selectedPerson = person;
         }
       });
+  }
+
+  warnNoLeaveNotification(sendNotification = false) {
+    if (sendNotification) {
+      if (this.noNotificationSnackbarRef)
+        this.noNotificationSnackbarRef.dismiss();
+      return;
+    }
+    this.noNotificationSnackbarRef = this.snackBar.open(`Approval Emails won't be sent for this leave request`, 'Dismiss')
   }
 
   updateDaysUsed() {
