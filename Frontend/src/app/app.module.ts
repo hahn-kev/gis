@@ -98,6 +98,8 @@ import { GradeService } from './job/grade/grade.service';
 import { RenderTemplateDialogComponent } from './components/render-template-dialog/render-template-dialog.component';
 import { MyDatePipe } from './services/my-date.pipe'
 import { DatePipe } from '@angular/common';
+import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { CsvService } from './services/csv.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -143,7 +145,8 @@ if (environment.production) {
     GradeListComponent,
     GradeComponent,
     RenderTemplateDialogComponent,
-    MyDatePipe
+    MyDatePipe,
+    ExportButtonComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -235,7 +238,8 @@ if (environment.production) {
     JobService,
     MissionOrgService,
     GradeService,
-    MyDatePipe
+    MyDatePipe,
+    CsvService
   ],
   bootstrap: [AppComponent]
 })
