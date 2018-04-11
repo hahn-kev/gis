@@ -35,7 +35,9 @@ using Newtonsoft.Json;
 using Npgsql;
 using Sentinel.Sdk.Extensions;
 using Sentinel.Sdk.Middleware;
+using Serilog;
 using IdentityUser = Backend.Entities.IdentityUser;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Backend
 {
@@ -209,7 +211,6 @@ namespace Backend
             loggerFactory.AddFile("Logs/log-{Date}.txt", LogLevel.Warning);
             if (env.IsDevelopment())
             {
-                loggerFactory.AddConsole(LogLevel.Trace);
                 app.UseDeveloperExceptionPage();
             }
 
@@ -243,7 +244,7 @@ namespace Backend
             app.UseSentinel();
             app.UseMvc();
 
-            ConfigureDatabase(app.ApplicationServices);
+            ConfigureDatabase(app.ApplicationServices, loggerFactory.CreateLogger("database"));
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
@@ -272,12 +273,12 @@ namespace Backend
 #endif
         }
 
-        public void ConfigureDatabase(IServiceProvider provider)
+        public void ConfigureDatabase(IServiceProvider provider, ILogger logger)
         {
             var settings = provider.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
             DataConnection.TurnTraceSwitchOn();
-            DataConnection.WriteTraceLine = (message, category) => Console.WriteLine(message);
+            DataConnection.WriteTraceLine = (message, category) => logger.LogDebug(message);
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
             DbConnection.SetupMappingBuilder(MappingSchema.Default);
         }

@@ -124,5 +124,20 @@ namespace UnitTestProject
             ).First();
             actualDate.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / -2));
         }
+
+        [Fact]
+        public void FormatConnectionStringSupportsUriFormat()
+        {
+            var actualConnectionString = Settings.FormatConnectionString("postgres://gis:gis123@localhost:5432/gis");
+            actualConnectionString.ShouldBe("Server=localhost;Database=gis;User Id=gis;Password=gis123;Port=5432");
+        }
+
+        [Fact]
+        public void FormatConnectionStringSupportsCustomString()
+        {
+            var expectedString = "Server=localhost;Database=gis;User Id=gis;Password=gis123;Port=5432";
+            var actualConnectionString = Settings.FormatConnectionString(expectedString);
+            actualConnectionString.ShouldBe(expectedString);
+        }
     }
 }

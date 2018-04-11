@@ -43,14 +43,21 @@ namespace Backend
             }
         }
 
-        private string FormatConnectionString(string connectionString)
+        public static string FormatConnectionString(string connectionString)
         {
-            var uri = new Uri(connectionString);
-            var db = uri.AbsolutePath.Trim('/');
-            var user = uri.UserInfo.Split(':')[0];
-            var passwd = uri.UserInfo.Split(':')[1];
-            var port = uri.Port > 0 ? uri.Port : 5432;
-            return $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={port}";
+            try
+            {
+                var uri = new Uri(connectionString);
+                var db = uri.AbsolutePath.Trim('/');
+                var user = uri.UserInfo.Split(':')[0];
+                var passwd = uri.UserInfo.Split(':')[1];
+                var port = uri.Port > 0 ? uri.Port : 5432;
+                return $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={port}";
+            }
+            catch (UriFormatException)
+            {
+                return connectionString;
+            }
         }
     }
 
