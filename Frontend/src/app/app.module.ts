@@ -100,6 +100,7 @@ import { MyDatePipe } from './services/my-date.pipe'
 import { DatePipe } from '@angular/common';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { CsvService } from './services/csv.service';
+import { SandboxComponent } from './components/sandbox/sandbox.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -146,7 +147,8 @@ if (environment.production) {
     GradeComponent,
     RenderTemplateDialogComponent,
     MyDatePipe,
-    ExportButtonComponent
+    ExportButtonComponent,
+    SandboxComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

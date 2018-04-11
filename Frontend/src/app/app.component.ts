@@ -9,6 +9,7 @@ import { SettingsService } from './services/settings.service';
 import { UserToken } from './login/user-token';
 import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,7 @@ import { Meta, Title } from '@angular/platform-browser';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
+  public isDev = !environment.production;
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: string;

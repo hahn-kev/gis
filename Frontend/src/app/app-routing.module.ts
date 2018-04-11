@@ -51,6 +51,7 @@ import { GradeResolverService } from './job/grade/grade-resolver.service';
 import { GradeComponent } from 'app/job/grade/edit/grade.component';
 import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
 import { CanDeactivateGuard } from './services/can-deactivate.guard';
+import { SandboxComponent } from './components/sandbox/sandbox.component';
 
 const routes: Routes = [
   {
@@ -334,6 +335,10 @@ const routes: Routes = [
             }
           }
         ]
+      },
+      {
+        path: 'sandbox',
+        component: SandboxComponent
       },
       {
         path: 'home',
