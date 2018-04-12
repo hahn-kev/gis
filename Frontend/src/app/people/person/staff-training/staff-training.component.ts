@@ -9,6 +9,8 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import * as moment from 'moment';
 import { NgForm } from '@angular/forms';
+import { LazyLoadService } from '../../../services/lazy-load.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-staff-training',
@@ -19,8 +21,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
 
   private _staffId;
   public training: StaffTrainingWithRequirement[] = [];
-  public requirements: Map<string, TrainingRequirement>;
-  public requirementsList: TrainingRequirement[];
+  public requirements: Observable<TrainingRequirement[]>;
   public newTraining = new StaffTraining();
   public requirement: TrainingRequirement;
   public isNew: boolean;
@@ -28,11 +29,14 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   private staffIdSubject = new Subject<string>();
   @ViewChild('newForm') newForm: NgForm;
 
-  constructor(private trainingService: TrainingRequirementService,
+  constructor(lazyLoadService: LazyLoadService,
+              private trainingService: TrainingRequirementService,
               private dialog: MatDialog,
               private snackBar: MatSnackBar) {
-    this.subscription = this.staffIdSubject.switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
-      .combineLatest(this.trainingService.listMapped()).subscribe(this.updateTrainingList.bind(this));
+    this.requirements = lazyLoadService.share('requirements', () => this.trainingService.list());
+    this.subscription = this.staffIdSubject
+      .switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
+      .subscribe(value => this.training = value);
   }
 
 
@@ -47,20 +51,6 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
     this.isNew = !staffId;
   }
 
-  updateTrainingList([training, requirements]: [StaffTraining[], Map<string, TrainingRequirement>]) {
-    this.requirements = requirements;
-    this.requirementsList = Array.from(requirements.values());
-    this.training = training.map(this.includeRequirementsInTraining.bind(this));
-  }
-
-  includeRequirementsInTraining(value: StaffTraining): StaffTrainingWithRequirement {
-    const staffTraining = <StaffTrainingWithRequirement> value;
-    const requirement = this.requirements.get(value.trainingRequirementId);
-    staffTraining.requirementName = requirement.name;
-    staffTraining.requirementScope = requirement.scope;
-    return staffTraining;
-  }
-
   ngOnInit() {
 
   }
@@ -72,9 +62,11 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   async saveNew() {
     this.newTraining.staffId = this.staffId;
     this.newTraining.trainingRequirementId = this.requirement.id;
-    const savedTraining = await this.trainingService.saveStaffTraining(this.newTraining);
+    let savedTraining = <StaffTrainingWithRequirement> await this.trainingService.saveStaffTraining(this.newTraining);
+    savedTraining.requirementName = this.requirement.name;
+    savedTraining.requirementScope = this.requirement.scope;
     this.training = [
-      this.includeRequirementsInTraining(savedTraining),
+      savedTraining,
       ...this.training
     ];
 

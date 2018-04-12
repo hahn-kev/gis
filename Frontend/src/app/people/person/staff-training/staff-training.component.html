@@ -5,30 +5,32 @@
     <mat-expansion-panel-header>
       <mat-panel-title>Add new Training record</mat-panel-title>
     </mat-expansion-panel-header>
-    <form id="newForm" #newForm="ngForm"
-          (submit)="saveNew(); newExpansionPanel.close();"
-          class="two-colum-grid">
-      <mat-form-field>
-        <mat-select name="requirement" required [(ngModel)]="requirement" placeholder="Completed Requirement">
-          <mat-option *ngFor="let eachRequirement of requirementsList"
-                      [value]="eachRequirement">
-            {{eachRequirement.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <ng-template matExpansionPanelContent>
+      <form id="newForm" #newForm="ngForm"
+            (submit)="saveNew(); newExpansionPanel.close();"
+            class="two-colum-grid">
+        <mat-form-field>
+          <mat-select name="requirement" required [(ngModel)]="requirement" placeholder="Completed Requirement">
+            <mat-option *ngFor="let eachRequirement of requirements | async"
+                        [value]="eachRequirement">
+              {{eachRequirement.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field>
-        <input name="completedDate" matInput [(ngModel)]="newTraining.completedDate"
-               required
-               [matDatepicker]="completedDatePicker"
-               placeholder="Date Completed">
-        <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #completedDatePicker></mat-datepicker>
-      </mat-form-field>
-    </form>
-    <mat-action-row>
-      <button type="submit" form="newForm" [disabled]="newForm.form.invalid" mat-button>Mark Complete</button>
-    </mat-action-row>
+        <mat-form-field>
+          <input name="completedDate" matInput [(ngModel)]="newTraining.completedDate"
+                 required
+                 [matDatepicker]="completedDatePicker"
+                 placeholder="Date Completed">
+          <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #completedDatePicker></mat-datepicker>
+        </mat-form-field>
+      </form>
+      <mat-action-row>
+        <button type="submit" form="newForm" [disabled]="newForm.form.invalid" mat-button>Mark Complete</button>
+      </mat-action-row>
+    </ng-template>
   </mat-expansion-panel>
 
   <!--completed training list-->
