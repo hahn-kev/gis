@@ -3,9 +3,10 @@
     <mat-select name="job"
                 [disabled]="readonly"
                 [(ngModel)]="role.jobId"
+                (ngModelChange)="jobChanged($event)"
                 required
                 placeholder="Job">
-      <mat-option *ngFor="let job of jobs | async" [value]="job.id">{{job.title}}</mat-option>
+      <mat-option *ngFor="let job of jobs" [value]="job.id">{{job.title}}</mat-option>
     </mat-select>
   </mat-form-field>
 
