@@ -15,7 +15,7 @@ namespace Backend.DataLayer
 {
     public interface IDbConnection : IDataContext
     {
-        IQueryable<ImageInfo> Images { get; }
+//        IQueryable<ImageInfo> Images { get; }
         IQueryable<Attachment> Attachments { get; }
         IQueryable<Person> People { get; }
         IQueryable<PersonExtended> PeopleExtended { get; }

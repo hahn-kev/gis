@@ -42,35 +42,35 @@ namespace Backend.DataLayer
             }
         }
 
-        public async Task GetImage(int id, Func<Stream, ImageInfo, Task> callback)
-        {
-            var imageInfo = await _connection.Images.SingleOrDefaultAsync(info => info.Id == id);
-            using (var trans = _connection.BeginTransaction())
-            {
-                using (var stream = await _largeObjectManager.OpenReadAsync(imageInfo.ImageId, CancellationToken.None))
-                {
-                    await callback(stream, imageInfo);
-                }
-            }
-        }
+//        public async Task GetImage(int id, Func<Stream, ImageInfo, Task> callback)
+//        {
+//            var imageInfo = await _connection.Images.SingleOrDefaultAsync(info => info.Id == id);
+//            using (var trans = _connection.BeginTransaction())
+//            {
+//                using (var stream = await _largeObjectManager.OpenReadAsync(imageInfo.ImageId, CancellationToken.None))
+//                {
+//                    await callback(stream, imageInfo);
+//                }
+//            }
+//        }
 
-        public IEnumerable<ImageInfo> Images()
-        {
-            return _connection.Images;
-        }
-
-        public void Delete(int id, uint? oid)
-        {
-            if (!oid.HasValue)
-            {
-                oid = _connection.Images.Where(info => info.Id == id).Select(info => info.ImageId).SingleOrDefault();
-            }
-            using (var transaction = _connection.BeginTransaction())
-            {
-                _largeObjectManager.Unlink(oid.Value);
-                _connection.Images.Where(info => info.Id == id).Delete();
-                transaction.Commit();
-            }
-        }
+//        public IEnumerable<ImageInfo> Images()
+//        {
+//            return _connection.Images;
+//        }
+//
+//        public void Delete(int id, uint? oid)
+//        {
+//            if (!oid.HasValue)
+//            {
+//                oid = _connection.Images.Where(info => info.Id == id).Select(info => info.ImageId).SingleOrDefault();
+//            }
+//            using (var transaction = _connection.BeginTransaction())
+//            {
+//                _largeObjectManager.Unlink(oid.Value);
+//                _connection.Images.Where(info => info.Id == id).Delete();
+//                transaction.Commit();
+//            }
+//        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using Moq;
 using Npgsql;
@@ -71,7 +72,7 @@ namespace UnitTestProject
 
             configure?.Invoke(ServiceCollection);
             ServiceProvider = ServiceCollection.BuildServiceProvider();
-            startup.ConfigureDatabase(ServiceProvider);
+            startup.ConfigureDatabase(ServiceProvider, new ConsoleLogger("db", (s, level) => true, false));
             DataConnection.DefaultSettings = new MockDbSettings();
             DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message, category);
             SetupSchema();
@@ -98,6 +99,7 @@ namespace UnitTestProject
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
             TryCreateTable<Attachment>();
+            TryCreateTable<MissionOrg>();
 
             var roles = new[] {"admin", "hr", "hradmin"};
             var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
@@ -145,6 +147,9 @@ namespace UnitTestProject
             jacobGroup.Supervisor = bob.Id;
             jacobGroup.ApproverIsSupervisor = true;
             _dbConnection.Insert(jacobGroup);
+            var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
+            jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
+            _dbConnection.Insert(jacobMissionOrg);
         }
 
         public Faker<PersonWithStaff> PersonFaker() =>
@@ -308,7 +313,7 @@ namespace UnitTestProject
             _dbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
-            personRoles[0].Active = true;//always have at least one active
+            personRoles[0].Active = true; //always have at least one active
             _dbConnection.BulkCopy(personRoles);
             var jobs = personRoles.Select(role => JobFaker().RuleFor(job => job.Id, role.JobId).Generate()).ToList();
 
@@ -338,6 +343,12 @@ namespace UnitTestProject
             });
 
             _dbConnection.Insert(AutoFaker.Generate<Grade>());
+            _dbConnection.Insert(AutoFaker.Generate<MissionOrg>());
+            _dbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
+            _dbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
+            _dbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
+            _dbConnection.Insert(AutoFaker.Generate<IdentityUserRole<int>>());
+            _dbConnection.Insert(AutoFaker.Generate<IdentityUserToken<int>>());
         }
 
         public void SetupTraining()

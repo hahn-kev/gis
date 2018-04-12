@@ -34,31 +34,31 @@ namespace Backend.Controllers
             return Json(imageInfo);
         }
 
-        [HttpGet("{id}")]
-        public async Task Get(int id)
-        {
-            await _imageRepository.GetImage(id, (stream, info) =>
-            {
-                Response.StatusCode = 200;
-                Response.ContentLength = stream.Length;
-                Response.ContentType = info.Type;
-                return stream.CopyToAsync(Response.Body);
-            });
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "admin")]
-        public IList<ImageInfo> Images()
-        {
-            return _imageRepository.Images().ToList();
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
-        public IActionResult Delete(int id, uint? oid)
-        {
-            _imageRepository.Delete(id, oid);
-            return Ok();
-        }
+//        [HttpGet("{id}")]
+//        public async Task Get(int id)
+//        {
+//            await _imageRepository.GetImage(id, (stream, info) =>
+//            {
+//                Response.StatusCode = 200;
+//                Response.ContentLength = stream.Length;
+//                Response.ContentType = info.Type;
+//                return stream.CopyToAsync(Response.Body);
+//            });
+//        }
+//
+//        [HttpGet]
+//        [Authorize(Roles = "admin")]
+//        public IList<ImageInfo> Images()
+//        {
+//            return _imageRepository.Images().ToList();
+//        }
+//
+//        [HttpDelete("{id}")]
+//        [Authorize(Roles = "admin")]
+//        public IActionResult Delete(int id, uint? oid)
+//        {
+//            _imageRepository.Delete(id, oid);
+//            return Ok();
+//        }
     }
 }

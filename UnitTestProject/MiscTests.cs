@@ -32,7 +32,7 @@ namespace UnitTestProject
             options.ShouldNotBeNull();
             options.Value.NotifyHrLeaveRequest.ShouldNotBeNull();
         }
-        
+
         [Fact]
         public void JsonDateWithoutKindHasCorrectFormat()
         {
@@ -73,6 +73,7 @@ namespace UnitTestProject
         {
             return typeof(Startup).Assembly.GetTypes()
                 .Where(type => type.Name.Contains("Repository") && !type.IsInterface && type != typeof(ImageRepository))
+                .Concat(new[] {typeof(IDbConnection)})
                 .SelectMany(type => type.GetProperties()
                     .Where(info => typeof(IQueryable).IsAssignableFrom(info.PropertyType))
                     .Select(info => new object[] {type, info})
@@ -118,8 +119,7 @@ namespace UnitTestProject
         public void SqlDatesGetExecutedProperly()
         {
             var tr = _servicesFixture.InsertRequirement(months: 12);
-            var actualDate = _servicesFixture.DbConnection.TrainingRequirements.Select(requirement => 
-            
+            var actualDate = _servicesFixture.DbConnection.TrainingRequirements.Select(requirement =>
                 Sql.AsSql(new DateTime(2018, 3, 1).AddMonths(requirement.RenewMonthsCount / -2))
             ).First();
             actualDate.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / -2));
