@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -159,7 +159,7 @@ namespace UnitTestProject
                 .RuleFor(extended => extended.Staff,
                     (f, extended) =>
                     {
-                        var staff = AutoFaker.Generate<Staff>();
+                        var staff = AutoFaker.Generate<StaffWithOrgName>();
                         staff.Id = extended.StaffId ?? throw new NullReferenceException("staffId null");
                         return staff;
                     }).RuleSet("notStaff",
@@ -212,7 +212,7 @@ namespace UnitTestProject
             action?.Invoke(person);
             _dbConnection.Insert(person);
             if (includeStaff)
-                _dbConnection.Insert(person.Staff);
+                _dbConnection.Insert<Staff>(person.Staff);
 
             return person;
         }

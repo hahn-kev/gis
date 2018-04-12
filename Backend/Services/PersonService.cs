@@ -53,7 +53,7 @@ namespace Backend.Services
 
             if (person.Staff != null)
             {
-                _entityService.Save(person.Staff);
+                _entityService.Save<Staff>(person.Staff);
                 person.StaffId = person.Staff.Id;
             }
             else
@@ -62,7 +62,7 @@ namespace Backend.Services
                 person.StaffId = null;
             }
 
-            _entityService.Save(person);
+            _entityService.Save<PersonExtended>(person);
             if (person.Staff != null)
             MatchStaffWithUser(person.Staff, person.Id);
 

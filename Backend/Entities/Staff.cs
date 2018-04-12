@@ -20,15 +20,31 @@ namespace Backend.Entities
         public string ThaiSsn { get; set; }
         public string VisaType { get; set; }
         public string WorkPermitType { get; set; }
-        
+
         public string Endorsements { get; set; }
         public string EndorsementAgency { get; set; }
     }
 
+    [Table("Staff", IsColumnAttributeRequired = false)]
     public class StaffWithName : Staff
     {
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string PreferredName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string LastName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public Guid PersonId { get; set; }
+    }
+
+    [Table("Staff", IsColumnAttributeRequired = false)]
+    public class StaffWithOrgName : Staff
+    {
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public string MissionOrgName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public string MissionOrgEmail { get; set; }
     }
 }

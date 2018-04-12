@@ -1,10 +1,10 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Nationality, NationalityName, Person, PersonWithOthers} from '../person';
+import { Nationality, NationalityName, Person, PersonWithOthers } from '../person';
 import { PersonService } from '../person.service';
 import { Role, RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { NgForm, NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
@@ -19,12 +19,15 @@ import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
 import { OrgChain } from '../groups/org-chain';
 import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
-import { Staff } from '../staff';
+import { StaffWithOrgName } from '../staff';
+import { LazyLoadService } from '../../services/lazy-load.service';
+import { MissionOrgService } from '../../mission-org/mission-org.service';
 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
-  styleUrls: ['./person.component.scss']
+  styleUrls: ['./person.component.scss'],
+  providers: [LazyLoadService]
 })
 export class PersonComponent implements OnInit, CanComponentDeactivate {
   public nationalities = Object.keys(Nationality);
@@ -33,9 +36,8 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public isSelf: boolean;
   public filteredCountries: Observable<string[]>;
   public person: PersonWithOthers;
-  public groups: OrgGroup[];
-  public orgChain: OrgChain;
-  public missionOrgs: MissionOrg[];
+  public groups: Observable<OrgGroup[]>;
+  public missionOrgs: Observable<MissionOrg[]>;
   public people: Person[];
   public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
@@ -43,7 +45,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public newRole = new Role();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
-  @ViewChildren(NgForm) forms:  QueryList<NgForm>;
+  @ViewChildren(NgForm) forms: QueryList<NgForm>;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
   @ViewChild('isStaff') isStaffElement: NgModel;
@@ -52,27 +54,22 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   constructor(private route: ActivatedRoute,
               private personService: PersonService,
               private groupService: GroupService,
+              missionOrgService: MissionOrgService,
               private router: Router,
               private dialog: MatDialog,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private lazyLoadService: LazyLoadService) {
     this.isSelf = this.router.url.indexOf('self') != -1;
+    this.groups = this.lazyLoadService.share('orgGroups', () => this.groupService.getAll());
+    this.missionOrgs = this.lazyLoadService.share('missionOrgs', () => missionOrgService.list());
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
-      groups: OrgGroup[],
-      people: Person[],
-      jobs: Job[],
-      missionOrgs: MissionOrg[]
+      people: Person[]
     }) => {
       this.person = value.person;
       if (value.person.staff) {
         this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
       }
-      this.groups = value.groups;
-      this.missionOrgs = value.missionOrgs;
-      this.jobs = value.jobs.reduce((map, job) => {
-        map[job.id] = job;
-        return map;
-      }, {});
       this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
@@ -82,7 +79,6 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
         return map;
       }, {});
       this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
-      this.refreshOrgChain();
     });
   }
 
@@ -96,21 +92,15 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     return value.toLowerCase().indexOf(test.toLowerCase()) === 0;
   }
 
-  refreshOrgChain(): void {
-    if (this.person.staff == null) return;
-    let orgGroup = this.groups.find(value => value.id == this.person.staff.orgGroupId);
-    this.orgChain = this.groupService.buildOrgChain(orgGroup, this.people.concat([this.person]), this.groups);
-  }
-
-  findMissionOrg() {
-    if (!this.person.staff) return false;
-    if (!this.person.staff.missionOrgId) return false;
-    return this.missionOrgs.find(value => value.id == this.person.staff.missionOrgId);
+  orgChain(groups: OrgGroup[] | null) {
+    if (this.person.staff == null || groups == null) return new OrgChain([]);
+    let orgGroup = groups.find(value => value.id == this.person.staff.orgGroupId);
+    return this.groupService.buildOrgChain(orgGroup, this.people.concat([this.person]), groups);
   }
 
   async isStaffChanged(isStaff: boolean): Promise<void> {
     if (isStaff) {
-      this.person.staff = new Staff();
+      this.person.staff = new StaffWithOrgName();
       return;
     }
     //deleting?
@@ -151,7 +141,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     this.snackBar.open(`${this.person.preferredName} Deleted`, null, {duration: 2000});
   }
 
-  async saveRole(role: Role, isNew = false): Promise<void> {
+  async saveRole(role: Role, panel: MatExpansionPanel, isNew = false): Promise<void> {
     role = await this.personService.updateRole(role);
     if (isNew) {
       this.person.roles = [...this.person.roles, <RoleWithJob> role];
@@ -166,6 +156,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     } else {
       this.snackBar.open(`Role Saved`, null, {duration: 2000});
     }
+    panel.close();
   }
 
   async deleteRole(role: Role) {
@@ -212,7 +203,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate() {
-    if (!this.forms.some(value => !value.pristine && !value.submitted )) return true;
+    if (!this.forms.some(value => !value.pristine && !value.submitted)) return true;
     return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
 }

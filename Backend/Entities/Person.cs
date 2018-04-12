@@ -63,16 +63,19 @@ namespace Backend.Entities
         public string ThaiZip { get; set; }
     }
 
+    [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithStaff : PersonExtended
     {
-        public Staff Staff { get; set; }
+        public StaffWithOrgName Staff { get; set; }
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string SpousePreferedName { get; set; }
     }
 
+    [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithOthers : PersonWithStaff
     {
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public LeaveDetails LeaveDetails { get; set; }
         public IList<PersonRoleWithJob> Roles { get; set; } = new List<PersonRoleWithJob>(0);
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; } = new List<EmergencyContactExtended>(0);

@@ -94,10 +94,7 @@ const routes: Routes = [
             canDeactivate: [CanDeactivateGuard],
             resolve: {
               person: PersonResolverService,
-              groups: GroupsResolveService,
-              people: PeopleResolveService,
-              jobs: JobListResolverService,
-              missionOrgs: MissionOrgListResolverService
+              people: PeopleResolveService
             }
           },
           {

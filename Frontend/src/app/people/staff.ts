@@ -35,3 +35,8 @@ export class StaffWithName extends Staff {
     this.preferredName = preferredName;
   }
 }
+
+export class StaffWithOrgName extends Staff {
+  public missionOrgName: string;
+  public missionOrgEmail: string;
+}

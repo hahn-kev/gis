@@ -24,12 +24,13 @@ namespace Backend.DataLayer
         public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended
             .OrderBy(person => person.PreferredName)
             .ThenBy(person => person.LastName);
+
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
                 from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
-                from staff in _dbConnection.Staff.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+                from staff in StaffWithOrgNames.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
                 where !person.Deleted
                 select new TPerson
                 {
@@ -99,6 +100,7 @@ namespace Backend.DataLayer
         public IQueryable<StaffWithName> StaffWithNames =>
             from staff in _dbConnection.Staff
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
+            from missionOrg in _dbConnection.MissionOrgs.LeftJoin(org => staff.MissionOrgId == org.Id).DefaultIfEmpty()
             where !person.Deleted
             select new StaffWithName
             {
@@ -121,7 +123,35 @@ namespace Backend.DataLayer
                 VisaType = staff.VisaType,
                 WorkPermitType = staff.WorkPermitType,
                 EndorsementAgency = staff.EndorsementAgency,
-                Endorsements = staff.Endorsements
+                Endorsements = staff.Endorsements,
+                PhoneExt = staff.PhoneExt
+            };
+
+        public IQueryable<StaffWithOrgName> StaffWithOrgNames =>
+            from staff in _dbConnection.Staff
+            from missionOrg in _dbConnection.MissionOrgs.LeftJoin(org => staff.MissionOrgId == org.Id).DefaultIfEmpty()
+            select new StaffWithOrgName
+            {
+                Id = staff.Id,
+                Email = staff.Email,
+                OrgGroupId = staff.OrgGroupId,
+                MissionOrgId = staff.MissionOrgId,
+                MissionOrgName = missionOrg.Name,
+                MissionOrgEmail = missionOrg.Email,
+                AnnualSalary = staff.AnnualSalary,
+                RenwebId = staff.RenwebId,
+                MoeLicenseNumber = staff.MoeLicenseNumber,
+                ContractIssued = staff.ContractIssued,
+                ContractExpireDate = staff.ContractExpireDate,
+                InsuranceNumber = staff.InsuranceNumber,
+                TeacherLicenseNo = staff.TeacherLicenseNo,
+                TeacherLicenseOrg = staff.TeacherLicenseOrg,
+                ThaiSsn = staff.ThaiSsn,
+                VisaType = staff.VisaType,
+                WorkPermitType = staff.WorkPermitType,
+                EndorsementAgency = staff.EndorsementAgency,
+                Endorsements = staff.Endorsements,
+                PhoneExt = staff.PhoneExt
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
@@ -180,7 +210,7 @@ namespace Backend.DataLayer
         {
             return from person in PeopleWithStaff.Where(staff => staff.StaffId != null)
                 from user in _dbConnection.Users.InnerJoin(u => person.Id == u.PersonId)
-                from userRole in _dbConnection.UserRoles.InnerJoin(u => u.UserId == user.Id) 
+                from userRole in _dbConnection.UserRoles.InnerJoin(u => u.UserId == user.Id)
                 from role in _dbConnection.Roles.InnerJoin(role => role.Id == userRole.RoleId)
                 where role.NormalizedName == roleName.ToUpper()
                 select person;

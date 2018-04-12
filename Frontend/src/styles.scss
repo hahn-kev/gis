@@ -88,6 +88,10 @@ html, body {
   align-items: center;
 }
 
+.mat-expansion-panel-body > .mat-action-row {
+  margin: 0 -24px -16px;
+}
+
 .spacer {
   flex: 1 1 auto;
 }

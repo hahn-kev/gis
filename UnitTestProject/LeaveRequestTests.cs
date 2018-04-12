@@ -155,7 +155,7 @@ namespace UnitTestProject
                     IsThai = true,
                     Id = personId,
                     StaffId = staffId,
-                    Staff = new Staff {Id = staffId}
+                    Staff = new StaffWithOrgName {Id = staffId}
                 };
             }
 
@@ -224,7 +224,7 @@ namespace UnitTestProject
                 return new PersonWithStaff
                 {
                     Id = id,
-                    Staff = new Staff()
+                    Staff = new StaffWithOrgName()
                 };
             }
 

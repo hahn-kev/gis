@@ -2,7 +2,7 @@ import { RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
-import { Staff } from './staff';
+import { Staff, StaffWithName, StaffWithOrgName } from './staff';
 
 export class Person extends BaseEntity {
   public firstName: string;
@@ -45,7 +45,7 @@ export class PersonExtended extends Person {
 }
 
 export class PersonWithStaff extends PersonExtended {
-  public staff: Staff;
+  public staff: StaffWithOrgName;
   public spousePreferedName: string;
 }
 

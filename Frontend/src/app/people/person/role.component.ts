@@ -3,6 +3,9 @@ import { Role } from '../role';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Job } from '../../job/job';
+import { JobService } from '../../job/job.service';
+import { LazyLoadService } from '../../services/lazy-load.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-role',
@@ -15,12 +18,10 @@ export class RoleComponent implements OnInit {
   @Input() role: Role;
   @Input() formId: string;
   @ViewChild('form') form: NgForm;
-  jobs: Job[];
+  jobs: Observable<Job[]>;
 
-  constructor(private route: ActivatedRoute) {
-    this.route.data.subscribe(value => {
-      this.jobs = value.jobs;
-    })
+  constructor(private route: ActivatedRoute, lazyLoadService: LazyLoadService, jobService: JobService) {
+    this.jobs = lazyLoadService.share('jobs', () => jobService.list());
   }
 
   ngOnInit() {
