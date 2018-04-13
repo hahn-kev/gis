@@ -10,17 +10,12 @@
 
   @media (min-width: 320px * 2 + $spacing * 3) {
     //grid mode
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100%;
+    min-height: 100%;
     align-content: center;
     justify-content: space-evenly;
     grid-template-columns: auto;
     grid-auto-flow: column;
-    padding: 0;
+    padding: 28px 0;
 
     mat-card {
       width: 320px;
