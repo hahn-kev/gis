@@ -19,8 +19,8 @@ namespace Backend.DataLayer
 
         public IQueryable<JobWithFilledInfo> JobWithFilledInfos =>
             from job in Job
-            from role in _dbConnection.PersonRoles.LeftJoin(role => role.JobId == job.Id)
-            where role.Active
+            from role in _dbConnection.PersonRoles.LeftJoin(role => role.JobId == job.Id).DefaultIfEmpty()
+            where role.Active || role == null
             group role by new {role.JobId, job}
             into g
             select new JobWithFilledInfo
