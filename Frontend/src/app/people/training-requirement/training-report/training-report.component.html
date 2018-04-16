@@ -31,43 +31,45 @@
           Completed by {{reqObj.completedRequirement}} Staff out of {{reqObj.totalStaff}}
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <ng-container *ngIf="reqObj.completedRequirement != reqObj.totalStaff">
-        <button mat-raised-button color="accent"
-                (click)="markAllComplete(reqObj)">
-          <mat-icon mat-list-icon>done_all</mat-icon>
-          Mark All complete
-        </button>
-        <mat-form-field>
-          <input name="completedDate" matInput
-                 [(ngModel)]="completedDate"
-                 [min]="selectedYear.startOfYear"
-                 [max]="selectedYear.endOfYear"
-                 [matDatepicker]="startDatePicker"
-                 placeholder="Date Completed">
-          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #startDatePicker></mat-datepicker>
-        </mat-form-field>
-      </ng-container>
-      <mat-list>
-        <ng-container *ngFor="let staffObj of reqObj.staffsWithTraining; let isLast = last; let index = index">
-          <mat-list-item>
-            <a mat-button [routerLink]="['/people', 'edit', staffObj.staff.personId]">
-              {{staffObj.staff.preferredName}} {{staffObj.staff.lastName}}
-            </a>
-            <span class="spacer"></span>
-            <ng-container *ngIf="staffObj.training.completedDate">
-              Completed On {{staffObj.training.completedDate | date}}
-            </ng-container>
-            <button mat-button *ngIf="!staffObj.training.completedDate" color="accent"
-                    (click)="completeTraining(reqObj, index)">
-              <mat-icon mat-list-icon>check</mat-icon>
-              Complete Training
-            </button>
-          </mat-list-item>
-          <mat-divider *ngIf="!isLast"></mat-divider>
+      <ng-template matExpansionPanelContent>
+        <ng-container *ngIf="reqObj.completedRequirement != reqObj.totalStaff">
+          <button mat-raised-button color="accent"
+                  (click)="markAllComplete(reqObj)">
+            <mat-icon mat-list-icon>done_all</mat-icon>
+            Mark All complete
+          </button>
+          <mat-form-field>
+            <input name="completedDate" matInput
+                   [(ngModel)]="completedDate"
+                   [min]="selectedYear.startOfYear"
+                   [max]="selectedYear.endOfYear"
+                   [matDatepicker]="startDatePicker"
+                   placeholder="Date Completed">
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #startDatePicker></mat-datepicker>
+          </mat-form-field>
         </ng-container>
+        <mat-list>
+          <ng-container *ngFor="let staffObj of reqObj.staffsWithTraining; let isLast = last; let index = index">
+            <mat-list-item>
+              <a mat-button [routerLink]="['/people', 'edit', staffObj.staff.personId]">
+                {{staffObj.staff.preferredName}} {{staffObj.staff.lastName}}
+              </a>
+              <span class="spacer"></span>
+              <ng-container *ngIf="staffObj.training.completedDate">
+                Completed On {{staffObj.training.completedDate | date}}
+              </ng-container>
+              <button mat-button *ngIf="!staffObj.training.completedDate" color="accent"
+                      (click)="completeTraining(reqObj, index)">
+                <mat-icon mat-list-icon>check</mat-icon>
+                Complete Training
+              </button>
+            </mat-list-item>
+            <mat-divider *ngIf="!isLast"></mat-divider>
+          </ng-container>
 
-      </mat-list>
+        </mat-list>
+      </ng-template>
     </mat-expansion-panel>
   </mat-accordion>
 
