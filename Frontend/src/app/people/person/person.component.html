@@ -517,7 +517,7 @@
 
       </mat-expansion-panel>
     </mat-accordion>
-    <mat-card>
+    <mat-card *ngIf="person.staffId">
       <mat-grid-list class="span-2-columns" cols="4" rowHeight="25px">
         <mat-grid-tile>
           <a [routerLink]="['/leave-request','list', person.id]" mat-button color="accent">View Leave</a>
