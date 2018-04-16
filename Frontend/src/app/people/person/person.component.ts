@@ -22,6 +22,7 @@ import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
+import { LeaveTypeName } from '../self/self';
 
 @Component({
   selector: 'app-person',
@@ -32,6 +33,7 @@ import { MissionOrgService } from '../../mission-org/mission-org.service';
 export class PersonComponent implements OnInit, CanComponentDeactivate {
   public nationalities = Object.keys(Nationality);
   public nationalityName = NationalityName;
+  public leaveTypeName = LeaveTypeName;
   public isNew: boolean;
   public isSelf: boolean;
   public filteredCountries: Observable<string[]>;

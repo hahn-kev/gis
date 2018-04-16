@@ -100,6 +100,10 @@ html, body {
   text-decoration: underline dashed;
 }
 
+.left .mat-figure {
+  justify-content: left !important;
+}
+
 .two-colum-grid {
   &:not(.mat-expansion-panel), .mat-expansion-panel-body {
     display: grid;
