@@ -64,7 +64,7 @@ namespace Backend.DataLayer
                 }).OrderBy(_ => _.PreferredName).ThenBy(_ => _.LastName);
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job
-            join orgGroup in _dbConnection.OrgGroups on job.OrgGroupId equals orgGroup.Id
+            from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
             select new JobWithOrgGroup
             {
                 Current = job.Current,
