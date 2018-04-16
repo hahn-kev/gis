@@ -92,6 +92,9 @@ namespace UnitTestProject
             TryCreateTable<PersonRole>();
             TryCreateTable<Job>();
             TryCreateTable<Grade>();
+            TryCreateTable<Endorsment>();
+            TryCreateTable<StaffEndorsment>();
+            TryCreateTable<RequiredEndorsment>();
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
