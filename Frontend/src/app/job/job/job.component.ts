@@ -9,11 +9,13 @@ import { Role, RoleExtended, RoleWithJob } from '../../people/role';
 import { PersonService } from '../../people/person.service';
 import { Grade } from '../grade/grade';
 import { BaseEditComponent } from '../../components/base-edit-component';
+import { LazyLoadService } from '../../services/lazy-load.service';
 
 @Component({
   selector: 'app-job',
   templateUrl: './job.component.html',
-  styleUrls: ['./job.component.scss']
+  styleUrls: ['./job.component.scss'],
+  providers: [LazyLoadService]
 })
 export class JobComponent extends BaseEditComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
