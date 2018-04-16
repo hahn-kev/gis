@@ -76,7 +76,7 @@
           <mat-icon>person</mat-icon>
         </a>
         <span class="spacer"></span>
-        <button mat-button (click)="deleteRole(role)" color="warn">Delete</button>
+        <button type="button" mat-button (click)="deleteRole(role)" color="warn">Delete</button>
         <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
         </button>
       </mat-action-row>
