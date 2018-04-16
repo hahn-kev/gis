@@ -17,6 +17,7 @@ namespace Backend.DataLayer
 
         public IQueryable<UserProfile> Users =>
             from user in _dbConnection.Users
+            from person in _dbConnection.People.LeftJoin(p => p.Id == user.PersonId).DefaultIfEmpty()
             from adminRole in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
             from hrRole in _dbConnection.Roles.Where(role => role.Name == "hr").DefaultIfEmpty()
             from hrAdminRole in _dbConnection.Roles.Where(role => role.Name == "hradmin").DefaultIfEmpty()
@@ -39,7 +40,8 @@ namespace Backend.DataLayer
                 IsHr = userHrRole != null,
                 IsHrAdmin = userHrAdminRole != null,
                 PersonId = user.PersonId,
-                ResetPassword = user.ResetPassword
+                ResetPassword = user.ResetPassword,
+                PersonName = (person.PreferredName ?? person.FirstName) + " " + person.LastName
             };
 
         public UserProfile UserByName(string name)

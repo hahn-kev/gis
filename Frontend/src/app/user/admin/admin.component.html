@@ -1,12 +1,17 @@
-<mat-nav-list>
-  <ng-container *ngFor="let user of users | async">
-    <mat-list-item routerLink="/user/edit/{{user.userName}}">
-      <span mat-line>{{user.userName}}</span>
-    </mat-list-item>
-    <mat-divider></mat-divider>
+<mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="userName">
+    <mat-header-cell *matHeaderCellDef>User Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.userName }}</mat-cell>
   </ng-container>
-
-</mat-nav-list>
+  <ng-container matColumnDef="personName">
+    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.personName}}</mat-cell>
+  </ng-container>
+  <!-- Header and Row Declarations -->
+  <mat-header-row *matHeaderRowDef="['userName', 'personName']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['userName', 'personName']"
+           [routerLink]="'/user/edit/' + row.userName"></mat-row>
+</mat-table>
 
 <a routerLink="/user/edit/new" class="user-add" mat-fab matTooltip="Add new User" matTooltipPosition="left">
   <mat-icon>add</mat-icon>

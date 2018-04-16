@@ -10,4 +10,5 @@ export class User {
 
   public isHr: boolean;
   public isHrAdmin: boolean;
+  public personName: string;
 }

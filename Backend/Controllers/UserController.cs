@@ -27,7 +27,7 @@ namespace Backend.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpGet]
-        public IReadOnlyCollection<IUser> Users()
+        public IReadOnlyCollection<UserProfile> Users()
         {
             return _userService.Users.ToList();
         }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../user';
 import { UserService } from '../user.service';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { AppDataSource } from '../../classes/app-data-source';
+import 'rxjs/add/operator/take';
 
 @Component({
   selector: 'app-admin',
@@ -10,10 +10,13 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-  users: Observable<User[]>;
-  constructor(private userService: UserService, private router: Router) { }
+  dataSource: AppDataSource<User>;
 
-  async ngOnInit() {
-    this.users = await this.userService.getUsers();
+  constructor(private userService: UserService) {
+    this.dataSource = new AppDataSource<User>();
+  }
+
+  ngOnInit() {
+    this.dataSource.observe(this.userService.getUsers());
   }
 }

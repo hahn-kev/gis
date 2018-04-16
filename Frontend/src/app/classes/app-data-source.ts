@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ActivatedRoute } from '@angular/router';
 import { MatTableDataSource } from '@angular/material';
+import { Observable } from 'rxjs/Observable';
 
 export class AppDataSource<T> extends MatTableDataSource<T> {
   private customColumnAccessors: { [key: string]: (data: T) => string | number } = {};
@@ -28,6 +28,13 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
     this.customColumnAccessors[columnId] = accessor;
   }
 
+  observe(observable: Observable<T[]>) {
+    return observable.subscribe(value => {
+      this.unfilteredData = value;
+      this.filterUpdated();
+    });
+  }
+
   bindToRouteData(route: ActivatedRoute, dataName: string): void {
     route.data.subscribe((value) => {
       this.unfilteredData = value[dataName];
@@ -36,12 +43,12 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
   }
 
   private unfilteredData: T[];
-  _customFilter = (data:T) => true;
+  _customFilter = (data: T) => true;
   set customFilter(value) {
     this._customFilter = value;
   }
 
-  filterUpdated(){
+  filterUpdated() {
     this.data = this.unfilteredData.filter(value => this._customFilter(value));
   }
 }

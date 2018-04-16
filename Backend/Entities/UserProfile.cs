@@ -25,6 +25,7 @@ namespace Backend.Entities
         public bool IsHr { get; set; }
         public bool IsHrAdmin { get; set; }
         public Guid? PersonId { get; set; }
+        public string PersonName { get; set; }
     }
 
     public interface IUser
