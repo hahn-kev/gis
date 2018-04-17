@@ -209,11 +209,13 @@
             <input matInput [(ngModel)]="person.staff.email"
                    type="email"
                    name="staffEmail"
+                   [readonly]="isSelf"
                    placeholder="Staff Email">
           </mat-form-field>
           <mat-form-field>
             <input matInput [(ngModel)]="person.staff.phoneExt"
                    name="phoneExt"
+                   [readonly]="isSelf"
                    placeholder="Phone Ext">
           </mat-form-field>
           <mat-form-field *ngIf="staffPanel.expanded">
