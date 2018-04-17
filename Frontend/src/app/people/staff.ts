@@ -13,7 +13,6 @@ export class Staff extends BaseEntity {
   public insuranceNumber: string;
   public teacherLicenseOrg: string;
   public teacherLicenseNo: string;
-  public thaiSsn: string;
   public visaType: string;
   public workPermitType: string;
   public endorsements: string;

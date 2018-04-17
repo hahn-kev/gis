@@ -17,7 +17,6 @@ namespace Backend.Entities
         public string InsuranceNumber { get; set; }
         public string TeacherLicenseOrg { get; set; }
         public string TeacherLicenseNo { get; set; }
-        public string ThaiSsn { get; set; }
         public string VisaType { get; set; }
         public string WorkPermitType { get; set; }
 
