@@ -23,6 +23,7 @@ import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
 import { LeaveType, LeaveTypeName } from '../self/self';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-person',
@@ -60,6 +61,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar,
+              private location: Location,
               private lazyLoadService: LazyLoadService) {
     this.isSelf = this.router.url.indexOf('self') != -1;
     this.groups = this.lazyLoadService.share('orgGroups', () => this.groupService.getAll());
@@ -130,14 +132,17 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   async save(): Promise<void> {
     let savedPerson = await this.personService.updatePerson(this.person, this.isSelf);
+    this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
     let commands: Array<any> = ['/people/list'];
     if (this.isNew) {
       commands = ['people', 'edit', savedPerson.id];
     } else if (this.isSelf) {
       commands = ['home'];
+    } else {
+      this.location.back();
+      return;
     }
     this.router.navigate(commands);
-    this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
   }
 
   async deletePerson() {

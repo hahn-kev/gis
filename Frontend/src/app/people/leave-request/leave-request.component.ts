@@ -21,7 +21,6 @@ import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
   selector: 'app-leave-request',
-  providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
   templateUrl: './leave-request.component.html',
   styleUrls: ['./leave-request.component.scss']
 })

@@ -40,7 +40,7 @@ import {
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { ActivityIndicatorInterceptorService } from './services/activity-indicator-interceptor.service';
-import {ObserversModule} from '@angular/cdk/observers';
+import { ObserversModule } from '@angular/cdk/observers';
 import { ToolbarTemplateDirective } from './toolbar/toolbar-template.directive';
 import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { AppTemplateService } from './toolbar/app-template.service';
@@ -97,7 +97,7 @@ import { GradeComponent } from './job/grade/edit/grade.component';
 import { GradeService } from './job/grade/grade.service';
 import { RenderTemplateDialogComponent } from './components/render-template-dialog/render-template-dialog.component';
 import { MyDatePipe } from './services/my-date.pipe'
-import { DatePipe } from '@angular/common';
+import { DatePipe, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { CsvService } from './services/csv.service';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
@@ -241,7 +241,11 @@ if (environment.production) {
     MissionOrgService,
     GradeService,
     MyDatePipe,
-    CsvService
+    CsvService,
+    {
+      provide: LocationStrategy,
+      useClass: PathLocationStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })
