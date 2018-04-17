@@ -14,6 +14,11 @@ export class LeaveReportComponent implements OnInit {
   public dataSource = new AppDataSource<PersonLeaveModel>();
 
   constructor(private route: ActivatedRoute) {
+    this.dataSource.filterPredicate = ((data, filter) =>
+      data.person.firstName.toUpperCase().startsWith(filter)
+      || data.person.lastName.toUpperCase().startsWith(filter)
+      || data.person.preferredName.toUpperCase().startsWith(filter)
+    );
     this.route.data.subscribe((value: { people: PersonAndLeaveDetails[] }) => {
       this.dataSource.data = value.people.map(p => {
         let plm = new PersonLeaveModel();
@@ -28,6 +33,10 @@ export class LeaveReportComponent implements OnInit {
   ngOnInit() {
   }
 
+
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toUpperCase();
+  }
 }
 
 export class PersonLeaveModel {
