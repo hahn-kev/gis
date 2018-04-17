@@ -24,7 +24,10 @@ export class JobListComponent implements OnInit {
     this.dataSource.bindToRouteData(this.route, 'jobs');
     this.dataSource.customFilter = row => this.showOnlyOpen ? row.open > 0 : true;
     this.dataSource.filterPredicate = ((data, filter) =>
-      (data.title || '').toUpperCase().startsWith(filter) || (data.jobDescription || '').toUpperCase().startsWith(filter));
+      (data.title || '').toUpperCase().includes(filter)
+      || (data.jobDescription || '').toUpperCase().includes(filter)
+      || (data.orgGroupName || '').toUpperCase().includes(filter)
+    );
   }
 
 
