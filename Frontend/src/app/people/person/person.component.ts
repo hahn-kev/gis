@@ -22,7 +22,7 @@ import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
-import { LeaveTypeName } from '../self/self';
+import { LeaveType, LeaveTypeName } from '../self/self';
 
 @Component({
   selector: 'app-person',
@@ -69,6 +69,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       people: Person[]
     }) => {
       this.person = value.person;
+      this.person.leaveDetails.leaveUseages = [
+        ...this.person.leaveDetails.leaveUseages
+          .filter(l => l.leaveType != LeaveType.Other)
+          .sort((a, b) => a.leaveType.localeCompare(b.leaveType)),
+        this.person.leaveDetails.leaveUseages.find(l => l.leaveType == LeaveType.Other)];
       if (value.person.staff) {
         this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
       }
