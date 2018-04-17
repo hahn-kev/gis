@@ -8,13 +8,13 @@
   </mat-form-field>
   <app-export-button [values]="dataSource" fileName="peopleData"></app-export-button>
 </ng-container>
-<mat-table [dataSource]="dataSource">
+<mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="preferredName">
-    <mat-header-cell *matHeaderCellDef>Preferred Name</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="lastName">
-    <mat-header-cell *matHeaderCellDef>Last Name</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
