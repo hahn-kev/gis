@@ -315,7 +315,12 @@ namespace UnitTestProject
             var personRoles = personRoleFaker.Generate(5);
             personRoles[0].Active = true; //always have at least one active
             _dbConnection.BulkCopy(personRoles);
-            var jobs = personRoles.Select(role => JobFaker().RuleFor(job => job.Id, role.JobId).Generate()).ToList();
+            var grade = AutoFaker.Generate<Grade>();
+            _dbConnection.Insert(grade);
+            var jobs = personRoles.Select(role => JobFaker()
+                .RuleFor(job => job.Id, role.JobId)
+                .RuleFor(job => job.GradeId, grade.Id)
+                .Generate()).ToList();
 
             _dbConnection.BulkCopy<Job>(jobs);
             _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
