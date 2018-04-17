@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Departments/Divisions</ng-container>
+<ng-container *appTemplateContent="'title'">Departments/Divisions ({{dataSource.filteredData.length}})</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="groupName">
     <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>

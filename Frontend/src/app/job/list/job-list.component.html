@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Jobs</ng-container>
+<ng-container *appTemplateContent="'title'">Jobs ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
   <mat-slide-toggle [(ngModel)]="showOnlyOpen" (ngModelChange)="dataSource.filterUpdated()">
     Only Open Jobs

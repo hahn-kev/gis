@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">{{showingMine ? 'My Leave' : 'Leave'}}</ng-container>
+<ng-container *appTemplateContent="'title'">{{showingMine ? 'My Leave' : 'Leave'}} ({{dataSource.filteredData.length}})</ng-container>
 <div class="main-card" *ngIf="showingMine && !(loginService.currentUserToken() | async).personId; else leaveTable">
   <mat-card>
     <p>No person was found attached to your account</p>

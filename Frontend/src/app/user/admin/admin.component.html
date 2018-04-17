@@ -1,3 +1,4 @@
+<ng-container *appTemplateContent="'title'">Users ({{dataSource.filteredData.length}})</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="userName">
     <mat-header-cell *matHeaderCellDef>User Name</mat-header-cell>
