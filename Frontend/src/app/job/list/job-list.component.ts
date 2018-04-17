@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Job, JobType, JobWithFilledInfo } from '../job';
+import { Job, JobType, jobTypeName, JobWithFilledInfo, NonSchoolAidJobTypes } from '../job';
 import { MatSort } from '@angular/material';
 
 @Component({
@@ -12,7 +12,7 @@ import { MatSort } from '@angular/material';
 export class JobListComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
   public dataSource: AppDataSource<JobWithFilledInfo>;
-  public typeName = Job.typeName;
+  public typeName = jobTypeName;
   public showOnlyOpen = false;
   public shownTypes: JobType[] = [];
   @ViewChild(MatSort) sort: MatSort;
@@ -71,8 +71,25 @@ export class JobListComponent implements OnInit {
   }
 
   jobSelectLabel(types: JobType[]) {
+
     if (types.length == this.jobTypes.length) return 'All';
-    if (!types.includes(JobType.SchoolAid) && types.length + 1 == this.jobTypes.length) return 'Staff Jobs';
+    if (this.areListsEqual(types, NonSchoolAidJobTypes)) return 'Staff Jobs';
     return types.join(', ');
+  }
+
+  areListsEqual(a: JobType[], b: JobType[]) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    a.sort();
+    b.sort();
+
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
 }

@@ -14,25 +14,6 @@ export class Job extends BaseEntity {
     super();
     this.current = true;
   }
-
-  static typeName(type: JobType): string {
-    switch (type) {
-      case JobType.FullTime:
-        return 'Full Time';
-      case JobType.HalfTime:
-        return 'Half Time';
-      case JobType.Contractor:
-        return 'Contractor';
-      case JobType.DailyWorker:
-        return 'Daily Worker';
-      case JobType.SchoolAid:
-        return 'School Aid';
-      case JobType.FullTime10Mo:
-        return 'Full Time (10 month)';
-      default:
-        return type;
-    }
-  }
 }
 
 export class JobWithFilledInfo extends Job {
@@ -53,4 +34,27 @@ export enum JobType {
   Contractor = 'Contractor',
   DailyWorker = 'DailyWorker',
   SchoolAid = 'SchoolAid',
+}
+
+export var NonSchoolAidJobTypes = Object.keys(JobType)
+  .map(value => JobType[value])
+  .filter(value => value != JobType.SchoolAid);
+
+export function jobTypeName(type: JobType): string {
+  switch (type) {
+    case JobType.FullTime:
+      return 'Full Time';
+    case JobType.HalfTime:
+      return 'Half Time';
+    case JobType.Contractor:
+      return 'Contractor';
+    case JobType.DailyWorker:
+      return 'Daily Worker';
+    case JobType.SchoolAid:
+      return 'School Aid';
+    case JobType.FullTime10Mo:
+      return 'Full Time (10 month)';
+    default:
+      return type;
+  }
 }

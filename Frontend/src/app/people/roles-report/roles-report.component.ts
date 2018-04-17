@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { Job } from '../../job/job';
+import { Job, jobTypeName } from '../../job/job';
 
 @Component({
   selector: 'app-roles-report',
@@ -15,7 +15,7 @@ import { Job } from '../../job/job';
 })
 export class RolesReportComponent implements OnInit{
   public dataSource: AppDataSource<RoleWithJob>;
-  public typeName = Job.typeName;
+  public typeName = jobTypeName;
 
   @ViewChild(MatSort) sort: MatSort;
   public roles: RoleWithJob[];

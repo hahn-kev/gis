@@ -10,6 +10,7 @@ import { UserToken } from './login/user-token';
 import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
+import { NonSchoolAidJobTypes } from './job/job';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ import { environment } from '../environments/environment';
 })
 export class AppComponent implements OnInit {
   public isDev = !environment.production;
+  nonSchoolAidJobTypes = NonSchoolAidJobTypes;
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: string;
@@ -60,6 +62,10 @@ export class AppComponent implements OnInit {
 
   updateTitle() {
     this.titleService.setTitle(this.titleElement.nativeElement.innerText);
+  }
+
+  isLinkActive(url: string): boolean {
+    return this.router.url.includes(url);
   }
 
 }

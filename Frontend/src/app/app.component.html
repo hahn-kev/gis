@@ -66,7 +66,10 @@
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
             <ng-container *appTemplateContent="'sidenav:hr'">
-              <a mat-list-item routerLink="/job/list" routerLinkActive="active-link">
+              <a mat-list-item
+                 [routerLink]="['/job','list']"
+                 [queryParams]="{types: nonSchoolAidJobTypes}"
+                 [class.active-link]="isLinkActive('/job/list')">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>

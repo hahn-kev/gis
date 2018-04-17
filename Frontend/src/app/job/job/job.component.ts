@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { JobService } from '../job.service';
-import { Job, JobType, JobWithRoles } from '../job';
+import { Job, JobType, jobTypeName, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { OrgGroup } from '../../people/groups/org-group';
@@ -19,7 +19,7 @@ import { LazyLoadService } from '../../services/lazy-load.service';
 })
 export class JobComponent extends BaseEditComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
-  public typeName = Job.typeName;
+  public typeName = jobTypeName;
   public job: JobWithRoles;
   public groups: OrgGroup[];
   public grades: Grade[];
