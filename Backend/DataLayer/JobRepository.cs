@@ -20,8 +20,10 @@ namespace Backend.DataLayer
         public IQueryable<JobWithFilledInfo> JobWithFilledInfos =>
             from job in Job
             from role in _dbConnection.PersonRoles.LeftJoin(role => role.JobId == job.Id).DefaultIfEmpty()
+            from grade in JobGrades.LeftJoin(grade => grade.Id == job.GradeId)
+            from org in _dbConnection.OrgGroups.LeftJoin(org => org.Id == job.OrgGroupId) 
             where role.Active || role == null
-            group role by new {role.JobId, job}
+            group role by new {role.JobId, job, grade, org}
             into g
             select new JobWithFilledInfo
             {
@@ -33,7 +35,9 @@ namespace Backend.DataLayer
                 OrgGroupId = g.Key.job.OrgGroupId,
                 Positions = g.Key.job.Positions,
                 Type = g.Key.job.Type,
-                Filled = g.Count()
+                Filled = g.Count(),
+                GradeNo = g.Key.job.GradeId == null ? (int?) null : g.Key.grade.GradeNo,
+                OrgGroupName = g.Key.org.GroupName
             };
 
         public JobWithRoles GetById(Guid jobId)

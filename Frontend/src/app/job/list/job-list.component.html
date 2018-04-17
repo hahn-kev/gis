@@ -25,6 +25,16 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{typeName(row.type)}}</mat-cell>
   </ng-container>
+
+  <ng-container matColumnDef="gradeNo">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Grade #</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.gradeNo}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="orgGroupName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Department/Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.orgGroupName}}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="current">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Current Job</mat-header-cell>
     <mat-cell *matCellDef="let row">
@@ -44,8 +54,8 @@
     <mat-cell *matCellDef="let row"> {{row.open}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['title', 'type', 'current', 'positions', 'filled', 'open']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['title', 'type', 'current', 'positions', 'filled', 'open']"
+  <mat-header-row *matHeaderRowDef="['title', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['title', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open']"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 

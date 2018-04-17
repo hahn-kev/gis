@@ -35,9 +35,11 @@ export class Job extends BaseEntity {
   }
 }
 
-export class JobWithFilledInfo extends Job{
+export class JobWithFilledInfo extends Job {
   public filled: number;
   public open: number;
+  public gradeNo: number;
+  public orgGroupName: string;
 }
 
 export class JobWithRoles extends Job {

@@ -22,6 +22,8 @@ namespace Backend.Entities
     {
         public int Filled { get; set; }
         public int Open => Positions - Filled;
+        public int? GradeNo { get; set; }
+        public string OrgGroupName { get; set; }
     }
 
     public class JobWithOrgGroup : Job
