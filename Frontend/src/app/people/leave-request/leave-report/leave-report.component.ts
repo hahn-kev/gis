@@ -33,7 +33,6 @@ export class LeaveReportComponent implements OnInit {
   ngOnInit() {
   }
 
-
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toUpperCase();
   }

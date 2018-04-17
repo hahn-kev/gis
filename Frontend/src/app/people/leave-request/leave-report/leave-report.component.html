@@ -10,6 +10,7 @@
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
     Show all Leave Requests
   </a>
+  <app-export-button [values]="dataSource" fileName="leaveSummaryData"></app-export-button>
 </ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="staff">
