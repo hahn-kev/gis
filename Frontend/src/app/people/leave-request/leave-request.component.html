@@ -109,6 +109,15 @@
         </mat-form-field>
       </ng-container>
 
+      <mat-form-field>
+        <input name="createdDaate" matInput
+               [(ngModel)]="leaveRequest.createdDate"
+               [matDatepicker]="createdDatePicker"
+               placeholder="Created Date">
+        <mat-datepicker-toggle matSuffix [for]="createdDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #createdDatePicker></mat-datepicker>
+      </mat-form-field>
+
       <div class="span-2-columns">
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
