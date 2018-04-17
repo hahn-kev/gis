@@ -118,7 +118,7 @@
         <mat-datepicker #createdDatePicker></mat-datepicker>
       </mat-form-field>
 
-      <div class="span-2-columns">
+      <div class="span-2-columns" *ngIf="selectedPerson">
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
           <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">

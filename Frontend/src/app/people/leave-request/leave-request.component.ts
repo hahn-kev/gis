@@ -31,7 +31,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequestWithNames;
   public daysUsed = 0;
-  public selectedPerson: PersonAndLeaveDetails;
+  public selectedPerson: PersonAndLeaveDetails | null;
   public isNew: boolean;
   public isHr = false;
   private myPersonId: string | null;
@@ -169,6 +169,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   showLeaveType(leaveType: LeaveType) {
+    if (!this.selectedPerson) return true;
     switch (leaveType) {
       case LeaveType.Vacation:
         return this.selectedPerson.person.isThai;
