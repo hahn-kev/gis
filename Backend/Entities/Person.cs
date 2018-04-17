@@ -35,12 +35,13 @@ namespace Backend.Entities
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonExtended : Person
     {
+        public string ThaiFirstName { get; set; }
+        public string ThaiLastName { get; set; }
         public bool SpeaksEnglish { get; set; }
         public string PhoneNumber { get; set; }
         public Guid? SpouseId { get; set; }
 
-        [Column(DataType = DataType.VarChar)]
-        public Nationality? Nationality { get; set; }
+        [Column(DataType = DataType.VarChar)] public Nationality? Nationality { get; set; }
 
         public DateTime? Birthdate { get; set; }
 
@@ -77,6 +78,7 @@ namespace Backend.Entities
     {
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public LeaveDetails LeaveDetails { get; set; }
+
         public IList<PersonRoleWithJob> Roles { get; set; } = new List<PersonRoleWithJob>(0);
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; } = new List<EmergencyContactExtended>(0);
     }
@@ -91,28 +93,21 @@ namespace Backend.Entities
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Nationality
     {
-        [MapValue(nameof(NorthAmerica))]
-        NorthAmerica,
+        [MapValue(nameof(NorthAmerica))] NorthAmerica,
 
         [MapValue(nameof(CentralSouthAmerica))]
         CentralSouthAmerica,
 
-        [MapValue(nameof(Africa))]
-        Africa,
+        [MapValue(nameof(Africa))] Africa,
 
-        [MapValue(nameof(MiddleEast))]
-        MiddleEast,
+        [MapValue(nameof(MiddleEast))] MiddleEast,
 
-        [MapValue(nameof(Europe))]
-        Europe,
+        [MapValue(nameof(Europe))] Europe,
 
-        [MapValue(nameof(CentralAsia))]
-        CentralAsia,
+        [MapValue(nameof(CentralAsia))] CentralAsia,
 
-        [MapValue(nameof(EastAsia))]
-        EastAsia,
+        [MapValue(nameof(EastAsia))] EastAsia,
 
-        [MapValue(nameof(Oceania))]
-        Oceania
+        [MapValue(nameof(Oceania))] Oceania
     }
 }

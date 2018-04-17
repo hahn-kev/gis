@@ -52,6 +52,14 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="thaiFirstName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Thai First Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.thaiFirstName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="thaiLastName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Thai Last Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.thaiLastName}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="email">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.email}}</mat-cell>

@@ -39,6 +39,8 @@ namespace Backend.DataLayer
                     FirstName = person.FirstName,
                     IsThai = person.IsThai,
                     LastName = person.LastName,
+                    ThaiFirstName = person.ThaiFirstName,
+                    ThaiLastName = person.ThaiLastName,
                     PreferredName = person.PreferredName,
                     SpeaksEnglish = person.SpeaksEnglish,
                     Staff = staff,
