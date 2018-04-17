@@ -1,6 +1,6 @@
 <ng-container *appTemplateContent="'title'">Jobs ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <mat-slide-toggle [(ngModel)]="showOnlyOpen" (ngModelChange)="dataSource.filterUpdated()">
+  <mat-slide-toggle [ngModel]="showOnlyOpen" (ngModelChange)="applyShowOnlyOpen($event)">
     Only Open Jobs
   </mat-slide-toggle>
   <button mat-icon-button>
@@ -8,6 +8,16 @@
   </button>
   <mat-form-field floatLabel="never">
     <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+  </mat-form-field>
+  <mat-form-field style="padding-left: 8px">
+    <mat-select [ngModel]="shownTypes"
+                (ngModelChange)="applyShownTypes($event)"
+                name="type"
+                multiple
+                placeholder="Show Job Types">
+      <mat-select-trigger>{{jobSelectLabel(shownTypes)}}</mat-select-trigger>
+      <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
+    </mat-select>
   </mat-form-field>
   <a mat-icon-button matTooltip="Role Report" matTooltipPosition="before" routerLink="../report/roles">
     <mat-icon>insert_chart</mat-icon>
@@ -58,7 +68,6 @@
   <mat-row class="hover-overlay" *matRowDef="let row; columns: ['title', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open']"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
-
 
 <a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Job" matTooltipPosition="left">
   <mat-icon>add</mat-icon>
