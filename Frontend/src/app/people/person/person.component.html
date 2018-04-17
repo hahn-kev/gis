@@ -30,7 +30,6 @@
         </mat-form-field>
         <mat-form-field>
           <mat-select [(ngModel)]="person.spouseId"
-                      [disabled]="isSelf"
                       (ngModelChange)="person.spouseChanged = true"
                       name="spouse"
                       placeholder="Spouse">
