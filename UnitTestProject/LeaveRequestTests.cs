@@ -453,6 +453,7 @@ namespace UnitTestProject
                 leaveRequest.EndDate = tmp;
             }
 
+            leaveRequest.OverrideDays = false;
             leaveRequest.Days = leaveRequest.CalculateLength();
             return leaveRequest;
         }
@@ -478,7 +479,6 @@ namespace UnitTestProject
         public void ThrowsWhenChangingTheDays()
         {
             LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.OverrideDays = false;
             LeaveRequest newRequest = oldRequest.Copy();
 
             newRequest.Days--;
@@ -540,7 +540,6 @@ namespace UnitTestProject
         public void AcceptMissmatchedCalculationForHalfDays()
         {
             LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.OverrideDays = false;
             //16th is a friday
             oldRequest.StartDate = new DateTime(2018, 3, 16);
             oldRequest.EndDate = new DateTime(2018, 3, 16);
@@ -556,7 +555,6 @@ namespace UnitTestProject
         public void DontMissmatchedCalculationForHalfDaysOnWeeken()
         {
             LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.OverrideDays = false;
             //17th is a saturday
             oldRequest.StartDate = new DateTime(2018, 3, 17);
             oldRequest.EndDate = new DateTime(2018, 3, 17);
