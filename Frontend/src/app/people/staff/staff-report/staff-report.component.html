@@ -4,38 +4,57 @@
     <mat-icon>search</mat-icon>
   </button>
   <mat-form-field floatLabel="never" class="print-hide">
-    <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+    <input autofocus matInput [value]="filter.text.value" (keyup)="filter.text.next($event.target.value)" placeholder="Search">
   </mat-form-field>
 
   <button mat-icon-button (click)="openFilterDialog()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
   <mat-form-field style="padding-left: 8px" class="print-hide">
-    <mat-select [(ngModel)]="selectedColumns"
-                (ngModelChange)="updateSelectedColumns($event)"
+    <mat-select [ngModel]="filter.selectedColumns | async"
+                (ngModelChange)="filter.selectedColumns.next($event)"
                 multiple
                 placeholder="Columns">
       <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{camel2title(column)}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <a mat-icon-button class="print-hide" matTooltip="Role Report" matTooltipPosition="before" routerLink="/job/report/roles">
+  <a mat-icon-button class="print-hide" matTooltip="Role Report" matTooltipPosition="before"
+     routerLink="/job/report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
   <app-export-button fileName="staff" [values]="dataSource"></app-export-button>
 </ng-container>
 <ng-container *appTemplateContent="'dialog:filter'">
   <div class="two-colum-grid">
-    <mat-checkbox [(ngModel)]="showThai">Show Thai Staff</mat-checkbox>
-    <mat-checkbox [(ngModel)]="showNonThai">Show Non Thai Staff</mat-checkbox>
-    <mat-checkbox [(ngModel)]="showMen">Show Men Staff</mat-checkbox>
-    <mat-checkbox [(ngModel)]="showWomen">Show Women Staff</mat-checkbox>
-    <mat-checkbox [(ngModel)]="filterOlderThan">Older than</mat-checkbox>
+    <mat-checkbox [ngModel]="!!(filter.showThai|async)" (ngModelChange)="filter.showThai.next($event)">
+      Show Thai Staff
+    </mat-checkbox>
+    <mat-checkbox [ngModel]="filter.showNonThai|async" (ngModelChange)="filter.showNonThai.next($event)">
+      Show Non Thai Staff
+    </mat-checkbox>
+    <mat-checkbox [ngModel]="filter.showMen|async" (ngModelChange)="filter.showMen.next($event)">
+      Show Men Staff
+    </mat-checkbox>
+    <mat-checkbox [ngModel]="filter.showWomen|async" (ngModelChange)="filter.showWomen.next($event)">
+      Show Women Staff
+    </mat-checkbox>
+    <mat-checkbox [ngModel]="filter.filterOlderThan|async" (ngModelChange)="filter.filterOlderThan.next($event)">
+      Older than
+    </mat-checkbox>
     <mat-form-field>
-      <input type="number" matInput [(ngModel)]="olderThanFilter" placeholder="Years">
+      <input type="number" matInput
+             [ngModel]="filter.olderThanFilter|async"
+             (ngModelChange)="filter.olderThanFilter.next($event)"
+             placeholder="Years">
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="filterYoungerThan">Younger than</mat-checkbox>
+    <mat-checkbox [ngModel]="filter.filterYoungerThan|async" (ngModelChange)="filter.filterYoungerThan.next($event)">
+      Younger than
+    </mat-checkbox>
     <mat-form-field>
-      <input type="number" matInput [(ngModel)]="youngerThanFilter" placeholder="Years">
+      <input type="number" matInput
+             [ngModel]="filter.youngerThanFilter|async"
+             (ngModelChange)="filter.youngerThanFilter.next($event)"
+             placeholder="Years">
     </mat-form-field>
   </div>
 </ng-container>
@@ -125,8 +144,8 @@
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="selectedColumns"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: selectedColumns"
+  <mat-header-row *matHeaderRowDef="filter.selectedColumns.value"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: filter.selectedColumns.value"
            [routerLink]="'/people/edit/' + row.id"></mat-row>
 </mat-table>
 

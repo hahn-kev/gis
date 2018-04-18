@@ -1,11 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
 import { Gender, NationalityName, PersonWithStaff } from '../../person';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
 import { MomentInput } from 'moment';
 import { RenderTemplateDialogComponent } from '../../../components/render-template-dialog/render-template-dialog.component';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { combineLatest } from 'rxjs/observable/combineLatest';
+import { Subject } from 'rxjs/Subject';
+import { debounceTime } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 @Component({
   selector: 'app-staff-report',
@@ -36,24 +41,37 @@ export class StaffReportComponent implements OnInit {
     'speaksEnglish',
     'nationality'
   ];
-  public selectedColumns: string[];
-  showThai = true;
-  showNonThai = true;
-  showMen = true;
-  showWomen = true;
-  filterOlderThan = false;
-  olderThanFilter = 0;
-  filterYoungerThan = false;
-  youngerThanFilter = 0;
+  filter = {
+    text: new BehaviorSubject(''),
+    selectedColumns: new BehaviorSubject(['preferredName', 'lastName']),
+    showThai: new BehaviorSubject(true),
+    showNonThai: new BehaviorSubject(true),
+    showMen: new BehaviorSubject(true),
+    showWomen: new BehaviorSubject(true),
+    filterOlderThan: new BehaviorSubject(false),
+    olderThanFilter: new BehaviorSubject(0),
+    filterYoungerThan: new BehaviorSubject(false),
+    youngerThanFilter: new BehaviorSubject(0),
+    matches: function (person: PersonWithStaff): boolean {
+      if (!this.showThai.value && person.isThai) return false;
+      if (!this.showNonThai.value && !person.isThai) return false;
+      if (!this.showMen.value && person.gender == Gender.Male) return false;
+      if (!this.showWomen.value && person.gender == Gender.Female) return false;
+      let yearsOld = StaffReportComponent.age(person.birthdate);
+      if ((this.filterYoungerThan.value || this.filterOlderThan.value) && Number.isNaN(yearsOld)) return false;
+      if (this.filterOlderThan.value && this.olderThanFilter.value >= yearsOld) return false;
+      if (this.filterYoungerThan.value && this.youngerThanFilter.value <= yearsOld) return false;
+      return true;
+    }
+  };
+
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {
-    this.selectedColumns = this.route.snapshot.queryParams['columns'] || ['preferredName', 'lastName'];
   }
 
   async openFilterDialog() {
     await RenderTemplateDialogComponent.OpenWait(this.dialog, 'Filters', 'filter');
-    this.dataSource.filterUpdated();
   }
 
   ngOnInit(): void {
@@ -62,39 +80,50 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => moment(data.birthdate).unix());
     this.dataSource.sort = this.sort;
-    this.dataSource.customFilter = (data: PersonWithStaff) => this.matchesFilters(data);
+    this.dataSource.customFilter = (data: PersonWithStaff) => this.filter.matches(data);
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
       return (data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
         || data.firstName.toUpperCase().startsWith(filter));
     };
-  }
-
-  matchesFilters(person: PersonWithStaff) {
-    if (!this.showThai && person.isThai) return false;
-    if (!this.showNonThai && !person.isThai) return false;
-    if (!this.showMen && person.gender == Gender.Male) return false;
-    if (!this.showWomen && person.gender == Gender.Female) return false;
-    let yearsOld = this.age(person.birthdate);
-    if ((this.filterYoungerThan || this.filterOlderThan) && Number.isNaN(yearsOld)) return false;
-    if (this.filterOlderThan && this.olderThanFilter >= yearsOld) return false;
-    if (this.filterYoungerThan && this.youngerThanFilter <= yearsOld) return false;
-    return true;
-  }
-
-  updateSelectedColumns(columns: string[]) {
-    this.router.navigate(['.'], {
-      relativeTo: this.route,
-      queryParams: {'columns': columns}
+    let ignoreChanges = true;
+    combineLatest(Object.keys(this.filter)
+      .filter(key => key !== 'matches')
+      .map(key => this.filter[key])
+    )
+    // .pipe(debounceTime(1))
+      .subscribe((values) => {
+        if (ignoreChanges) return;
+        let params: Params = {};
+        let keys = Object.keys(this.filter).filter(key => key !== 'matches');
+        for (let i = 0; i < keys.length; i++) {
+          params[keys[i]] = values[i];
+        }
+        this.router.navigate(['.'],
+          {
+            relativeTo: this.route,
+            queryParams: params
+          });
+      });
+    this.route.queryParams.subscribe(value => {
+      let keys = Object.keys(value);
+      ignoreChanges = true;
+      for (let key of keys) {
+        let subject: Subject<any> = this.filter[key];
+        let keyValue = value[key];
+        if (key != 'text' && (keyValue == 'false' || keyValue == 'true')) keyValue = keyValue != 'false';
+        subject.next(keyValue);
+      }
+      ignoreChanges = false;
+      this.dataSource.filter = this.filter.text.value.toUpperCase();
+      this.dataSource.filterUpdated();
     });
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toUpperCase();
-  }
+  age = StaffReportComponent.age;
 
-  age(date: MomentInput) {
+  static age(date: MomentInput) {
     return moment().diff(moment(date), 'years');
   }
 
