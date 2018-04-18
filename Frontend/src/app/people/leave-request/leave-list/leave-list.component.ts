@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LeaveRequest } from '../leave-request';
 import { AppDataSource } from 'app/classes/app-data-source';
 import { LoginService } from '../../../services/auth/login.service';
+import { LeaveTypeName } from '../../self/self';
 
 @Component({
   selector: 'app-leave-list',
@@ -11,6 +12,7 @@ import { LoginService } from '../../../services/auth/login.service';
 })
 export class LeaveListComponent implements OnInit {
   public dataSource: AppDataSource<LeaveRequest>;
+  public typeName = LeaveTypeName;
   public filteredByUser: string | null;
   public showingMine: boolean;
   public hrColumns = ['requester', 'type', 'approved', 'approvedBy', 'startDate', 'endDate', 'days', 'createdDate'];
