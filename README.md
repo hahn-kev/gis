@@ -1,5 +1,6 @@
 ## Gis
 [![Build status](https://gisthailand.visualstudio.com/_apis/public/build/definitions/30e4089a-2508-47ae-abc3-ba12087ff8ae/1/badge)](https://gisthailand.visualstudio.com/Gis/_build/index?definitionId=1)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhahn-kev%2Fgis.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhahn-kev%2Fgis?ref=badge_shield)
 
 This document should explain some of the following for the GIS office app
 * [how](#server-setup) the production server is configured
@@ -234,3 +235,7 @@ you'll need to update the config file on the server to use the new account.
 - [Material](https://material.angular.io/) (Frontend UI)
 - [Sentry](https://sentry.io/hahn-kev/GIS/) (Error reporting)
 - [SendGrid](https://app.sendgrid.com) (Email)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhahn-kev%2Fgis.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhahn-kev%2Fgis?ref=badge_large)
