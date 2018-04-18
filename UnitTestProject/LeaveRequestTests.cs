@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using SendGrid.Helpers.Mail;
+using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
@@ -565,6 +566,29 @@ namespace UnitTestProject
             //does not throw
             Assert.Throws<UnauthorizedAccessException>(() =>
                 _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+        }
+
+        [Fact]
+        public void ThrowsForNewRequestsWhenOverridingDays()
+        {
+            LeaveRequest request = GenerateRequest();
+            request.OverrideDays = true;
+            Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
+        }
+
+        [Fact]
+        public void FixesDaysIfCalculationIsOff()
+        {
+            LeaveRequest request = GenerateRequest();
+            
+            //16th is a friday
+            request.StartDate = new DateTime(2018, 3, 14);
+            request.EndDate = new DateTime(2018, 3, 16);
+            //should be 3 days
+            request.Days = 2;
+            _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId);
+            request.Days.ShouldBe(3);
         }
     }
 }

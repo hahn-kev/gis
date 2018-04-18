@@ -84,6 +84,7 @@ namespace Backend.Services
             leaveRequest.ApprovedById = null;
             leaveRequest.CreatedDate = DateTime.Now;
             var leaveUsage = GetCurrentLeaveUseage(leaveRequest.Type, result.personOnLeave.Id);
+            var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
             try
             {
@@ -97,6 +98,7 @@ namespace Backend.Services
             }
             catch
             {
+                if (isNew)
                 _entityService.Delete(leaveRequest);
                 throw;
             }
@@ -360,8 +362,10 @@ namespace Backend.Services
 
         public void ThrowIfHrRequiredForUpdate(LeaveRequest updatedLeaveRequest, Guid? personMakingChanges)
         {
-            var oldRequest =
-                _leaveRequestRepository.LeaveRequests.Single(request => request.Id == updatedLeaveRequest.Id);
+            LeaveRequest oldRequest = null;
+            if (!updatedLeaveRequest.IsNew())
+                oldRequest = _leaveRequestRepository.LeaveRequests.SingleOrDefault(request =>
+                    request.Id == updatedLeaveRequest.Id);
             ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest, personMakingChanges);
         }
 
@@ -369,6 +373,22 @@ namespace Backend.Services
             LeaveRequest newRequest,
             Guid? personMakingChanges)
         {
+            if (oldRequest == null)
+            {
+                if (newRequest.OverrideDays)
+                {
+                    throw new UnauthorizedAccessException(
+                        "You're not allowed to override the leave calculation, talk to HR");
+                }
+
+                if (newRequest.Days != newRequest.CalculateLength() &&
+                    newRequest.Days != newRequest.CalculateLength() - 0.5m)
+                {
+                    newRequest.Days = newRequest.CalculateLength();
+                }
+                return;
+            }
+
             if (oldRequest.PersonId != personMakingChanges ||
                 oldRequest.PersonId != newRequest.PersonId)
             {

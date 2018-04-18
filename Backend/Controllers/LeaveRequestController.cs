@@ -87,16 +87,7 @@ namespace Backend.Controllers
 
             if (!User.IsAdminOrHr())
             {
-                if (leaveRequest.OverrideDays)
-                {
-                    throw new UnauthorizedAccessException(
-                        "You're not allowed to override the leave calculation, talk to HR");
-                }
-
-                if (leaveRequest.Days != leaveRequest.CalculateLength() && leaveRequest.Days != leaveRequest.CalculateLength() - 0.5m)
-                {
-                    leaveRequest.Days = leaveRequest.CalculateLength();
-                }
+                _leaveService.ThrowIfHrRequiredForUpdate(leaveRequest, User.PersonId());
             }
 
             Person notified = await _leaveService.RequestLeave(leaveRequest);

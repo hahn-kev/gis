@@ -51,8 +51,6 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   ngOnInit(): void {
-    //we're adding an empty list at the beginning of this observable
-    //so that we get a result right away, then later update with value
     this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), this.route.queryParams)
       .subscribe(([data, user, queryParams]: [
         { leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] },
@@ -83,7 +81,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         this.noNotificationSnackbarRef.dismiss();
       return;
     }
-    this.noNotificationSnackbarRef = this.snackBar.open(`Approval Emails won't be sent for this leave request`, 'Dismiss')
+    this.noNotificationSnackbarRef = this.snackBar.open(
+      `Approval Emails won't be sent for this leave request`,
+      'Dismiss')
   }
 
   updateDaysUsed() {
@@ -98,11 +98,14 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
 
   async submit(): Promise<void> {
     if (this.isNew) {
-      let overUsingLeave = this.leaveRequestService.isOverUsingLeave(this.leaveRequest, this.selectedPerson.leaveUseages);
+      let overUsingLeave = this.leaveRequestService.isOverUsingLeave(
+        this.leaveRequest,
+        this.selectedPerson.leaveUseages);
       let doctorsNote = this.leaveRequest.type == LeaveType.Sick && (this.leaveRequest.days > 2);
       if (overUsingLeave || doctorsNote) {
 
-        const result = await ConfirmDialogComponent.OpenWait(this.dialog,
+        const result = await ConfirmDialogComponent.OpenWait(
+          this.dialog,
           (overUsingLeave ? `This leave request is using more leave than you have\n` : '')
           + (doctorsNote ? `You must email a doctors note to HR` : ''),
           'Request Leave',
@@ -110,28 +113,37 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         if (!result) return;
       }
     }
-
-    if (this.sendNotification && this.isNew) {
+    if ((this.sendNotification && this.isNew) || (await this.promptSendNotification())) {
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
+      let message: string;
       if (!notified) {
-        this.snackBar.open(`Leave request created, supervisor not found, no notification was sent`,
-          null,
-          {duration: 2000});
+        message = `Leave request ${this.isNew ? 'created' : 'updated'}, supervisor not found, no notification was sent`;
       } else {
-        this.snackBar.open(`Leave request created, notified ${notified.firstName} ${notified.lastName}`,
-          null,
-          {duration: 2000});
+        message = `Leave request ${this.isNew ? 'created' : 'updated'}, notified ${notified.firstName} ${notified.lastName}`;
       }
+      this.snackBar.open(
+        message,
+        null,
+        {duration: 2000});
       this.router.navigate([
         'leave-request',
         'list',
         this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
-      ])
+      ]);
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
       this.snackBar.open('Leave updated, notification was not sent of changes', null, {duration: 2000});
       this.location.back();
     }
+  }
+
+  promptSendNotification() {
+    if (this.leaveRequest.approved) return Promise.resolve(false);
+    return ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      'Send another leave request approval email?',
+      'Send Email & Save',
+      'Save');
   }
 
   personSelectedChanged(personId: string): void {
@@ -145,9 +157,11 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   async deleteRequest(): Promise<void> {
-    const result = await this.dialog.open(ConfirmDialogComponent,
+    const result = await this.dialog.open(
+      ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete Request for ${this.selectedPerson.person.preferredName}?`,
+        data: ConfirmDialogComponent.Options(
+          `Delete Request for ${this.selectedPerson.person.preferredName}?`,
           'Delete',
           'Cancel')
       }).afterClosed().toPromise();
@@ -155,11 +169,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     await this.leaveRequestService.deleteRequest(this.leaveRequest.id).toPromise();
 
     this.snackBar.open('Request deleted', null, {duration: 2000});
-    this.router.navigate([
-      'leave-request',
-      'list',
-      this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
-    ]);
+    this.location.back();
   }
 
   showLeaveUsage(leaveUseage: LeaveUseage) {
