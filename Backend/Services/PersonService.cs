@@ -109,7 +109,8 @@ namespace Backend.Services
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (role.PersonId == Guid.Empty) throw new NullReferenceException("role person id is null");
-            _entityService.Save(role, out var isNew);
+            var isNew = role.IsNew();
+            _entityService.Save(role);
             if (isNew && role.Active)
             {
                 //when a new job is active, take the org group from the job and put it on the staff

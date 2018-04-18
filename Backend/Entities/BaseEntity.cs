@@ -7,5 +7,7 @@ namespace Backend.Entities
     {
         [PrimaryKey]
         public Guid Id { get; set; } = Guid.Empty;
+
+        public bool IsNew() => Id == Guid.Empty;
     }
 }

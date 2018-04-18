@@ -8,7 +8,6 @@ namespace Backend.Services
 {
     public interface IEntityService
     {
-        void Save<T>(T entity, out bool isNew) where T : BaseEntity;
         void Save<T>(T entity) where T : BaseEntity;
         void Delete<T>(T entity) where T : BaseEntity;
         void Delete<T>(Guid id) where T : BaseEntity;
@@ -23,20 +22,14 @@ namespace Backend.Services
             _dbConnection = dbConnection;
         }
 
+
         public virtual void Save<T>(T entity) where T : BaseEntity
         {
-            Save(entity, out _);
-        }
-
-        public virtual void Save<T>(T entity, out bool isNew) where T : BaseEntity
-        {
-            isNew = false;
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (entity.Id == Guid.Empty)
+            if (entity.IsNew())
             {
                 entity.Id = Guid.NewGuid();
                 _dbConnection.Insert(entity);
-                isNew = true;
                 return;
             }
 
