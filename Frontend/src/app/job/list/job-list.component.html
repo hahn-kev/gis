@@ -19,10 +19,10 @@
       <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <a mat-icon-button matTooltip="Role Report" matTooltipPosition="before" routerLink="../report/roles">
+  <a mat-icon-button class="print-hide" matTooltip="Role Report" matTooltipPosition="before" routerLink="../report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
-  <a mat-icon-button matTooltip="Job Grades" matTooltipPosition="before" routerLink="../grade/list">
+  <a mat-icon-button class="print-hide" matTooltip="Job Grades" matTooltipPosition="before" routerLink="../grade/list">
     <mat-icon>attach_money</mat-icon>
   </a>
 </ng-container>
