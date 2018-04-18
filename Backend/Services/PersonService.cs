@@ -33,9 +33,7 @@ namespace Backend.Services
         #region people
 
         public IList<Person> People() =>
-            _personRepository.People.Where(person => !person.Deleted)
-                .OrderBy(person => person.PreferredName)
-                .ThenBy(person => person.LastName).ToList();
+            _personRepository.People.Where(person => !person.Deleted).ToList();
 
         public PersonWithOthers GetById(Guid id)
         {

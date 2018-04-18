@@ -16,13 +16,13 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Person> People => _dbConnection.People
-            .OrderBy(person => person.PreferredName)
+            .OrderBy(person => person.PreferredName ?? person.FirstName)
             .ThenBy(person => person.LastName);
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
         public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended
-            .OrderBy(person => person.PreferredName)
+            .OrderBy(person => person.PreferredName ?? person.FirstName)
             .ThenBy(person => person.LastName);
 
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
@@ -63,7 +63,7 @@ namespace Backend.DataLayer
                     ThaiSoi = person.ThaiSoi,
                     ThaiTambon = person.ThaiTambon,
                     ThaiZip = person.ThaiZip
-                }).OrderBy(_ => _.PreferredName).ThenBy(_ => _.LastName);
+                }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job
             from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
