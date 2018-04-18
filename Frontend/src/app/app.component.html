@@ -102,6 +102,24 @@
                 <span mat-line>Required Training</span>
               </a>
             </ng-container>
+
+            <mat-divider></mat-divider>
+            <h3 mat-subheader>School Aid</h3>
+            <ng-container appRenderTemplate="sidenav:school-aid"></ng-container>
+            <ng-container *appTemplateContent="'sidenav:school-aid'">
+              <a mat-list-item
+                 [routerLink]="['/job','list']"
+                 [queryParams]="{types: [schoolAidJobType]}"
+                 [class.active-link]="isLinkActive('/job/list')">
+                <mat-icon mat-list-icon>work</mat-icon>
+                <span mat-line>Jobs</span>
+              </a>
+              <a mat-list-item routerLink="/people/school-aid/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>supervisor_account</mat-icon>
+                <span mat-line>School Aids</span>
+              </a>
+            </ng-container>
+
           </ng-container>
 
           <ng-container *requireRole="'admin'">

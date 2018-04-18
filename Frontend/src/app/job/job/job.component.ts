@@ -10,6 +10,7 @@ import { PersonService } from '../../people/person.service';
 import { Grade } from '../grade/grade';
 import { BaseEditComponent } from '../../components/base-edit-component';
 import { LazyLoadService } from '../../services/lazy-load.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-job',
@@ -30,6 +31,7 @@ export class JobComponent extends BaseEditComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
+              private location: Location,
               dialog: MatDialog) {
     super(dialog);
   }
@@ -45,7 +47,7 @@ export class JobComponent extends BaseEditComponent implements OnInit {
 
   async save() {
     await this.jobService.save(this.job);
-    this.router.navigate(['/job/list']);
+    this.location.back();
     this.snackBar.open(`${this.job.title} ${this.isNew ? 'Added' : 'Saved'}`, null, {duration: 2000});
   }
 

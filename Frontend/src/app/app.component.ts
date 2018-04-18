@@ -10,7 +10,7 @@ import { UserToken } from './login/user-token';
 import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
-import { NonSchoolAidJobTypes } from './job/job';
+import { JobType, NonSchoolAidJobTypes } from './job/job';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +20,7 @@ import { NonSchoolAidJobTypes } from './job/job';
 export class AppComponent implements OnInit {
   public isDev = !environment.production;
   nonSchoolAidJobTypes = NonSchoolAidJobTypes;
+  schoolAidJobType = JobType.SchoolAid;
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: string;

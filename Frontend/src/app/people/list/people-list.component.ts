@@ -12,6 +12,9 @@ import { MatSort } from '@angular/material';
 export class PeopleListComponent implements OnInit {
   public dataSource: AppDataSource<Person>;
   @ViewChild(MatSort) sort: MatSort;
+  get title() {
+    return this.route.snapshot.data.title || 'People';
+  }
 
   constructor(private route: ActivatedRoute) {
   }

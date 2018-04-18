@@ -26,6 +26,13 @@ namespace Backend.Controllers
             return _personService.People();
         }
 
+        [HttpGet("school-aids")]
+        [Authorize(Roles = "admin,hr")]
+        public IList<Person> ListSchoolAids()
+        {
+            return _personService.SchoolAids();
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,hr")]
         public PersonWithOthers Get(Guid id)
@@ -40,10 +47,11 @@ namespace Backend.Controllers
             {
                 throw new UnauthorizedAccessException("You're only allowed to modify your own details ");
             }
+
             _personService.Save(person);
             return Json(person);
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "admin,hr")]
         public IActionResult Update([FromBody] PersonWithStaff person)
@@ -90,6 +98,7 @@ namespace Backend.Controllers
         {
             return _personService.StaffWithNames;
         }
+
         [HttpGet("staff/all")]
         [Authorize(Roles = "admin,hr")]
         public IList<PersonWithStaff> StaffAll()

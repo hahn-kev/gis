@@ -20,6 +20,11 @@ export class PersonService {
     return this.http.get<Person[]>('/api/person');
   }
 
+  getAllSchoolAids(): Observable<Person[]> {
+    return this.http.get<Person[]>('/api/person/school-aids');
+
+  }
+
   getPeopleWithDaysOfLeave(): Observable<PersonWithDaysOfLeave[]> {
     return this.http.get<PersonWithDaysOfLeave[]>('/api/person/leave');
   }

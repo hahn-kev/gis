@@ -35,6 +35,9 @@ namespace Backend.Services
         public IList<Person> People() =>
             _personRepository.People.Where(person => !person.Deleted).ToList();
 
+        public IList<Person> SchoolAids() =>
+            _personRepository.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
+
         public PersonWithOthers GetById(Guid id)
         {
             var personWithOthers = _personRepository.GetById(id);
@@ -62,7 +65,7 @@ namespace Backend.Services
 
             _entityService.Save<PersonExtended>(person);
             if (person.Staff != null)
-            MatchStaffWithUser(person.Staff, person.Id);
+                MatchStaffWithUser(person.Staff, person.Id);
 
             if (person.SpouseChanged)
             {

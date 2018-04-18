@@ -2,13 +2,14 @@
   //list mode
   display: grid;
   $spacing: 12px;
+  $number-of-cards: 3;
   grid-template-columns: minmax(250px, 1fr);
   grid-template-rows: auto;
   padding: $spacing;
   grid-row-gap: $spacing;
   justify-content: center;
 
-  @media (min-width: 320px * 2 + $spacing * 3) {
+  @media (min-width: 320px * $number-of-cards + $spacing * 3) {
     //grid mode
     min-height: 100%;
     align-content: center;

@@ -12,6 +12,17 @@
       </mat-nav-list>
     </mat-card-content>
   </mat-card>
+
+  <mat-card class="mat-elevation-z6" *requireRole="'hr,admin'">
+    <!--<img mat-card-image src="assets/img/believe-home.jpg" alt="Believe">-->
+    <mat-card-title>School Aid</mat-card-title>
+    <mat-card-content>
+      <mat-nav-list>
+        <ng-container appRenderTemplate="sidenav:school-aid"></ng-container>
+      </mat-nav-list>
+    </mat-card-content>
+  </mat-card>
+
   <mat-card class="mat-elevation-z6">
     <!--<img mat-card-image src="assets/img/pexels-photo-592940.jpeg" alt="Live">-->
     <mat-card-title>Me!</mat-card-title>

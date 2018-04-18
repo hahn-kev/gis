@@ -17,6 +17,7 @@ namespace Backend.Entities
 
         public Gender Gender { get; set; }
         public bool IsThai { get; set; }
+        public bool IsSchoolAid { get; set; }
 
         private string _preferredName;
 
@@ -35,7 +36,6 @@ namespace Backend.Entities
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonExtended : Person
     {
-        public bool IsSchoolAid { get; set; }
         public string ThaiFirstName { get; set; }
         public string ThaiLastName { get; set; }
         public bool SpeaksEnglish { get; set; }

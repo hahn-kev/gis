@@ -13,6 +13,7 @@ export class Person extends BaseEntity {
   public preferredName: string;
   public gender = Gender.Male;
   public isThai: boolean;
+  public isSchoolAid: boolean;
 }
 
 export enum Gender {
@@ -21,7 +22,6 @@ export enum Gender {
 }
 
 export class PersonExtended extends Person {
-  public isSchoolAid: boolean;
   public thaiFirstName: string;
   public thaiLastName: string;
   public speaksEnglish: boolean;

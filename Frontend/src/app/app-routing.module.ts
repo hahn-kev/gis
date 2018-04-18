@@ -52,6 +52,7 @@ import { GradeComponent } from 'app/job/grade/edit/grade.component';
 import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
 import { CanDeactivateGuard } from './services/can-deactivate.guard';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
+import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 
 const routes: Routes = [
   {
@@ -103,6 +104,19 @@ const routes: Routes = [
             resolve: {
               people: PeopleResolveService
             }
+          },
+          {
+            path:'school-aid',
+            children: [
+              {
+                path:'list',
+                component: PeopleListComponent,
+                data: {title: 'School Aid'},
+                resolve: {
+                  people: SchoolAidResolveService
+                }
+              }
+            ]
           }
         ]
       },
@@ -390,7 +404,8 @@ const routes: Routes = [
     GradeResolverService,
     GradeListResolverService,
     JobFilledListResolverService,
-    CanDeactivateGuard
+    CanDeactivateGuard,
+    SchoolAidResolveService
   ]
 })
 export class AppRoutingModule {
