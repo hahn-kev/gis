@@ -81,6 +81,12 @@
                             (ngModelChange)="isStaffChanged($event)">
             Is Staff
           </mat-slide-toggle>
+
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="isSchoolAid"
+                            [(ngModel)]="person.isSchoolAid">
+            Is School Aid
+          </mat-slide-toggle>
         </div>
 
 

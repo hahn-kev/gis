@@ -38,6 +38,7 @@ namespace Backend.DataLayer
                     Email = person.Email,
                     FirstName = person.FirstName,
                     IsThai = person.IsThai,
+                    IsSchoolAid = person.IsSchoolAid,
                     LastName = person.LastName,
                     ThaiFirstName = person.ThaiFirstName,
                     ThaiLastName = person.ThaiLastName,

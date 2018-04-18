@@ -21,6 +21,7 @@ export enum Gender {
 }
 
 export class PersonExtended extends Person {
+  public isSchoolAid: boolean;
   public thaiFirstName: string;
   public thaiLastName: string;
   public speaksEnglish: boolean;
