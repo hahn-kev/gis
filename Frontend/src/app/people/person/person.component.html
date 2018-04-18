@@ -25,11 +25,11 @@
           <input matInput required name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name">
         </mat-form-field>
 
-        <mat-form-field>
-          <input matInput required name="thaiFirstName" [(ngModel)]="person.thaiFirstName" placeholder="Thai First Name">
+        <mat-form-field *ngIf="person.isThai">
+          <input matInput name="thaiFirstName" [(ngModel)]="person.thaiFirstName" placeholder="Thai First Name">
         </mat-form-field>
-        <mat-form-field>
-          <input matInput required name="thaiLastName" [(ngModel)]="person.thaiLastName" placeholder="Thai Last Name">
+        <mat-form-field *ngIf="person.isThai">
+          <input matInput name="thaiLastName" [(ngModel)]="person.thaiLastName" placeholder="Thai Last Name">
         </mat-form-field>
 
         <mat-form-field>
