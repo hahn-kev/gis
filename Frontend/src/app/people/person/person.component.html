@@ -374,7 +374,7 @@
   </form>
 
   <div class="column-2">
-    <span class="mat-caption">Roles</span>
+    <span class="mat-caption" *ngIf="!isSelf || person.roles.length != 0">Roles</span>
     <mat-accordion class="roles">
       <!--new role-->
       <mat-expansion-panel #newRolePanel
@@ -435,7 +435,10 @@
       </mat-expansion-panel>
     </mat-accordion>
 
-    <span class="mat-caption">Emergency Contacts</span>
+    <span class="mat-caption"
+          *ngIf="!isSelf || !person.spouseId || !person.staff?.missionOrgId || person.emergencyContacts.length != 0">
+      Emergency Contacts
+    </span>
     <mat-accordion class="emergency-contact">
       <mat-expansion-panel #newEmergencyContactPanel
                            *ngIf="!isSelf"
