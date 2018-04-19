@@ -446,6 +446,7 @@ namespace UnitTestProject
         private LeaveRequest GenerateRequest()
         {
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
+            leaveRequest.Approved = null;
             if (leaveRequest.StartDate > leaveRequest.EndDate)
             {
                 var tmp = leaveRequest.StartDate;
@@ -579,7 +580,7 @@ namespace UnitTestProject
         public void FixesDaysIfCalculationIsOff()
         {
             LeaveRequest request = GenerateRequest();
-            
+
             //16th is a friday
             request.StartDate = new DateTime(2018, 3, 14);
             request.EndDate = new DateTime(2018, 3, 16);
@@ -587,6 +588,21 @@ namespace UnitTestProject
             request.Days = 2;
             _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId);
             request.Days.ShouldBe(3);
+        }
+
+        [Fact]
+        public void ThrowsWhenModifyingApprovedLeave()
+        {
+            LeaveRequest oldRequest = GenerateRequest();
+            oldRequest.Approved = true;
+            Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
+            oldRequest.Approved = false;
+            Assert.Throws<UnauthorizedAccessException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
+            oldRequest.Approved = null;
+            //doesn't throw
+            _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId);
         }
     }
 }

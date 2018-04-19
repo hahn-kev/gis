@@ -38,6 +38,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
 
   private subscription: Subscription;
+  get isReadonly() {
+    return this.leaveRequest.approved !== null && !this.isHr;
+  }
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -62,7 +65,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         this.isNew = !this.leaveRequest.id;
         this.isHr = user.isHrOrAdmin();
         this.updateDaysUsed();
-        this.sendNotification = this.isNew && (!this.isHr || !queryParams.noNotification);
+        this.sendNotification = (!this.isHr || (!queryParams.noNotification && this.isHr));
         if (!this.sendNotification && this.isNew) {
           setTimeout(() => this.warnNoLeaveNotification());
         }
@@ -96,7 +99,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     this.subscription.unsubscribe();
   }
 
-  async submit(): Promise<void> {
+  async submit(isDraft = false): Promise<void> {
+    if (this.isReadonly) return;
+    if (isDraft) this.formSubmitted = true;
     if (this.isNew) {
       let overUsingLeave = this.leaveRequestService.isOverUsingLeave(
         this.leaveRequest,
@@ -113,7 +118,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         if (!result) return;
       }
     }
-    if ((this.sendNotification && this.isNew) || (await this.promptSendNotification())) {
+    if (!isDraft && this.sendNotification) {
       const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
       let message: string;
       if (!notified) {
@@ -129,7 +134,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
       ]);
     } else {
       await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
-      this.snackBar.open('Leave updated, notification was not sent of changes', null, {duration: 2000});
+      let message = 'Leave updated, notification was not sent of changes';
+      if (isDraft) message = 'Leave Request draft saved';
+      this.snackBar.open(message, null, {duration: 2000});
       this.location.back();
     }
   }

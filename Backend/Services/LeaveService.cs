@@ -82,7 +82,6 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
-            leaveRequest.CreatedDate = DateTime.Now;
             var leaveUsage = GetCurrentLeaveUseage(leaveRequest.Type, result.personOnLeave.Id);
             var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
@@ -99,7 +98,7 @@ namespace Backend.Services
             catch
             {
                 if (isNew)
-                _entityService.Delete(leaveRequest);
+                    _entityService.Delete(leaveRequest);
                 throw;
             }
         }
@@ -386,7 +385,13 @@ namespace Backend.Services
                 {
                     newRequest.Days = newRequest.CalculateLength();
                 }
+
                 return;
+            }
+
+            if (oldRequest.Approved != null)
+            {
+                throw new UnauthorizedAccessException("You're not allowed to modify approved leave requests");
             }
 
             if (oldRequest.PersonId != personMakingChanges ||

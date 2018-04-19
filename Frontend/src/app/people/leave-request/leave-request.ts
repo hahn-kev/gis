@@ -6,13 +6,14 @@ export class LeaveRequest extends BaseEntity {
   public startDate: Date;
   public endDate: Date;
   public type: LeaveType;
-  public approved: boolean;
+  public approved: boolean | null = null;
   public approvedById: string;
   public createdDate: Date;
   public reason: string;
   public days: number;
   public overrideDays: boolean;
-  constructor(){
+
+  constructor() {
     super();
     this.createdDate = new Date();
   }

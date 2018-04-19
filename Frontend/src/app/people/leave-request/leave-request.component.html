@@ -3,9 +3,9 @@
   <ng-template #elseBlock>Edit Leave Request</ng-template>
 </ng-container>
 <ng-container *appToolbarContent>
-  <mat-slide-toggle *ngIf="isNew && isHr"
+  <mat-slide-toggle *ngIf="isHr"
                     [(ngModel)]="sendNotification"
-  (ngModelChange)="warnNoLeaveNotification($event)">
+                    (ngModelChange)="warnNoLeaveNotification($event)">
     Send Approval Email
   </mat-slide-toggle>
 </ng-container>
@@ -26,7 +26,7 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <mat-select name="type" required placeholder="Type" [(ngModel)]="leaveRequest.type">
+        <mat-select name="type" required [disabled]="isReadonly" placeholder="Type" [(ngModel)]="leaveRequest.type">
           <ng-container *ngFor="let type of typesOfLeave">
             <mat-option [value]="type" *ngIf="showLeaveType(type)">{{typeName(type)}}</mat-option>
           </ng-container>
@@ -37,7 +37,7 @@
                [(ngModel)]="leaveRequest.startDate"
                (ngModelChange)="updateDaysUsed()"
                [max]="leaveRequest.endDate"
-               [disabled]="leaveRequest.overrideDays && !isHr"
+               [disabled]="(leaveRequest.overrideDays && !isHr) || isReadonly"
                [matDatepicker]="startDatePicker"
                placeholder="Start Date">
         <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
@@ -48,7 +48,7 @@
                [(ngModel)]="leaveRequest.endDate"
                (ngModelChange)="updateDaysUsed()"
                [min]="leaveRequest.startDate"
-               [disabled]="leaveRequest.overrideDays && !isHr"
+               [disabled]="(leaveRequest.overrideDays && !isHr) || isReadonly"
                [matDatepicker]="endDatePicker"
                placeholder="End Date">
         <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
@@ -74,7 +74,7 @@
                           [matTooltipDisabled]="isHr">Override Leave Calculation
         </mat-slide-toggle>
         <mat-slide-toggle name="halfDay"
-                          [disabled]="leaveRequest.days !== 0.5 && leaveRequest.days !== 1"
+                          [disabled]="(leaveRequest.days !== 0.5 && leaveRequest.days !== 1) || isReadonly"
                           [ngModel]="leaveRequest.days == 0.5"
                           (ngModelChange)="leaveRequest.days = ($event ? 0.5 : 1); leaveRequest.overrideDays = false"
                           matTooltip="Start & End date must be the same for half days"
@@ -84,33 +84,34 @@
       </div>
       <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="leaveRequest.reason"
+                    [readonly]="isReadonly"
                     name="reason"
                     placeholder="Reason"></textarea>
       </mat-form-field>
-      <ng-container *ngIf="isHr">
-
-        <mat-form-field>
-          <mat-select name="approved" [(ngModel)]="leaveRequest.approved" placeholder="Approval Status">
-            <mat-option [value]="null">Unknown</mat-option>
-            <mat-option [value]="true">Approved</mat-option>
-            <mat-option [value]="false">Unapproved</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-select name="approver"
-                      [(ngModel)]="leaveRequest.approvedById"
-                      placeholder="Approved By">
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
-              {{eachPerson.person.preferredName}} {{eachPerson.person.lastName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </ng-container>
 
       <mat-form-field>
-        <input name="createdDaate" matInput
+        <mat-select name="approved" [disabled]="!isHr" [(ngModel)]="leaveRequest.approved"
+                    placeholder="Approval Status">
+          <mat-option [value]="null">Unknown</mat-option>
+          <mat-option [value]="true">Approved</mat-option>
+          <mat-option [value]="false">Unapproved</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field *ngIf="isHr">
+        <mat-select name="approver"
+                    [(ngModel)]="leaveRequest.approvedById"
+                    placeholder="Approved By">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">
+            {{eachPerson.person.preferredName}} {{eachPerson.person.lastName}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input name="createdDate" matInput
+               [disabled]="isReadonly"
                [(ngModel)]="leaveRequest.createdDate"
                [matDatepicker]="createdDatePicker"
                placeholder="Created Date">
@@ -132,10 +133,39 @@
     </form>
 
     <mat-card-actions>
-      <button type="submit" form="form" [disabled]="!leaveForm.form.valid" mat-button>
-        {{isNew ? (sendNotification ? 'Request Leave' : 'Create Leave') : 'Save'}}
-      </button>
-      <button mat-button *ngIf="!isNew" color="warn" (click)="deleteRequest()">Delete Request</button>
+      <div class="tooltip"
+           matTooltip="Only HR Can update approved leave requests"
+           [matTooltipDisabled]="!isReadonly">
+        <button type="submit"
+                form="form"
+                *ngIf="!isReadonly"
+                [disabled]="!leaveForm.form.valid || isReadonly"
+                mat-button>
+          {{sendNotification ? 'Send Request' : (isNew ? 'Create Leave' : 'Save')}}
+        </button>
+      </div>
+      <div
+        class="tooltip"
+        matTooltip="Only HR Can update approved leave requests"
+        [matTooltipDisabled]="!isReadonly">
+        <button type="button"
+                *ngIf="sendNotification"
+                [disabled]="isReadonly"
+                (click)="submit(true)"
+                mat-button>Save Draft
+        </button>
+      </div>
+      <div
+        class="tooltip"
+        matTooltip="Only HR Can delete approved leave requests"
+        [matTooltipDisabled]="!isReadonly">
+        <button mat-button
+                *ngIf="!isNew"
+                [disabled]="isReadonly"
+                color="warn"
+                (click)="deleteRequest()">Delete Request
+        </button>
+      </div>
     </mat-card-actions>
   </mat-card>
 </div>

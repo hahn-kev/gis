@@ -6,13 +6,14 @@ import { MatDialog } from '@angular/material';
 
 export class BaseEditComponent implements CanComponentDeactivate {
   @ViewChild(NgForm) form: NgForm;
+  formSubmitted: boolean = false;
 
   constructor(protected dialog: MatDialog) {
 
   }
 
   canDeactivate() {
-    if (!this.form || this.form.pristine || this.form.submitted) return true;
+    if (!this.form || this.form.pristine || this.form.submitted || this.formSubmitted) return true;
     return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
 }

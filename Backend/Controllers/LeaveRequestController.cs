@@ -49,8 +49,6 @@ namespace Backend.Controllers
         [HttpPut]
         public LeaveRequest Update([FromBody] LeaveRequest updatedLeaveRequest)
         {
-            if (updatedLeaveRequest.Id == Guid.Empty && !User.IsAdminOrHr())
-                throw new Exception("Trying to create a new request with the update action, use post instead");
             if (!User.IsAdminOrHr())
             {
                 _leaveService.ThrowIfHrRequiredForUpdate(updatedLeaveRequest, User.PersonId());
