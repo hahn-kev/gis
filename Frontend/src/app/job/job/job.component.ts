@@ -55,7 +55,7 @@ export class JobComponent extends BaseEditComponent implements OnInit {
     let result = await ConfirmDialogComponent.OpenWait(this.dialog, 'Delete Job?', 'Delete', 'Cancel');
     if (!result) return;
     await this.jobService.delete(this.job.id).toPromise();
-    this.router.navigate(['/job/list']);
+    this.location.back();
     this.snackBar.open(`${this.job.title} Deleted`, null, {duration: 2000});
   }
 
