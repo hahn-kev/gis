@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
+using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
@@ -62,6 +63,27 @@ namespace UnitTestProject
         }
 
         [Fact]
+        public void ShouldNotCountRejectedLeaveRequests()
+        {
+            var pendingRequest = new LeaveRequest(new DateTime(2015, 5, 4), new DateTime(2015, 5, 5))
+            {
+                Approved = null
+            };
+            pendingRequest.Days.ShouldBe(2);
+            var approvedRequest = new LeaveRequest(new DateTime(2015, 5, 4), new DateTime(2015, 5, 4))
+            {
+                Approved = true
+            };
+            approvedRequest.Days.ShouldBe(1);
+            var rejectedRequest = new LeaveRequest(new DateTime(2015, 5, 4), new DateTime(2015, 5, 7))
+            {
+                Approved = false
+            };
+            rejectedRequest.Days.ShouldBe(4);
+            LeaveService.TotalLeaveUsed(new[] {pendingRequest, approvedRequest, rejectedRequest}).ShouldBe(3);
+        }
+
+        [Fact]
         public void ShouldAllowOverridingLeaveUsed()
         {
             var startDate = new DateTime(2015, 5, 4);
@@ -89,7 +111,8 @@ namespace UnitTestProject
             var leaveRequest = _servicesFixture.InsertLeaveRequest(LeaveType.Other, personWithStaff.Id, expectedDays);
 
             var currentLeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithStaff.Id);
-            var leaveUseage = currentLeaveDetails.LeaveUseages.SingleOrDefault(useage => useage.LeaveType == LeaveType.Other);
+            var leaveUseage =
+                currentLeaveDetails.LeaveUseages.SingleOrDefault(useage => useage.LeaveType == LeaveType.Other);
             Assert.NotNull(leaveUseage);
             Assert.Equal(expectedDays, leaveUseage.Used);
         }

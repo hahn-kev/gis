@@ -279,7 +279,8 @@ namespace Backend.Services
 
         public static decimal TotalLeaveUsed(IEnumerable<LeaveRequest> requests)
         {
-            return requests.Sum(request => request.Days);
+            //filter out rejected requests, but pending (null) and approved should be counted
+            return requests.Where(request => request.Approved != false).Sum(request => request.Days);
         }
 
         public decimal TotalLeaveUsed(LeaveType leaveType, Guid personId, int schoolYear)

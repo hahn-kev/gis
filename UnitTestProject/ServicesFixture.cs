@@ -231,6 +231,7 @@ namespace UnitTestProject
         public LeaveRequest InsertLeaveRequest(LeaveType leaveType, Guid personId, int days)
         {
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
+            leaveRequest.Approved = null;
             leaveRequest.Type = leaveType;
             leaveRequest.PersonId = personId;
             leaveRequest.Days = days;

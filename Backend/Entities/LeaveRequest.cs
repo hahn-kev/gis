@@ -9,6 +9,7 @@ namespace Backend.Entities
 {
     public class LeaveRequest : BaseEntity
     {
+        [JsonConstructor]
         public LeaveRequest()
         {
         }
@@ -17,6 +18,7 @@ namespace Backend.Entities
         {
             StartDate = startDate;
             EndDate = endDate;
+            Days = CalculateLength();
         }
 
         public Guid PersonId { get; set; }
@@ -25,6 +27,9 @@ namespace Backend.Entities
         public decimal Days { get; set; }
         public bool OverrideDays { get; set; }
         public string Reason { get; set; }
+        /// <summary>
+        /// Null means pending, true is approved, false is rejected
+        /// </summary>
         public bool? Approved { get; set; }
 
         /// <summary>
