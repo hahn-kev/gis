@@ -45,7 +45,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
-  public newRole = new Role();
+  public newRole = new RoleWithJob();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
@@ -157,15 +157,16 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     this.snackBar.open(`${this.person.preferredName} Deleted`, null, {duration: 2000});
   }
 
-  async saveRole(role: Role, panel: MatExpansionPanel, isNew = false): Promise<void> {
-    role = await this.personService.updateRole(role);
+  async saveRole(role: RoleWithJob, panel: MatExpansionPanel, isNew = false): Promise<void> {
+    let updatedRole = await this.personService.updateRole(role);
     if (isNew) {
+      role = {...updatedRole, ...role};
       this.person.roles = [...this.person.roles, <RoleWithJob> role];
       if (role.active && this.person.staff) {
         //back end will have done this already, just updating the front end
-        this.person.staff.orgGroupId = this.jobs[role.jobId].orgGroupId;
+        this.person.staff.orgGroupId = role.job.orgGroupId;
       }
-      this.newRole = new Role();
+      this.newRole = new RoleWithJob();
       this.newRole.personId = this.person.id;
       this.newRoleEl.form.resetForm();
       this.snackBar.open(`Role Added`, null, {duration: 2000});
@@ -175,10 +176,10 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     panel.close();
   }
 
-  async deleteRole(role: Role) {
+  async deleteRole(role: RoleWithJob) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete role ${this.jobs[role.jobId].title}?`,
+        data: ConfirmDialogComponent.Options(`Delete role ${role.job.title}?`,
           'Delete',
           'Cancel')
       });
