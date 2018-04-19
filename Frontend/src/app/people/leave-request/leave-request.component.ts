@@ -121,10 +121,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
       } else {
         message = `Leave request ${this.isNew ? 'created' : 'updated'}, notified ${notified.firstName} ${notified.lastName}`;
       }
-      this.snackBar.open(
-        message,
-        null,
-        {duration: 2000});
+      this.snackBar.open(message, 'Dismiss');
       this.router.navigate([
         'leave-request',
         'list',
