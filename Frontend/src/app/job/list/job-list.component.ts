@@ -13,6 +13,7 @@ export class JobListComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
   public dataSource: AppDataSource<JobWithFilledInfo>;
   public typeName = jobTypeName;
+  public filter: string;
   public showOnlyOpen = false;
   public shownTypes: JobType[] = [];
   @ViewChild(MatSort) sort: MatSort;
@@ -40,7 +41,8 @@ export class JobListComponent implements OnInit {
       this.shownTypes = (params.has('types') ? params.getAll('types') : this.jobTypes)
         .map(jt => JobType[jt]);
       let oldFilter = this.dataSource.filter;
-      this.dataSource.filter = (params.get('filter') || '').toUpperCase();
+      this.filter = params.get('filter');
+      this.dataSource.filter = (this.filter || '').toUpperCase();
       this.dataSource.filterUpdated();
     });
   }
