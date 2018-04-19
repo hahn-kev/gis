@@ -20,8 +20,8 @@ namespace Backend.Entities
 
     public class JobWithFilledInfo : Job
     {
-        public int Filled { get; set; }
-        public int Open => Positions - Filled;
+        public long Filled { get; set; }
+        public long Open => Positions - Filled;
         public int? GradeNo { get; set; }
         public string OrgGroupName { get; set; }
     }

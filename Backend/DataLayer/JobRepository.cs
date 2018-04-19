@@ -35,7 +35,7 @@ namespace Backend.DataLayer
                 OrgGroupId = g.Key.job.OrgGroupId,
                 Positions = g.Key.job.Positions,
                 Type = g.Key.job.Type,
-                Filled = g.Count(),
+                Filled = g.CountExt(role => role.Id),
                 GradeNo = g.Key.job.GradeId == null ? (int?) null : g.Key.grade.GradeNo,
                 OrgGroupName = g.Key.org.GroupName
             };

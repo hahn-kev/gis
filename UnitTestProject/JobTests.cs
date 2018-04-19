@@ -19,7 +19,6 @@ namespace UnitTestProject
         [Fact]
         public void FetchJobListWithFilledDoesntThrow()
         {
-            LinqToDB.Common.Configuration.Linq.GenerateExpressionTest = true;
             var job = _sf.InsertJob();
             _sf.InsertRole(job.Id, active: true);
             var jobs = _js.JobWithFilledInfos();
@@ -57,6 +56,16 @@ namespace UnitTestProject
             actualJob2.ShouldNotBeNull();
             actualJob1.Filled.ShouldBe(2);
             actualJob2.Filled.ShouldBe(1);
+        }
+
+        [Fact]
+        public void FetchJobWithoutAnyRolesShouldHaveZeroFilled()
+        {
+            var job = _sf.InsertJob(j => j.Positions = 3);
+            var actualJob = _js.JobWithFilledInfos().Single();
+            actualJob.ShouldNotBeNull();
+            actualJob.Filled.ShouldBe(0);
+
         }
     }
 }
