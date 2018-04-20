@@ -27,6 +27,53 @@ namespace Backend.DataLayer
 
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
+        public IQueryable<PersonWithStaffSummaries> PeopleWithStaffSummaries
+        {
+            get
+            {
+                return from person in PeopleGeneric<PersonWithStaffSummaries>()
+                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
+                    group role by new {person} into g
+                    select new PersonWithStaffSummaries
+                    {
+                        Id = g.Key.person.Id,
+                        Email = g.Key.person.Email,
+                        FirstName = g.Key.person.FirstName,
+                        IsThai = g.Key.person.IsThai,
+                        IsSchoolAid = g.Key.person.IsSchoolAid,
+                        LastName = g.Key.person.LastName,
+                        ThaiFirstName = g.Key.person.ThaiFirstName,
+                        ThaiLastName = g.Key.person.ThaiLastName,
+                        PreferredName = g.Key.person.PreferredName,
+                        SpeaksEnglish = g.Key.person.SpeaksEnglish,
+                        Staff = g.Key.person.Staff,
+                        StaffId = g.Key.person.StaffId,
+                        PhoneNumber = g.Key.person.PhoneNumber,
+                        SpouseId = g.Key.person.SpouseId,
+                        SpousePreferedName = g.Key.person.SpousePreferedName,
+                        Birthdate = g.Key.person.Birthdate,
+                        Gender = g.Key.person.Gender,
+                        Nationality = g.Key.person.Nationality,
+                        PassportAddress = g.Key.person.PassportAddress,
+                        PassportCity = g.Key.person.PassportCity,
+                        PassportCountry = g.Key.person.PassportCountry,
+                        PassportState = g.Key.person.PassportState,
+                        PassportZip = g.Key.person.PassportZip,
+                        ThaiAddress = g.Key.person.ThaiAddress,
+                        ThaiAmphur = g.Key.person.ThaiAmphur,
+                        ThaiMubaan = g.Key.person.ThaiMubaan,
+                        ThaiProvince = g.Key.person.ThaiProvince,
+                        ThaiSoi = g.Key.person.ThaiSoi,
+                        ThaiTambon = g.Key.person.ThaiTambon,
+                        ThaiZip = g.Key.person.ThaiZip,
+                        Deleted = g.Key.person.Deleted,
+                        //summary here
+                        DaysOfService = g.Sum(role => role.StartDate.DayDiff(role.EndDate ?? DateTime.Now)),
+                        IsActive = g.Sum(role => role.Active ? 1 : 0) > 0
+                    };
+            }
+        }
+
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
                 from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
@@ -63,7 +110,8 @@ namespace Backend.DataLayer
                     ThaiProvince = person.ThaiProvince,
                     ThaiSoi = person.ThaiSoi,
                     ThaiTambon = person.ThaiTambon,
-                    ThaiZip = person.ThaiZip
+                    ThaiZip = person.ThaiZip,
+                    Deleted = person.Deleted
                 }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job

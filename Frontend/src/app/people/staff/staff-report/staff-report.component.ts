@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { Gender, NationalityName, PersonWithStaff } from '../../person';
+import { Gender, NationalityName, PersonWithStaff, PersonWithStaffSummaries } from '../../person';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
@@ -30,6 +30,9 @@ export class StaffReportComponent implements OnInit {
     'staffEmail',
     'phoneNumber',
     'phoneExtension',
+    'serviceLength',
+    'isActive',
+
     'birthdate',
     'age',
     'untilBirthday',
@@ -43,6 +46,7 @@ export class StaffReportComponent implements OnInit {
   ];
   filter = {
     text: new BehaviorSubject(''),
+    showInactive: new BehaviorSubject(false),
     selectedColumns: new BehaviorSubject(['preferredName', 'lastName']),
     showThai: new BehaviorSubject(true),
     showNonThai: new BehaviorSubject(true),
@@ -52,7 +56,8 @@ export class StaffReportComponent implements OnInit {
     olderThanFilter: new BehaviorSubject(0),
     filterYoungerThan: new BehaviorSubject(false),
     youngerThanFilter: new BehaviorSubject(0),
-    matches: function (person: PersonWithStaff): boolean {
+    matches: function (person: PersonWithStaffSummaries): boolean {
+      if (!this.showInactive.value && !person.isActive) return false;
       if (!this.showThai.value && person.isThai) return false;
       if (!this.showNonThai.value && !person.isThai) return false;
       if (!this.showMen.value && person.gender == Gender.Male) return false;
@@ -75,14 +80,14 @@ export class StaffReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new AppDataSource<PersonWithStaff>();
+    this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => moment(data.birthdate).unix());
     this.dataSource.sort = this.sort;
-    this.dataSource.customFilter = (data: PersonWithStaff) => this.filter.matches(data);
+    this.dataSource.customFilter = (data: PersonWithStaffSummaries) => this.filter.matches(data);
     this.dataSource.bindToRouteData(this.route, 'staff');
-    this.dataSource.filterPredicate = (data: PersonWithStaff, filter: string) => {
+    this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
       return (data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
         || data.firstName.toUpperCase().startsWith(filter));
@@ -129,6 +134,11 @@ export class StaffReportComponent implements OnInit {
 
   timeToBirthday(date: MomentInput) {
     return moment(date).year(moment().year()).fromNow();
+  }
+
+  daysAsYears(days: number){
+    if (days < 1) return 'None';
+    return moment.duration(days, 'days').humanize();
   }
 
   camel2title(camelCase: string) {

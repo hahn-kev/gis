@@ -4,9 +4,13 @@
     <mat-icon>search</mat-icon>
   </button>
   <mat-form-field floatLabel="never" class="print-hide">
-    <input autofocus matInput [value]="filter.text.value" (keyup)="filter.text.next($event.target.value)" placeholder="Search">
+    <input autofocus matInput [value]="filter.text.value" (keyup)="filter.text.next($event.target.value)"
+           placeholder="Search">
   </mat-form-field>
 
+  <mat-slide-toggle [ngModel]="filter.showInactive.value" (ngModelChange)="filter.showInactive.next($event)">
+    Show Inactive
+  </mat-slide-toggle>
   <button mat-icon-button (click)="openFilterDialog()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
@@ -141,6 +145,18 @@
   <ng-container matColumnDef="nationality">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Nationality</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{nationalityName(row.nationality)}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="serviceLength">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="daysOfService">Service Length</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{daysAsYears(row.daysOfService)}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="isActive">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Active</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.isActive"></mat-checkbox>
+    </mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->

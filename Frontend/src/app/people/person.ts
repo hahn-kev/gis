@@ -53,6 +53,11 @@ export class PersonWithStaff extends PersonExtended {
   public spousePreferedName: string;
 }
 
+export class PersonWithStaffSummaries extends PersonWithStaff {
+  public daysOfService: number;
+  public isActive: boolean;
+}
+
 export class PersonWithOthers extends PersonWithStaff {
   public leaveDetails: LeaveDetails;
   public roles: RoleWithJob[] = [];

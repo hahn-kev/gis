@@ -102,6 +102,12 @@ namespace Backend.DataLayer
             return (int) (endDate - startDate).Value.TotalDays;
         }
 
+        [Sql.Expression("DATE_PART('day', {1} - {0})", PreferServerSide = true)]
+        public static double DayDiff(this DateTime startDate, DateTime endDate)
+        {
+            return (endDate - startDate).TotalDays;
+        }
+
         [Sql.Expression("DateTime({0}, {1} || ' Month')", PreferServerSide = true)]
         public static DateTime AddMonths(DateTime date, int months)
         {

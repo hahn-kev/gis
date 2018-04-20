@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Person, PersonWithDaysOfLeave, PersonWithOthers, PersonWithStaff} from './person';
+import { Person, PersonWithDaysOfLeave, PersonWithOthers, PersonWithStaff, PersonWithStaffSummaries } from './person';
 import { Observable } from 'rxjs/Observable';
 import { Role, RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
@@ -60,6 +60,10 @@ export class PersonService {
 
   getStaffAll() {
     return this.http.get<PersonWithStaff[]>('/api/person/staff/all');
+  }
+
+  getStaffSummaries() {
+    return this.http.get<PersonWithStaffSummaries[]>('/api/person/staff/summaries');
   }
 
   getEmergencyContacts(personId: string) {

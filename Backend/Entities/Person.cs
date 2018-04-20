@@ -74,6 +74,12 @@ namespace Backend.Entities
         public string SpousePreferedName { get; set; }
     }
 
+    public class PersonWithStaffSummaries : PersonWithStaff
+    {
+        public double DaysOfService { get; set; }
+        public bool IsActive { get; set; }
+    }
+
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithOthers : PersonWithStaff
     {
