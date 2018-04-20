@@ -102,6 +102,7 @@ namespace Backend.DataLayer
             return (int) (endDate - startDate).Value.TotalDays;
         }
 
+        [Sql.Expression(ProviderName.SQLiteMS, "julianday({0}) - julianday({1})", PreferServerSide = true)]
         [Sql.Expression("DATE_PART('day', {1} - {0})", PreferServerSide = true)]
         public static double DayDiff(this DateTime startDate, DateTime endDate)
         {
