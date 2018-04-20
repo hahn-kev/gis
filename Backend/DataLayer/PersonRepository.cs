@@ -177,6 +177,23 @@ namespace Backend.DataLayer
             {
                 person.Roles = GetPersonRolesWithJob(id).ToList();
                 person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
+                person.Evaluations = (from eval in _dbConnection.Evaluations
+                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
+                    from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                    where eval.PersonId == person.Id
+                    select new EvaluationWithNames
+                    {
+                        Id = eval.Id,
+                        PersonId = eval.PersonId,
+                        Evaluator = eval.Evaluator,
+                        RoleId = eval.RoleId,
+                        Date = eval.Date,
+                        Notes = eval.Notes,
+                        Result = eval.Result,
+                        Score = eval.Score,
+                        Total = eval.Total,
+                        JobTitle = job.Title
+                    }).ToList();
             }
 
             return person;

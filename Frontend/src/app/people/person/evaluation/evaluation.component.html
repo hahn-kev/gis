@@ -1,0 +1,77 @@
+<form [id]="formId" class="two-colum-grid">
+
+  <mat-form-field>
+    <mat-select [(ngModel)]="evaluation.roleId"
+                (ngModelChange)="updateJobTitle($event)"
+                name="role"
+                required
+                [disabled]="readonly"
+                placeholder="Role">
+      <mat-option *ngFor="let role of roles" [value]="role.id">
+        {{role.job?.title}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select [(ngModel)]="evaluation.evaluator"
+                name="evaluator"
+                required
+                [disabled]="readonly"
+                placeholder="Evaluator">
+      <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">
+        {{eachPerson.preferredName}} {{eachPerson.lastName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input name="date"
+           required matInput
+           [readonly]="readonly"
+           [(ngModel)]="evaluation.date"
+           [matDatepicker]="datePicker"
+           placeholder="Date">
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+    <mat-datepicker [disabled]="readonly" #datePicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-select
+      [(ngModel)]="evaluation.result"
+      required
+      [disabled]="readonly"
+      placeholder="Result"
+      name="result">
+      <mat-option [value]="null">None</mat-option>
+      <mat-option *ngFor="let result of evaluationResults" [value]="result">{{result}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input matInput
+           type="number"
+           [max]="evaluation.total"
+           [(ngModel)]="evaluation.score"
+           [readonly]="readonly"
+           required
+           name="score"
+           placeholder="Score">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput
+           type="number"
+           [(ngModel)]="evaluation.total"
+           [readonly]="readonly"
+           required
+           name="total"
+           placeholder="Total">
+  </mat-form-field>
+
+  <mat-form-field class="span-2-columns">
+    <textarea matInput
+              name="notes"
+              placeholder="Notes"
+              [readonly]="readonly"
+              [(ngModel)]="evaluation.notes"></textarea>
+  </mat-form-field>
+</form>

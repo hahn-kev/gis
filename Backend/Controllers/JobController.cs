@@ -24,6 +24,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("filled")]
+        [Authorize(Roles = "admin,hr")]
         public IList<JobWithFilledInfo> JobsFilled()
         {
             return _jobService.JobWithFilledInfos();

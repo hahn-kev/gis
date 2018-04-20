@@ -531,8 +531,71 @@
             </mat-action-row>
           </ng-template>
 
-      </mat-expansion-panel>
-    </mat-accordion>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </ng-container>
+    <ng-container *ngIf="!isSelf || person.evaluations.length != 0">
+      <span class="mat-caption">Evaluations</span>
+      <mat-accordion class="evaluations">
+        <!--new evaluation-->
+        <mat-expansion-panel #newEvalPanel
+                             *ngIf="!isSelf"
+                             [disabled]="isNew"
+                             [matTooltipDisabled]="!isNew"
+                             matTooltip="To add an Evaluation first save the person">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Add new Evaluation</mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <ng-template matExpansionPanelContent>
+            <app-evaluation
+              #newEvalEl
+              [roles]="person.roles"
+              [evaluation]="newEvaluation"
+              (submit)="saveEvaluation(newEvaluation, newEvalPanel, newEvalEl, true)"
+              formId="newEvalForm">
+            </app-evaluation>
+
+            <mat-action-row>
+              <button type="submit"
+                      form="newEvalForm"
+                      [disabled]="newEvalEl.form.invalid"
+                      mat-button>Add
+              </button>
+            </mat-action-row>
+          </ng-template>
+        </mat-expansion-panel>
+
+        <!--evaluations list-->
+        <mat-expansion-panel #evalPanel *ngFor="let eval of person.evaluations">
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{eval.jobTitle}}</mat-panel-title>
+            <mat-panel-description>
+              {{eval.date | date}} ({{eval.score/eval.total * 100 | number:'1.0-0'}}%)
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-evaluation
+              [evaluation]="eval"
+              [roles]="person.roles"
+              [readonly]="isSelf"
+              #evalEl
+              [formId]="'form_' + eval.id"
+              (submit)="saveEvaluation(eval, evalPanel, evalEl)">
+            </app-evaluation>
+            <mat-action-row *ngIf="!isSelf">
+              <button mat-button (click)="deleteEvaluation(eval)" color="warn">Delete</button>
+              <button type="submit"
+                      [attr.form]="'form_' + eval.id"
+                      [disabled]="evalEl.form.invalid"
+                      mat-button>Save
+              </button>
+            </mat-action-row>
+          </ng-template>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </ng-container>
+
     <mat-card *ngIf="person.staffId">
       <mat-grid-list class="span-2-columns" cols="4" rowHeight="25px">
         <mat-grid-tile>

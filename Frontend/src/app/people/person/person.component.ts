@@ -24,6 +24,9 @@ import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
 import { LeaveType, LeaveTypeName } from '../self/self';
 import { Location } from '@angular/common';
+import { Evaluation, EvaluationWithNames } from './evaluation/evaluation';
+import { EvaluationService } from './evaluation/evaluation.service';
+import { EvaluationComponent } from './evaluation/evaluation.component';
 
 @Component({
   selector: 'app-person',
@@ -46,6 +49,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new RoleWithJob();
+  public newEvaluation = new EvaluationWithNames();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
@@ -58,6 +62,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
               private personService: PersonService,
               private groupService: GroupService,
               missionOrgService: MissionOrgService,
+              private evaluationService: EvaluationService,
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar,
@@ -86,6 +91,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
+      this.newEvaluation.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
       this.peopleMap = this.people.reduce((map, currentValue) => {
         map[currentValue.id] = currentValue;
@@ -118,9 +124,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     }
     //deleting?
     if (!this.isNew) {
-      const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      const dialogRef = this.dialog.open(
+        ConfirmDialogComponent,
         {
-          data: ConfirmDialogComponent.Options(`Deleting staff, data will be lost, this can not be undone`,
+          data: ConfirmDialogComponent.Options(
+            `Deleting staff, data will be lost, this can not be undone`,
             'Delete',
             'Cancel')
         });
@@ -177,9 +185,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deleteRole(role: RoleWithJob) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+    const dialogRef = this.dialog.open(
+      ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete role ${role.job.title}?`,
+        data: ConfirmDialogComponent.Options(
+          `Delete role ${role.job.title}?`,
           'Delete',
           'Cancel')
       });
@@ -206,9 +216,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+    const dialogRef = this.dialog.open(
+      ConfirmDialogComponent,
       {
-        data: ConfirmDialogComponent.Options(`Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
+        data: ConfirmDialogComponent.Options(
+          `Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
           'Delete',
           'Cancel')
       });
@@ -217,6 +229,37 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     await this.personService.deleteEmergencyContact(emergencyContact.id);
     this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
     this.snackBar.open(`Emergency Contact Deleted`, null, {duration: 2000});
+  }
+
+  async saveEvaluation(evaluation: EvaluationWithNames, panel: MatExpansionPanel, evalComponent: EvaluationComponent, isNew = false) {
+    let updatedEval = await this.evaluationService.save(evaluation);
+    if (isNew) {
+      evaluation = {...evaluation, ...updatedEval};
+      this.person.evaluations = [...this.person.evaluations, evaluation];
+      this.newEvaluation = new EvaluationWithNames();
+      this.newEvaluation.personId = this.person.id;
+      evalComponent.form.resetForm();
+      this.snackBar.open(`Evaluation Added`, null, {duration: 2000});
+    } else {
+      this.snackBar.open(`Evaluation Saved`, null, {duration: 2000});
+    }
+    panel.close();
+  }
+
+  async deleteEvaluation(evaluation: EvaluationWithNames) {
+    const dialogRef = this.dialog.open(
+      ConfirmDialogComponent,
+      {
+        data: ConfirmDialogComponent.Options(
+          `Delete ${evaluation.jobTitle} Evaluation?`,
+          'Delete',
+          'Cancel')
+      });
+    let result = await dialogRef.afterClosed().toPromise();
+    if (!result) return;
+    await this.evaluationService.deleteEvaluation(evaluation.id);
+    this.person.evaluations = this.person.evaluations.filter(value => value.id != evaluation.id);
+    this.snackBar.open(`Evaluation Deleted`, null, {duration: 2000});
   }
 
   canDeactivate() {

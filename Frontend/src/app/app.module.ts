@@ -101,6 +101,8 @@ import { DatePipe, LocationStrategy, PathLocationStrategy } from '@angular/commo
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { CsvService } from './services/csv.service';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
+import { EvaluationComponent } from './people/person/evaluation/evaluation.component';
+import { EvaluationService } from './people/person/evaluation/evaluation.service';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -148,7 +150,8 @@ if (environment.production) {
     RenderTemplateDialogComponent,
     MyDatePipe,
     ExportButtonComponent,
-    SandboxComponent
+    SandboxComponent,
+    EvaluationComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -245,7 +248,8 @@ if (environment.production) {
     {
       provide: LocationStrategy,
       useClass: PathLocationStrategy
-    }
+    },
+    EvaluationService
   ],
   bootstrap: [AppComponent]
 })

@@ -39,11 +39,23 @@ namespace Backend.Entities
     [JsonConverter(typeof(StringEnumConverter))]
     public enum JobType
     {
+        [MapValue(nameof(FullTime))]
+        [MapValue("0")]
         FullTime,
+        [MapValue(nameof(HalfTime))]
+        [MapValue("1")]
         HalfTime,
+        [MapValue(nameof(Contractor))]
+        [MapValue("2")]
         Contractor,
+        [MapValue(nameof(DailyWorker))]
+        [MapValue("3")]
         DailyWorker,
+        [MapValue(nameof(SchoolAid))]
+        [MapValue("4")]
         SchoolAid,
+        [MapValue(nameof(FullTime10Mo))]
+        [MapValue("5")]
         FullTime10Mo,
     }
 }

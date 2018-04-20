@@ -98,6 +98,7 @@ namespace UnitTestProject
             TryCreateTable<Staff>();
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
+            TryCreateTable<Evaluation>();
             TryCreateTable<Attachment>();
             TryCreateTable<MissionOrg>();
 
@@ -322,7 +323,12 @@ namespace UnitTestProject
                 .RuleFor(job => job.Id, role.JobId)
                 .RuleFor(job => job.GradeId, grade.Id)
                 .Generate()).ToList();
-
+            var evaluation = AutoFaker.Generate<Evaluation>();
+            evaluation.PersonId = personWithRole.Id;
+            evaluation.Evaluator = leaveApprover.Id;
+            evaluation.RoleId = personRoles[0].Id;
+            _dbConnection.Insert(evaluation);
+            
             _dbConnection.BulkCopy<Job>(jobs);
             _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();

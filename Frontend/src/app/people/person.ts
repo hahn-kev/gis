@@ -3,6 +3,7 @@ import { EmergencyContactExtended } from './emergency-contact';
 import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
 import { Staff, StaffWithName, StaffWithOrgName } from './staff';
+import { EvaluationWithNames } from './person/evaluation/evaluation';
 
 export class Person extends BaseEntity {
   public firstName: string;
@@ -56,6 +57,7 @@ export class PersonWithOthers extends PersonWithStaff {
   public leaveDetails: LeaveDetails;
   public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
+  public evaluations: EvaluationWithNames[] = [];
 }
 
 export class PersonWithDaysOfLeave extends Person {
