@@ -124,15 +124,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     }
     //deleting?
     if (!this.isNew) {
-      const dialogRef = this.dialog.open(
-        ConfirmDialogComponent,
-        {
-          data: ConfirmDialogComponent.Options(
-            `Deleting staff, data will be lost, this can not be undone`,
-            'Delete',
-            'Cancel')
-        });
-      let result = await dialogRef.afterClosed().toPromise();
+      let result = await ConfirmDialogComponent.OpenWait(
+        this.dialog,
+        `Deleting staff, data will be lost, this can not be undone`,
+        'Delete',
+        'Cancel');
       if (!result) {
         //roll back switch
         this.isStaffElement.control.setValue(true, {emitEvent: false});
@@ -158,7 +154,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deletePerson() {
-    let result = await ConfirmDialogComponent.OpenWait(this.dialog, `Delete person?`, 'Delete', 'Cancel');
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete person?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.personService.deletePerson(this.person.id);
     this.router.navigate(['/people/list']);
@@ -185,15 +185,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deleteRole(role: RoleWithJob) {
-    const dialogRef = this.dialog.open(
-      ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(
-          `Delete role ${role.job.title}?`,
-          'Delete',
-          'Cancel')
-      });
-    let result = await dialogRef.afterClosed().toPromise();
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete role ${role.job.title}?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.personService.deleteRole(role.id);
     this.person.roles = this.person.roles.filter(value => value.id != role.id);
@@ -216,15 +212,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
-    const dialogRef = this.dialog.open(
-      ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(
-          `Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
-          'Delete',
-          'Cancel')
-      });
-    let result = await dialogRef.afterClosed().toPromise();
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.personService.deleteEmergencyContact(emergencyContact.id);
     this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
@@ -247,15 +239,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async deleteEvaluation(evaluation: EvaluationWithNames) {
-    const dialogRef = this.dialog.open(
-      ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(
-          `Delete ${evaluation.jobTitle} Evaluation?`,
-          'Delete',
-          'Cancel')
-      });
-    let result = await dialogRef.afterClosed().toPromise();
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete ${evaluation.jobTitle} Evaluation?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.evaluationService.deleteEvaluation(evaluation.id);
     this.person.evaluations = this.person.evaluations.filter(value => value.id != evaluation.id);

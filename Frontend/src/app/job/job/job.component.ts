@@ -65,13 +65,12 @@ export class JobComponent extends BaseEditComponent implements OnInit {
   }
 
   async deleteRole(role: RoleExtended) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(`Delete role for ${role.preferredName} ${role.lastName}?`,
-          'Delete',
-          'Cancel')
-      });
-    let result = await dialogRef.afterClosed().toPromise();
+
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete role for ${role.preferredName} ${role.lastName}?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.personService.deleteRole(role.id);
     this.job.roles = this.job.roles.filter(value => value.id != role.id);

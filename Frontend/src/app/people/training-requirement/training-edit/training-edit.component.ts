@@ -64,13 +64,10 @@ export class TrainingEditComponent extends BaseEditComponent implements OnInit {
   }
 
   async delete() {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(`Deleting Training requirement, any training records will also be deleted`,
-          'Delete',
-          'Cancel')
-      });
-    const result = await dialogRef.afterClosed().toPromise();
+    const result = await ConfirmDialogComponent.OpenWait(this.dialog,
+      `Deleting Training requirement, any training records will also be deleted`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.trainingService.deleteRequirement(this.training.id);
     this.router.navigate(['training', 'list'], {relativeTo: this.route});

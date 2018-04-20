@@ -85,20 +85,26 @@ export class UserComponent extends BaseEditComponent implements OnInit {
     this.snackBar.open(`Role revoked, user must logout and login to lose the role`, null, {duration: 2000});
   }
 
-  deleteUser(): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent,
-      {data: ConfirmDialogComponent.Options(`Delete User ${this.user.userName}?`, 'Delete', 'Cancel')});
-    dialogRef.afterClosed().subscribe(async result => {
-      if (result) {
-        await this.userService.deleteUser(this.user.id);
-        this.router.navigate(['/user/admin']);
-      }
-    });
+  async deleteUser() {
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete User ${this.user.userName}?`,
+      'Delete',
+      'Cancel');
+
+    if (result) {
+      await this.userService.deleteUser(this.user.id);
+      this.router.navigate(['/user/admin']);
+    }
+
   }
 
   async impersonate() {
     await this.authService.impersonate(this.user.email);
-    this.snackBar.open(`You're now logged in as ${this.user.userName} just logout to stop impersonating them`, null, {duration: 2000});
+    this.snackBar.open(
+      `You're now logged in as ${this.user.userName} just logout to stop impersonating them`,
+      null,
+      {duration: 2000});
     this.router.navigate(['/home']);
   }
 

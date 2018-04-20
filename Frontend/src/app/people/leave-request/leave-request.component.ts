@@ -38,6 +38,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
 
   private subscription: Subscription;
+
   get isReadonly() {
     return this.leaveRequest.approved !== null && !this.isHr;
   }
@@ -161,14 +162,11 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   async deleteRequest(): Promise<void> {
-    const result = await this.dialog.open(
-      ConfirmDialogComponent,
-      {
-        data: ConfirmDialogComponent.Options(
-          `Delete Request for ${this.selectedPerson.person.preferredName}?`,
-          'Delete',
-          'Cancel')
-      }).afterClosed().toPromise();
+    const result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete Request for ${this.selectedPerson.person.preferredName}?`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.leaveRequestService.deleteRequest(this.leaveRequest.id).toPromise();
 
