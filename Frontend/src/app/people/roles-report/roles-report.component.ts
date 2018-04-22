@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { Job, jobTypeName } from '../../job/job';
+import { Job, jobStatusName as jobTypeName } from '../../job/job';
 
 @Component({
   selector: 'app-roles-report',

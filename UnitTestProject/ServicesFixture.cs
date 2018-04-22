@@ -187,7 +187,7 @@ namespace UnitTestProject
         {
             return InsertJob(job =>
             {
-                job.Type = JobType.FullTime;
+                job.Status = JobStatus.FullTime;
                 job.OrgGroup.Type = GroupType.Department;
                 action?.Invoke(job);
             });

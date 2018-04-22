@@ -196,7 +196,7 @@ namespace UnitTestProject
             var job = _servicesFixture.InsertJob(j =>
             {
                 //force job to provide time off
-                j.Type = JobType.FullTime;
+                j.Status = JobStatus.FullTime;
                 j.OrgGroup.Type = GroupType.Department;
             });
             _dbConnection.Insert(personWithStaff);

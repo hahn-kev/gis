@@ -320,7 +320,7 @@ namespace Backend.Services
             {
                 if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
                     role.Active) return 20;
-                if (role.Job.Type == JobType.FullTime || role.Job.Type == JobType.HalfTime)
+                if (role.Job.Status == JobStatus.FullTime || role.Job.Status == JobStatus.HalfTime)
                     totalServiceTime = totalServiceTime + role.LengthOfService();
             }
 

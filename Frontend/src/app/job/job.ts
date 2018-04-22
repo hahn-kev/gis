@@ -4,6 +4,7 @@ import { BaseEntity } from '../classes/base-entity';
 export class Job extends BaseEntity {
   public title: string;
   public type: JobType;
+  public status: JobStatus;
   public jobDescription: string;
   public gradeId: string;
   public orgGroupId: string;
@@ -27,7 +28,7 @@ export class JobWithRoles extends Job {
   public roles: RoleExtended[];
 }
 
-export enum JobType {
+export enum JobStatus {
   FullTime = 'FullTime',
   FullTime10Mo = 'FullTime10Mo',
   HalfTime = 'HalfTime',
@@ -36,24 +37,38 @@ export enum JobType {
   SchoolAid = 'SchoolAid',
 }
 
-export var NonSchoolAidJobTypes = Object.keys(JobType)
-  .map(value => JobType[value])
-  .filter(value => value != JobType.SchoolAid);
+export var NonSchoolAidJobStatus = Object.keys(JobStatus)
+  .map(value => JobStatus[value])
+  .filter(value => value != JobStatus.SchoolAid);
 
-export function jobTypeName(type: JobType): string {
-  switch (type) {
-    case JobType.FullTime:
+export function jobStatusName(status: JobStatus): string {
+  switch (status) {
+    case JobStatus.FullTime:
       return 'Full Time';
-    case JobType.HalfTime:
+    case JobStatus.HalfTime:
       return 'Half Time';
-    case JobType.Contractor:
-      return 'Contractor';
-    case JobType.DailyWorker:
+    case JobStatus.DailyWorker:
       return 'Daily Worker';
-    case JobType.SchoolAid:
+    case JobStatus.SchoolAid:
       return 'School Aid';
-    case JobType.FullTime10Mo:
+    case JobStatus.FullTime10Mo:
       return 'Full Time (10 month)';
+    default:
+      return status;
+  }
+}
+
+export enum JobType {
+  Admin = 'Admin',
+  Support = 'Support',
+  Teacher = 'Teacher',
+  BlueCollar = 'BlueCollar'
+}
+
+export function jobTypeName(type: JobType) {
+  switch (type) {
+    case JobType.BlueCollar:
+      return 'Blue Collar';
     default:
       return type;
   }

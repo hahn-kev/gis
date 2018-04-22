@@ -10,7 +10,8 @@ namespace Backend.Entities
     public class Job : BaseEntity
     {
         public string Title { get; set; }
-        [Column(DataType = DataType.VarChar)] public JobType Type { get; set; }
+        [Column(DataType = DataType.VarChar)] public JobType? Type { get; set; }
+        [Column(DataType = DataType.VarChar)] public JobStatus? Status { get; set; }
         public string JobDescription { get; set; }
         public Guid? GradeId { get; set; }
         public Guid OrgGroupId { get; set; }
@@ -37,25 +38,33 @@ namespace Backend.Entities
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum JobStatus
+    {
+        [MapValue(nameof(FullTime))] [MapValue("0")]
+        FullTime,
+
+        [MapValue(nameof(HalfTime))] [MapValue("1")]
+        HalfTime,
+
+        [MapValue(nameof(Contractor))] [MapValue("2")]
+        Contractor,
+
+        [MapValue(nameof(DailyWorker))] [MapValue("3")]
+        DailyWorker,
+
+        [MapValue(nameof(SchoolAid))] [MapValue("4")]
+        SchoolAid,
+
+        [MapValue(nameof(FullTime10Mo))] [MapValue("5")]
+        FullTime10Mo,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum JobType
     {
-        [MapValue(nameof(FullTime))]
-        [MapValue("0")]
-        FullTime,
-        [MapValue(nameof(HalfTime))]
-        [MapValue("1")]
-        HalfTime,
-        [MapValue(nameof(Contractor))]
-        [MapValue("2")]
-        Contractor,
-        [MapValue(nameof(DailyWorker))]
-        [MapValue("3")]
-        DailyWorker,
-        [MapValue(nameof(SchoolAid))]
-        [MapValue("4")]
-        SchoolAid,
-        [MapValue(nameof(FullTime10Mo))]
-        [MapValue("5")]
-        FullTime10Mo,
+        [MapValue(nameof(Admin))] Admin,
+        [MapValue(nameof(Support))] Support,
+        [MapValue(nameof(Teacher))] Teacher,
+        [MapValue(nameof(BlueCollar))] BlueCollar
     }
 }

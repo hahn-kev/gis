@@ -124,7 +124,7 @@ namespace UnitTestProject
             PersonRoleWithJob Role(bool active = true,
                 DateTime startDate = default(DateTime),
                 DateTime? endDate = null,
-                JobType jobType = JobType.FullTime,
+                JobStatus jobType = JobStatus.FullTime,
                 Guid? supervisorId = null,
                 GroupType groupType = GroupType.Division)
             {
@@ -134,7 +134,7 @@ namespace UnitTestProject
                     Active = active,
                     Job = new JobWithOrgGroup
                     {
-                        Type = jobType,
+                        Status = jobType,
                         OrgGroup = new OrgGroup {Supervisor = supervisorId ?? Guid.NewGuid(), Type = groupType}
                     },
                     StartDate = startDate,
@@ -184,9 +184,9 @@ namespace UnitTestProject
                 //non fulltime/half don't get leave
                 yield return (0, new List<PersonRoleWithJob>
                 {
-                    Role(startDate: twoYearsAgo, jobType: JobType.Contractor),
-                    Role(startDate: twoYearsAgo, jobType: JobType.DailyWorker),
-                    Role(startDate: twoYearsAgo, jobType: JobType.SchoolAid)
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.Contractor),
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.DailyWorker),
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.SchoolAid)
                 });
             }
 

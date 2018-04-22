@@ -1,4 +1,4 @@
-<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
+﻿<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
                   mode="query"></mat-progress-bar>
 <div class="main">
   <mat-toolbar color="primary">
@@ -68,7 +68,7 @@
             <ng-container *appTemplateContent="'sidenav:hr'">
               <a mat-list-item
                  [routerLink]="['/job','list']"
-                 [queryParams]="{types: nonSchoolAidJobTypes}"
+                 [queryParams]="{types: nonSchoolAidJobStatus}"
                  [class.active-link]="isLinkActive('/job/list')">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>

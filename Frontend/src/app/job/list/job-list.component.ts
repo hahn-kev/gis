@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Job, JobType, jobTypeName, JobWithFilledInfo, NonSchoolAidJobTypes } from '../job';
+import { Job, JobStatus, jobStatusName, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
 import { MatSort } from '@angular/material';
 
 @Component({
@@ -10,12 +10,12 @@ import { MatSort } from '@angular/material';
   styleUrls: ['./job-list.component.scss']
 })
 export class JobListComponent implements OnInit {
-  public jobTypes = Object.keys(JobType);
+  public jobStatus = Object.keys(JobStatus);
   public dataSource: AppDataSource<JobWithFilledInfo>;
-  public typeName = jobTypeName;
+  public statusName = jobStatusName;
   public filter: string;
   public showOnlyOpen = false;
-  public shownTypes: JobType[] = [];
+  public shownStatus: JobStatus[] = [];
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, private router: Router) {
@@ -28,7 +28,7 @@ export class JobListComponent implements OnInit {
     this.dataSource.bindToRouteData(this.route, 'jobs');
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
       if (this.showOnlyOpen && row.open <= 0) return false;
-      if (!this.shownTypes.includes(row.type)) return false;
+      if (!this.shownStatus.includes(row.status)) return false;
       return true;
     };
     this.dataSource.filterPredicate = ((data, filter) =>
@@ -38,8 +38,8 @@ export class JobListComponent implements OnInit {
     );
     this.route.queryParamMap.subscribe(params => {
       this.showOnlyOpen = params.has('onlyOpen') ? params.get('onlyOpen') == 'true' : false;
-      this.shownTypes = (params.has('types') ? params.getAll('types') : this.jobTypes)
-        .map(jt => JobType[jt]);
+      this.shownStatus = (params.has('status') ? params.getAll('status') : this.jobStatus)
+        .map(jt => JobStatus[jt]);
       let oldFilter = this.dataSource.filter;
       this.filter = params.get('filter');
       this.dataSource.filter = (this.filter || '').toUpperCase();
@@ -49,18 +49,18 @@ export class JobListComponent implements OnInit {
 
 
   applyFilter(filterValue: string) {
-    this.setQuery(filterValue, this.showOnlyOpen, this.shownTypes);
+    this.setQuery(filterValue, this.showOnlyOpen, this.shownStatus);
   }
 
   applyShowOnlyOpen(onlyOpen: boolean) {
-    this.setQuery(this.dataSource.filter, onlyOpen, this.shownTypes);
+    this.setQuery(this.dataSource.filter, onlyOpen, this.shownStatus);
   }
 
-  applyShownTypes(types: JobType[]) {
+  applyShownTypes(types: JobStatus[]) {
     this.setQuery(this.dataSource.filter, this.showOnlyOpen, types);
   }
 
-  setQuery(filter: string, onlyOpen: boolean, types: JobType[]) {
+  setQuery(filter: string, onlyOpen: boolean, types: JobStatus[]) {
     let params: Params = {
       onlyOpen: onlyOpen,
       types: types
@@ -72,14 +72,14 @@ export class JobListComponent implements OnInit {
     });
   }
 
-  jobSelectLabel(types: JobType[]) {
+  jobSelectLabel(types: JobStatus[]) {
 
-    if (types.length == this.jobTypes.length) return 'All';
-    if (this.areListsEqual(types, NonSchoolAidJobTypes)) return 'Staff Jobs';
+    if (types.length == this.jobStatus.length) return 'All';
+    if (this.areListsEqual(types, NonSchoolAidJobStatus)) return 'Staff Jobs';
     return types.join(', ');
   }
 
-  areListsEqual(a: JobType[], b: JobType[]) {
+  areListsEqual<T>(a: T[], b: T[]) {
     if (a === b) return true;
     if (a == null || b == null) return false;
     if (a.length != b.length) return false;

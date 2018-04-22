@@ -16,7 +16,15 @@
           <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
         </mat-select>
       </mat-form-field>
-        <mat-slide-toggle name="current" [(ngModel)]="job.current">Current</mat-slide-toggle>
+      <mat-form-field>
+
+        <mat-select [(ngModel)]="job.status" name="status"
+                    placeholder="Status">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-slide-toggle name="current" [(ngModel)]="job.current">Current</mat-slide-toggle>
       <mat-form-field>
         <mat-select [(ngModel)]="job.gradeId" name="grade"
                     placeholder="Grade">
