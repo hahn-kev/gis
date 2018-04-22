@@ -1,4 +1,4 @@
-﻿<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
+<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
                   mode="query"></mat-progress-bar>
 <div class="main">
   <mat-toolbar color="primary">
@@ -129,7 +129,7 @@
               <mat-icon mat-list-icon>face</mat-icon>
               <a mat-line>User Managment</a>
             </a>
-            <a mat-list-item routerLink="/sandbox" routerLinkActive="active-link">Sandbox</a>
+            <a mat-list-item *ngIf="isDev" routerLink="/sandbox" routerLinkActive="active-link">Sandbox</a>
           </ng-container>
         </ng-container>
         <mat-divider></mat-divider>
