@@ -7,41 +7,41 @@
   </mat-card>
 </div>
 <ng-template #leaveTable>
-  <mat-table [dataSource]="dataSource">
+  <mat-table [dataSource]="dataSource"matSort>
     <ng-container matColumnDef="requester">
-      <mat-header-cell *matHeaderCellDef>Leave for</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Leave for</mat-header-cell>
       <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="type">
-      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
       <mat-cell *matCellDef="let row"> {{typeName(row.type)}}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="approved">
-      <mat-header-cell *matHeaderCellDef>Approved</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Approved</mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-checkbox disabled [checked]="row.approved"></mat-checkbox>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="approvedBy">
-      <mat-header-cell *matHeaderCellDef>Approved by</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Approved by</mat-header-cell>
       <mat-cell *matCellDef="let row"> {{row.approvedByName}}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="startDate">
-      <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>
       <mat-cell *matCellDef="let row">{{row.startDate | date}}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="endDate">
-      <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>End Date</mat-header-cell>
       <mat-cell *matCellDef="let row">{{row.endDate | date}}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="createdDate">
-      <mat-header-cell *matHeaderCellDef>Created Date</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Created Date</mat-header-cell>
       <mat-cell *matCellDef="let row">{{row.createdDate | date}}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="days">
-      <mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Length</mat-header-cell>
       <mat-cell *matCellDef="let row">{{row.days}}</mat-cell>
     </ng-container>
     <!-- Header and Row Declarations -->

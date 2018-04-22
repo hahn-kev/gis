@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LeaveRequest } from '../leave-request';
 import { AppDataSource } from 'app/classes/app-data-source';
 import { LoginService } from '../../../services/auth/login.service';
 import { LeaveTypeName } from '../../self/self';
+import { MatSort } from '@angular/material';
 
 @Component({
   selector: 'app-leave-list',
@@ -17,6 +18,7 @@ export class LeaveListComponent implements OnInit {
   public showingMine: boolean;
   public hrColumns = ['requester', 'type', 'approved', 'approvedBy', 'startDate', 'endDate', 'days', 'createdDate'];
   public personColumns = ['startDate', 'endDate', 'days', 'type', 'approved', 'approvedBy', 'createdDate'];
+  @ViewChild(MatSort) matSort: MatSort;
 
 //todo let non hr people access this, and filter by logged in user
   constructor(private route: ActivatedRoute, public loginService: LoginService) {
@@ -28,6 +30,7 @@ export class LeaveListComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new AppDataSource<LeaveRequest>();
+    this.dataSource.sort = this.matSort;
     this.dataSource.bindToRouteData(this.route, 'leave');
   }
 

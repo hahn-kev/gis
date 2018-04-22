@@ -43,7 +43,9 @@ namespace Backend.Services
 
         public IList<LeaveRequestWithNames> ListByPersonId(Guid personId)
         {
-            return _leaveRequestRepository.LeaveRequestWithNames.Where(request => request.PersonId == personId)
+            return _leaveRequestRepository.LeaveRequestWithNames
+                .Where(request => request.PersonId == personId)
+                .OrderBy(leaveRequest => leaveRequest.StartDate)
                 .ToList();
         }
 
