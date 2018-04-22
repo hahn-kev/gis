@@ -22,6 +22,11 @@ namespace Backend.Entities
 
         public string Endorsements { get; set; }
         public string EndorsementAgency { get; set; }
+
+        public void RemoveSalary()
+        {
+            AnnualSalary = null;
+        }
     }
 
     [Table("Staff", IsColumnAttributeRequired = false)]

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Backend.Entities;
 
 namespace Backend.Utils
 {
@@ -12,6 +13,7 @@ namespace Backend.Utils
         {
             return BusinessDaysUntil(firstDay, lastDay, Enumerable.Empty<DateTime>());
         }
+
         /// <summary>
         /// Calculates number of business days, taking into account:
         ///  - weekends (Saturdays and Sundays)
@@ -63,6 +65,16 @@ namespace Backend.Utils
             }
 
             return businessDays;
+        }
+
+        public static IList<T> ForEach<T>(this IList<T> list, Action<T> action)
+        {
+            foreach (var v in list)
+            {
+                action(v);
+            }
+
+            return list;
         }
     }
 }

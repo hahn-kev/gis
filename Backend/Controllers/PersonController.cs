@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Authentication;
 using Backend.Entities;
 using Backend.Services;
+using Backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -96,21 +97,21 @@ namespace Backend.Controllers
         [Authorize(Roles = "admin,hr")]
         public IList<StaffWithName> Staff()
         {
-            return _personService.StaffWithNames;
+            return _personService.StaffWithNames.ForEach(s => s.RemoveSalary());
         }
 
         [HttpGet("staff/all")]
         [Authorize(Roles = "admin,hr")]
         public IList<PersonWithStaff> StaffAll()
         {
-            return _personService.StaffAll;
+            return _personService.StaffAll.ForEach(p => p?.Staff.RemoveSalary());
         }
 
         [HttpGet("staff/summaries")]
         [Authorize(Roles = "admin,hr")]
         public IList<PersonWithStaffSummaries> StaffSummaries()
         {
-            return _personService.StaffSummaries;
+            return _personService.StaffSummaries.ForEach(p => p?.Staff.RemoveSalary());
         }
 
         [HttpGet("{personId}/emergency")]
