@@ -83,7 +83,7 @@ export class StaffReportComponent implements OnInit {
     this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
-    this.dataSource.customColumnAccessor('untilBirthday', data => moment(data.birthdate).unix());
+    this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
     this.dataSource.sort = this.sort;
     this.dataSource.customFilter = (data: PersonWithStaffSummaries) => this.filter.matches(data);
     this.dataSource.bindToRouteData(this.route, 'staff');
@@ -133,7 +133,9 @@ export class StaffReportComponent implements OnInit {
   }
 
   timeToBirthday(date: MomentInput) {
-    return moment(date).year(moment().year()).fromNow();
+    let mDate = moment(date).year(moment().year());
+    if (mDate.isBefore(moment())) return mDate.add(1, 'year');
+    return mDate;
   }
 
   daysAsYears(days: number){

@@ -121,7 +121,7 @@
   </ng-container>
   <ng-container matColumnDef="untilBirthday">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Time to Birthday</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{ row.birthdate ? timeToBirthday(row.birthdate) : '' }}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{ row.birthdate ? timeToBirthday(row.birthdate).fromNow() : '' }}</mat-cell>
   </ng-container>
 
 
