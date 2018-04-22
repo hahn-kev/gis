@@ -299,13 +299,21 @@
                    [(ngModel)]="person.staff.moeLicenseNumber"
                    placeholder="MOE License Number">
           </mat-form-field>
+
           <mat-form-field>
-            <input matInput
-                   name="insuranceNumber"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.insuranceNumber"
-                   placeholder="Insurance Number">
+            <mat-select [(ngModel)]="staffInsurer"
+                        (ngModelChange)="person.staff.insurer = staffInsurer.join(',')"
+                        [disabled]="isSelf"
+
+                        multiple
+                        name="insurer"
+                        placeholder="Insurer">
+              <mat-option value="GIS">GIS</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+
           </mat-form-field>
+
           <mat-form-field>
             <input matInput
                    name="teacherLicenseOrg"
@@ -313,6 +321,7 @@
                    [(ngModel)]="person.staff.teacherLicenseOrg"
                    placeholder="Teacher License Organization">
           </mat-form-field>
+
           <mat-form-field>
             <input matInput
                    name="teacherLicenseNo"

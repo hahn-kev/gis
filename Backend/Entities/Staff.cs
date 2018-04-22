@@ -15,6 +15,7 @@ namespace Backend.Entities
         public DateTime? ContractIssued { get; set; }
         public DateTime? ContractExpireDate { get; set; }
         public string InsuranceNumber { get; set; }
+        public string Insurer { get; set; }
         public string TeacherLicenseOrg { get; set; }
         public string TeacherLicenseNo { get; set; }
         public string VisaType { get; set; }

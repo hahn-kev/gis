@@ -52,6 +52,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public newEvaluation = new EvaluationWithNames();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
+  public staffInsurer: string[]= [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
@@ -87,6 +88,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
       if (value.person.staff) {
         this.staffEndorsments = (value.person.staff.endorsements || '').split(',');
+        this.staffInsurer = (value.person.staff.insurer || '').split(',');
       }
       this.isNew = !this.person.id;
       this.newRole.personId = this.person.id;

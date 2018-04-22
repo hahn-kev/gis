@@ -11,6 +11,7 @@ export class Staff extends BaseEntity {
   public contractIssued?: Date;
   public contractExpireDate?: Date;
   public insuranceNumber: string;
+  public insurer: string;
   public teacherLicenseOrg: string;
   public teacherLicenseNo: string;
   public visaType: string;
