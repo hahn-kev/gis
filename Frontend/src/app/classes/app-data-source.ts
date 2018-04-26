@@ -44,7 +44,7 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
 
   private unfilteredData: T[];
   _customFilter = (data: T) => true;
-  set customFilter(value) {
+  set customFilter(value: (value: T) => boolean) {
     this._customFilter = value;
   }
 
