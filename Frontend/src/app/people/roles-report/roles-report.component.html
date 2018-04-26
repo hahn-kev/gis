@@ -1,33 +1,26 @@
 <ng-container *appTemplateContent="'title'">Roles Report ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <span class="mat-body-2">Roles Starting:</span>
-  <button mat-button [matMenuTriggerFor]="duringMenu">
-    {{during ? 'During or before' : 'Before'}}
-    <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
-  </button>
-  <mat-menu #duringMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item (click)="setDuring(false)">Before</button>
-    <button mat-menu-item (click)="setDuring(true)">During or before</button>
-  </mat-menu>
-
-  <!--begin date-->
-  <button mat-button (click)="beginDatePicker.open()">
-    <mat-icon mat-list-icon>today</mat-icon>
-    {{beginDate | date}}
-  </button>
-  <input class="invisible" [max]="endDate" [ngModel]="beginDate" (ngModelChange)="setBeginDate($event)"
-         [matDatepicker]="beginDatePicker">
-  <mat-datepicker #beginDatePicker></mat-datepicker>
-  <span class="mat-body-2">and ending after</span>
-
-  <!--end date-->
-  <button mat-button (click)="endDatePicker.open()">
-    <mat-icon mat-list-icon>today</mat-icon>
-    {{endDate | date}}
-  </button>
-  <input class="invisible" [min]="beginDate" [ngModel]="endDate" (ngModelChange)="setEndDate($event)"
-         [matDatepicker]="endDatePicker">
-  <mat-datepicker #endDatePicker></mat-datepicker>
+  <!--<span class="mat-body-2">Roles Starting:</span>-->
+  <mat-form-field floatLabel="never" class="print-hide">
+    <input autofocus matInput [value]="urlBinding.values.search"
+           (keyup)="urlBinding.values.search = ($event.target.value)"
+           placeholder="Search">
+  </mat-form-field>
+  <mat-form-field style="padding-left: 8px">
+    <mat-select [(ngModel)]="urlBinding.values.type"
+                name="type"
+                multiple
+                placeholder="Show Job Types">
+      <mat-select-trigger>{{jobSelectLabel(urlBinding.values.type)}}</mat-select-trigger>
+      <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field style="padding-left: 8px">
+    <mat-select [(ngModel)]="urlBinding.values.year"
+                placeholder="Year">
+      <mat-option *ngFor="let year of schoolYears" [value]="year.value">{{year.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
 </ng-container>
 
 <mat-table [dataSource]="dataSource" matSort>
@@ -35,10 +28,16 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.job.title}}</mat-cell>
   </ng-container>
+
   <ng-container matColumnDef="job.type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Type</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{typeName(row.job.type)}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="job.orgGroup.groupName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Department/Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.job.orgGroup?.groupName}}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="preferredName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
@@ -64,8 +63,8 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['job.title', 'job.type', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+    *matHeaderRowDef="['job.title', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['job.title', 'job.type', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           *matRowDef="let row; columns: ['job.title', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
            [routerLink]="'/people/edit/' + row.personId"></mat-row>
 </mat-table>

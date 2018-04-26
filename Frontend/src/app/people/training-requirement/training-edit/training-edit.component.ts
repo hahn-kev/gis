@@ -40,7 +40,7 @@ export class TrainingEditComponent extends BaseEditComponent implements OnInit {
       this.training = value.training;
       this.isNew = !this.training.id;
     });
-    this.years = this.trainingService.years();
+    this.years = Year.years();
   }
 
   get for() {

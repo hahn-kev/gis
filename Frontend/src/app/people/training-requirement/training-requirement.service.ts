@@ -4,7 +4,6 @@ import { TrainingRequirement } from './training-requirement';
 import { Observable } from 'rxjs/Observable';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { debounceTime, map } from 'rxjs/operators';
-import { Year } from './year';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
 import { StaffWithName } from '../staff';
@@ -75,23 +74,6 @@ export class TrainingRequirementService {
           'requirementId': requirementId
         }, responseType: 'text'
       }).toPromise();
-  }
-
-  years(): Year[] {
-    const today = new Date();
-    const years = new Array<Year>(today.getUTCFullYear() - 2000 + 3);
-    for (let i = 0; i < years.length; i++) {
-      let display;
-      if (i < 9) {
-        display = `0${i} - 0${i + 1}`;
-      } else if (i === 9) {
-        display = '09 - 10';
-      } else {
-        display = `${i} - ${i + 1}`;
-      }
-      years[i] = new Year(i + 2000, display);
-    }
-    return years.reverse();
   }
 
   buildRequirementsWithStaff(staffObservable: Observable<StaffWithName[]>,

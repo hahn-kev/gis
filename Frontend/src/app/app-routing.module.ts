@@ -32,7 +32,6 @@ import { StaffTrainingResolverService } from './people/training-requirement/staf
 import { StaffResolveService } from './people/staff-resolve.service';
 import { LeaveRequestResolverService } from './people/leave-request/leave-request-resolver.service';
 import { EmergencyContactResolverService } from './people/emergency-contact-resolver.service';
-import { SelfComponent } from './people/self/self.component';
 import { SelfService } from './people/self/self.service';
 import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
@@ -165,16 +164,18 @@ const routes: Routes = [
             path: 'report',
             children: [
               {
-                path: 'roles/:start',
+                path: 'roles/:year',
                 component: RolesReportComponent,
-                runGuardsAndResolvers: 'paramsOrQueryParamsChange',
                 resolve: {
                   roles: RolesResolverService
                 }
               },
               {
                 path: 'roles',
-                redirectTo: 'roles/during'
+                component: RolesReportComponent,
+                resolve: {
+                  roles: RolesResolverService
+                }
               }
             ]
           },

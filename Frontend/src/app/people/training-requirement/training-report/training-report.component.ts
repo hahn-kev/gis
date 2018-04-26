@@ -29,7 +29,7 @@ export class TrainingReportComponent implements OnInit {
               private trainingService: TrainingRequirementService,
               private personService: PersonService,
               private router: Router) {
-    this.years = this.trainingService.years();
+    this.years = Year.years();
     this.selectedYearSubject = new BehaviorSubject(null);
     this.route.params.pipe(
       pluck('year'),

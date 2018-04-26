@@ -1,78 +1,79 @@
-import { Component, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoleExtended, RoleWithJob } from '../role';
-import { PersonService } from '../person.service';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { Job, jobStatusName as jobTypeName } from '../../job/job';
+import { JobStatus, jobStatusName as jobTypeName, NonSchoolAidJobTypes } from '../../job/job';
+import { Year } from '../training-requirement/year';
+import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({
   selector: 'app-roles-report',
   templateUrl: './roles-report.component.html',
-  styleUrls: ['./roles-report.component.scss']
+  styleUrls: ['./roles-report.component.scss'],
+  providers: [UrlBindingService]
 })
-export class RolesReportComponent implements OnInit{
+export class RolesReportComponent implements OnInit {
   public dataSource: AppDataSource<RoleWithJob>;
   public typeName = jobTypeName;
-
+  public jobTypes = Object.keys(JobStatus);
+  public schoolYears = Year.years();
   @ViewChild(MatSort) sort: MatSort;
-  public roles: RoleWithJob[];
-  public during: boolean;
-  public beginDate: Moment;
-  public endDate: Moment;
-  readonly oneYearInMs = 1000 * 60 * 60 * 24 * 365;
 
 
   constructor(private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              public urlBinding: UrlBindingService<{ year: number, type: JobStatus[], start: string, search: string }>) {
     this.dataSource = new AppDataSource<RoleWithJob>();
+
     this.dataSource.bindToRouteData(this.route, 'roles');
-    this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
-    this.route.queryParams.subscribe((params: { begin, end }) => {
-      this.beginDate = this.parseDate(params.begin, Date.now() - this.oneYearInMs / 2);
-      this.endDate = this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
-    });
+    this.urlBinding.addParam('year', Year.CurrentSchoolYear(), true);
+    this.urlBinding.addParam('type', NonSchoolAidJobTypes);
+    this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
+    // this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
+    // this.route.queryParams.subscribe((params: { begin, end }) => {
+    //   this.beginDate = this.parseDate(params.begin, Date.now() - this.oneYearInMs / 2);
+    //   this.endDate = this.parseDate(params.end, Date.now() + this.oneYearInMs / 2);
+    // });
+    this.dataSource.filterPredicate = (data, filter) => {
+      return data.preferredName.toUpperCase().startsWith(filter)
+        || data.lastName.toUpperCase().startsWith(filter)
+        || data.job.title.toUpperCase().includes(filter)
+        || (data.job.orgGroup && data.job.orgGroup.groupName.toUpperCase().includes(filter));
+    };
+    this.dataSource.customFilter = value => {
+      if (!this.urlBinding.values.type.includes(value.job.status)) return false;
+      return true;
+    };
+    this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
+    //load returns true if params updated
+    if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }
 
   ngOnInit(): void {
     this.dataSource.sort = this.sort;
   }
 
-
-  parseDate(param: string, fallback: number) {
-    if (param) return moment(param, 'YYYY-M-D');
-    return moment(fallback);
+  jobSelectLabel(types: JobStatus[]) {
+    if (typeof types === 'string') return types;
+    if (types.length === this.jobTypes.length) return 'All';
+    if (this.areListsEqual(types, NonSchoolAidJobTypes)) return 'Staff Jobs';
+    return types.map(value => this.typeName(value)).join(', ');
   }
 
-  setDuring(during: boolean): void {
-    this.during = during;
-    this.updateRoute();
-  }
+  areListsEqual(a: JobStatus[], b: JobStatus[]) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
 
-  async setBeginDate(beginDate: Moment): Promise<void> {
-    this.beginDate = beginDate;
-    this.updateRoute();
-  }
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    a.sort();
+    b.sort();
 
-  async setEndDate(endDate: Moment): Promise<void> {
-    this.endDate = endDate;
-    this.updateRoute();
-  }
-
-  updateRoute(): void {
-    this.router.navigate(['..', this.during ? 'during' : 'before'],
-      {
-        relativeTo: this.route,
-        queryParams: {
-          begin: RolesReportComponent.formatDate(this.beginDate),
-          end: RolesReportComponent.formatDate(this.endDate)
-        },
-      });
-  }
-
-  static formatDate(date: Moment): string {
-    return date.format('YYYY-M-D');
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
 }
