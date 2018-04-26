@@ -15,13 +15,30 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Job> Job => _dbConnection.Job;
+
+        public IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
+            from job in _dbConnection.Job
+            from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
+            select new JobWithOrgGroup
+            {
+                Current = job.Current,
+                Id = job.Id,
+                GradeId = job.GradeId,
+                OrgGroupId = job.OrgGroupId,
+                JobDescription = job.JobDescription,
+                Title = job.Title,
+                Positions = job.Positions,
+                Type = job.Type,
+                OrgGroup = orgGroup
+            };
+
         public IQueryable<Grade> JobGrades => _dbConnection.JobGrades;
 
         public IQueryable<JobWithFilledInfo> JobWithFilledInfos =>
             from job in Job
             from role in _dbConnection.PersonRoles.LeftJoin(role => role.JobId == job.Id).DefaultIfEmpty()
             from grade in JobGrades.LeftJoin(grade => grade.Id == job.GradeId)
-            from org in _dbConnection.OrgGroups.LeftJoin(org => org.Id == job.OrgGroupId) 
+            from org in _dbConnection.OrgGroups.LeftJoin(org => org.Id == job.OrgGroupId)
             where role.Active || role == null
             group role by new {role.JobId, job, grade, org}
             into g
@@ -52,7 +69,8 @@ namespace Backend.DataLayer
             return job;
         }
 
-        private IQueryable<JobWithRoles> JobsWithRoles => from job in Job
+        private IQueryable<JobWithRoles> JobsWithRoles =>
+            from job in Job
             select new JobWithRoles
             {
                 Id = job.Id,

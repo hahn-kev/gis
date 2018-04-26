@@ -76,7 +76,7 @@ export class JobListComponent implements OnInit {
 
     if (types.length == this.jobStatus.length) return 'All';
     if (this.areListsEqual(types, NonSchoolAidJobStatus)) return 'Staff Jobs';
-    return types.join(', ');
+    return types.map(value => this.statusName(value)).join(', ');
   }
 
   areListsEqual<T>(a: T[], b: T[]) {

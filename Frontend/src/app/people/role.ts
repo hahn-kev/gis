@@ -1,4 +1,4 @@
-﻿import { Job } from '../job/job';
+﻿import { JobWithOrgGroup } from '../job/job';
 import { BaseEntity } from '../classes/base-entity';
 
 export class Role extends BaseEntity {
@@ -15,5 +15,5 @@ export class RoleExtended extends Role {
 }
 
 export class RoleWithJob extends RoleExtended {
-  public job: Job;
+  public job: JobWithOrgGroup;
 }

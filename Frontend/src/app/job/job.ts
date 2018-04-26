@@ -1,5 +1,6 @@
 ﻿import { RoleExtended } from '../people/role';
 import { BaseEntity } from '../classes/base-entity';
+import { OrgGroup } from '../people/groups/org-group';
 
 export class Job extends BaseEntity {
   public title: string;
@@ -22,6 +23,10 @@ export class JobWithFilledInfo extends Job {
   public open: number;
   public gradeNo: number;
   public orgGroupName: string;
+}
+
+export class JobWithOrgGroup extends Job {
+  public orgGroup: OrgGroup;
 }
 
 export class JobWithRoles extends Job {

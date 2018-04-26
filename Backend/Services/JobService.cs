@@ -19,9 +19,9 @@ namespace Backend.Services
             _personRepository = personRepository;
         }
 
-        public IList<Job> Jobs()
+        public IList<JobWithOrgGroup> Jobs()
         {
-            return _jobRepository.Job.OrderBy(job => job.Title).ToList();
+            return _jobRepository.JobsWithOrgGroup.OrderBy(job => job.Title).ToList();
         }
 
         public IList<JobWithFilledInfo> JobWithFilledInfos()

@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { RoleWithJob } from '../role';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Job } from '../../job/job';
+import { JobWithOrgGroup } from '../../job/job';
 import { JobService } from '../../job/job.service';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { take } from 'rxjs/operators';
@@ -18,7 +18,7 @@ export class RoleComponent implements OnInit {
   @Input() role: RoleWithJob;
   @Input() formId: string;
   @ViewChild('form') form: NgForm;
-  jobs: Job[] = [];
+  jobs: JobWithOrgGroup[] = [];
 
   constructor(private route: ActivatedRoute, lazyLoadService: LazyLoadService, jobService: JobService) {
     lazyLoadService.share('jobs', () => jobService.list())

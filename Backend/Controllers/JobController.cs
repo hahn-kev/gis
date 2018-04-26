@@ -18,7 +18,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public IList<Job> Jobs()
+        public IList<JobWithOrgGroup> Jobs()
         {
             return _jobService.Jobs();
         }
