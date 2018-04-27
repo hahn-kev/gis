@@ -4,9 +4,9 @@
 }
 
 .mat-column-active {
-  flex: 0.5 4;
+  flex-grow: 0.5;
 }
 
-.mat-column-startDate, .mat-column-endDate{
-  flex: 0.5 4;
+.mat-column-startDate, .mat-column-endDate, .mat-column-job-type {
+  flex-grow: 0.5;
 }

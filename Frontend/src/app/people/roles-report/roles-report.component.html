@@ -38,6 +38,10 @@
     <mat-cell *matCellDef="let row"> {{row.job.title}}</mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="job.status">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Job Status</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{statusName(row.job.status)}}</mat-cell>
+  </ng-container>
   <ng-container matColumnDef="job.type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Type</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{typeName(row.job.type)}}</mat-cell>
@@ -72,8 +76,8 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['job.title', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+    *matHeaderRowDef="['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['job.title', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           *matRowDef="let row; columns: ['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
            [routerLink]="'/people/edit/' + row.personId"></mat-row>
 </mat-table>

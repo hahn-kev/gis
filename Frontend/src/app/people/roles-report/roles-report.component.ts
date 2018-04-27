@@ -45,8 +45,9 @@ export class RolesReportComponent implements OnInit {
         || (data.job.orgGroup && data.job.orgGroup.groupName.toUpperCase().includes(filter));
     };
     this.dataSource.customFilter = value => {
-      if (!this.urlBinding.values.status.includes(value.job.status)) return false;
-      if (!this.urlBinding.values.type.includes(value.job.type)) return false;
+      const values = this.urlBinding.values;
+      if (values.status.length != this.jobStatus.length && !values.status.includes(value.job.status)) return false;
+      if (values.type.length != this.jobTypes.length && !values.type.includes(value.job.type)) return false;
       return true;
     };
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
