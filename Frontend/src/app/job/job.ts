@@ -42,7 +42,7 @@ export enum JobStatus {
   SchoolAid = 'SchoolAid',
 }
 
-export var NonSchoolAidJobStatus = Object.keys(JobStatus)
+export const NonSchoolAidJobStatus = Object.keys(JobStatus)
   .map(value => JobStatus[value])
   .filter(value => value != JobStatus.SchoolAid);
 
@@ -62,13 +62,15 @@ export function jobStatusName(status: JobStatus): string {
       return status;
   }
 }
-
 export enum JobType {
   Admin = 'Admin',
   Support = 'Support',
   Teacher = 'Teacher',
   BlueCollar = 'BlueCollar'
 }
+
+export const AllJobTypes = Object.keys(JobType)
+  .map(value => JobType[value]);
 
 export function jobTypeName(type: JobType) {
   switch (type) {

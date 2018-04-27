@@ -68,7 +68,7 @@
             <ng-container *appTemplateContent="'sidenav:hr'">
               <a mat-list-item
                  [routerLink]="['/job','list']"
-                 [queryParams]="{types: nonSchoolAidJobStatus}"
+                 [queryParams]="{status: nonSchoolAidJobStatus}"
                  [class.active-link]="isLinkActive('/job/list')">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
@@ -109,12 +109,12 @@
             <ng-container *appTemplateContent="'sidenav:school-aid'">
               <a mat-list-item
                  [routerLink]="['/job','list']"
-                 [queryParams]="{types: [schoolAidJobType]}"
+                 [queryParams]="{status: [schoolAidJobStatus]}"
                  [class.active-link]="isLinkActive('/job/list')">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
-              <a mat-list-item routerLink="/job/report/roles" [queryParams]="{type: [schoolAidJobType]}"
+              <a mat-list-item routerLink="/job/report/roles" [queryParams]="{status: [schoolAidJobType]}"
                  routerLinkActive="active-link">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Roles</span>

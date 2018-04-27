@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { JobStatus, jobStatusName as jobTypeName, NonSchoolAidJobTypes } from '../../job/job';
+import { AllJobTypes, JobStatus, jobStatusName, JobType, jobTypeName, NonSchoolAidJobStatus } from '../../job/job';
 import { Year } from '../training-requirement/year';
 import { UrlBindingService } from '../../services/url-binding.service';
 
@@ -16,19 +16,22 @@ import { UrlBindingService } from '../../services/url-binding.service';
 export class RolesReportComponent implements OnInit {
   public dataSource: AppDataSource<RoleWithJob>;
   public typeName = jobTypeName;
-  public jobTypes = Object.keys(JobStatus);
+  public statusName = jobStatusName;
+  public jobStatus = Object.keys(JobStatus);
+  public jobTypes = Object.keys(JobType);
   public schoolYears = Year.years();
   @ViewChild(MatSort) sort: MatSort;
 
 
   constructor(private route: ActivatedRoute,
               private router: Router,
-              public urlBinding: UrlBindingService<{ year: number, type: JobStatus[], start: string, search: string }>) {
+              public urlBinding: UrlBindingService<{ year: number, type: JobType[], status: JobStatus[], start: string, search: string }>) {
     this.dataSource = new AppDataSource<RoleWithJob>();
 
     this.dataSource.bindToRouteData(this.route, 'roles');
     this.urlBinding.addParam('year', Year.CurrentSchoolYear(), true);
-    this.urlBinding.addParam('type', NonSchoolAidJobTypes);
+    this.urlBinding.addParam('type', AllJobTypes);
+    this.urlBinding.addParam('status', NonSchoolAidJobStatus);
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     // this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
     // this.route.queryParams.subscribe((params: { begin, end }) => {
@@ -42,7 +45,8 @@ export class RolesReportComponent implements OnInit {
         || (data.job.orgGroup && data.job.orgGroup.groupName.toUpperCase().includes(filter));
     };
     this.dataSource.customFilter = value => {
-      if (!this.urlBinding.values.type.includes(value.job.status)) return false;
+      if (!this.urlBinding.values.status.includes(value.job.status)) return false;
+      if (!this.urlBinding.values.type.includes(value.job.type)) return false;
       return true;
     };
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
@@ -54,11 +58,17 @@ export class RolesReportComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  jobSelectLabel(types: JobStatus[]) {
-    if (typeof types === 'string') return types;
-    if (types.length === this.jobTypes.length) return 'All';
-    if (this.areListsEqual(types, NonSchoolAidJobTypes)) return 'Staff Jobs';
-    return types.map(value => this.typeName(value)).join(', ');
+  jobSelectLabel(status: JobStatus[]) {
+    if (typeof status === 'string') return status;
+    if (status.length === this.jobStatus.length) return 'All';
+    if (this.areListsEqual(status, NonSchoolAidJobStatus)) return 'Staff Jobs';
+    return status.map(value => this.statusName(value)).join(', ');
+  }
+
+  jobTypeSelectLabel(status: JobType[]) {
+    if (typeof status === 'string') return status;
+    if (status.length === this.jobTypes.length) return 'All';
+    return status.map(value => this.typeName(value)).join(', ');
   }
 
   areListsEqual(a: JobStatus[], b: JobStatus[]) {

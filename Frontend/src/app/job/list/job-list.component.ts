@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Job, JobStatus, jobStatusName, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
+import { JobStatus, jobStatusName, jobTypeName, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
 import { MatSort } from '@angular/material';
 
 @Component({
@@ -13,6 +13,7 @@ export class JobListComponent implements OnInit {
   public jobStatus = Object.keys(JobStatus);
   public dataSource: AppDataSource<JobWithFilledInfo>;
   public statusName = jobStatusName;
+  public typeName = jobTypeName;
   public filter: string;
   public showOnlyOpen = false;
   public shownStatus: JobStatus[] = [];

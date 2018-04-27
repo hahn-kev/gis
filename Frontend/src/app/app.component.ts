@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { UserToken } from './login/user-token';
 import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
-import { JobStatus, NonSchoolAidJobStatus} from './job/job';
+import { JobStatus, NonSchoolAidJobStatus } from './job/job';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,7 @@ import { JobStatus, NonSchoolAidJobStatus} from './job/job';
 export class AppComponent implements OnInit {
   public isDev = !environment.production;
   nonSchoolAidJobStatus = NonSchoolAidJobStatus;
-  schoolAidJobType = JobStatus.SchoolAid;
+  schoolAidJobStatus = JobStatus.SchoolAid;
   currentUser: Observable<UserToken>;
   indicatorStatus: Observable<boolean>;
   version: string;
