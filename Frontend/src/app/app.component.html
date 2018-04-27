@@ -114,6 +114,11 @@
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
+              <a mat-list-item routerLink="/job/report/roles" [queryParams]="{type: [schoolAidJobType]}"
+                 routerLinkActive="active-link">
+                <mat-icon mat-list-icon>work</mat-icon>
+                <span mat-line>Roles</span>
+              </a>
               <a mat-list-item routerLink="/people/school-aid/list" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>supervisor_account</mat-icon>
                 <span mat-line>School Aids</span>
