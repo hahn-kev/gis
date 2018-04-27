@@ -29,6 +29,7 @@ namespace Backend.DataLayer
                 Title = job.Title,
                 Positions = job.Positions,
                 Type = job.Type,
+                Status = job.Status,
                 OrgGroup = orgGroup
             };
 

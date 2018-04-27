@@ -15,15 +15,17 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public IQueryable<Person> People => _dbConnection.People
-            .OrderBy(person => person.PreferredName ?? person.FirstName)
-            .ThenBy(person => person.LastName);
+        public IQueryable<Person> People =>
+            _dbConnection.People
+                .OrderBy(person => person.PreferredName ?? person.FirstName)
+                .ThenBy(person => person.LastName);
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
-        public IQueryable<PersonExtended> PeopleExtended => _dbConnection.PeopleExtended
-            .OrderBy(person => person.PreferredName ?? person.FirstName)
-            .ThenBy(person => person.LastName);
+        public IQueryable<PersonExtended> PeopleExtended =>
+            _dbConnection.PeopleExtended
+                .OrderBy(person => person.PreferredName ?? person.FirstName)
+                .ThenBy(person => person.LastName);
 
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
 
@@ -33,7 +35,8 @@ namespace Backend.DataLayer
             {
                 return from person in PeopleGeneric<PersonWithStaffSummaries>()
                     from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
-                    group role by new {person} into g
+                    group role by new {person}
+                    into g
                     select new PersonWithStaffSummaries
                     {
                         Id = g.Key.person.Id,
@@ -114,7 +117,8 @@ namespace Backend.DataLayer
                     Deleted = person.Deleted
                 }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 
-        private IQueryable<JobWithOrgGroup> JobsWithOrgGroup => from job in _dbConnection.Job
+        private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
+            from job in _dbConnection.Job
             from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
             select new JobWithOrgGroup
             {
@@ -126,7 +130,7 @@ namespace Backend.DataLayer
                 Title = job.Title,
                 Positions = job.Positions,
                 Status = job.Status,
-                 Type = job.Type,
+                Type = job.Type,
                 OrgGroup = orgGroup
             };
 
