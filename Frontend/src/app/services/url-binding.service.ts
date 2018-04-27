@@ -101,6 +101,8 @@ export class UrlBindingService<T_VALUES> {
 
     // If you don't care about the order of the elements inside
     // the array, you should sort both arrays here.
+    a = [...a];
+    b = [...b];
     a.sort();
     b.sort();
 
@@ -147,6 +149,7 @@ export class UrlBindingService<T_VALUES> {
         relativeTo: this.route,
         queryParams: params
       });
+      this.onParamsUpdated(this.values);
     });
   }
 }
