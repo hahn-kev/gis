@@ -1,35 +1,40 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { JobStatus, jobStatusName, jobTypeName, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
+import { ActivatedRoute } from '@angular/router';
+import {
+  AllJobTypes,
+  JobStatus,
+  jobStatusName,
+  JobType,
+  jobTypeName,
+  JobWithFilledInfo,
+  NonSchoolAidJobStatus
+} from '../job';
 import { MatSort } from '@angular/material';
+import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.component.html',
-  styleUrls: ['./job-list.component.scss']
+  styleUrls: ['./job-list.component.scss'],
+  providers: [UrlBindingService]
 })
 export class JobListComponent implements OnInit {
   public jobStatus = Object.keys(JobStatus);
+  public jobTypes = Object.keys(JobType);
   public dataSource: AppDataSource<JobWithFilledInfo>;
   public statusName = jobStatusName;
   public typeName = jobTypeName;
-  public filter: string;
-  public showOnlyOpen = false;
-  public shownStatus: JobStatus[] = [];
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
-
-  }
-
-  ngOnInit(): void {
+  constructor(private route: ActivatedRoute,
+              public urlBinding: UrlBindingService<{ search: string, showOnlyOpen: boolean, status: JobStatus[], type: JobType[] }>) {
     this.dataSource = new AppDataSource<JobWithFilledInfo>();
-    this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'jobs');
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
-      if (this.showOnlyOpen && row.open <= 0) return false;
-      if (!this.shownStatus.includes(row.status)) return false;
+      if (this.urlBinding.values.showOnlyOpen && row.open <= 0) return false;
+      if (!this.urlBinding.values.status.includes(row.status)) return false;
+      if (!this.urlBinding.values.type.includes(row.type)) return false;
       return true;
     };
     this.dataSource.filterPredicate = ((data, filter) =>
@@ -37,47 +42,29 @@ export class JobListComponent implements OnInit {
         || (data.jobDescription || '').toUpperCase().includes(filter)
         || (data.orgGroupName || '').toUpperCase().includes(filter)
     );
-    this.route.queryParamMap.subscribe(params => {
-      this.showOnlyOpen = params.has('onlyOpen') ? params.get('onlyOpen') == 'true' : false;
-      this.shownStatus = (params.has('status') ? params.getAll('status') : this.jobStatus)
-        .map(jt => JobStatus[jt]);
-      let oldFilter = this.dataSource.filter;
-      this.filter = params.get('filter');
-      this.dataSource.filter = (this.filter || '').toUpperCase();
-      this.dataSource.filterUpdated();
-    });
+
+    this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
+    this.urlBinding.addParam('showOnlyOpen', false);
+    this.urlBinding.addParam('status', NonSchoolAidJobStatus);
+    this.urlBinding.addParam('type', AllJobTypes);
+    this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
+    //load returns true if params updated
+    if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }
 
-
-  applyFilter(filterValue: string) {
-    this.setQuery(filterValue, this.showOnlyOpen, this.shownStatus);
-  }
-
-  applyShowOnlyOpen(onlyOpen: boolean) {
-    this.setQuery(this.dataSource.filter, onlyOpen, this.shownStatus);
-  }
-
-  applyShownTypes(types: JobStatus[]) {
-    this.setQuery(this.dataSource.filter, this.showOnlyOpen, types);
-  }
-
-  setQuery(filter: string, onlyOpen: boolean, types: JobStatus[]) {
-    let params: Params = {
-      onlyOpen: onlyOpen,
-      types: types
-    };
-    if (filter !== '') params.filter = filter;
-    this.router.navigate(['.'], {
-      relativeTo: this.route,
-      queryParams: params
-    });
+  ngOnInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   jobSelectLabel(types: JobStatus[]) {
-
     if (types.length == this.jobStatus.length) return 'All';
     if (this.areListsEqual(types, NonSchoolAidJobStatus)) return 'Staff Jobs';
     return types.map(value => this.statusName(value)).join(', ');
+  }
+
+  jobTypeSelectLabel(status: JobType[]) {
+    if (status.length === this.jobTypes.length) return 'All';
+    return status.map(value => this.typeName(value)).join(', ');
   }
 
   areListsEqual<T>(a: T[], b: T[]) {
