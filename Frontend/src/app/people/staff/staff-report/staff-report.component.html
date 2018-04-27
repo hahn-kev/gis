@@ -4,19 +4,18 @@
     <mat-icon>search</mat-icon>
   </button>
   <mat-form-field floatLabel="never" class="print-hide">
-    <input autofocus matInput [value]="filter.text.value" (keyup)="filter.text.next($event.target.value)"
-           placeholder="Search">
+    <input autofocus matInput [value]="urlBinding.values.search"
+           (keyup)="urlBinding.values.search = $event.target.value" placeholder="Search">
   </mat-form-field>
 
-  <mat-slide-toggle [ngModel]="filter.showInactive.value" (ngModelChange)="filter.showInactive.next($event)">
+  <mat-slide-toggle [(ngModel)]="urlBinding.values.showInactive">
     Show Inactive
   </mat-slide-toggle>
   <button mat-icon-button (click)="openFilterDialog()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
   <mat-form-field style="padding-left: 8px" class="print-hide">
-    <mat-select [ngModel]="filter.selectedColumns | async"
-                (ngModelChange)="filter.selectedColumns.next($event)"
+    <mat-select [(ngModel)]="urlBinding.values.selectedColumns"
                 multiple
                 placeholder="Columns">
       <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{camel2title(column)}}</mat-option>
@@ -30,34 +29,32 @@
 </ng-container>
 <ng-container *appTemplateContent="'dialog:filter'">
   <div class="two-colum-grid">
-    <mat-checkbox [ngModel]="!!(filter.showThai|async)" (ngModelChange)="filter.showThai.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.showThai">
       Show Thai Staff
     </mat-checkbox>
-    <mat-checkbox [ngModel]="filter.showNonThai|async" (ngModelChange)="filter.showNonThai.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.showNonThai">
       Show Non Thai Staff
     </mat-checkbox>
-    <mat-checkbox [ngModel]="filter.showMen|async" (ngModelChange)="filter.showMen.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.showMen">
       Show Men Staff
     </mat-checkbox>
-    <mat-checkbox [ngModel]="filter.showWomen|async" (ngModelChange)="filter.showWomen.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.showWomen">
       Show Women Staff
     </mat-checkbox>
-    <mat-checkbox [ngModel]="filter.filterOlderThan|async" (ngModelChange)="filter.filterOlderThan.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.filterOlderThan">
       Older than
     </mat-checkbox>
     <mat-form-field>
       <input type="number" matInput
-             [ngModel]="filter.olderThanFilter|async"
-             (ngModelChange)="filter.olderThanFilter.next($event)"
+             [(ngModel)]="urlBinding.values.olderThanFilter"
              placeholder="Years">
     </mat-form-field>
-    <mat-checkbox [ngModel]="filter.filterYoungerThan|async" (ngModelChange)="filter.filterYoungerThan.next($event)">
+    <mat-checkbox [(ngModel)]="urlBinding.values.filterYoungerThan">
       Younger than
     </mat-checkbox>
     <mat-form-field>
       <input type="number" matInput
-             [ngModel]="filter.youngerThanFilter|async"
-             (ngModelChange)="filter.youngerThanFilter.next($event)"
+             [(ngModel)]="urlBinding.values.youngerThanFilter"
              placeholder="Years">
     </mat-form-field>
   </div>
@@ -160,8 +157,8 @@
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="filter.selectedColumns.value"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: filter.selectedColumns.value"
+  <mat-header-row *matHeaderRowDef="urlBinding.values.selectedColumns"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: urlBinding.values.selectedColumns"
            [routerLink]="'/people/edit/' + row.id"></mat-row>
 </mat-table>
 

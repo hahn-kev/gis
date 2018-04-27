@@ -1,25 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { Gender, NationalityName, PersonWithStaff, PersonWithStaffSummaries } from '../../person';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Gender, NationalityName, PersonWithStaffSummaries } from '../../person';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
 import { MomentInput } from 'moment';
 import { RenderTemplateDialogComponent } from '../../../components/render-template-dialog/render-template-dialog.component';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { Subject } from 'rxjs/Subject';
-import { debounceTime } from 'rxjs/operators';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { UrlBindingService } from '../../../services/url-binding.service';
 
 @Component({
   selector: 'app-staff-report',
   templateUrl: './staff-report.component.html',
-  styleUrls: ['./staff-report.component.scss']
+  styleUrls: ['./staff-report.component.scss'],
+  providers: [UrlBindingService]
 })
 export class StaffReportComponent implements OnInit {
   public nationalityName = NationalityName;
-  public dataSource: AppDataSource<PersonWithStaff>;
+  public dataSource: AppDataSource<PersonWithStaffSummaries>;
+  age = StaffReportComponent.age;
   public avalibleColumns = [
     'preferredName',
     'firstName',
@@ -44,35 +42,62 @@ export class StaffReportComponent implements OnInit {
     'speaksEnglish',
     'nationality'
   ];
-  filter = {
-    text: new BehaviorSubject(''),
-    showInactive: new BehaviorSubject(false),
-    selectedColumns: new BehaviorSubject(['preferredName', 'lastName']),
-    showThai: new BehaviorSubject(true),
-    showNonThai: new BehaviorSubject(true),
-    showMen: new BehaviorSubject(true),
-    showWomen: new BehaviorSubject(true),
-    filterOlderThan: new BehaviorSubject(false),
-    olderThanFilter: new BehaviorSubject(0),
-    filterYoungerThan: new BehaviorSubject(false),
-    youngerThanFilter: new BehaviorSubject(0),
-    matches: function (person: PersonWithStaffSummaries): boolean {
-      if (!this.showInactive.value && !person.isActive) return false;
-      if (!this.showThai.value && person.isThai) return false;
-      if (!this.showNonThai.value && !person.isThai) return false;
-      if (!this.showMen.value && person.gender == Gender.Male) return false;
-      if (!this.showWomen.value && person.gender == Gender.Female) return false;
-      let yearsOld = StaffReportComponent.age(person.birthdate);
-      if ((this.filterYoungerThan.value || this.filterOlderThan.value) && Number.isNaN(yearsOld)) return false;
-      if (this.filterOlderThan.value && this.olderThanFilter.value >= yearsOld) return false;
-      if (this.filterYoungerThan.value && this.youngerThanFilter.value <= yearsOld) return false;
-      return true;
-    }
-  };
+
 
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private dialog: MatDialog,
+              public urlBinding: UrlBindingService<{
+                search: string,
+                showInactive: boolean,
+                selectedColumns: string[],
+                showThai: boolean,
+                showNonThai: boolean,
+                showMen: boolean,
+                showWomen: boolean,
+                filterOlderThan: boolean,
+                olderThanFilter: number,
+                filterYoungerThan: boolean,
+                youngerThanFilter: number
+              }>) {
+    this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
+    this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
+    this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
+    this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
+    this.dataSource.bindToRouteData(this.route, 'staff');
+    this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
+      return (data.preferredName.toUpperCase().startsWith(filter)
+        || data.lastName.toUpperCase().startsWith(filter)
+        || data.firstName.toUpperCase().startsWith(filter));
+    };
+    this.dataSource.customFilter = person => {
+      if (!this.urlBinding.values.showInactive && !person.isActive) return false;
+      if (!this.urlBinding.values.showThai && person.isThai) return false;
+      if (!this.urlBinding.values.showNonThai && !person.isThai) return false;
+      if (!this.urlBinding.values.showMen && person.gender === Gender.Male) return false;
+      if (!this.urlBinding.values.showWomen && person.gender === Gender.Female) return false;
+      const yearsOld = StaffReportComponent.age(person.birthdate);
+      if ((this.urlBinding.values.filterYoungerThan || this.urlBinding.values.filterOlderThan) && Number.isNaN(yearsOld)) return false;
+      if (this.urlBinding.values.filterOlderThan && this.urlBinding.values.olderThanFilter >= yearsOld) return false;
+      if (this.urlBinding.values.filterYoungerThan && this.urlBinding.values.youngerThanFilter <= yearsOld) return false;
+      return true;
+    };
+
+    this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
+    this.urlBinding.addParam('showInactive', false);
+    this.urlBinding.addParam('selectedColumns', ['preferredName', 'lastName']);
+    this.urlBinding.addParam('showThai', true);
+    this.urlBinding.addParam('showNonThai', true);
+    this.urlBinding.addParam('showMen', true);
+    this.urlBinding.addParam('showWomen', true);
+    this.urlBinding.addParam('filterOlderThan', false);
+    this.urlBinding.addParam('olderThanFilter', 0);
+    this.urlBinding.addParam('filterYoungerThan', false);
+    this.urlBinding.addParam('youngerThanFilter', 0);
+    this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
+    if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }
 
   async openFilterDialog() {
@@ -80,53 +105,9 @@ export class StaffReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
-    this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
-    this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
-    this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
     this.dataSource.sort = this.sort;
-    this.dataSource.customFilter = (data: PersonWithStaffSummaries) => this.filter.matches(data);
-    this.dataSource.bindToRouteData(this.route, 'staff');
-    this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
-      return (data.preferredName.toUpperCase().startsWith(filter)
-        || data.lastName.toUpperCase().startsWith(filter)
-        || data.firstName.toUpperCase().startsWith(filter));
-    };
-    let ignoreChanges = true;
-    combineLatest(Object.keys(this.filter)
-      .filter(key => key !== 'matches')
-      .map(key => this.filter[key])
-    )
-    // .pipe(debounceTime(1))
-      .subscribe((values) => {
-        if (ignoreChanges) return;
-        let params: Params = {};
-        let keys = Object.keys(this.filter).filter(key => key !== 'matches');
-        for (let i = 0; i < keys.length; i++) {
-          params[keys[i]] = values[i];
-        }
-        this.router.navigate(['.'],
-          {
-            relativeTo: this.route,
-            queryParams: params
-          });
-      });
-    this.route.queryParams.subscribe(value => {
-      let keys = Object.keys(value);
-      ignoreChanges = true;
-      for (let key of keys) {
-        let subject: Subject<any> = this.filter[key];
-        let keyValue = value[key];
-        if (key != 'text' && (keyValue == 'false' || keyValue == 'true')) keyValue = keyValue != 'false';
-        subject.next(keyValue);
-      }
-      ignoreChanges = false;
-      this.dataSource.filter = this.filter.text.value.toUpperCase();
-      this.dataSource.filterUpdated();
-    });
   }
 
-  age = StaffReportComponent.age;
 
   static age(date: MomentInput) {
     return moment().diff(moment(date), 'years');
@@ -138,7 +119,7 @@ export class StaffReportComponent implements OnInit {
     return mDate;
   }
 
-  daysAsYears(days: number){
+  daysAsYears(days: number) {
     if (days < 1) return 'None';
     return moment.duration(days, 'days').humanize();
   }
