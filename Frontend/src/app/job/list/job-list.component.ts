@@ -32,9 +32,10 @@ export class JobListComponent implements OnInit {
     this.dataSource = new AppDataSource<JobWithFilledInfo>();
     this.dataSource.bindToRouteData(this.route, 'jobs');
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
-      if (this.urlBinding.values.showOnlyOpen && row.open <= 0) return false;
-      if (!this.urlBinding.values.status.includes(row.status)) return false;
-      if (!this.urlBinding.values.type.includes(row.type)) return false;
+      const values = this.urlBinding.values;
+      if (values.showOnlyOpen && row.open <= 0) return false;
+      if (values.status.length != this.jobStatus.length && !values.status.includes(row.status)) return false;
+      if (values.type.length != this.jobTypes.length && !values.type.includes(row.type)) return false;
       return true;
     };
     this.dataSource.filterPredicate = ((data, filter) =>

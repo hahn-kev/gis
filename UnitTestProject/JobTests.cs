@@ -65,7 +65,25 @@ namespace UnitTestProject
             var actualJob = _js.JobWithFilledInfos().Single();
             actualJob.ShouldNotBeNull();
             actualJob.Filled.ShouldBe(0);
+        }
 
+        [Fact]
+        public void FetchJobWithoutType()
+        {
+            var job1 = _sf.InsertJob(j => j.Type = null);
+            _sf.InsertRole(job1.Id, active: true);
+            var actualJob = _js.JobWithFilledInfos().Single();
+            actualJob.Id.ShouldBe(job1.Id);
+        }
+
+        [Fact]
+        public void FetchJobWitInactiveRole()
+        {
+            var job = _sf.InsertJob();
+            _sf.InsertRole(job.Id, active: false);
+            var jobs = _js.JobWithFilledInfos();
+            jobs.ShouldNotBeNull();
+            jobs.ShouldNotBeEmpty();
         }
     }
 }

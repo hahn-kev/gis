@@ -40,22 +40,22 @@ namespace Backend.Entities
     [JsonConverter(typeof(StringEnumConverter))]
     public enum JobStatus
     {
-        [MapValue(nameof(FullTime))] [MapValue("0")]
+        [MapValue(nameof(FullTime), IsDefault = true)] [MapValue("0")]
         FullTime,
 
-        [MapValue(nameof(HalfTime))] [MapValue("1")]
+        [MapValue(nameof(HalfTime), IsDefault = true)] [MapValue("1")]
         HalfTime,
 
-        [MapValue(nameof(Contractor))] [MapValue("2")]
+        [MapValue(nameof(Contractor), IsDefault = true)] [MapValue("2")]
         Contractor,
 
-        [MapValue(nameof(DailyWorker))] [MapValue("3")]
+        [MapValue(nameof(DailyWorker), IsDefault = true)] [MapValue("3")]
         DailyWorker,
 
-        [MapValue(nameof(SchoolAid))] [MapValue("4")]
+        [MapValue(nameof(SchoolAid), IsDefault = true)] [MapValue("4")]
         SchoolAid,
 
-        [MapValue(nameof(FullTime10Mo))] [MapValue("5")]
+        [MapValue(nameof(FullTime10Mo), IsDefault = true)] [MapValue("5")]
         FullTime10Mo,
     }
 
