@@ -12,8 +12,8 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class MissionOrgController : MyController
     {
-        private IEntityService _entityService;
-        private IDbConnection _dbConnection;
+        private readonly IEntityService _entityService;
+        private readonly IDbConnection _dbConnection;
 
         public MissionOrgController(IEntityService entityService, IDbConnection dbConnection)
         {
@@ -28,14 +28,14 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Roles = "admin,hr,registrar")]
         public MissionOrg GetOrg(Guid id)
         {
             return _dbConnection.MissionOrgs.SingleOrDefault(org => org.Id == id);
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Roles = "admin,hr,registrar")]
         public MissionOrg Save([FromBody] MissionOrg org)
         {
             _entityService.Save(org);
@@ -43,7 +43,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Roles = "admin,hr,registrar")]
         public IActionResult Delete(Guid id)
         {
             _entityService.Delete<MissionOrg>(id);

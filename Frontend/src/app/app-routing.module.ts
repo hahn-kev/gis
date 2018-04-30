@@ -86,7 +86,7 @@ const routes: Routes = [
         path: 'people',
         canActivate: [RoleGuardService],
         data: {
-          requireRole: ['admin', 'hr']
+          requireRole: ['admin', 'hr', 'registrar']
         },
         children: [
           {
@@ -312,7 +312,7 @@ const routes: Routes = [
         path: 'mission-org',
         canActivate: [RoleGuardService],
         data: {
-          requireRole: ['admin', 'hr']
+          requireRole: ['admin', 'hr', 'registrar']
         },
         children: [
           {

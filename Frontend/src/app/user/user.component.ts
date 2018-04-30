@@ -8,7 +8,6 @@ import { PersonService } from '../people/person.service';
 import { Observable } from 'rxjs/Observable';
 import { Person } from '../people/person';
 import { environment } from '../../environments/environment';
-import { LoginService } from '../services/auth/login.service';
 import { AuthenticateService } from '../services/auth/authenticate.service';
 import { BaseEditComponent } from '../components/base-edit-component';
 
@@ -25,28 +24,6 @@ export class UserComponent extends BaseEditComponent implements OnInit {
   public password: string;
   public errorMessage: string;
   public people: Observable<Person[]>;
-  public roles = [
-    {
-      title: 'Admin',
-      name: 'admin',
-      update: (user: User, value: boolean) => user.isAdmin = value,
-      value: (user: User) => user.isAdmin,
-      show: (user: User) => true
-    },
-    {
-      title: 'HR',
-      name: 'hr',
-      update: (user: User, value: boolean) => user.isHr = value,
-      value: (user: User) => user.isHr,
-      show: (user: User) => !user.isHrAdmin
-    },
-    {
-      title: 'HR Admin',
-      name: 'hr,hradmin',
-      update: (user: User, value: boolean) => user.isHrAdmin = user.isHr = value,
-      value: (user: User) => user.isHrAdmin,
-      show: (user: User) => true
-    }];
 
   constructor(private route: ActivatedRoute,
               private userService: UserService,
@@ -73,15 +50,28 @@ export class UserComponent extends BaseEditComponent implements OnInit {
     this.router.navigate([this.isSelf ? '/home' : '/user/admin']);
   }
 
-  async grantRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
-    await this.userService.grantRole(role.name, this.user.id);
-    role.update(this.user, true);
+  async updateRoles(roles: string[]) {
+    if (roles.includes('hradmin') && !roles.includes('hr')) roles.push('hr');
+    for (const newRole of roles) {
+      if (this.user.roles.includes(newRole)) continue;
+      await this.grantRole(newRole);
+    }
+    const existingRoles = this.user.roles;
+    for (const oldRole of existingRoles) {
+      if (roles.includes(oldRole)) continue;
+      await this.revokeRole(oldRole);
+    }
+  }
+
+  async grantRole(role: string): Promise<void> {
+    await this.userService.grantRole(role, this.user.id);
+    this.user.roles = [...this.user.roles, role];
     this.snackBar.open(`Role granted, user must logout and login to use new role`, null, {duration: 2000});
   }
 
-  async revokeRole(role: { name: string, update: (user: User, value: boolean) => void }): Promise<void> {
-    await this.userService.revokeRole(role.name, this.user.id);
-    role.update(this.user, false);
+  async revokeRole(role: string): Promise<void> {
+    await this.userService.revokeRole(role, this.user.id);
+    this.user.roles = this.user.roles.filter(value => value != role);
     this.snackBar.open(`Role revoked, user must logout and login to lose the role`, null, {duration: 2000});
   }
 

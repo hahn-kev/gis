@@ -127,6 +127,22 @@
 
           </ng-container>
 
+          <ng-container *requireRole="'admin,registrar'">
+            <mat-divider></mat-divider>
+            <h3 mat-subheader>Registrar</h3>
+            <ng-container appRenderTemplate="sidenav:registrar"></ng-container>
+            <ng-container *appTemplateContent="'sidenav:registrar'">
+              <a mat-list-item routerLink="/mission-org/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>account_balance</mat-icon>
+                <span mat-line>Mission Org</span>
+              </a>
+              <a mat-list-item routerLink="/people/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>supervisor_account</mat-icon>
+                <span mat-line>People</span>
+              </a>
+            </ng-container>
+          </ng-container>
+
           <ng-container *requireRole="'admin'">
             <mat-divider></mat-divider>
             <h3 mat-subheader>Admin</h3>

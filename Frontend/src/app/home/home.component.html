@@ -28,7 +28,16 @@
     <mat-card-title>Me!</mat-card-title>
     <mat-card-content>
       <mat-nav-list>
-        <ng-container  appRenderTemplate="sidenav:me"></ng-container>
+        <ng-container appRenderTemplate="sidenav:me"></ng-container>
+      </mat-nav-list>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="mat-elevation-z6" *requireRole="'registrar,admin'">
+    <!--<img mat-card-image src="assets/img/pexels-photo-592940.jpeg" alt="Live">-->
+    <mat-card-title>Registrar</mat-card-title>
+    <mat-card-content>
+      <mat-nav-list>
+        <ng-container appRenderTemplate="sidenav:registrar"></ng-container>
       </mat-nav-list>
     </mat-card-content>
   </mat-card>

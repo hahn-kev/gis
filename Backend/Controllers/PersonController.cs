@@ -35,7 +35,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Roles = "admin,hr,registrar")]
         public PersonWithOthers Get(Guid id)
         {
             return _personService.GetById(id);
@@ -54,7 +54,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Roles = "admin,hr,registrar")]
         public IActionResult Update([FromBody] PersonWithStaff person)
         {
             _personService.Save(person);

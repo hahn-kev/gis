@@ -18,27 +18,12 @@ namespace Backend.DataLayer
         public IQueryable<UserProfile> Users =>
             from user in _dbConnection.Users
             from person in _dbConnection.People.LeftJoin(p => p.Id == user.PersonId).DefaultIfEmpty()
-            from adminRole in _dbConnection.Roles.Where(role => role.Name == "admin").DefaultIfEmpty()
-            from hrRole in _dbConnection.Roles.Where(role => role.Name == "hr").DefaultIfEmpty()
-            from hrAdminRole in _dbConnection.Roles.Where(role => role.Name == "hradmin").DefaultIfEmpty()
-            from userAdminRole in _dbConnection.UserRoles
-                .Where(userRole => userRole.RoleId == adminRole.Id && userRole.UserId == user.Id)
-                .DefaultIfEmpty()
-            from userHrRole in _dbConnection.UserRoles
-                .Where(userRole => userRole.RoleId == hrRole.Id && userRole.UserId == user.Id)
-                .DefaultIfEmpty()
-            from userHrAdminRole in _dbConnection.UserRoles
-                .Where(userRole => userRole.RoleId == hrAdminRole.Id && userRole.UserId == user.Id)
-                .DefaultIfEmpty()
             select new UserProfile
             {
                 Id = user.Id,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 UserName = user.UserName,
-                IsAdmin = userAdminRole != null,
-                IsHr = userHrRole != null,
-                IsHrAdmin = userHrAdminRole != null,
                 PersonId = user.PersonId,
                 ResetPassword = user.ResetPassword,
                 PersonName = (person.PreferredName ?? person.FirstName) + " " + person.LastName
@@ -47,8 +32,8 @@ namespace Backend.DataLayer
         public UserProfile UserByName(string name)
         {
             if (string.IsNullOrEmpty(name)) return null;
-            return Users.FirstOrDefault(user =>
-                user.UserName == name);
+            return FillRoles(Users.FirstOrDefault(user =>
+                user.UserName == name));
         }
 
         public void UpdatePersonId(int id, Guid personId)
@@ -56,7 +41,16 @@ namespace Backend.DataLayer
             _dbConnection.Users.Where(user => user.Id == id).Set(user => user.PersonId, personId).Update();
         }
 
-        public UserProfile UserById(int id) => Users.FirstOrDefault(user => user.Id == id);
+        public UserProfile UserById(int id) => FillRoles(Users.FirstOrDefault(user => user.Id == id));
+
+        private UserProfile FillRoles(UserProfile profile)
+        {
+            profile.Roles = (from userRole in _dbConnection.UserRoles
+                from role in _dbConnection.Roles.LeftJoin(role => role.Id == userRole.RoleId)
+                where userRole.UserId == profile.Id
+                select role.Name).ToList();
+            return profile;
+        }
 
         public void DeleteUser(int id)
         {

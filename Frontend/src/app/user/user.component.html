@@ -70,26 +70,19 @@
           </mat-select>
         </mat-form-field>
 
-        <div class="span-2-columns" *ngIf="!isNew">
-          <ng-container *ngFor="let role of roles">
-            <ng-container *ngIf="role.show(user)">
-              <button type="button"
-                      *ngIf="!role.value(user)"
-                      (click)="grantRole(role)"
-                      mat-raised-button
-                      color="accent">
-                Grant {{role.title}} rights
-              </button>
-              <button type="button"
-                      *ngIf="role.value(user)"
-                      (click)="revokeRole(role)"
-                      mat-raised-button
-                      color="accent">
-                Revoke {{role.title}} rights
-              </button>
-            </ng-container>
-          </ng-container>
-        </div>
+        <mat-form-field>
+          <mat-select name="roles"
+                      multiple
+                      [ngModel]="user.roles"
+                      (ngModelChange)="updateRoles($event)"
+                      placeholder="Roles">
+            <mat-option value="admin">Admin</mat-option>
+            <mat-option value="hr">HR</mat-option>
+            <mat-option value="hradmin">HR Admin</mat-option>
+            <mat-option value="registrar">Registrar</mat-option>
+          </mat-select>
+
+        </mat-form-field>
       </ng-container>
 
 
