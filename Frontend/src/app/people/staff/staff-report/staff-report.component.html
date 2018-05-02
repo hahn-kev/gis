@@ -18,7 +18,7 @@
     <mat-select [(ngModel)]="urlBinding.values.selectedColumns"
                 multiple
                 placeholder="Columns">
-      <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{camel2title(column)}}</mat-option>
+      <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{column | titleCase}}</mat-option>
     </mat-select>
   </mat-form-field>
   <a mat-icon-button class="print-hide" matTooltip="Role Report" matTooltipPosition="before"

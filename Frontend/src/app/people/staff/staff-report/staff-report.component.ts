@@ -123,10 +123,4 @@ export class StaffReportComponent implements OnInit {
     if (days < 1) return 'None';
     return moment.duration(days, 'days').humanize();
   }
-
-  camel2title(camelCase: string) {
-    return camelCase
-      .replace(/([A-Z])/g, (match) => ` ${match}`)
-      .replace(/^./, (match) => match.toUpperCase());
-  }
 }
