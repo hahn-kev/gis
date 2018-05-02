@@ -606,8 +606,8 @@
     </ng-container>
 
     <mat-card *ngIf="person.staffId">
-      <mat-grid-list class="span-2-columns" cols="4" rowHeight="25px">
-        <mat-grid-tile>
+      <mat-grid-list class="span-2-columns" cols="5" rowHeight="25px">
+        <mat-grid-tile [colspan]="2">
           <a [routerLink]="['/leave-request','list', person.id]" mat-button color="accent">View Leave</a>
         </mat-grid-tile>
         <mat-grid-tile class="hint" matTooltip="Pending leave requests are included in the calculation for used leave">
@@ -617,7 +617,7 @@
         <mat-grid-tile>Total</mat-grid-tile>
         <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUseages">
           <ng-container *ngIf="leaveUsed.leaveType != (person.gender == 'Male' ? 'Maternity' : 'Paternity')">
-            <mat-grid-tile class="left">{{ leaveTypeName(leaveUsed.leaveType) }}</mat-grid-tile>
+            <mat-grid-tile [colspan]="2" class="left">{{ leaveTypeName(leaveUsed.leaveType) }}</mat-grid-tile>
             <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
             <mat-grid-tile>{{leaveUsed.left}}</mat-grid-tile>
             <mat-grid-tile>{{leaveUsed.totalAllowed}}</mat-grid-tile>
