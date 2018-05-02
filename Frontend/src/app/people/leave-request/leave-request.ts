@@ -16,8 +16,8 @@ export class LeaveRequest extends BaseEntity {
   constructor() {
     super();
     this.createdDate = new Date();
-    this.startDate = new Date();
-    this.endDate = new Date();
+    this.startDate = null;
+    this.endDate = null;
   }
 }
 

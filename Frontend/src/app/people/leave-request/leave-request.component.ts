@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequestWithNames } from './leave-request';
@@ -16,7 +16,6 @@ import { PersonAndLeaveDetails } from './person-and-leave-details';
 import 'rxjs/add/operator/share';
 import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
 import { Gender } from '../person';
-import * as moment from 'moment';
 import { BaseEditComponent } from '../../components/base-edit-component';
 
 @Component({
@@ -33,8 +32,8 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public selectedPerson: PersonAndLeaveDetails | null;
   public isNew: boolean;
   public isHr = false;
-  private myPersonId: string | null;
   public sendNotification = true;
+  private myPersonId: string | null;
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
 
   private subscription: Subscription;
@@ -87,11 +86,14 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     }
     this.noNotificationSnackbarRef = this.snackBar.open(
       `Approval Emails won't be sent for this leave request`,
-      'Dismiss')
+      'Dismiss');
   }
 
   updateDaysUsed() {
-    if (!this.leaveRequest.overrideDays) {
+    if (this.leaveRequest.startDate && !this.leaveRequest.endDate) {
+      this.leaveRequest.endDate = this.leaveRequest.startDate;
+    }
+    if (!this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
       this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
     }
   }
