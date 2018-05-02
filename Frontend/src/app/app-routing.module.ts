@@ -111,7 +111,7 @@ const routes: Routes = [
               {
                 path: 'list',
                 component: PeopleListComponent,
-                data: {title: 'School Aid'},
+                data: {title: 'School Aids'},
                 resolve: {
                   people: SchoolAidResolveService
                 }

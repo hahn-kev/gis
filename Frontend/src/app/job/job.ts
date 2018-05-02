@@ -55,7 +55,7 @@ export function jobStatusName(status: JobStatus): string {
     case JobStatus.DailyWorker:
       return 'Daily Worker';
     case JobStatus.SchoolAid:
-      return 'School Aid';
+      return 'School Aide';
     case JobStatus.FullTime10Mo:
       return 'Full Time (10 month)';
     default:
