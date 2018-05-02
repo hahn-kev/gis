@@ -97,12 +97,13 @@ import { GradeComponent } from './job/grade/edit/grade.component';
 import { GradeService } from './job/grade/grade.service';
 import { RenderTemplateDialogComponent } from './components/render-template-dialog/render-template-dialog.component';
 import { MyDatePipe } from './services/my-date.pipe'
-import { DatePipe, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { CsvService } from './services/csv.service';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { EvaluationComponent } from './people/person/evaluation/evaluation.component';
 import { EvaluationService } from './people/person/evaluation/evaluation.service';
+import { TitleCasePipe } from './services/title-case.pipe';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -151,7 +152,8 @@ if (environment.production) {
     MyDatePipe,
     ExportButtonComponent,
     SandboxComponent,
-    EvaluationComponent
+    EvaluationComponent,
+    TitleCasePipe
   ],
   entryComponents: [
     ConfirmDialogComponent,

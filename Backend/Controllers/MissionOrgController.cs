@@ -13,25 +13,25 @@ namespace Backend.Controllers
     public class MissionOrgController : MyController
     {
         private readonly IEntityService _entityService;
-        private readonly IDbConnection _dbConnection;
+        private readonly MissionOrgRepository _orgRepository;
 
-        public MissionOrgController(IEntityService entityService, IDbConnection dbConnection)
+        public MissionOrgController(IEntityService entityService, MissionOrgRepository orgRepository)
         {
             _entityService = entityService;
-            _dbConnection = dbConnection;
+            _orgRepository = orgRepository;
         }
 
         [HttpGet]
-        public IList<MissionOrg> List()
+        public IList<MissionOrgWithNames> List()
         {
-            return _dbConnection.MissionOrgs.ToList();
+            return _orgRepository.MissionOrgsWithNames.ToList();
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,hr,registrar")]
         public MissionOrg GetOrg(Guid id)
         {
-            return _dbConnection.MissionOrgs.SingleOrDefault(org => org.Id == id);
+            return _orgRepository.GetOrg(id);
         }
 
         [HttpPost]

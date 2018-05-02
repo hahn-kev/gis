@@ -25,6 +25,26 @@
           <mat-icon>person_add</mat-icon>
         </button>
       </div>
+
+      <mat-form-field>
+        <mat-select name="status"
+                    [(ngModel)]="missionOrg.status"
+                    placeholder="Status">
+          <mat-option>None</mat-option>
+          <mat-option *ngFor="let status of statusList" [value]="status">{{status | titleCase}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input name="approvedDate" matInput
+               [(ngModel)]="missionOrg.approvedDate"
+               [matDatepicker]="approvedDatePicker"
+               placeholder="Date Approved">
+        <mat-datepicker-toggle matSuffix [for]="approvedDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #approvedDatePicker></mat-datepicker>
+      </mat-form-field>
+
       <mat-form-field>
         <input matInput [(ngModel)]="missionOrg.email"
                type="email"

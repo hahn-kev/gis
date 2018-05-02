@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MissionOrg } from './mission-org';
+import { MissionOrg, MissionOrgWithNames } from './mission-org';
 
 @Injectable()
 export class MissionOrgService {
@@ -9,7 +9,7 @@ export class MissionOrgService {
   }
 
   list() {
-    return this.http.get<MissionOrg[]>('/api/missionOrg/');
+    return this.http.get<MissionOrgWithNames[]>('/api/missionOrg/');
   }
 
   getById(id: string) {
