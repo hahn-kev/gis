@@ -24,7 +24,7 @@ namespace Backend.Controllers
         [HttpGet]
         public IList<MissionOrgWithNames> List()
         {
-            return _orgRepository.MissionOrgsWithNames.ToList();
+            return _orgRepository.MissionOrgsWithNames.OrderBy(org => org.Name).ToList();
         }
 
         [HttpGet("{id}")]
