@@ -24,7 +24,7 @@ export class StaffReportComponent implements OnInit {
     'lastName',
     'thaiFirstName',
     'thaiLastName',
-    'email',
+    'personalEmail',
     'staffEmail',
     'phoneNumber',
     'phoneExtension',
@@ -68,9 +68,13 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
-      return (data.preferredName.toUpperCase().startsWith(filter)
+      return data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
-        || data.firstName.toUpperCase().startsWith(filter));
+        || data.firstName.toUpperCase().startsWith(filter)
+        || (data.thaiFirstName || '').startsWith(filter)
+        || (data.thaiLastName || '').startsWith(filter)
+        || (data.email || '').toUpperCase().includes(filter)
+        || (data.staff.email || '').toUpperCase().includes(filter);
     };
     this.dataSource.customFilter = person => {
       if (!this.urlBinding.values.showInactive && !person.isActive) return false;

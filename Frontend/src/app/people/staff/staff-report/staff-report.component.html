@@ -80,8 +80,8 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Thai Last Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.thaiLastName}}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="email">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
+  <ng-container matColumnDef="personalEmail">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="email">Personal Email</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.email}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="staffEmail">
