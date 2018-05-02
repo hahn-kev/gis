@@ -144,6 +144,11 @@
     <mat-cell *matCellDef="let row"> {{nationalityName(row.nationality)}}</mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="startDate">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.startDate | date}}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="serviceLength">
     <mat-header-cell *matHeaderCellDef mat-sort-header="daysOfService">Service Length</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{daysAsYears(row.daysOfService)}}</mat-cell>

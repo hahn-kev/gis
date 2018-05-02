@@ -76,6 +76,7 @@ namespace Backend.Entities
 
     public class PersonWithStaffSummaries : PersonWithStaff
     {
+        public DateTime? StartDate { get; set; }
         public double DaysOfService { get; set; }
         public bool IsActive { get; set; }
     }

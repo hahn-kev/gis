@@ -72,7 +72,8 @@ namespace Backend.DataLayer
                         Deleted = g.Key.person.Deleted,
                         //summary here
                         DaysOfService = g.Sum(role => role.StartDate.DayDiff(role.EndDate ?? DateTime.Now)),
-                        IsActive = g.Sum(role => role.Active ? 1 : 0) > 0
+                        IsActive = g.Sum(role => role.Active ? 1 : 0) > 0,
+                        StartDate = g.Min(role => (DateTime?) role.StartDate)
                     };
             }
         }

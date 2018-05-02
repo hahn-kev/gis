@@ -30,6 +30,7 @@ export class StaffReportComponent implements OnInit {
     'phoneExtension',
     'serviceLength',
     'isActive',
+    'startDate',
 
     'birthdate',
     'age',

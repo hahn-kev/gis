@@ -2,7 +2,7 @@ import { RoleWithJob } from './role';
 import { EmergencyContactExtended } from './emergency-contact';
 import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
-import { Staff, StaffWithName, StaffWithOrgName } from './staff';
+import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
 
 export class Person extends BaseEntity {
@@ -54,6 +54,7 @@ export class PersonWithStaff extends PersonExtended {
 }
 
 export class PersonWithStaffSummaries extends PersonWithStaff {
+  public startDate: Date;
   public daysOfService: number;
   public isActive: boolean;
 }
