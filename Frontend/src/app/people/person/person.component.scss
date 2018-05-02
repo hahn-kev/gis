@@ -22,11 +22,8 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    & > .mat-accordion {
+    & > *:not(span) {
       margin-bottom: $spacing;
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
   }
   .column-1 {

@@ -113,6 +113,9 @@ html, body {
     @media (max-width: 460px) {
       grid-template-columns: 1fr;
     }
+    .mat-slide-toggle {
+      padding-bottom: 16px;
+    }
   }
 }
 
@@ -122,11 +125,10 @@ html, body {
     grid-column: span 1;
   }
 
-  .mat-slide-toggle {
-    padding-bottom: 16px;
-    &:not(:first-child) {
-      padding-left: 8px;
-    }
+  .mat-slide-toggle:not(:first-child) {
+
+    padding-left: 8px;
+
   }
 }
 
@@ -191,6 +193,7 @@ html, body {
     page-break-after: auto;
   }
 }
+
 .print-hide {
   @include print-hide;
 }
