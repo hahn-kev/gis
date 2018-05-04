@@ -4,12 +4,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="node_modules\**" />
+    <Compile Remove="dist\**"/>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="node_modules\**" />
+    <EmbeddedResource Remove="dist\**"/>
   </ItemGroup>
   <ItemGroup>
     <None Remove="node_modules\**" />
+    <None Remove="dist\**"/>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\assets\img" />
