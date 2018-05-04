@@ -151,6 +151,12 @@ namespace UnitTestProject
             var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
             jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
             _dbConnection.Insert(jacobMissionOrg);
+            var jacobJob = InsertJob();
+            InsertRole(role =>
+            {
+                role.PersonId = jacob.Id;
+                role.JobId = jacobJob.Id;
+            });
         }
 
         public Faker<PersonWithStaff> PersonFaker() =>
