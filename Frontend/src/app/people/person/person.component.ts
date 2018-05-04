@@ -2,7 +2,7 @@ import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/
 import { ActivatedRoute, Router } from '@angular/router';
 import { Nationality, NationalityName, Person, PersonWithOthers } from '../person';
 import { PersonService } from '../person.service';
-import { Role, RoleWithJob } from '../role';
+import { RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
 import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
@@ -11,7 +11,7 @@ import { EmergencyContactExtended } from '../emergency-contact';
 import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
 import { RoleComponent } from './role.component';
 import { countries } from '../countries';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { endorsments } from '../teacher-endorsements';
 import { Job } from '../../job/job';
@@ -24,7 +24,7 @@ import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
 import { LeaveType, LeaveTypeName } from '../self/self';
 import { Location } from '@angular/common';
-import { Evaluation, EvaluationWithNames } from './evaluation/evaluation';
+import { EvaluationWithNames } from './evaluation/evaluation';
 import { EvaluationService } from './evaluation/evaluation.service';
 import { EvaluationComponent } from './evaluation/evaluation.component';
 

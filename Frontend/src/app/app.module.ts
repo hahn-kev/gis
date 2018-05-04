@@ -46,7 +46,7 @@ import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { AppTemplateService } from './toolbar/app-template.service';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { configureSettings, SettingsService } from './services/settings.service';
-import { ClipboardModule } from 'ngx-clipboard/dist';
+import { ClipboardModule } from 'ngx-clipboard';
 import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { MessageComponent } from './message/message.component';
 import { CookieModule } from 'ngx-cookie';
@@ -96,7 +96,7 @@ import { GradeListComponent } from './job/grade/list/grade-list.component';
 import { GradeComponent } from './job/grade/edit/grade.component';
 import { GradeService } from './job/grade/grade.service';
 import { RenderTemplateDialogComponent } from './components/render-template-dialog/render-template-dialog.component';
-import { MyDatePipe } from './services/my-date.pipe'
+import { MyDatePipe } from './services/my-date.pipe';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { CsvService } from './services/csv.service';

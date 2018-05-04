@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { JobWithFilledInfo } from 'app/job/job';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { JobService } from '../job.service';
 
 @Injectable()

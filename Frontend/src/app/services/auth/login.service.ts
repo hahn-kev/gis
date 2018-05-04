@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { JwtHelperService } from './jwt-helper.service';
 import { filter, map } from 'rxjs/operators';
 import * as Raven from 'raven-js';
@@ -51,12 +50,12 @@ export class LoginService implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return this.loggedIn().map(loggedIn => {
+    return this.loggedIn().pipe(map(loggedIn => {
       if (!loggedIn) {
         this.promptLogin(state.url);
       }
       return loggedIn;
-    });
+    }));
   }
 
   isHrOrAdmin() {

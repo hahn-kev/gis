@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TrainingRequirement } from './training-requirement';
-import { Observable } from 'rxjs/Observable';
-import { combineLatest } from 'rxjs/observable/combineLatest';
+import { combineLatest, Observable, of } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
@@ -24,10 +23,10 @@ export class TrainingRequirementService {
   }
 
   listMapped(): Observable<Map<string, TrainingRequirement>> {
-    return this.list().map(value =>
+    return this.list().pipe(map(value =>
       new Map<string, TrainingRequirement>(value
         .map((training): [string, TrainingRequirement] => [training.id, training]))
-    );
+    ));
   }
 
   getTrainingByStaffId(staffId: string) {
@@ -39,11 +38,11 @@ export class TrainingRequirementService {
   }
 
   getStaffTrainingByYearMapped(year: number): Observable<Map<string, StaffTraining>> {
-    return this.getStaffTrainingByYear(year).map(staffTrainings => {
+    return this.getStaffTrainingByYear(year).pipe(map(staffTrainings => {
       return new Map<string, StaffTraining>(staffTrainings
         .map((training): [string, StaffTraining] => [StaffTraining.getKey(training), training])
       );
-    });
+    }));
   }
 
   get(id: string): Observable<TrainingRequirement> {
@@ -86,7 +85,7 @@ export class TrainingRequirementService {
       requirementsObservable,
       yearObservable,
       showCompletedObservable,
-      Observable.of([]))
+      of([]))
       .pipe(
         debounceTime(20),
         map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
@@ -94,8 +93,12 @@ export class TrainingRequirementService {
             .filter(this.isInYear.bind(this, year))
             // .map(this.buildRequirementWithStaff.bind(this, staff, staffTraining, orgGroups, showCompleted))
             .map(
-              requirement => this.buildRequirementWithStaff(staff, staffTraining, orgGroups, showCompleted, requirement))
-            .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0))
+              requirement => this.buildRequirementWithStaff(staff,
+                staffTraining,
+                orgGroups,
+                showCompleted,
+                requirement))
+            .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0));
         }));
   }
 

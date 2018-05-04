@@ -1,9 +1,10 @@
 import { ActivatedRoute } from '@angular/router';
 import { MatTableDataSource } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export class AppDataSource<T> extends MatTableDataSource<T> {
   private customColumnAccessors: { [key: string]: (data: T) => string | number } = {};
+  private unfilteredData: T[];
 
   constructor() {
     super();
@@ -42,7 +43,6 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
     });
   }
 
-  private unfilteredData: T[];
   _customFilter = (data: T) => true;
   set customFilter(value: (value: T) => boolean) {
     this._customFilter = value;

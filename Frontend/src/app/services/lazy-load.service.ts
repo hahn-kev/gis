@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { mergeMap, multicast, share, shareReplay, startWith, switchMap } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 @Injectable()
 export class LazyLoadService {

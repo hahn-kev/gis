@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LoginService } from 'app/services/auth/login.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { UserToken } from '../login/user-token'
 import { HttpClient } from '@angular/common/http';
 

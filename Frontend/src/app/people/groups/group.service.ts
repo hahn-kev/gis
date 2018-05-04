@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OrgGroup } from './org-group';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Person } from '../person';
 import { LinkType, OrgChain, OrgChainLink } from './org-chain';
+import { map } from 'rxjs/internal/operators';
 
 @Injectable()
 export class GroupService {
@@ -20,7 +21,8 @@ export class GroupService {
   }
 
   getAllMap() {
-    return this.getAll().map(value => new Map<string, OrgGroup>(value.map((group): [string, OrgGroup] => [group.id, group])))
+    return this.getAll()
+      .pipe(map(value => new Map<string, OrgGroup>(value.map((group): [string, OrgGroup] => [group.id, group]))));
   }
 
   updateGroup(group: OrgGroup): Promise<Object> {
@@ -61,6 +63,7 @@ export class GroupService {
     let map = (<Map<string, OrgGroup>>orgGroups);
     let groupId = childOrgId;
     let group: OrgGroup;
+
     while (true) {
       group = map.get(groupId);
       if (group == undefined) return false;

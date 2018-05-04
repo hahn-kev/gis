@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { JobService } from './job.service';
-import { Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Job } from 'app/job/job';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class JobListResolverService implements Resolve<Job[]> {

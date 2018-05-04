@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { PersonWithStaff} from './person';
+import { PersonWithStaff } from './person';
 import { PersonService } from './person.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class StaffResolveService implements Resolve<PersonWithStaff[]> {

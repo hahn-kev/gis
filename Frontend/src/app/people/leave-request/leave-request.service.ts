@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
 import { Person } from '../person';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { LeaveUseage } from '../self/self';
 import * as moment from 'moment';
@@ -35,7 +35,7 @@ export class LeaveRequestService {
   }
 
   listByPersonId(personId: string): Observable<LeaveRequestWithNames[]> {
-    if (!personId) return Observable.of([]);
+    if (!personId) return of([]);
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 

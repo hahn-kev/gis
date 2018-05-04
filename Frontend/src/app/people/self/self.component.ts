@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Self } from './self';
 import { LoginService } from '../../services/auth/login.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { UserToken } from '../../login/user-token';
 
 @Component({

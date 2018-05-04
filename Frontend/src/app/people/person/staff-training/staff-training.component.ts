@@ -2,15 +2,13 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { StaffTraining, StaffTrainingWithRequirement } from '../../training-requirement/staff-training';
 import { TrainingRequirementService } from '../../training-requirement/training-requirement.service';
 import { TrainingRequirement } from '../../training-requirement/training-requirement';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/switchMap';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import * as moment from 'moment';
 import { NgForm } from '@angular/forms';
 import { LazyLoadService } from '../../../services/lazy-load.service';
-import { Observable } from 'rxjs/Observable';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-staff-training',
@@ -34,8 +32,8 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
               private dialog: MatDialog,
               private snackBar: MatSnackBar) {
     this.requirements = lazyLoadService.share('requirements', () => this.trainingService.list());
-    this.subscription = this.staffIdSubject
-      .switchMap(staffId => this.trainingService.getTrainingByStaffId(staffId))
+    this.subscription = this.staffIdSubject.pipe(switchMap(
+      staffId => this.trainingService.getTrainingByStaffId(staffId)))
       .subscribe(value => this.training = value);
   }
 

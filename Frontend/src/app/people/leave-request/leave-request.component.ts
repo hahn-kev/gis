@@ -5,15 +5,11 @@ import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequestWithNames } from './leave-request';
 import { MatDialog, MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material';
 import { LoginService } from '../../services/auth/login.service';
-import { Subscription } from 'rxjs/Subscription';
+import { combineLatest, Subscription } from 'rxjs';
 import { PersonService } from '../person.service';
-import 'rxjs/add/operator/combineLatest';
 import { UserToken } from '../../login/user-token';
-import 'rxjs/add/operator/defaultIfEmpty';
-import 'rxjs/add/operator/concat';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import 'rxjs/add/operator/share';
 import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
 import { Gender } from '../person';
 import { BaseEditComponent } from '../../components/base-edit-component';
@@ -54,7 +50,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   ngOnInit(): void {
-    this.subscription = this.route.data.combineLatest(this.loginService.safeUserToken(), this.route.queryParams)
+    this.subscription = combineLatest(this.route.data, this.loginService.safeUserToken(), this.route.queryParams)
       .subscribe(([data, user, queryParams]: [
         { leaveRequest: LeaveRequestWithNames, people: PersonAndLeaveDetails[] },
         UserToken,

@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { Subscription } from 'rxjs/Subscription';
-import { isArray } from 'util';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { isArray } from 'util';
 
 @Injectable()
 export class UrlBindingService<T_VALUES> {
@@ -22,19 +20,17 @@ export class UrlBindingService<T_VALUES> {
         set(value) {
           subject.next(value);
         },
-      })
+      });
     }
     return this._values;
-  };
+  }
 
-  private params: string[] = [];
   public subjects: BehaviorSubject<any>[] = [];
+  private params: string[] = [];
   private defaultValues = [];
   private pathParams: boolean[] = [];
   private subjectsSubscription: Subscription;
   private ignoreUpdates = false;
-  public onParamsUpdated = (values: T_VALUES) => {
-  };
 
   constructor(private route: ActivatedRoute, private router: Router) {
     combineLatest(this.route.paramMap, this.route.queryParamMap)
@@ -43,6 +39,9 @@ export class UrlBindingService<T_VALUES> {
         this._loadFromParams(params, queryParams);
       });
   }
+
+  public onParamsUpdated = (values: T_VALUES) => {
+  };
 
   public loadFromParams() {
     return this._loadFromParams(this.route.snapshot.paramMap, this.route.snapshot.queryParamMap);

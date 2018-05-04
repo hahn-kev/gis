@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, Input, OnDestroy, Output, ViewContainerRef } from '@angular/core';
 import { AppTemplateService } from './app-template.service';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/delay';
+import { Subscription } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Directive({
   selector: '[appRenderTemplate]'
@@ -15,8 +15,7 @@ export class ToolbarTemplateDirective implements OnDestroy {
   set templateName(templateName: string) {
     if (this.subscription) this.subscription.unsubscribe();
     this._templateName = templateName;
-    this.subscription = this.toolbarService.ObserveTemplateRef(templateName || 'toolbar')
-      .delay(0)
+    this.subscription = this.toolbarService.ObserveTemplateRef(templateName || 'toolbar').pipe(delay(0))
       .subscribe(templateRef => {
         let originalValue = this.hasView;
         try {

@@ -1,5 +1,5 @@
 ﻿import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie';
@@ -11,6 +11,7 @@ import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
 import { JobStatus, NonSchoolAidJobStatus } from './job/job';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -52,7 +53,7 @@ export class AppComponent implements OnInit {
       this.sidenav.close();
       if (this.rightDrawer) this.rightDrawer.close();
     });
-    this.hasAttachments = this.attachmentService.extractId().map(value => value.hasAttachments);
+    this.hasAttachments = this.attachmentService.extractId().pipe(map(value => value.hasAttachments));
   }
 
   logout(): void {

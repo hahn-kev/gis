@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LeaveRequestService } from './leave-request.service';
 import { LoginService } from '../../services/auth/login.service';
 import { first, switchMap } from 'rxjs/operators';

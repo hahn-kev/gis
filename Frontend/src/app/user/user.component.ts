@@ -5,7 +5,7 @@ import { UserService } from './user.service';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonService } from '../people/person.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Person } from '../people/person';
 import { environment } from '../../environments/environment';
 import { AuthenticateService } from '../services/auth/authenticate.service';

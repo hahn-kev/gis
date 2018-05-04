@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ChildActivationEnd, Router } from '@angular/router';
-import { hasOwnProperty } from 'tslint/lib/utils';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/filter';
+import { of } from 'rxjs';
 import { AttachmentService } from './attachment.service';
-import 'rxjs/add/operator/mergeMap';
 import { Attachment } from './attachment';
 import { MatDialog } from '@angular/material';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-attachments',
@@ -20,16 +17,17 @@ export class AttachmentsComponent implements OnInit {
 
   constructor(private attachmentService: AttachmentService, private dialog: MatDialog) {
     this.attachmentService.extractId().subscribe(value => this.attachedToId = value.id);
-    attachmentService.extractId().flatMap((value) => {
+    attachmentService.extractId().pipe(mergeMap((value) => {
       if (value.hasAttachments) return attachmentService.attachedOn(value.id);
-      return Observable.of([]);
-    })
+      return of([]);
+    }))
       .subscribe(attachments => {
         this.attachments = attachments;
       });
   }
 
   ngOnInit() {
+
   }
 
   async removeAttachment(attachment: Attachment) {

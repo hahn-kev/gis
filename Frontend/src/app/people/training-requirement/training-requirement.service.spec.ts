@@ -3,7 +3,7 @@ import { inject, TestBed } from '@angular/core/testing';
 import { TrainingRequirementService } from './training-requirement.service';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { StaffWithName } from '../staff';
 import { TrainingRequirement } from './training-requirement';

@@ -4,9 +4,9 @@ import { SettingsService } from '../services/settings.service';
 import { LoginService } from '../services/auth/login.service';
 // noinspection ES6UnusedImports
 import {} from 'google.picker';
-import 'rxjs/add/operator/first';
 import { Attachment } from '../components/attachments/attachment';
 import { PickerDocument, PickerResponse } from './picker-response';
+import { first } from 'rxjs/operators';
 
 @Injectable()
 export class DrivePickerService {
@@ -33,7 +33,7 @@ export class DrivePickerService {
   async openPicker(): Promise<PickerResponse> {
     const gisTeamDriveId = '0ANi-SiRomIBKUk9PVA';
     await this.loadPicker();
-    const token = await this.loginService.currentUserToken().first().toPromise();
+    const token = await this.loginService.currentUserToken().pipe(first()).toPromise();
     return new Promise<PickerResponse>(resolve => {
       this.activePicker = new google.picker.PickerBuilder()
         .enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES)

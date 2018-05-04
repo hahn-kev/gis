@@ -4,10 +4,9 @@ import { StaffTraining } from '../staff-training';
 import { TrainingRequirementService } from '../training-requirement.service';
 import { Year } from '../year';
 import { RequirementWithStaff } from './requirement-with-staff';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, pluck, share } from 'rxjs/operators';
 import { PersonService } from '../../person.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
 
 @Component({

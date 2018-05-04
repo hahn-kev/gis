@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TrainingRequirementService } from './training-requirement.service';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { StaffTraining } from './staff-training';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Year } from './year';
 
 @Injectable()

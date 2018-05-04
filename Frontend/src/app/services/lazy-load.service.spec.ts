@@ -1,7 +1,7 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { LazyLoadService } from './lazy-load.service';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 describe('LazyLoadService', () => {
   beforeEach(() => {
