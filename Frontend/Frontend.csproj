@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\assets\img" />
+    <Folder Include="src\assets\js"/>
   </ItemGroup>
 </Project>
