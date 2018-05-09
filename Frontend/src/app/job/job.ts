@@ -27,6 +27,7 @@ export class JobWithFilledInfo extends Job {
 
 export class JobWithOrgGroup extends Job {
   public orgGroup: OrgGroup;
+  public gradeNo: number;
 }
 
 export class JobWithRoles extends Job {

@@ -30,6 +30,7 @@ namespace Backend.Entities
     public class JobWithOrgGroup : Job
     {
         public OrgGroup OrgGroup { get; set; }
+        public int? GradeNo { get; set; }
     }
 
     public class JobWithRoles : Job

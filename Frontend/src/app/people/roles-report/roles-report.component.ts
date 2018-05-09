@@ -25,7 +25,7 @@ export class RolesReportComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private router: Router,
-              public urlBinding: UrlBindingService<{ year: number, type: JobType[], status: JobStatus[], start: string, search: string }>) {
+              public urlBinding: UrlBindingService<{ year: number, type: JobType[], status: JobStatus[], search: string }>) {
     this.dataSource = new AppDataSource<RoleWithJob>();
 
     this.dataSource.bindToRouteData(this.route, 'roles');
@@ -59,14 +59,14 @@ export class RolesReportComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  jobSelectLabel(status: JobStatus[]) {
+  jobSelectLabel(status: JobStatus[] | string) {
     if (typeof status === 'string') return status;
     if (status.length === this.jobStatus.length) return 'All';
     if (this.areListsEqual(status, NonSchoolAidJobStatus)) return 'Staff Jobs';
     return status.map(value => this.statusName(value)).join(', ');
   }
 
-  jobTypeSelectLabel(status: JobType[]) {
+  jobTypeSelectLabel(status: JobType[] | string) {
     if (typeof status === 'string') return status;
     if (status.length === this.jobTypes.length) return 'All';
     return status.map(value => this.typeName(value)).join(', ');

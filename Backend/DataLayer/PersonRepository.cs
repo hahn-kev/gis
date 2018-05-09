@@ -121,6 +121,7 @@ namespace Backend.DataLayer
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job
             from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
+            from grade in _dbConnection.JobGrades.LeftJoin(grade => grade.Id == job.GradeId).DefaultIfEmpty()
             select new JobWithOrgGroup
             {
                 Current = job.Current,
@@ -132,7 +133,8 @@ namespace Backend.DataLayer
                 Positions = job.Positions,
                 Status = job.Status,
                 Type = job.Type,
-                OrgGroup = orgGroup
+                OrgGroup = orgGroup,
+                GradeNo = (int?) grade.GradeNo
             };
 
         public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>

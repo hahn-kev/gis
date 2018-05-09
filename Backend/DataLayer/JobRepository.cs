@@ -19,6 +19,7 @@ namespace Backend.DataLayer
         public IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job
             from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
+            from grade in JobGrades.LeftJoin(grade => grade.Id == job.GradeId).DefaultIfEmpty()
             select new JobWithOrgGroup
             {
                 Current = job.Current,
@@ -30,7 +31,8 @@ namespace Backend.DataLayer
                 Positions = job.Positions,
                 Type = job.Type,
                 Status = job.Status,
-                OrgGroup = orgGroup
+                OrgGroup = orgGroup,
+                GradeNo = (int?) grade.GradeNo
             };
 
         public IQueryable<Grade> JobGrades => _dbConnection.JobGrades;
@@ -54,7 +56,7 @@ namespace Backend.DataLayer
                 Status = g.Key.job.Status,
                 Type = g.Key.job.Type,
                 Filled = g.Sum(role => role.Active ? 1 : 0),
-                GradeNo = g.Key.grade.GradeNo,
+                GradeNo = (int?) g.Key.grade.GradeNo,
                 OrgGroupName = g.Key.org.GroupName
             };
 

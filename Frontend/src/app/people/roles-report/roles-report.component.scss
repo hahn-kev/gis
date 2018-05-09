@@ -3,10 +3,6 @@
   width: 0;
 }
 
-.mat-column-active {
-  flex-grow: 0.5;
-}
-
-.mat-column-startDate, .mat-column-endDate, .mat-column-job-type {
+.mat-column-active, .mat-column-startDate, .mat-column-endDate, .mat-column-job-type, .mat-column-job-gradeNo {
   flex-grow: 0.5;
 }
