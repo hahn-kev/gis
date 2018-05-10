@@ -24,7 +24,7 @@
         <div id="user" *ngIf="currentUser | async as user">
           <h2>
             <ng-container i18n="welcome user@@welcomeUser">Welcome {{user.userName}}</ng-container>
-            <button mat-icon-button (click)="logout()"
+            <button mat-icon-button tabindex="-1" (click)="logout()"
                     matTooltip="Logout">
               <mat-icon>exit_to_app</mat-icon>
             </button>
@@ -114,7 +114,7 @@
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
-              <a mat-list-item routerLink="/job/report/roles" [queryParams]="{status: [schoolAidJobType]}"
+              <a mat-list-item routerLink="/job/report/roles" [queryParams]="{status: [schoolAidJobStatus]}"
                  routerLinkActive="active-link">
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Roles</span>
