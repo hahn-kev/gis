@@ -19,6 +19,6 @@ export class MissionOrgWithNames extends MissionOrg {
 export enum MissionOrgStatus {
   Associate = 'Associate',
   OwnerAssociate = 'OwnerAssociate',
-  FounderAssociate = 'FounderAssociate',
+  FoundingAssociate = 'FoundingAssociate',
   Founder = 'Founder'
 }

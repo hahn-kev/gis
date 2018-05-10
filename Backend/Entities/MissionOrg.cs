@@ -34,8 +34,9 @@ namespace Backend.Entities
         [MapValue(nameof(OwnerAssociate))]
         OwnerAssociate,
 
-        [MapValue(nameof(FounderAssociate))]
-        FounderAssociate,
+        [MapValue("FounderAssociate")]
+        [MapValue(nameof(FoundingAssociate))]
+        FoundingAssociate,
 
         [MapValue(nameof(Founder))]
         Founder
