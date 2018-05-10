@@ -572,7 +572,7 @@
       <app-staff-training [staffId]="person.staffId"></app-staff-training>
     </ng-container>
     <!--evaluations-->
-    <ng-container *ngIf="!isSelf || person.evaluations.length != 0">
+    <ng-container *ngIf="(!isSelf || person.evaluations.length != 0) && person.staffId">
       <span class="mat-caption">Evaluations</span>
       <mat-accordion class="evaluations">
         <!--new evaluation-->
