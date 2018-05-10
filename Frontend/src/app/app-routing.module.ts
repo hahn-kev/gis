@@ -53,6 +53,7 @@ import { CanDeactivateGuard } from './services/can-deactivate.guard';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 import { StaffSummariesResolveService } from './people/staff/staff-report/staff-summaries-resolve.service';
+import { PersonRequiredGuard } from './services/person-required.guard';
 
 const routes: Routes = [
   {
@@ -234,13 +235,21 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: LeaveRequestComponent,
+            canActivate: [PersonRequiredGuard],
             canDeactivate: [CanDeactivateGuard],
             resolve: {
               leaveRequest: LeaveRequestResolverService,
               people: PeopleWithLeaveResolverService
             }
           },
-
+          {
+            path: 'list/mine',
+            canActivate: [PersonRequiredGuard],
+            component: LeaveListComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            }
+          },
           {
             path: 'list/:personId',
             component: LeaveListComponent,
@@ -335,19 +344,12 @@ const routes: Routes = [
       },
       {
         path: 'self',
-        children: [
-          {
-            path: '',
-            component: PersonComponent,
-            resolve: {
-              person: SelfService,
-              groups: GroupsResolveService,
-              people: PeopleResolveService,
-              jobs: JobListResolverService,
-              missionOrgs: MissionOrgListResolverService
-            }
-          }
-        ]
+        canActivate: [PersonRequiredGuard],
+        component: PersonComponent,
+        resolve: {
+          person: SelfService,
+          people: PeopleResolveService
+        }
       },
       {
         path: 'sandbox',
@@ -408,7 +410,8 @@ const routes: Routes = [
     JobFilledListResolverService,
     CanDeactivateGuard,
     SchoolAidResolveService,
-    StaffSummariesResolveService
+    StaffSummariesResolveService,
+    PersonRequiredGuard
   ]
 })
 export class AppRoutingModule {

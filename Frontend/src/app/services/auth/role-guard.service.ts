@@ -7,6 +7,10 @@ import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class RoleGuardService implements CanActivate {
+
+  constructor(private loginService: LoginService, private snackBarService: MatSnackBar) {
+  }
+
   canActivate(route: ActivatedRouteSnapshot,
               state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     //noinspection TypeScriptUnresolvedVariable
@@ -22,9 +26,6 @@ export class RoleGuardService implements CanActivate {
         this.snackBarService.open(`Access denied, missing role [${role}]`, 'dismiss', {duration: 2000});
       }
     }));
-  }
-
-  constructor(private loginService: LoginService, private snackBarService: MatSnackBar) {
   }
 
 }
