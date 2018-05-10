@@ -27,6 +27,8 @@ import { Location } from '@angular/common';
 import { EvaluationWithNames } from './evaluation/evaluation';
 import { EvaluationService } from './evaluation/evaluation.service';
 import { EvaluationComponent } from './evaluation/evaluation.component';
+import { LoginService } from '../../services/auth/login.service';
+import { first } from 'rxjs/internal/operators';
 
 @Component({
   selector: 'app-person',
@@ -38,6 +40,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public nationalities = Object.keys(Nationality);
   public nationalityName = NationalityName;
   public leaveTypeName = LeaveTypeName;
+  public isAdmin: boolean;
   public isNew: boolean;
   public isSelf: boolean;
   public filteredCountries: Observable<string[]>;
@@ -52,7 +55,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public newEvaluation = new EvaluationWithNames();
   public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
-  public staffInsurer: string[]= [];
+  public staffInsurer: string[] = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
@@ -63,12 +66,14 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
               private personService: PersonService,
               private groupService: GroupService,
               missionOrgService: MissionOrgService,
+              loginService: LoginService,
               private evaluationService: EvaluationService,
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar,
               private location: Location,
               private lazyLoadService: LazyLoadService) {
+    loginService.safeUserToken().pipe(first()).subscribe(value => this.isAdmin = value.hasRole('admin'));
     this.isSelf = this.router.url.indexOf('self') != -1;
     this.groups = this.lazyLoadService.share('orgGroups', () => this.groupService.getAll());
     this.missionOrgs = this.lazyLoadService.share('missionOrgs', () => missionOrgService.list());
@@ -95,9 +100,9 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       this.newEmergencyContact.personId = this.person.id;
       this.newEvaluation.personId = this.person.id;
       this.people = value.people.filter(person => person.id != value.person.id);
-      this.peopleMap = this.people.reduce((map, currentValue) => {
-        map[currentValue.id] = currentValue;
-        return map;
+      this.peopleMap = this.people.reduce((pMap, currentValue) => {
+        pMap[currentValue.id] = currentValue;
+        return pMap;
       }, {});
       this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
     });
@@ -126,11 +131,16 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     }
     //deleting?
     if (!this.isNew) {
-      let result = await ConfirmDialogComponent.OpenWait(
-        this.dialog,
-        `Deleting staff, data will be lost, this can not be undone`,
-        'Delete',
-        'Cancel');
+      let result = false;
+      if (this.isAdmin) {
+        result = await ConfirmDialogComponent.OpenWait(
+          this.dialog,
+          `Deleting staff, data will be lost, this can not be undone`,
+          'Delete',
+          'Cancel');
+      } else {
+        this.snackBar.open(`Only an Admin can mark someone as staff as not staff, this will delete data`, 'Dismiss');
+      }
       if (!result) {
         //roll back switch
         this.isStaffElement.control.setValue(true, {emitEvent: false});
@@ -225,7 +235,10 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     this.snackBar.open(`Emergency Contact Deleted`, null, {duration: 2000});
   }
 
-  async saveEvaluation(evaluation: EvaluationWithNames, panel: MatExpansionPanel, evalComponent: EvaluationComponent, isNew = false) {
+  async saveEvaluation(evaluation: EvaluationWithNames,
+                       panel: MatExpansionPanel,
+                       evalComponent: EvaluationComponent,
+                       isNew = false) {
     let updatedEval = await this.evaluationService.save(evaluation);
     if (isNew) {
       evaluation = {...evaluation, ...updatedEval};
