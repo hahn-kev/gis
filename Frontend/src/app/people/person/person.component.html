@@ -75,17 +75,21 @@
                             [(ngModel)]="person.isThai">
             Is Thai
           </mat-slide-toggle>
-          <mat-slide-toggle [disabled]="isSelf"
+          <mat-slide-toggle [disabled]="isSelf || person.isSchoolAid"
                             name="isStaff"
                             #isStaff="ngModel"
                             [ngModel]="person.staff"
-                            (ngModelChange)="isStaffChanged($event)">
+                            (ngModelChange)="isStaffChanged($event)"
+                            matTooltip="A person can't be a school aid and Staff at the same time"
+                            [matTooltipDisabled]="!person.isSchoolAid">
             Is Staff
           </mat-slide-toggle>
 
-          <mat-slide-toggle [disabled]="isSelf"
+          <mat-slide-toggle [disabled]="isSelf || person.staff"
                             name="isSchoolAid"
-                            [(ngModel)]="person.isSchoolAid">
+                            [(ngModel)]="person.isSchoolAid"
+                            matTooltip="A person can't be a School Aide and Staff at the same time"
+                            [matTooltipDisabled]="!person.staff">
             Is School Aide
           </mat-slide-toggle>
 
