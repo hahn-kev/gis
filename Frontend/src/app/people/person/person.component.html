@@ -473,25 +473,25 @@
               <mat-option value="Consultant">Consultant</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field>
-            <input matInput
-                   name="endorsmentAgency"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.endorsementAgency"
-                   placeholder="Endorsment Agency">
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select [(ngModel)]="staffEndorsments"
-                        (ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"
-                        [disabled]="isSelf"
-                        multiple
-                        name="endorsements"
-                        placeholder="Endorsements">
-              <mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">
-                {{endorsment}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <!--<mat-form-field>-->
+          <!--<input matInput-->
+          <!--name="endorsmentAgency"-->
+          <!--[readonly]="isSelf"-->
+          <!--[(ngModel)]="person.staff.endorsementAgency"-->
+          <!--placeholder="Endorsment Agency">-->
+          <!--</mat-form-field>-->
+          <!--<mat-form-field>-->
+          <!--<mat-select [(ngModel)]="staffEndorsments"-->
+          <!--(ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"-->
+          <!--[disabled]="isSelf"-->
+          <!--multiple-->
+          <!--name="endorsements"-->
+          <!--placeholder="Endorsements">-->
+          <!--<mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">-->
+          <!--{{endorsment}}-->
+          <!--</mat-option>-->
+          <!--</mat-select>-->
+          <!--</mat-form-field>-->
 
         </ng-template>
       </mat-expansion-panel>
