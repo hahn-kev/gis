@@ -160,8 +160,13 @@ html, body {
   .mat-form-field {
     font-size: 16px;
     padding-top: 6px;
-    &.mat-focused .mat-form-field-label {
-      color: mat-color(map-get($theme-contrast, foreground), secondary-text);
+    &.mat-focused {
+      .mat-form-field-ripple {
+        background-color: currentColor;
+      }
+      .mat-form-field-label {
+        color: mat-color(map-get($theme-contrast, foreground), secondary-text);
+      }
     }
   }
   .mat-form-field-ripple {
