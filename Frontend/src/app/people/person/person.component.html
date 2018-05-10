@@ -255,7 +255,7 @@
             <mat-panel-description class="secondary-text">{{person.staff.missionOrgEmail || 'Email unknown'}}
               <a mat-icon-button [routerLink]="'/mission-org/edit/' + person.staff.missionOrgId">
                 <mat-icon class="foreground-text"
-                          [matTooltip]="'View Mission Org'"
+                          [matTooltip]="'View Sending Org'"
                           matTooltipPosition="before">
                   account_balance
                 </mat-icon>
@@ -371,7 +371,7 @@
             <mat-select name="missionOrg"
                         [disabled]="isSelf"
                         [(ngModel)]="person.staff.missionOrgId"
-                        placeholder="Mission Org">
+                        placeholder="Sending Org">
               <mat-option [value]="null">None</mat-option>
               <mat-option *ngFor="let org of missionOrgs | async" [value]="org.id">{{org.name}}</mat-option>
             </mat-select>

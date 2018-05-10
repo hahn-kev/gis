@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Mission Orgs</ng-container>
+<ng-container *appTemplateContent="'title'">Sending Orgs ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
   <button mat-icon-button>
     <mat-icon>search</mat-icon>
@@ -41,6 +41,6 @@
 </mat-table>
 
 
-<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Mission Org" matTooltipPosition="left">
+<a routerLink="../edit/new" class="add-button" mat-fab matTooltip="Add new Sending Org" matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>

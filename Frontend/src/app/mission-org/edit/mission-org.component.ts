@@ -42,7 +42,7 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
 
   async delete() {
     let result = await ConfirmDialogComponent.OpenWait(this.dialog,
-      `Delete Mission Org ${this.missionOrg.name}?`,
+      `Delete Sending Org ${this.missionOrg.name}?`,
       'Delete',
       'Cancel');
     if (!result) return;
