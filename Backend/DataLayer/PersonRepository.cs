@@ -34,8 +34,12 @@ namespace Backend.DataLayer
             get
             {
                 return from person in PeopleGeneric<PersonWithStaffSummaries>()
-                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
-                    group role by new {person}
+                    from r in (
+                        from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
+                        from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                        select new {role, job}
+                    )
+                    group r by new {person}
                     into g
                     select new PersonWithStaffSummaries
                     {
@@ -71,9 +75,12 @@ namespace Backend.DataLayer
                         ThaiZip = g.Key.person.ThaiZip,
                         Deleted = g.Key.person.Deleted,
                         //summary here
-                        DaysOfService = g.Sum(role => role.StartDate.DayDiff(role.EndDate ?? DateTime.Now)),
-                        IsActive = g.Sum(role => role.Active ? 1 : 0) > 0,
-                        StartDate = g.Min(role => (DateTime?) role.StartDate)
+                        DaysOfService = g.Sum(r =>
+                            r.job.Status == JobStatus.SchoolAid
+                                ? 0
+                                : r.role.StartDate.DayDiff(r.role.EndDate ?? DateTime.Now)),
+                        IsActive = g.Sum(r => r.role.Active ? 1 : 0) > 0,
+                        StartDate = g.Min(r => (DateTime?) r.role.StartDate)
                     };
             }
         }
