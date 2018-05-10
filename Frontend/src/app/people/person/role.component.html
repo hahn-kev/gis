@@ -6,7 +6,7 @@
                 (ngModelChange)="jobChanged($event)"
                 required
                 placeholder="Job">
-      <mat-option *ngFor="let job of jobs" [value]="job.id">{{job.title}}</mat-option>
+      <mat-option *ngFor="let job of jobsObservable | async" [value]="job.id">{{job.title}}</mat-option>
     </mat-select>
   </mat-form-field>
 
