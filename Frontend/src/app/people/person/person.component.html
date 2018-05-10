@@ -106,19 +106,13 @@
                    name="phone"
                    placeholder="Phone Number">
           </mat-form-field>
-
-          <mat-form-field>
-            <mat-select [(ngModel)]="person.nationality" name="nationality"
-                        placeholder="Nationality">
-              <mat-option *ngFor="let nat of nationalities" [value]="nat">{{nationalityName(nat)}}</mat-option>
-            </mat-select>
-          </mat-form-field>
         </mat-expansion-panel>
 
         <!--passport address-->
         <mat-expansion-panel class="two-colum-grid">
           <mat-expansion-panel-header>
             <mat-panel-title>Passport Address</mat-panel-title>
+            <mat-panel-description>{{person.passportCountry}}</mat-panel-description>
           </mat-expansion-panel-header>
           <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="person.passportAddress"

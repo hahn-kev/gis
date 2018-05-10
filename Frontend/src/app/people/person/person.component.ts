@@ -1,6 +1,6 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Nationality, NationalityName, Person, PersonWithOthers } from '../person';
+import { Person, PersonWithOthers } from '../person';
 import { PersonService } from '../person.service';
 import { RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
@@ -37,8 +37,6 @@ import { first } from 'rxjs/internal/operators';
   providers: [LazyLoadService]
 })
 export class PersonComponent implements OnInit, CanComponentDeactivate {
-  public nationalities = Object.keys(Nationality);
-  public nationalityName = NationalityName;
   public leaveTypeName = LeaveTypeName;
   public isAdmin: boolean;
   public isNew: boolean;

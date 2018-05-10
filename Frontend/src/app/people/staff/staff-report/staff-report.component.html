@@ -139,10 +139,6 @@
       <mat-checkbox disabled [checked]="row.speaksEnglish"></mat-checkbox>
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="nationality">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Nationality</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{nationalityName(row.nationality)}}</mat-cell>
-  </ng-container>
 
   <ng-container matColumnDef="startDate">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { Gender, NationalityName, PersonWithStaffSummaries } from '../../person';
+import { Gender, PersonWithStaffSummaries } from '../../person';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
@@ -15,7 +15,6 @@ import { UrlBindingService } from '../../../services/url-binding.service';
   providers: [UrlBindingService]
 })
 export class StaffReportComponent implements OnInit {
-  public nationalityName = NationalityName;
   public dataSource: AppDataSource<PersonWithStaffSummaries>;
   age = StaffReportComponent.age;
   public avalibleColumns = [
@@ -40,8 +39,7 @@ export class StaffReportComponent implements OnInit {
     'endorsementAgency',
     'legalStatus',
     'isThai',
-    'speaksEnglish',
-    'nationality'
+    'speaksEnglish'
   ];
 
 
