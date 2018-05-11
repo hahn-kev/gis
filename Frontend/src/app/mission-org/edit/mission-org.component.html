@@ -59,7 +59,12 @@
       <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="missionOrg.address"
                     name="address"
-                    placeholder="Address"></textarea>
+                    placeholder="Home Address"></textarea>
+      </mat-form-field>
+      <mat-form-field class="span-2-columns">
+          <textarea matInput [(ngModel)]="missionOrg.addressLocal"
+                    name="addressLocal"
+                    placeholder="Local Address"></textarea>
       </mat-form-field>
       <mat-slide-toggle name="inThailand" [(ngModel)]="missionOrg.officeInThailand">Office is in Thailand
       </mat-slide-toggle>

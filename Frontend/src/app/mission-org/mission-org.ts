@@ -6,6 +6,7 @@ export class MissionOrg extends BaseEntity {
   public phone: string;
   public email: string;
   public address: string;
+  public addressLocal: string;
   public officeInThailand: boolean;
   public approvedDate: Date;
   public status?: MissionOrgStatus;

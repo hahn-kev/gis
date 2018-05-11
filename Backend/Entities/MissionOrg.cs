@@ -13,6 +13,7 @@ namespace Backend.Entities
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }
+        public string AddressLocal { get; set; }
         public bool OfficeInThailand { get; set; }
         public DateTime? ApprovedDate { get; set; }
 

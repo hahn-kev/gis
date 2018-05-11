@@ -27,6 +27,7 @@ namespace Backend.DataLayer
             {
                 Id = org.Id,
                 Address = org.Address,
+                AddressLocal = org.AddressLocal,
                 ApprovedDate = org.ApprovedDate,
                 Email = org.Email,
                 Name = org.Name,
