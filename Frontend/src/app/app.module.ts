@@ -104,6 +104,7 @@ import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { EvaluationComponent } from './people/person/evaluation/evaluation.component';
 import { EvaluationService } from './people/person/evaluation/evaluation.service';
 import { TitleCasePipe } from './services/title-case.pipe';
+import { QuickAddButtonComponent } from './people/person/quick-add/quick-add-button.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -153,7 +154,8 @@ if (environment.production) {
     ExportButtonComponent,
     SandboxComponent,
     EvaluationComponent,
-    TitleCasePipe
+    TitleCasePipe,
+    QuickAddButtonComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

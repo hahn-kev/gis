@@ -1,0 +1,13 @@
+<button *ngIf="!personId" type="button" matTooltip="Quick add Person"
+        appQuickAdd
+        (updateSelected)="personIdChange.emit($event)"
+        (updateList)="updateList.emit($event)"
+        mat-icon-button>
+  <mat-icon>person_add</mat-icon>
+</button>
+<a *ngIf="personId"
+   [matTooltip]="'View ' + title "
+   [routerLink]="'/people/edit/' + personId"
+   mat-icon-button>
+  <mat-icon>person</mat-icon>
+</a>

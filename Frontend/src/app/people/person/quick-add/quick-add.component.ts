@@ -13,7 +13,7 @@ export class QuickAddComponent implements OnInit {
 
   constructor(private personService: PersonService,
               @Inject(MAT_DIALOG_DATA) private data: any,
-              private dialogRef: MatDialogRef<QuickAddComponent>) {
+              private dialogRef: MatDialogRef<QuickAddComponent, PersonWithStaff>) {
   }
 
   ngOnInit() {

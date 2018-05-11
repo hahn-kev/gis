@@ -12,19 +12,17 @@
                       [(ngModel)]="missionOrg.repId"
                       required
                       placeholder="Org Rep">
-            <mat-option>None</mat-option>
+            <mat-option [value]="null">None</mat-option>
             <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
               {{eachPerson.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <button type="button" matTooltip="Quick add Person"
-                appQuickAdd
-                (updateSelected)="missionOrg.repId = $event"
-                (updateList)="people.push($event)"
-                mat-icon-button>
-          <mat-icon>person_add</mat-icon>
-        </button>
+        <app-quick-add-button
+          [(personId)]="missionOrg.repId"
+          title="Rep"
+          (updateList)="people.push($event)">
+        </app-quick-add-button>
       </div>
 
       <mat-form-field>
