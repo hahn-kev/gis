@@ -74,52 +74,50 @@
       <button type="button" *ngIf="!isNew" color="warn" (click)="delete()" mat-button>Delete</button>
     </mat-card-actions>
   </mat-card>
-  <div>
-    <span class="mat-caption">Year Summaries</span>
-    <app-accordion-list [createNewItem]="createNewYear" [items]="years" itemTitle="Year" (delete)="deleteYear($event)">
-      <ng-container *appAccordionListHeader="let item;">
-        <mat-panel-title>{{item.year}}</mat-panel-title>
-        <mat-panel-description>{{item.level}}</mat-panel-description>
-      </ng-container>
-      <ng-container *appAccordionListContent="let item; index as index">
-        <form appAccordionListForm class="two-colum-grid" (submit)="saveYear(item)">
-          <mat-form-field>
-            <input [(ngModel)]="item.studentCount" required type="number" placeholder="Student Count"
-                   name="studentCount"
-                   matInput>
-          </mat-form-field>
-          <mat-form-field>
-            <input [(ngModel)]="item.teacherCount" required type="number" placeholder="Teacher Count"
-                   name="teacherCount"
-                   matInput>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select name="status"
-                        [(ngModel)]="item.status"
-                        placeholder="Status">
-              <mat-option>None</mat-option>
-              <mat-option *ngFor="let status of statusList" [value]="status">{{status | titleCase}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select name="levle"
-                        [(ngModel)]="item.level"
-                        placeholder="Level">
-              <mat-option>None</mat-option>
-              <mat-option *ngFor="let level of levelList" [value]="level">{{level | titleCase}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select [(ngModel)]="item.year"
-                        required
-                        name="year"
-                        placeholder="Year">
-              <mat-option [value]="null">None</mat-option>
-              <mat-option *ngFor="let year of schoolYears" [value]="year.value">{{year.name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </form>
-      </ng-container>
-    </app-accordion-list>
-  </div>
+  <app-accordion-list [createNewItem]="createNewYear" [items]="missionOrg.yearSummaries" title="Year Summaries"
+                      itemTitle="Year" (save)="saveYear($event)" (delete)="deleteYear($event)">
+    <ng-container *appAccordionListHeader="let item;">
+      <mat-panel-title>{{item.year}}</mat-panel-title>
+      <mat-panel-description>{{item.level}}</mat-panel-description>
+    </ng-container>
+    <ng-container *appAccordionListContent="let item; index as index">
+      <form appAccordionListForm class="two-colum-grid">
+        <mat-form-field>
+          <input [(ngModel)]="item.studentCount" required type="number" placeholder="Student Count"
+                 name="studentCount"
+                 matInput>
+        </mat-form-field>
+        <mat-form-field>
+          <input [(ngModel)]="item.teacherCount" required type="number" placeholder="Teacher Count"
+                 name="teacherCount"
+                 matInput>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select name="status"
+                      [(ngModel)]="item.status"
+                      placeholder="Status">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let status of statusList" [value]="status">{{status | titleCase}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select name="level"
+                      [(ngModel)]="item.level"
+                      placeholder="Level">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let level of levelList" [value]="level">{{level | titleCase}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select [(ngModel)]="item.year"
+                      required
+                      name="year"
+                      placeholder="Year">
+            <mat-option [value]="null">None</mat-option>
+            <mat-option *ngFor="let year of schoolYears" [value]="year.value">{{year.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </ng-container>
+  </app-accordion-list>
 </div>

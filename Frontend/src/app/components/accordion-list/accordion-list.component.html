@@ -1,3 +1,4 @@
+<span class="mat-caption" *ngIf="title">{{title}}</span>
 <mat-accordion>
   <mat-expansion-panel *ngIf="addNew" #newItemPanel (opened)="newItem = newItem ? newItem : createNewItem()">
     <mat-expansion-panel-header>
@@ -10,7 +11,7 @@
     </ng-container>
     <mat-action-row *ngIf="showActions">
       <button type="button"
-              (click)="newForm?.ngForm.ngSubmit.emit(newItem)"
+              (click)="newForm.ngForm.ngSubmit.emit()"
               [disabled]="newForm?.ngForm.invalid" mat-button>
         Add {{itemTitle}}
       </button>
@@ -29,7 +30,7 @@
     <mat-action-row *ngIf="showActions">
       <button type="button" mat-button (click)="onDelete(item)" color="warn">Delete</button>
       <button type="button"
-              (click)="forms[index]?.ngForm.ngSubmit.emit(item)"
+              (click)="forms[index].ngForm.ngSubmit.emit()"
               [disabled]="forms[index]?.ngForm.invalid" mat-button>
         Save {{itemTitle}}
       </button>

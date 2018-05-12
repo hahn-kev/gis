@@ -1,4 +1,5 @@
 ﻿import { BaseEntity } from '../classes/base-entity';
+import { MissionOrgYearSummary } from './mission-org-year-summary';
 
 export class MissionOrg extends BaseEntity {
   public name: string;
@@ -14,6 +15,10 @@ export class MissionOrg extends BaseEntity {
 
 export class MissionOrgWithNames extends MissionOrg {
   public contactName: string;
+}
+
+export class MissionOrgWithYearSummaries extends MissionOrg {
+  public yearSummaries: MissionOrgYearSummary[] = [];
 }
 
 

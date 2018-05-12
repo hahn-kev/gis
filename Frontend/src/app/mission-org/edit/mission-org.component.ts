@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MissionOrg, MissionOrgStatus } from '../mission-org';
+import { MissionOrgStatus, MissionOrgWithYearSummaries } from '../mission-org';
 import { MissionOrgService } from '../mission-org.service';
 import { Person } from '../../people/person';
 import { BaseEditComponent } from '../../components/base-edit-component';
@@ -18,10 +18,9 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
   public schoolYears = Year.years();
   public statusList = Object.keys(MissionOrgStatus);
   public levelList = Object.keys(MissionOrgLevel);
-  public missionOrg: MissionOrg;
+  public missionOrg: MissionOrgWithYearSummaries;
   public people: Person[];
   public isNew = false;
-  public years: MissionOrgYearSummary[];
 
   constructor(private missionOrgService: MissionOrgService,
               private route: ActivatedRoute,
@@ -29,24 +28,6 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
               private snackBar: MatSnackBar,
               dialog: MatDialog) {
     super(dialog);
-    this.years = [
-      {
-        id: 'test',
-        year: 2004,
-        level: MissionOrgLevel.Gold,
-        status: MissionOrgStatus.Associate,
-        studentCount: 4,
-        teacherCount: 5
-      },
-      {
-        id: 'test1',
-        year: 2005,
-        level: MissionOrgLevel.Gold,
-        status: MissionOrgStatus.Associate,
-        studentCount: 6,
-        teacherCount: 7
-      }
-    ];
   }
 
   ngOnInit() {
@@ -57,9 +38,11 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
     });
   }
 
-  createNewYear() {
-    return new MissionOrgYearSummary();
-  }
+  createNewYear = () => {
+    let yearSummary = new MissionOrgYearSummary();
+    yearSummary.missionOrgId = this.missionOrg.id;
+    return yearSummary;
+  };
 
   async save() {
     await this.missionOrgService.save(this.missionOrg);
@@ -87,14 +70,15 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
     if (!result) return;
     await this.missionOrgService.deleteYear(yearSummary.id);
     //todo update year list
+    this.missionOrg.yearSummaries = this.missionOrg.yearSummaries.filter(value => value.id != yearSummary.id);
     this.snackBar.open(`Year Summary Deleted`, null, {duration: 2000});
   }
 
   async saveYear(yearSummary: MissionOrgYearSummary) {
     let isNew = !yearSummary.id;
-    await this.missionOrgService.saveYear(yearSummary);
+    yearSummary = await this.missionOrgService.saveYear(yearSummary);
     if (isNew) {
-      //todo update year list
+      this.missionOrg.yearSummaries = [yearSummary, ...this.missionOrg.yearSummaries];
     }
     this.snackBar.open(`Year Summary Saved`, null, {duration: 2000});
   }

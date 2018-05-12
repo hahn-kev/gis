@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MissionOrg, MissionOrgWithNames } from './mission-org';
+import { MissionOrg, MissionOrgWithNames, MissionOrgWithYearSummaries } from './mission-org';
 import { MissionOrgYearSummary } from './mission-org-year-summary';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class MissionOrgService {
   }
 
   getById(id: string) {
-    return this.http.get<MissionOrg>('/api/missionOrg/' + id);
+    return this.http.get<MissionOrgWithYearSummaries>('/api/missionOrg/' + id);
   }
 
   delete(id: string) {

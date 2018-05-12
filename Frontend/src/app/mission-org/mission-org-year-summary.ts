@@ -2,6 +2,7 @@
 import { MissionOrgStatus } from './mission-org';
 
 export class MissionOrgYearSummary extends BaseEntity {
+  public missionOrgId: string;
   public year: number;
   public studentCount: number;
   public teacherCount: number;

@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, TemplateRef, ViewChildren } from '@angular/core';
 import { AccordionListContentDirective } from './accordion-list-content.directive';
 import { AccordionListFormDirective } from './accordion-list-form.directive';
+import { MatExpansionPanel } from '@angular/material';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-accordion-list',
@@ -8,6 +10,7 @@ import { AccordionListFormDirective } from './accordion-list-form.directive';
   styleUrls: ['./accordion-list.component.scss']
 })
 export class AccordionListComponent<T> implements OnInit {
+  @Input() title: string = null;
   @Input() createNewItem: () => T;
   newItem: T;
   @Input() itemTitle = 'Item';
@@ -16,6 +19,8 @@ export class AccordionListComponent<T> implements OnInit {
   @Input() items: T[] = [];
 
   @Output() delete = new EventEmitter<T>();
+  @Output() save = new EventEmitter<T>();
+  @ViewChildren(MatExpansionPanel) expansionPanels: QueryList<MatExpansionPanel>;
   newForm: AccordionListFormDirective<T>;
   forms: AccordionListFormDirective<T>[] = [];
   public header: TemplateRef<{ $implicit: T, index: number }>;
@@ -26,6 +31,12 @@ export class AccordionListComponent<T> implements OnInit {
 
   onDelete(item: T) {
     this.delete.emit(item);
+  }
+
+  onSave(item: T, panel: MatExpansionPanel, form: NgForm, isNew = false) {
+    this.save.emit(item);
+    panel.close();
+    if (isNew) form.resetForm();
   }
 
   ngOnInit() {
