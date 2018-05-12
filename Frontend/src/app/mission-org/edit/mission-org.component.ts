@@ -6,6 +6,8 @@ import { MissionOrg, MissionOrgStatus } from '../mission-org';
 import { MissionOrgService } from '../mission-org.service';
 import { Person } from '../../people/person';
 import { BaseEditComponent } from '../../components/base-edit-component';
+import { MissionOrgLevel, MissionOrgYearSummary } from '../mission-org-year-summary';
+import { Year } from '../../people/training-requirement/year';
 
 @Component({
   selector: 'app-mission-org',
@@ -13,10 +15,13 @@ import { BaseEditComponent } from '../../components/base-edit-component';
   styleUrls: ['./mission-org.component.scss']
 })
 export class MissionOrgComponent extends BaseEditComponent implements OnInit {
+  public schoolYears = Year.years();
   public statusList = Object.keys(MissionOrgStatus);
+  public levelList = Object.keys(MissionOrgLevel);
   public missionOrg: MissionOrg;
   public people: Person[];
   public isNew = false;
+  public years: MissionOrgYearSummary[];
 
   constructor(private missionOrgService: MissionOrgService,
               private route: ActivatedRoute,
@@ -24,6 +29,24 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
               private snackBar: MatSnackBar,
               dialog: MatDialog) {
     super(dialog);
+    this.years = [
+      {
+        id: 'test',
+        year: 2004,
+        level: MissionOrgLevel.Gold,
+        status: MissionOrgStatus.Associate,
+        studentCount: 4,
+        teacherCount: 5
+      },
+      {
+        id: 'test1',
+        year: 2005,
+        level: MissionOrgLevel.Gold,
+        status: MissionOrgStatus.Associate,
+        studentCount: 6,
+        teacherCount: 7
+      }
+    ];
   }
 
   ngOnInit() {
@@ -32,6 +55,10 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
       this.people = value.people;
       this.isNew = !this.missionOrg.id;
     });
+  }
+
+  createNewYear() {
+    return new MissionOrgYearSummary();
   }
 
   async save() {
@@ -49,5 +76,26 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
     await this.missionOrgService.delete(this.missionOrg.id);
     this.router.navigate(['/mission-org/list']);
     this.snackBar.open(`${this.missionOrg.name} Deleted`, null, {duration: 2000});
+  }
+
+  async deleteYear(yearSummary: MissionOrgYearSummary) {
+    let result = await ConfirmDialogComponent.OpenWait(
+      this.dialog,
+      `Delete Year Summary ${Year.yearName(yearSummary.year)}?`,
+      'Delete',
+      'Cancel');
+    if (!result) return;
+    await this.missionOrgService.deleteYear(yearSummary.id);
+    //todo update year list
+    this.snackBar.open(`Year Summary Deleted`, null, {duration: 2000});
+  }
+
+  async saveYear(yearSummary: MissionOrgYearSummary) {
+    let isNew = !yearSummary.id;
+    await this.missionOrgService.saveYear(yearSummary);
+    if (isNew) {
+      //todo update year list
+    }
+    this.snackBar.open(`Year Summary Saved`, null, {duration: 2000});
   }
 }

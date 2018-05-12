@@ -22,17 +22,21 @@ export class Year {
     const today = new Date();
     const years = new Array<Year>(today.getUTCFullYear() - 2000 + 3);
     for (let i = 0; i < years.length; i++) {
-      let display;
-      if (i < 9) {
-        display = `0${i} - 0${i + 1}`;
-      } else if (i === 9) {
-        display = '09 - 10';
-      } else {
-        display = `${i} - ${i + 1}`;
-      }
+      let display = this.yearName(i + 2000);
       years[i] = new Year(i + 2000, display);
     }
     return years.reverse();
+  }
+
+  static yearName(year: number) {
+    year -= 2000;
+    if (year < 9) {
+      return `0${year} - 0${year + 1}`;
+    } else if (year === 9) {
+      return '09 - 10';
+    } else {
+      return `${year} - ${year + 1}`;
+    }
   }
 
   constructor(public value: number, public name?: string) {
