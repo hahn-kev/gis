@@ -1,0 +1,38 @@
+<mat-accordion>
+  <mat-expansion-panel *ngIf="addNew" #newItemPanel (opened)="newItem = newItem ? newItem : createNewItem()">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Add new {{itemTitle}}</mat-panel-title>
+    </mat-expansion-panel-header>
+    <ng-container *ngIf="content">
+      <ng-template matExpansionPanelContent>
+        <ng-container *ngTemplateOutlet="content; context: {$implicit: newItem,  index: -1}"></ng-container>
+      </ng-template>
+    </ng-container>
+    <mat-action-row *ngIf="showActions">
+      <button type="button"
+              (click)="newForm?.ngForm.ngSubmit.emit(newItem)"
+              [disabled]="newForm?.ngForm.invalid" mat-button>
+        Add {{itemTitle}}
+      </button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel #itemPanel *ngFor="let item of items; index as index">
+    <mat-expansion-panel-header *ngIf="header">
+      <ng-container *ngTemplateOutlet="header; context: {$implicit: item, index: index}"></ng-container>
+    </mat-expansion-panel-header>
+    <ng-container *ngIf="content">
+      <ng-template matExpansionPanelContent>
+        <ng-container *ngTemplateOutlet="content; context: {$implicit: item,  index: index}"></ng-container>
+      </ng-template>
+    </ng-container>
+    <mat-action-row *ngIf="showActions">
+      <button type="button" mat-button (click)="onDelete(item)" color="warn">Delete</button>
+      <button type="button"
+              (click)="forms[index]?.ngForm.ngSubmit.emit(item)"
+              [disabled]="forms[index]?.ngForm.invalid" mat-button>
+        Save {{itemTitle}}
+      </button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>

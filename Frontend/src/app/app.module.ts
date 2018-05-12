@@ -105,6 +105,10 @@ import { EvaluationComponent } from './people/person/evaluation/evaluation.compo
 import { EvaluationService } from './people/person/evaluation/evaluation.service';
 import { TitleCasePipe } from './services/title-case.pipe';
 import { QuickAddButtonComponent } from './people/person/quick-add/quick-add-button.component';
+import { AccordionListComponent } from './components/accordion-list/accordion-list.component';
+import { AccordionListHeaderDirective } from './components/accordion-list/accordion-list-header.directive';
+import { AccordionListContentDirective } from './components/accordion-list/accordion-list-content.directive';
+import { AccordionListFormDirective } from './components/accordion-list/accordion-list-form.directive';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -155,7 +159,11 @@ if (environment.production) {
     SandboxComponent,
     EvaluationComponent,
     TitleCasePipe,
-    QuickAddButtonComponent
+    QuickAddButtonComponent,
+    AccordionListComponent,
+    AccordionListHeaderDirective,
+    AccordionListContentDirective,
+    AccordionListFormDirective
   ],
   entryComponents: [
     ConfirmDialogComponent,
