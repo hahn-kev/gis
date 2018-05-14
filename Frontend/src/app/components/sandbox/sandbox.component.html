@@ -1,5 +1,13 @@
 <div class="main-card">
   <mat-card>
-    hello!
+    <mat-form-field>
+      <input name="startDate" required matInput
+             [(ngModel)]="date"
+             [matDatepicker]="startDatePicker"
+             placeholder="Start Date">
+      <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #startDatePicker></mat-datepicker>
+    </mat-form-field>
+    <button mat-raised-button (click)="test()">Test</button>
   </mat-card>
 </div>

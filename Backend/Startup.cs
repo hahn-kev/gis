@@ -98,7 +98,8 @@ namespace Backend
                 })
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    //time zone info won't be included, this is so we can pass a date from the front end without the timezone
+                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
             //todo response caching?
 //            services.AddResponseCaching();

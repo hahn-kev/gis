@@ -1,6 +1,7 @@
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
+import * as moment from 'moment';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { hmrBootstrap } from './hmr';
@@ -9,6 +10,10 @@ import 'hammerjs';
 if (environment.production) {
   enableProdMode();
 }
+moment.fn.toJSON = function () {
+  return this.format('YYYY-MM-DD[T]HH:mm:ss.SSS');
+};
+
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 if (environment.hmr) {
   if (module['hot']) {
