@@ -190,8 +190,11 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(GetExpectedNotifyHrValues))]
-        public void NotifiesHrWhenAppropriate(LeaveRequest request, PersonWithStaff personWithStaff, int usedLeave,
-            int totalYears, bool expectedEmailed)
+        public void NotifiesHrWhenAppropriate(LeaveRequest request,
+            PersonWithStaff personWithStaff,
+            int usedLeave,
+            int totalYears,
+            bool expectedEmailed)
         {
             var job = _servicesFixture.InsertJob(j =>
             {
@@ -435,7 +438,8 @@ namespace UnitTestProject
                 requestedBy,
                 department,
                 devision,
-                supervisorGroup, new LeaveUseage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
+                supervisorGroup,
+                new LeaveUseage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
                 Assert.Equal(expectedApproverId, actualApprover.Id);
@@ -577,7 +581,7 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public void FixesDaysIfCalculationIsOff()
+        public void ThrowIfCalculationIsOff()
         {
             LeaveRequest request = GenerateRequest();
 
@@ -586,8 +590,9 @@ namespace UnitTestProject
             request.EndDate = new DateTime(2018, 3, 16);
             //should be 3 days
             request.Days = 2;
-            _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId);
-            request.Days.ShouldBe(3);
+            Assert.Throws<ArgumentException>(() =>
+                _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
+            request.Days.ShouldBe(2);
         }
 
         [Fact]

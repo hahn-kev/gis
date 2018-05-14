@@ -386,7 +386,7 @@ namespace Backend.Services
                 if (newRequest.Days != newRequest.CalculateLength() &&
                     newRequest.Days != newRequest.CalculateLength() - 0.5m)
                 {
-                    newRequest.Days = newRequest.CalculateLength();
+                    throw new ArgumentException($"Leave request days calculated didn't match what was expected for dates {newRequest.StartDate} to {newRequest.EndDate}");
                 }
 
                 return;
