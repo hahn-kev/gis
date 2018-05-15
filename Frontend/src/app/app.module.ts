@@ -13,6 +13,7 @@ import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
   MatAutocompleteModule,
+  MatBottomSheetModule,
   MatButtonModule,
   MatButtonToggleModule,
   MatCardModule,
@@ -109,6 +110,7 @@ import { AccordionListComponent } from './components/accordion-list/accordion-li
 import { AccordionListHeaderDirective } from './components/accordion-list/accordion-list-header.directive';
 import { AccordionListContentDirective } from './components/accordion-list/accordion-list-content.directive';
 import { AccordionListFormDirective } from './components/accordion-list/accordion-list-form.directive';
+import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -163,12 +165,14 @@ if (environment.production) {
     AccordionListComponent,
     AccordionListHeaderDirective,
     AccordionListContentDirective,
-    AccordionListFormDirective
+    AccordionListFormDirective,
+    RenderTemplateBottomSheetComponent,
   ],
   entryComponents: [
     ConfirmDialogComponent,
     QuickAddComponent,
-    RenderTemplateDialogComponent
+    RenderTemplateDialogComponent,
+    RenderTemplateBottomSheetComponent
   ],
   imports: [
     LocalStorageModule.withConfig({
@@ -205,6 +209,7 @@ if (environment.production) {
     MatExpansionModule,
     MatAutocompleteModule,
     MatGridListModule,
+    MatBottomSheetModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,
