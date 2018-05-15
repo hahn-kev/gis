@@ -201,12 +201,15 @@ namespace Backend.Services
             {
                 {":type", leaveRequest.Type.ToString()},
                 {":approve", $"{_settings.BaseUrl}/api/leaveRequest/approve/{leaveRequest.Id}"},
+                {":supervisor", supervisor.PreferredName + " " + supervisor.LastName},
                 {":firstName", supervisor.PreferredName + " " + supervisor.LastName},
                 {":requester", requestedBy.PreferredName + " " + requestedBy.LastName},
                 {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
                 {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
-                {":left", $"{leaveUseage.Left} Day(s)"}
+                {":left", $"{leaveUseage.Left} Day(s)"},
+                {":totalDays", $"{leaveUseage.TotalAllowed} Day(s)"},
+                {":reason", leaveRequest.Reason}
             };
 
             await _emailService.SendTemplateEmail(substituions,
