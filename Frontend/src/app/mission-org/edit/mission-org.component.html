@@ -6,7 +6,10 @@
 </ng-container>
 <ng-container *appTemplateContent="'staff'; let sheet">
   <mat-nav-list *ngIf="peopleInOrgQuery | async as peopleInOrg; else empty">
-    <h3 mat-subheader>Staff ({{peopleInOrg.length}})</h3>
+    <h3 mat-subheader>
+      <mat-icon mat-list-icon>person</mat-icon>
+      Staff ({{peopleInOrg.length}})
+    </h3>
     <a mat-list-item *ngFor="let person of peopleInOrg" [routerLink]="['/people', 'edit', person.id]"
        (click)="sheet.dismiss()">{{person.preferredName}} {{person.lastName}}</a>
   </mat-nav-list>

@@ -50,6 +50,10 @@ html, body {
   padding-right: 0 !important;
 }
 
+.mat-nav-list .mat-subheader .mat-list-icon {
+  margin-right: 4px;
+}
+
 .main-card {
   min-height: 100%;
   padding: 12px;
@@ -146,6 +150,10 @@ html, body {
   display: flex;
   .mat-form-field {
     flex-grow: 1;
+  }
+  .mat-icon-button .mat-icon {
+    vertical-align: text-top;
+    padding-top: 2px;
   }
 }
 
