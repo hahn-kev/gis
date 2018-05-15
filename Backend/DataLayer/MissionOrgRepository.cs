@@ -15,9 +15,26 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public MissionOrg GetOrg(Guid id)
+        public MissionOrgWithYearSummaries GetOrg(Guid id)
         {
-            return _dbConnection.MissionOrgs.SingleOrDefault(org => org.Id == id);
+            var missionOrg = _dbConnection.MissionOrgs.Select(org => new MissionOrgWithYearSummaries()
+            {
+                Id = org.Id,
+                Name = org.Name,
+                RepId = org.RepId,
+                Phone = org.Phone,
+                Email = org.Email,
+                Address = org.Address,
+                AddressLocal = org.AddressLocal,
+                ApprovedDate = org.ApprovedDate,
+                OfficeInThailand = org.OfficeInThailand,
+                Status = org.Status
+            }).SingleOrDefault(org => org.Id == id);
+            if (missionOrg == null) throw new NullReferenceException("No Mission org found matching ID");
+            missionOrg.YearSummaries = _dbConnection.MissionOrgYearSummaries
+                .Where(year => year.MissionOrgId == id)
+                .ToList();
+            return missionOrg;
         }
 
         public IQueryable<MissionOrgWithNames> MissionOrgsWithNames =>

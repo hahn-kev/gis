@@ -29,7 +29,7 @@ namespace Backend.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,hr,registrar")]
-        public MissionOrg GetOrg(Guid id)
+        public MissionOrgWithYearSummaries GetOrg(Guid id)
         {
             return _orgRepository.GetOrg(id);
         }
@@ -47,6 +47,22 @@ namespace Backend.Controllers
         public IActionResult Delete(Guid id)
         {
             _entityService.Delete<MissionOrg>(id);
+            return Ok();
+        }
+
+        [HttpPost("year")]
+        [Authorize(Roles = "admin,hr,registrar")]
+        public MissionOrgYearSummary Save([FromBody] MissionOrgYearSummary yearSummary)
+        {
+            _entityService.Save(yearSummary);
+            return yearSummary;
+        }
+
+        [HttpDelete("year/{id}")]
+        [Authorize(Roles = "admin,hr,registrar")]
+        public IActionResult DeleteYear(Guid id)
+        {
+            _entityService.Delete<MissionOrgYearSummary>(id);
             return Ok();
         }
     }
