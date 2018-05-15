@@ -101,6 +101,7 @@ namespace UnitTestProject
             TryCreateTable<Evaluation>();
             TryCreateTable<Attachment>();
             TryCreateTable<MissionOrg>();
+            TryCreateTable<MissionOrgYearSummary>();
 
             var roles = new[] {"admin", "hr", "hradmin"};
             var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
@@ -151,6 +152,9 @@ namespace UnitTestProject
             var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
             jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
             _dbConnection.Insert(jacobMissionOrg);
+            var jacobMissionOrgYear = AutoFaker.Generate<MissionOrgYearSummary>();
+            jacobMissionOrgYear.MissionOrgId = jacobMissionOrg.Id;
+            _dbConnection.Insert(jacobMissionOrgYear);
             var jacobJob = InsertJob();
             InsertRole(role =>
             {
