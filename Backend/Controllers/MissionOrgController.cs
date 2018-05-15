@@ -65,5 +65,11 @@ namespace Backend.Controllers
             _entityService.Delete<MissionOrgYearSummary>(id);
             return Ok();
         }
+
+        [HttpGet("{id}/people")]
+        public IList<Person> People(Guid id)
+        {
+            return _orgRepository.PeopleInOrg(id).ToList();
+        }
     }
 }

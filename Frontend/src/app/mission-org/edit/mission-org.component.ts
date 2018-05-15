@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatBottomSheet, MatDialog, MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionOrgStatus, MissionOrgWithYearSummaries } from '../mission-org';
 import { MissionOrgService } from '../mission-org.service';
@@ -8,6 +8,8 @@ import { Person } from '../../people/person';
 import { BaseEditComponent } from '../../components/base-edit-component';
 import { MissionOrgLevel, MissionOrgYearSummary } from '../mission-org-year-summary';
 import { Year } from '../../people/training-requirement/year';
+import { RenderTemplateBottomSheetComponent } from '../../components/render-template-bottom-sheet/render-template-bottom-sheet.component';
+import { Observable } from 'rxjs/Rx';
 
 @Component({
   selector: 'app-mission-org',
@@ -21,11 +23,13 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
   public missionOrg: MissionOrgWithYearSummaries;
   public people: Person[];
   public isNew = false;
+  public peopleInOrgQuery: Observable<Person[]>;
 
   constructor(private missionOrgService: MissionOrgService,
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
+              private bottomSheet: MatBottomSheet,
               dialog: MatDialog) {
     super(dialog);
   }
@@ -35,6 +39,7 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
       this.missionOrg = value.missionOrg;
       this.people = value.people;
       this.isNew = !this.missionOrg.id;
+      this.peopleInOrgQuery = !this.isNew ? this.missionOrgService.listPeople(this.missionOrg.id) : Observable.of(null);
     });
   }
 
@@ -81,5 +86,9 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
       this.missionOrg.yearSummaries = [yearSummary, ...this.missionOrg.yearSummaries];
     }
     this.snackBar.open(`Year Summary Saved`, null, {duration: 2000});
+  }
+
+  showStaff() {
+    RenderTemplateBottomSheetComponent.Open(this.bottomSheet, 'staff');
   }
 }

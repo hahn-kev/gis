@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MissionOrg, MissionOrgWithNames, MissionOrgWithYearSummaries } from './mission-org';
 import { MissionOrgYearSummary } from './mission-org-year-summary';
+import { Person } from '../people/person';
 
 @Injectable()
 export class MissionOrgService {
@@ -31,5 +32,9 @@ export class MissionOrgService {
 
   deleteYear(id: string) {
     return this.http.delete('/api/missionOrg/year/' + id).toPromise();
+  }
+
+  listPeople(orgId: string) {
+    return this.http.get<Person[]>(`/api/missionOrg/${orgId}/people`);
   }
 }

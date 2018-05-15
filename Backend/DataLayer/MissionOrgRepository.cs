@@ -54,5 +54,14 @@ namespace Backend.DataLayer
                 Status = org.Status,
                 ContactName = (person.PreferredName ?? person.FirstName) + " " + person.LastName
             };
+
+        public IQueryable<Person> PeopleInOrg(Guid orgId)
+        {
+            return from p in _dbConnection.People
+                from staff in _dbConnection.Staff.InnerJoin(staff => staff.Id == p.StaffId)
+                from missionOrg in _dbConnection.MissionOrgs.InnerJoin(org => org.Id == staff.MissionOrgId)
+                where missionOrg.Id == orgId
+                select p;
+        }
     }
 }

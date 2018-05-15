@@ -1,5 +1,19 @@
 <ng-container *appTemplateContent="'title'">Edit {{missionOrg.name}}</ng-container>
-
+<ng-container *appToolbarContent>
+  <button mat-icon-button matTooltip="View Staff" (click)="showStaff()">
+    <mat-icon>people</mat-icon>
+  </button>
+</ng-container>
+<ng-container *appTemplateContent="'staff'; let sheet">
+  <mat-nav-list *ngIf="peopleInOrgQuery | async as peopleInOrg; else empty">
+    <h3 mat-subheader>Staff ({{peopleInOrg.length}})</h3>
+    <a mat-list-item *ngFor="let person of peopleInOrg" [routerLink]="['/people', 'edit', person.id]"
+       (click)="sheet.dismiss()">{{person.preferredName}} {{person.lastName}}</a>
+  </mat-nav-list>
+  <ng-template #empty>
+    <h3>No Staff work for this Sending Org</h3>
+  </ng-template>
+</ng-container>
 <div class="main-card">
   <mat-card>
     <form id="form" (submit)="save()" class="two-colum-grid">
