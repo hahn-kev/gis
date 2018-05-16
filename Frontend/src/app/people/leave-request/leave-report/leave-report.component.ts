@@ -25,7 +25,7 @@ export class LeaveReportComponent implements OnInit {
         plm.person = p.person;
 
         for (let leave of p.leaveUseages) plm.appendLeave(leave);
-        return plm
+        return plm;
       });
     });
   }
