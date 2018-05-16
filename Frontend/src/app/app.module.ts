@@ -36,7 +36,8 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
@@ -111,6 +112,7 @@ import { AccordionListHeaderDirective } from './components/accordion-list/accord
 import { AccordionListContentDirective } from './components/accordion-list/accordion-list-content.directive';
 import { AccordionListFormDirective } from './components/accordion-list/accordion-list-form.directive';
 import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
+import { OrgTreeComponent } from './org-tree/org-tree.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -167,6 +169,7 @@ if (environment.production) {
     AccordionListContentDirective,
     AccordionListFormDirective,
     RenderTemplateBottomSheetComponent,
+    OrgTreeComponent,
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -210,6 +213,7 @@ if (environment.production) {
     MatAutocompleteModule,
     MatGridListModule,
     MatBottomSheetModule,
+    MatTreeModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,

@@ -18,7 +18,7 @@ namespace Backend.Services
             _entityService = entityService;
         }
 
-        public List<OrgGroup> OrgGroups => _orgGroupRepository.OrgGroups.OrderBy(group => group.GroupName).ToList();
+        public List<OrgGroupWithSupervisor> OrgGroups => _orgGroupRepository.OrgGroupsWithSupervisor.OrderBy(group => group.GroupName).ToList();
 
         public OrgGroup GetById(Guid id)
         {

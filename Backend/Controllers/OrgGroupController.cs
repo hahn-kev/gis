@@ -25,7 +25,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public List<OrgGroup> OrgGroups() => _orgGroupService.OrgGroups;
+        public List<OrgGroupWithSupervisor> OrgGroups() => _orgGroupService.OrgGroups;
 
         [HttpPost]
         [Authorize(Roles = "admin,hr")]

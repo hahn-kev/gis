@@ -10,7 +10,8 @@ export class JobFilledListResolverService implements Resolve<JobWithFilledInfo[]
   constructor(private jobService: JobService) {
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<JobWithFilledInfo[]> | Promise<JobWithFilledInfo[]> | JobWithFilledInfo[] {
+  resolve(route: ActivatedRouteSnapshot,
+          state: RouterStateSnapshot): Observable<JobWithFilledInfo[]> | Promise<JobWithFilledInfo[]> | JobWithFilledInfo[] {
     return this.jobService.listWithFilledInfo();
   }
 }
