@@ -6,6 +6,7 @@ import { isArray } from 'util';
 
 @Injectable()
 export class UrlBindingService<T_VALUES> {
+  public subjects: BehaviorSubject<any>[] = [];
   private _values: T_VALUES = null;
   public get values(): T_VALUES {
     if (this._values) return this._values;
@@ -25,8 +26,7 @@ export class UrlBindingService<T_VALUES> {
     return this._values;
   }
 
-  public subjects: BehaviorSubject<any>[] = [];
-  private params: string[] = [];
+  private params = [];
   private defaultValues = [];
   private pathParams: boolean[] = [];
   private subjectsSubscription: Subscription;
@@ -45,6 +45,19 @@ export class UrlBindingService<T_VALUES> {
 
   public loadFromParams() {
     return this._loadFromParams(this.route.snapshot.paramMap, this.route.snapshot.queryParamMap);
+  }
+
+
+  addParam<K extends keyof T_VALUES>(name: K, defaultValue: T_VALUES[K], pathParam = false) {
+    this.params.push(name);
+    this.pathParams.push(pathParam);
+    this.defaultValues.push(defaultValue);
+    const subject = new BehaviorSubject<T_VALUES[K]>(defaultValue);
+    this.subjects.push(subject);
+    this.ignoreUpdates = true;
+    this.updateSubscription();
+    this.ignoreUpdates = false;
+    return subject.asObservable();
   }
 
   private _loadFromParams(params: ParamMap, queryParams: ParamMap) {
@@ -93,7 +106,7 @@ export class UrlBindingService<T_VALUES> {
     return hadUpdate;
   }
 
-  areListsEqual(a: any[], b: any[]) {
+  private areListsEqual(a: any[], b: any[]) {
     if (a === b) return true;
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
@@ -109,18 +122,6 @@ export class UrlBindingService<T_VALUES> {
       if (a[i] !== b[i]) return false;
     }
     return true;
-  }
-
-  addParam<T_VALUE>(name: string, defaultValue: T_VALUE, pathParam = false) {
-    this.params.push(name);
-    this.pathParams.push(pathParam);
-    this.defaultValues.push(defaultValue);
-    const subject = new BehaviorSubject<T_VALUE>(defaultValue);
-    this.subjects.push(subject);
-    this.ignoreUpdates = true;
-    this.updateSubscription();
-    this.ignoreUpdates = false;
-    return subject.asObservable();
   }
 
   private updateSubscription() {
