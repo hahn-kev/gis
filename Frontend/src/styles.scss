@@ -117,9 +117,10 @@ html, body {
     @media (max-width: 460px) {
       grid-template-columns: 1fr;
     }
-    .mat-slide-toggle {
-      padding-bottom: 16px;
-    }
+  }
+
+  .mat-slide-toggle {
+    margin-bottom: 16px;
   }
 }
 
@@ -168,6 +169,7 @@ html, body {
   .mat-form-field {
     font-size: 16px;
     padding-top: 6px;
+    padding-left: 8px;
     &.mat-focused {
       .mat-form-field-ripple {
         background-color: currentColor;
@@ -179,6 +181,10 @@ html, body {
   }
   .mat-form-field-ripple {
     background-color: currentColor;
+  }
+
+  .mat-slide-toggle {
+    padding-left: 8px;
   }
 }
 

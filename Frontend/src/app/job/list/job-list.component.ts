@@ -28,7 +28,13 @@ export class JobListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ search: string, showOnlyOpen: boolean, status: JobStatus[], type: JobType[] }>) {
+              public urlBinding: UrlBindingService<{
+                search: string,
+                showOnlyOpen: boolean,
+                status: JobStatus[],
+                type: JobType[],
+                showInactive: boolean
+              }>) {
     this.dataSource = new AppDataSource<JobWithFilledInfo>();
     this.dataSource.bindToRouteData(this.route, 'jobs');
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
@@ -36,6 +42,7 @@ export class JobListComponent implements OnInit {
       if (values.showOnlyOpen && row.open <= 0) return false;
       if (values.status.length != this.jobStatus.length && !values.status.includes(row.status)) return false;
       if (values.type.length != this.jobTypes.length && !values.type.includes(row.type)) return false;
+      if (!values.showInactive && !row.current) return false;
       return true;
     };
     this.dataSource.filterPredicate = ((data, filter) =>
@@ -48,6 +55,7 @@ export class JobListComponent implements OnInit {
     this.urlBinding.addParam('showOnlyOpen', false);
     this.urlBinding.addParam('status', NonSchoolAidJobStatus);
     this.urlBinding.addParam('type', AllJobTypes);
+    this.urlBinding.addParam('showInactive', false);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     //load returns true if params updated
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
