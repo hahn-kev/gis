@@ -88,7 +88,17 @@ export class TrainingReportComponent implements OnInit {
     staffTraining.staffId = staffWithTraining.staff.id;
     staffTraining.completedDate = this.completedDate.toDate();
     await this.trainingService.saveStaffTraining(staffTraining);
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe((training) => this.staffTraining.next(training));
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value)
+      .subscribe((training) => this.staffTraining.next(training));
+  }
+
+  async markSelectedComplete(reqObject: RequirementWithStaff) {
+    const staffIds = reqObject.staffsWithTraining
+      .filter(value => !value.training.completedDate && value.selected)
+      .map(value => value.staff.id);
+    await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate.toDate());
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value)
+      .subscribe((training) => this.staffTraining.next(training));
   }
 
   async markAllComplete(reqObject: RequirementWithStaff): Promise<void> {
@@ -96,6 +106,28 @@ export class TrainingReportComponent implements OnInit {
       .filter(value => !value.training.completedDate)
       .map(value => value.staff.id);
     await this.trainingService.markAllComplete(staffIds, reqObject.requirement.id, this.completedDate.toDate());
-    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value).subscribe((training) => this.staffTraining.next(training));
+    this.trainingService.getStaffTrainingByYearMapped(this.selectedYear.value)
+      .subscribe((training) => this.staffTraining.next(training));
   }
+
+  allSelected(reqObject: RequirementWithStaff) {
+    let hasSelected = false;
+    let hasNotSelected = false;
+    for (let value of reqObject.staffsWithTraining.filter(st => !st.training.completedDate)) {
+      if (value.selected) {
+        hasSelected = true;
+      } else {
+        hasNotSelected = true;
+      }
+      if (hasNotSelected && hasSelected) return null;
+    }
+    return hasSelected && !hasNotSelected;
+  }
+
+  selectAll(reqObject: RequirementWithStaff, selected: boolean) {
+    for (let value of reqObject.staffsWithTraining.filter(st => !st.training.completedDate)) {
+      value.selected = selected;
+    }
+  }
+
 }
