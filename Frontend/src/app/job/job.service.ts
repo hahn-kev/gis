@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Job, JobWithFilledInfo, JobWithOrgGroup, JobWithRoles } from './job';
+import { RoleExtended } from '../people/role';
 
 @Injectable()
 export class JobService {
@@ -8,8 +9,12 @@ export class JobService {
   constructor(private http: HttpClient) {
   }
 
+  simpleList() {
+    return this.http.get<Job[]>('/api/job');
+  }
+
   list() {
-    return this.http.get<JobWithOrgGroup[]>('/api/job');
+    return this.http.get<JobWithOrgGroup[]>('/api/job/orgGroups');
   }
 
   listWithFilledInfo() {
@@ -26,5 +31,9 @@ export class JobService {
 
   delete(jobId: string) {
     return this.http.delete('/api/job/' + jobId, {responseType: 'text'});
+  }
+
+  getAllRoles() {
+    return this.http.get<RoleExtended[]>('/api/job/roles/all');
   }
 }

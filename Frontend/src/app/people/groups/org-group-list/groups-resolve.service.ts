@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { OrgGroup } from '../org-group';
+import { OrgGroupWithSupervisor } from '../org-group';
 import { Observable } from 'rxjs';
 import { GroupService } from '../group.service';
 
 @Injectable()
-export class GroupsResolveService implements Resolve<OrgGroup[]> {
+export class GroupsResolveService implements Resolve<OrgGroupWithSupervisor[]> {
   resolve(route: ActivatedRouteSnapshot,
-          state: RouterStateSnapshot): Observable<OrgGroup[]> | Promise<OrgGroup[]> | OrgGroup[] {
+          state: RouterStateSnapshot): Observable<OrgGroupWithSupervisor[]> | Promise<OrgGroupWithSupervisor[]> | OrgGroupWithSupervisor[] {
     return this.orgGroupService.getAll();
   }
 

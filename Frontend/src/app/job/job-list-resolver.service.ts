@@ -11,6 +11,6 @@ export class JobListResolverService implements Resolve<Job[]> {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Job[]> | Promise<Job[]> | Job[] {
-    return this.jobService.list();
+    return this.jobService.simpleList();
   }
 }

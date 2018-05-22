@@ -13,6 +13,7 @@ import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
   MatAutocompleteModule,
+  MatBadgeModule,
   MatBottomSheetModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -36,7 +37,8 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
@@ -111,6 +113,7 @@ import { AccordionListHeaderDirective } from './components/accordion-list/accord
 import { AccordionListContentDirective } from './components/accordion-list/accordion-list-content.directive';
 import { AccordionListFormDirective } from './components/accordion-list/accordion-list-form.directive';
 import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
+import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { DialogDirective } from './components/render-template-dialog/dialog.directive';
 
 if (environment.production) {
@@ -168,7 +171,8 @@ if (environment.production) {
     AccordionListContentDirective,
     AccordionListFormDirective,
     RenderTemplateBottomSheetComponent,
-    DialogDirective
+    DialogDirective,
+    OrgTreeComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -212,6 +216,8 @@ if (environment.production) {
     MatAutocompleteModule,
     MatGridListModule,
     MatBottomSheetModule,
+    MatTreeModule,
+    MatBadgeModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,

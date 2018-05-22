@@ -18,9 +18,15 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public IList<JobWithOrgGroup> Jobs()
+        public IList<Job> Jobs()
         {
             return _jobService.Jobs();
+        }
+
+        [HttpGet("orgGroups")]
+        public IList<JobWithOrgGroup> JobsWithOrgGroup()
+        {
+            return _jobService.JobsWithOrgGroup();
         }
 
         [HttpGet("filled")]
@@ -82,6 +88,12 @@ namespace Backend.Controllers
         {
             _jobService.DeleteGrade(id);
             return Ok();
+        }
+
+        [HttpGet("roles/all")]
+        public IList<PersonRoleExtended> AllRoles()
+        {
+            return _jobService.PersonRolesExtended;
         }
     }
 }

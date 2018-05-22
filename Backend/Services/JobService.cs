@@ -10,16 +10,19 @@ namespace Backend.Services
     {
         private readonly JobRepository _jobRepository;
         private readonly IEntityService _entityService;
-        private readonly PersonRepository _personRepository;
 
-        public JobService(JobRepository jobRepository, IEntityService entityService, PersonRepository personRepository)
+        public JobService(JobRepository jobRepository, IEntityService entityService)
         {
             _jobRepository = jobRepository;
             _entityService = entityService;
-            _personRepository = personRepository;
         }
 
-        public IList<JobWithOrgGroup> Jobs()
+        public IList<Job> Jobs()
+        {
+            return _jobRepository.Job.OrderBy(job => job.Title).ToList();
+        }
+
+        public IList<JobWithOrgGroup> JobsWithOrgGroup()
         {
             return _jobRepository.JobsWithOrgGroup.OrderBy(job => job.Title).ToList();
         }
@@ -63,5 +66,7 @@ namespace Backend.Services
         {
             _entityService.Delete<Grade>(id);
         }
+
+        public IList<PersonRoleExtended> PersonRolesExtended => _jobRepository.PersonRolesExtended.OrderByDescending(extended => extended.StartDate).ToList();
     }
 }

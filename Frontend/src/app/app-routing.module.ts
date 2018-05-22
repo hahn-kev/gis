@@ -54,6 +54,8 @@ import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 import { StaffSummariesResolveService } from './people/staff/staff-report/staff-summaries-resolve.service';
 import { PersonRequiredGuard } from './services/person-required.guard';
+import { OrgTreeComponent } from './org-tree/org-tree.component';
+import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
 
 const routes: Routes = [
   {
@@ -201,7 +203,6 @@ const routes: Routes = [
             ]
           }
         ]
-
       },
       {
         path: 'groups',
@@ -343,6 +344,33 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'org-tree',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
+        children: [
+          {
+            path: '',
+            component: OrgTreeComponent,
+            resolve: {
+              roles: AllRolesResolverService,
+              jobs: JobListResolverService,
+              groups: GroupsResolveService,
+            }
+          },
+          {
+            path: ':rootId',
+            component: OrgTreeComponent,
+            resolve: {
+              roles: AllRolesResolverService,
+              jobs: JobListResolverService,
+              groups: GroupsResolveService,
+            }
+          }
+        ]
+      },
+      {
         path: 'self',
         canActivate: [PersonRequiredGuard],
         component: PersonComponent,
@@ -411,7 +439,8 @@ const routes: Routes = [
     CanDeactivateGuard,
     SchoolAidResolveService,
     StaffSummariesResolveService,
-    PersonRequiredGuard
+    PersonRequiredGuard,
+    AllRolesResolverService
   ]
 })
 export class AppRoutingModule {

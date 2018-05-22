@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { OrgGroup } from './org-group';
+import { OrgGroup, OrgGroupWithSupervisor } from './org-group';
 import { Observable } from 'rxjs';
 import { Person } from '../person';
 import { LinkType, OrgChain, OrgChainLink } from './org-chain';
@@ -16,8 +16,8 @@ export class GroupService {
     return this.http.get<OrgGroup>('/api/orggroup/' + id);
   }
 
-  getAll(): Observable<OrgGroup[]> {
-    return this.http.get<OrgGroup[]>('/api/orggroup');
+  getAll(): Observable<OrgGroupWithSupervisor[]> {
+    return this.http.get<OrgGroupWithSupervisor[]>('/api/orggroup');
   }
 
   getAllMap() {

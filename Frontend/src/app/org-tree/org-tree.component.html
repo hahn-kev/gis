@@ -1,0 +1,102 @@
+<ng-container *appTemplateContent="'title'">Organization</ng-container>
+<ng-container *appToolbarContent>
+  <mat-slide-toggle [(ngModel)]="urlBinding.values.allJobs" style="padding-right: 16px;">
+    Show Inactive Jobs
+  </mat-slide-toggle>
+  <mat-slide-toggle [(ngModel)]="urlBinding.values.allRoles">
+    Show Role History
+  </mat-slide-toggle>
+
+  <a mat-icon-button class="print-hide" matTooltip="Org List" matTooltipPosition="before"
+     routerLink="/groups/list">
+    <mat-icon>list_alt</mat-icon>
+  </a>
+</ng-container>
+<div class="main-card">
+  <mat-card>
+    <mat-tree [dataSource]="nodes" [treeControl]="treeControl" [trackBy]="trackBy">
+      <ng-container *matTreeNodeDef="let node; when: isOrgNode">
+        <mat-nested-tree-node role="group">
+          <div class="mat-tree-node" matTreeNodePadding>
+            <button mat-icon-button matTreeNodeToggle
+                    [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
+                    [attr.aria-label]="'toggle ' + node.value.groupName">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <a mat-button [routerLink]="['/groups', 'edit', node.id]">
+              <mat-icon>location_city</mat-icon>
+              {{node.value.groupName}}
+            </a>
+            <span class="spacer"></span>
+            <mat-chip-list>
+              <a mat-chip *ngIf="node.value.supervisorPerson as person"
+                 [routerLink]="['/people', 'edit', person.id]">
+                Supervisor {{person.preferredName}} {{person.lastName}}
+                <mat-icon matChipRemove>person</mat-icon>
+              </a>
+
+              <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
+              <mat-chip *ngIf="openJobs(node) > 0" [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
+          <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+                       [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
+          <ng-container *ngIf="treeControl.isExpanded(node)">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ng-container>
+        </mat-nested-tree-node>
+      </ng-container>
+
+      <ng-container *matTreeNodeDef="let node; when: isJobNode">
+        <mat-nested-tree-node role="group">
+          <div class="mat-tree-node" matTreeNodePadding>
+            <button mat-icon-button matTreeNodeToggle [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
+                    [attr.aria-label]="'toggle ' + node.value.title">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <a mat-button [routerLink]="['/job', 'edit', node.id]">
+              <mat-icon>work</mat-icon>
+              {{node.value.title}}
+            </a>
+            <span class="spacer"></span>
+            <mat-chip-list>
+              <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
+              <mat-chip *ngIf="openJobs(node) > 0" [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
+          <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+                       [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
+          <ng-container *ngIf="treeControl.isExpanded(node)">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ng-container>
+        </mat-nested-tree-node>
+      </ng-container>
+
+      <ng-container *matTreeNodeDef="let node; when: isRoleNode">
+        <mat-tree-node matTreeNodeToggle matTreeNodePadding>
+          <button mat-icon-button disabled></button>
+          <a mat-button [routerLink]="['/people', 'edit', node.id]">
+            <mat-icon>person</mat-icon>
+            {{node.value.preferredName}} {{node.value.lastName}}
+          </a>
+          <span class="spacer"></span>
+          <mat-chip-list>
+            <mat-chip [selected]="true" color="accent">
+              {{node.value.startDate | date}}
+              <mat-icon style="font-size: 18px; height: 18px; width: 18px;">arrow_right_alt</mat-icon>
+              {{node.value.active ? 'now' : (node.value.endDate | date)}}
+            </mat-chip>
+          </mat-chip-list>
+        </mat-tree-node>
+        <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+                     [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
+      </ng-container>
+    </mat-tree>
+  </mat-card>
+</div>
