@@ -3,10 +3,14 @@ import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { isArray } from 'util';
+import { Observable } from 'rxjs/Observable';
+
+type ObservableValues<T> = {
+  [K in keyof T]: Observable<T[K]>
+};
 
 @Injectable()
 export class UrlBindingService<T_VALUES> {
-  private _values: T_VALUES = null;
   public get values(): T_VALUES {
     if (this._values) return this._values;
     this._values = {} as T_VALUES;
@@ -25,7 +29,22 @@ export class UrlBindingService<T_VALUES> {
     return this._values;
   }
 
+  public get observableValues(): ObservableValues<T_VALUES> {
+    if (this._observableValues) return this._observableValues;
+    this._observableValues = {} as ObservableValues<T_VALUES>;
+    for (let i = 0; i < this.params.length; i++) {
+      const name = this.params[i];
+      const subject = this.subjects[i];
+      Object.defineProperty(this._observableValues, name, {
+        value: subject
+      });
+    }
+    return this._observableValues;
+  }
+
   public subjects: BehaviorSubject<any>[] = [];
+  private _observableValues: ObservableValues<T_VALUES> = null;
+  private _values: T_VALUES = null;
   private params: string[] = [];
   private defaultValues = [];
   private pathParams: boolean[] = [];
