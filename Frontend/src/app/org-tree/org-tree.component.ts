@@ -23,16 +23,17 @@ interface Data {
   providers: [UrlBindingService]
 })
 export class OrgTreeComponent implements OnInit {
-  nestedTreeControl: NestedTreeControl<OrgNode<any>>;
-  nodes: OrgNode<any>[];
+  treeControl: NestedTreeControl<OrgNode>;
+  nodes: OrgNode[];
   data: Data;
   rootId: string;
 
   constructor(private route: ActivatedRoute,
               public urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean }>) {
-    this.urlBinding.addParam('allRoles', true);
-    this.urlBinding.addParam('allJobs', true);
-    this.nestedTreeControl = new NestedTreeControl<OrgNode<any>>(dataNode => dataNode.observableChildren);
+    this.urlBinding.addParam('allRoles', false);
+    this.urlBinding.addParam('allJobs', false);
+    this.treeControl = new NestedTreeControl<OrgNode>(dataNode => dataNode.observableChildren);
+    this.treeControl.getLevel = dataNode => dataNode.level;
     combineLatest(this.route.params, this.route.data).subscribe(([params, data]: [
       {
         rootId: string
@@ -40,7 +41,8 @@ export class OrgTreeComponent implements OnInit {
       ]) => {
       this.data = data;
       this.rootId = params.rootId;
-      if (!this.urlBinding.loadFromParams()) this.buildList();
+      this.urlBinding.loadFromParams();
+      this.buildList();
     });
   }
 
@@ -49,10 +51,11 @@ export class OrgTreeComponent implements OnInit {
       .map(org => this.buildOrgNode(org, this.data));
     if (this.rootId) {
       this.nodes = [this.findNode(this.nodes, this.rootId)].filter(value => value != null);
+      //we're setting the parent to null here so that the level property works
+      if (this.nodes.length == 1) this.nodes[0].parent = null;
     }
-    this.nestedTreeControl.dataNodes = this.nodes;
     for (let node of this.nodes) {
-      this.nestedTreeControl.expand(node);
+      this.treeControl.expand(node);
     }
   }
 
@@ -95,35 +98,35 @@ export class OrgTreeComponent implements OnInit {
     );
   }
 
-  isOrgNode = (i: number, node: OrgNode<any>) => {
+  isOrgNode = (i: number, node: OrgNode) => {
     return node.type == 'org';
   };
 
-  isJobNode = (i: number, node: OrgNode<any>) => {
+  isJobNode = (i: number, node: OrgNode) => {
     return node.type == 'job';
   };
 
-  isRoleNode = (i: number, node: OrgNode<any>) => {
+  isRoleNode = (i: number, node: OrgNode) => {
     return node.type == 'role';
   };
 
-  isOrg(node: OrgNode<any>): node is OrgNode<OrgGroupWithSupervisor> {
+  isOrg(node: OrgNode): node is OrgNode<OrgGroupWithSupervisor, Job | OrgGroupWithSupervisor, OrgGroupWithSupervisor> {
     return node.type == 'org';
   }
 
-  isJob(node: OrgNode<any>): node is OrgNode<Job, RoleExtended> {
+  isJob(node: OrgNode): node is OrgNode<Job, RoleExtended, OrgGroupWithSupervisor> {
     return node.type == 'job';
   }
 
-  isRole(node: OrgNode<any>): node is OrgNode<RoleExtended> {
+  isRole(node: OrgNode): node is OrgNode<RoleExtended, never, Job> {
     return node.type == 'role';
   }
 
-  trackBy(i: number, node: OrgNode<any>) {
+  trackBy(i: number, node: OrgNode) {
     return node.id;
   }
 
-  filledJobs(node: OrgNode<any>) {
+  filledJobs(node: OrgNode) {
     if (this.isJob(node)) {
       return node.filteredChildren.filter(child => child.value.active).length;
     } else if (this.isOrg(node)) {
@@ -133,7 +136,7 @@ export class OrgTreeComponent implements OnInit {
     return 0;
   }
 
-  jobsAvalible(node: OrgNode<any>) {
+  jobsAvalible(node: OrgNode) {
     if (this.isJob(node)) {
       return node.value.positions;
     } else if (this.isOrg(node)) {
@@ -143,7 +146,7 @@ export class OrgTreeComponent implements OnInit {
     return 0;
   }
 
-  openJobs(node: OrgNode<any>) {
+  openJobs(node: OrgNode) {
     if (this.isJob(node)) {
       return node.value.positions - node.filteredChildren.filter(child => child.value.active).length;
     } else if (this.isOrg(node)) {
@@ -153,7 +156,7 @@ export class OrgTreeComponent implements OnInit {
     return 0;
   }
 
-  findNode(nodes: OrgNode<any>[], id: string): OrgNode<any> {
+  findNode(nodes: OrgNode[], id: string): OrgNode {
     for (let node of nodes) {
       if (node.id == id) return node;
       let foundChild = this.findNode(node.allChildren, id);
@@ -163,6 +166,35 @@ export class OrgTreeComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  dividerMargin(node: OrgNode) {
+    return 48 + node.level * 40 + 'px';
+  }
+
+  isLast(node: OrgNode) {
+    if (node.parent) {
+      return node.parent.filteredChildren.findIndex(
+        value => value.id == node.id) + 1 == node.parent.filteredChildren.length;
+    }
+    return this.nodes.findIndex(value => value.id == node.id) + 1 == this.nodes.length;
+  }
+
+  isLastVisible(node: OrgNode) {
+    let visitedNodes = [node];
+    if (node.hasChildren && this.treeControl.isExpanded(node)) return false;
+    if (node.parent) {
+      while (node.parent) {
+        if (this.isLast(node)) {
+          node = node.parent;
+          if (visitedNodes.indexOf(node) != -1) throw new Error('Error loop in tree found');
+          visitedNodes.push(node);
+        } else {
+          return false;
+        }
+      }
+    }
+    return this.isLast(node);
   }
 
 }

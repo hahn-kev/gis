@@ -67,6 +67,6 @@ namespace Backend.Services
             _entityService.Delete<Grade>(id);
         }
 
-        public IList<PersonRoleExtended> PersonRolesExtended => _jobRepository.PersonRolesExtended.ToList();
+        public IList<PersonRoleExtended> PersonRolesExtended => _jobRepository.PersonRolesExtended.OrderByDescending(extended => extended.StartDate).ToList();
     }
 }

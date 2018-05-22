@@ -1,4 +1,10 @@
 <ng-container *appTemplateContent="'title'">Edit {{group.type}}</ng-container>
+<ng-container *appToolbarContent>
+  <a mat-icon-button *ngIf="!isNew" [routerLink]="['/org-tree', group.id]"
+     matTooltip="View Org Tree At {{group.groupName}}">
+    <mat-icon>location_city</mat-icon>
+  </a>
+</ng-container>
 <form class="main-card" id="form" #groupForm="ngForm" (ngSubmit)="save()">
   <mat-card class="two-colum-grid">
     <mat-form-field>
