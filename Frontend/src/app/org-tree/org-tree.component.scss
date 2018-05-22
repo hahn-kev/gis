@@ -1,11 +1,15 @@
-.mat-tree {
-
+.mat-tree .mat-tree-node {
+  padding-left: 8px;
+  padding-right: 8px;
+  .spacer {
+    min-width: 8px;
+  }
   a.mat-chip {
     text-decoration: none;
     cursor: pointer;
   }
+}
 
-  .mat-tree-node .spacer {
-    padding-left: 8px;
-  }
+.mat-card {
+  padding: 8px 0;
 }
