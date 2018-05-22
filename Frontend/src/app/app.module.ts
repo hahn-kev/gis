@@ -13,6 +13,7 @@ import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
   MatAutocompleteModule,
+  MatBadgeModule,
   MatBottomSheetModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -214,6 +215,7 @@ if (environment.production) {
     MatGridListModule,
     MatBottomSheetModule,
     MatTreeModule,
+    MatBadgeModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,

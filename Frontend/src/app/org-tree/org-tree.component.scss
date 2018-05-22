@@ -3,6 +3,9 @@
     margin-top: 0;
     margin-bottom: 0;
     list-style-type: none;
-
+  }
+  .mat-divider {
+    margin-left: 48px;
+    width: calc(100% - 48px);
   }
 }

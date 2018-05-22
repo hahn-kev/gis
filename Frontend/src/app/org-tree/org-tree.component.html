@@ -6,66 +6,88 @@
   <mat-slide-toggle [(ngModel)]="urlBinding.values.allRoles">
     Show Role History
   </mat-slide-toggle>
+
+  <a mat-icon-button class="print-hide" matTooltip="Org List" matTooltipPosition="before"
+     routerLink="/groups/list">
+    <mat-icon>list_alt</mat-icon>
+  </a>
 </ng-container>
+<div class="main-card">
+  <mat-card>
+    <mat-tree [dataSource]="nodes" [treeControl]="nestedTreeControl" [trackBy]="trackBy">
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: isOrgNode" role="group">
+        <li>
+          <div class="mat-tree-node">
+            <button mat-icon-button matTreeNodeToggle
+                    [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
+                    [attr.aria-label]="'toggle ' + node.value.groupName">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{nestedTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <a mat-button [routerLink]="['/groups', 'edit', node.id]">
+              <mat-icon>location_city</mat-icon>
+              {{node.value.groupName}}
+            </a>
+            <span class="spacer"></span>
+            <a *ngIf="node.value.supervisorPerson as person" mat-icon-button
+               [routerLink]="['/people', 'edit', node.id]"
+               matTooltipPosition="before"
+               matTooltip="View Supervisor {{person.preferredName}} {{person.lastName}}">
+              <mat-icon>person</mat-icon>
+            </a>
+            <mat-chip-list>
+              <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
+              <mat-chip [selected]="true" color="accent">Open Jobs: {{openJobs(node)}}</mat-chip>
+            </mat-chip-list>
+          </div>
+          <mat-divider [inset]="true"></mat-divider>
+          <ul *ngIf="nestedTreeControl.isExpanded(node)">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ul>
+        </li>
+      </mat-nested-tree-node>
 
-<mat-tree [dataSource]="nodes" [treeControl]="nestedTreeControl">
-  <mat-nested-tree-node *matTreeNodeDef="let node; when: isOrgNode">
-    <li>
-      <div class="mat-tree-node">
-        <button mat-icon-button matTreeNodeToggle [style.visibility]="node.children.length ? 'visible' : 'hidden'"
-                [attr.aria-label]="'toggle ' + node.value.groupName">
-          <mat-icon class="mat-icon-rtl-mirror">
-            {{nestedTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-          </mat-icon>
-        </button>
-        <a mat-button [routerLink]="['/groups', 'edit', node.id]">
-          <mat-icon>location_city</mat-icon>
-          {{node.value.groupName}}
-        </a>
-        <a *ngIf="node.value.supervisorPerson as person" mat-button [routerLink]="['/people', 'edit', node.id]">
-          <mat-icon>person</mat-icon>
-          Supervisor: {{person.preferredName}} {{person.lastName}}
-        </a>
-        <span>
-          Jobs Total: {{jobsAvalible(node)}} Filled: {{filledJobs(node)}}
-        </span>
-      </div>
-      <ul *ngIf="nestedTreeControl.isExpanded(node)">
-        <ng-container matTreeNodeOutlet></ng-container>
-      </ul>
-    </li>
-  </mat-nested-tree-node>
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: isJobNode; let index = index" role="group">
+        <li>
+          <div class="mat-tree-node">
+            <button mat-icon-button matTreeNodeToggle [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
+                    [attr.aria-label]="'toggle ' + node.value.title">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{nestedTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <a mat-button [routerLink]="['/job', 'edit', node.id]">
+              <mat-icon>work</mat-icon>
+              {{node.value.title}}
+            </a>
+            <span class="spacer"></span>
+            <mat-chip-list>
+              <mat-chip [selected]="true" color="primary">Staff: {{filledJobs(node)}}</mat-chip>
+              <mat-chip [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}</mat-chip>
+            </mat-chip-list>
+          </div>
+          <mat-divider [inset]="true"></mat-divider>
+          <ul *ngIf="nestedTreeControl.isExpanded(node)">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ul>
+        </li>
+      </mat-nested-tree-node>
 
-  <mat-nested-tree-node *matTreeNodeDef="let node; when: isJobNode">
-    <li>
-      <div class="mat-tree-node">
-        <button mat-icon-button matTreeNodeToggle [style.visibility]="node.children.length ? 'visible' : 'hidden'"
-                [attr.aria-label]="'toggle ' + node.value.title">
-          <mat-icon class="mat-icon-rtl-mirror">
-            {{nestedTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-          </mat-icon>
-        </button>
-        <a mat-button [routerLink]="['/job', 'edit', node.id]">
-          <mat-icon>work</mat-icon>
-          {{node.value.title}}
-        </a>
-        <span>Jobs Total: {{jobsAvalible(node)}} Filled: {{filledJobs(node)}}</span>
-      </div>
-      <ul *ngIf="nestedTreeControl.isExpanded(node)">
-        <ng-container matTreeNodeOutlet></ng-container>
-      </ul>
-    </li>
-  </mat-nested-tree-node>
-
-  <mat-tree-node *matTreeNodeDef="let node; when: isRoleNode">
-    <li class="mat-tree-node">
-      <button mat-icon-button disabled></button>
-
-      <a mat-button [routerLink]="['/people', 'edit', node.id]">
-        <mat-icon>person</mat-icon>
-        {{node.value.preferredName}} {{node.value.lastName}}
-      </a>
-      <span>{{node.value.startDate | date}} till {{node.value.active ? 'now' : (node.value.endDate | date)}}</span>
-    </li>
-  </mat-tree-node>
-</mat-tree>
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: isRoleNode; let index = index">
+        <li>
+          <div class="mat-tree-node">
+            <button mat-icon-button disabled></button>
+            <a mat-button [routerLink]="['/people', 'edit', node.id]">
+              <mat-icon>person</mat-icon>
+              {{node.value.preferredName}} {{node.value.lastName}}
+            </a>
+            <span class="spacer"></span>
+            <span>{{node.value.startDate | date}} till {{node.value.active ? 'now' : (node.value.endDate | date)}}</span>
+          </div>
+          <mat-divider [inset]="true"></mat-divider>
+        </li>
+      </mat-nested-tree-node>
+    </mat-tree>
+  </mat-card>
+</div>
