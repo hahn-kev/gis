@@ -22,6 +22,9 @@ namespace Backend.DataLayer
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
+        public IQueryable<LeaveRequest> LeaveRequestsInYear(int year) =>
+            _dbConnection.LeaveRequests.Where(request => request.StartDate.InSchoolYear(year));
+
         public IQueryable<PersonExtended> PeopleExtended =>
             _dbConnection.PeopleExtended
                 .OrderBy(person => person.PreferredName ?? person.FirstName)

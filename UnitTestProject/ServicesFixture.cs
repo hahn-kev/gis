@@ -239,6 +239,14 @@ namespace UnitTestProject
             });
         }
 
+        public PersonRole InsertRole(Action<PersonRole> action = null)
+        {
+            var role = AutoFaker.Generate<PersonRole>();
+            action?.Invoke(role);
+            _dbConnection.Insert(role);
+            return role;
+        }
+
         public LeaveRequest InsertLeaveRequest(LeaveType leaveType, Guid personId, int days)
         {
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
@@ -251,14 +259,6 @@ namespace UnitTestProject
             leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4);
             _dbConnection.Insert(leaveRequest);
             return leaveRequest;
-        }
-
-        public PersonRole InsertRole(Action<PersonRole> action = null)
-        {
-            var role = AutoFaker.Generate<PersonRole>();
-            action?.Invoke(role);
-            _dbConnection.Insert(role);
-            return role;
         }
 
         public IdentityUser InsertUser(Action<IdentityUser> modify = null, params string[] roles)

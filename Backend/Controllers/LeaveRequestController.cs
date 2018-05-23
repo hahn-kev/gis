@@ -110,7 +110,7 @@ namespace Backend.Controllers
         {
             if (listAll && !User.IsAdminOrHr())
                 throw new UnauthorizedAccessException("Only admin and hr users are allowed to see all leave");
-            return _leaveService.PeopleWithLeave(listAll
+            return _leaveService.PeopleWithCurrentLeave(listAll
                 ? (Guid?) null
                 : (User.PersonId() ??
                    throw new AuthenticationException("If user isn't admin or hr they must have a personId")));

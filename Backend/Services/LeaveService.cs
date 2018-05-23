@@ -119,7 +119,8 @@ namespace Backend.Services
 
         private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor orgGroup, LeaveUsage leaveUsage)
+            OrgGroupWithSupervisor orgGroup,
+            LeaveUsage leaveUsage)
         {
             //super and requested by will be the same if the requester is a supervisor
             if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor) return null;
@@ -139,7 +140,8 @@ namespace Backend.Services
 
         private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            PersonWithStaff supervisor, LeaveUsage leaveUsage)
+            PersonWithStaff supervisor,
+            LeaveUsage leaveUsage)
         {
             //this is a list of substitutions avalible in the email template
             //these are used when notifying non approving supervisors of leave
@@ -232,15 +234,20 @@ namespace Backend.Services
 
         public LeaveDetails GetCurrentLeaveDetails(Guid personId)
         {
+            return GetLeaveDetails(personId, DateTime.Now.SchoolYear());
+        }
+
+        public LeaveDetails GetLeaveDetails(Guid personId, int schoolYear)
+        {
             return GetLeaveDetails(personId,
                 _personRepository.GetPersonRolesWithJob(personId),
-                DateTime.Now.SchoolYear());
+                schoolYear);
         }
 
         public LeaveDetails GetLeaveDetails(Guid personId, IEnumerable<PersonRoleWithJob> personRoles, int schoolYear)
         {
-            var leaveRequests = _personRepository.LeaveRequests
-                .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear));
+            var leaveRequests = _personRepository.LeaveRequestsInYear(schoolYear)
+                .Where(request => request.PersonId == personId).ToList();
             return new LeaveDetails
             {
                 LeaveUsages = CalculateLeaveDetails(personRoles, leaveRequests)
@@ -272,7 +279,7 @@ namespace Backend.Services
             return GetLeaveUseage(leaveType, personId, DateTime.Now.SchoolYear());
         }
 
-        private LeaveUsage GetLeaveUseage(LeaveType leaveType, Guid personId, int schoolYear)
+        public LeaveUsage GetLeaveUseage(LeaveType leaveType, Guid personId, int schoolYear)
         {
             return new LeaveUsage
             {
@@ -334,7 +341,12 @@ namespace Backend.Services
             return 20;
         }
 
-        public IList<PersonAndLeaveDetails> PeopleWithLeave(Guid? personId)
+        public IList<PersonAndLeaveDetails> PeopleWithCurrentLeave(Guid? personId)
+        {
+            return PeopleWithLeave(personId, DateTime.Now.SchoolYear());
+        }
+
+        public IList<PersonAndLeaveDetails> PeopleWithLeave(Guid? personId, int schoolYear)
         {
             if (personId != null)
             {
@@ -345,16 +357,18 @@ namespace Backend.Services
                     new PersonAndLeaveDetails
                     {
                         Person = person,
-                        LeaveUsages = GetCurrentLeaveDetails(personId.Value).LeaveUsages
+                        LeaveUsages = GetLeaveDetails(personId.Value, schoolYear).LeaveUsages
                     }
                 };
             }
 
             var people = _personRepository.People.Where(person => person.StaffId != null).ToList();
             var peopleIds = people.Select(person => person.Id).ToList();
-            var leaveRequests = _personRepository.LeaveRequests.Where(request => peopleIds.Contains(request.PersonId))
+            var leaveRequests = _personRepository.LeaveRequestsInYear(schoolYear)
+                .Where(request => peopleIds.Contains(request.PersonId))
                 .ToLookup(request => request.PersonId);
-            var personRoles = _personRepository.PersonRolesWithJob.Where(role => peopleIds.Contains(role.PersonId))
+            var personRoles = _personRepository.PersonRolesWithJob
+                .Where(role => peopleIds.Contains(role.PersonId))
                 .ToLookup(role => role.PersonId);
             return
                 people.Select(person => new PersonAndLeaveDetails
@@ -388,7 +402,8 @@ namespace Backend.Services
                 if (newRequest.Days != newRequest.CalculateLength() &&
                     newRequest.Days != newRequest.CalculateLength() - 0.5m)
                 {
-                    throw new ArgumentException($"Leave request days calculated didn't match what was expected for dates {newRequest.StartDate} to {newRequest.EndDate}");
+                    throw new ArgumentException(
+                        $"Leave request days calculated didn't match what was expected for dates {newRequest.StartDate} to {newRequest.EndDate}");
                 }
 
                 return;

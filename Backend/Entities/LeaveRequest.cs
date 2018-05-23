@@ -51,6 +51,12 @@ namespace Backend.Entities
         {
             return (LeaveRequest) MemberwiseClone();
         }
+
+        public override string ToString()
+        {
+            return
+                $"{Type} {StartDate.ToShortDateString()} -> {EndDate.ToShortDateString()} Days: {Days} Approved: {Approved}";
+        }
     }
 
     [Table("LeaveRequest", IsColumnAttributeRequired = false)]
