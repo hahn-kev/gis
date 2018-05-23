@@ -3,7 +3,7 @@ import { AppDataSource } from '../../../classes/app-data-source';
 import { PersonAndLeaveDetails } from '../person-and-leave-details';
 import { ActivatedRoute } from '@angular/router';
 import { Person } from '../../person';
-import { LeaveType, LeaveUseage } from '../../self/self';
+import { LeaveType, LeaveUsage } from '../../self/self';
 
 @Component({
   selector: 'app-leave-report',
@@ -24,7 +24,7 @@ export class LeaveReportComponent implements OnInit {
         let plm = new PersonLeaveModel();
         plm.person = p.person;
 
-        for (let leave of p.leaveUseages) plm.appendLeave(leave);
+        for (let leave of p.leaveUsages) plm.appendLeave(leave);
         return plm;
       });
     });
@@ -40,16 +40,16 @@ export class LeaveReportComponent implements OnInit {
 
 export class PersonLeaveModel {
   public person: Person;
-  public sick: LeaveUseage;
-  public vacation: LeaveUseage;
-  public personal: LeaveUseage;
-  public parental: LeaveUseage;
-  public emergency: LeaveUseage;
-  public schoolRelated: LeaveUseage;
-  public missionRelated: LeaveUseage;
-  public other: LeaveUseage;
+  public sick: LeaveUsage;
+  public vacation: LeaveUsage;
+  public personal: LeaveUsage;
+  public parental: LeaveUsage;
+  public emergency: LeaveUsage;
+  public schoolRelated: LeaveUsage;
+  public missionRelated: LeaveUsage;
+  public other: LeaveUsage;
 
-  appendLeave(leave: LeaveUseage) {
+  appendLeave(leave: LeaveUsage) {
     switch (leave.leaveType) {
       case LeaveType.Sick:
         this.sick = leave;
@@ -77,7 +77,7 @@ export class PersonLeaveModel {
         break;
       default:
         if (!this.other) {
-          this.other = new LeaveUseage();
+          this.other = new LeaveUsage();
           this.other.leaveType = LeaveType.Other;
         }
         this.other.totalAllowed += leave.totalAllowed;

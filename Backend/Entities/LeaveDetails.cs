@@ -4,10 +4,10 @@ namespace Backend.Entities
 {
     public class LeaveDetails
     {
-        public IList<LeaveUseage> LeaveUseages { get; set; }
+        public IList<LeaveUsage> LeaveUsages { get; set; }
     }
 
-    public class LeaveUseage
+    public class LeaveUsage
     {
         public LeaveType LeaveType { get; set; }
         public decimal Used { get; set; }

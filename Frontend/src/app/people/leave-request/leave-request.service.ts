@@ -4,7 +4,7 @@ import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
 import { Person } from '../person';
 import { Observable, of } from 'rxjs';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { LeaveUseage } from '../self/self';
+import { LeaveUsage } from '../self/self';
 import * as moment from 'moment';
 import * as buisness from 'moment-business';
 
@@ -44,8 +44,8 @@ export class LeaveRequestService {
       {params: {listAll: listAll ? 'true' : 'false'}});
   }
 
-  isOverUsingLeave(leaveRequest: LeaveRequest, leaveUseages: LeaveUseage[]) {
-    const leaveUsage = leaveUseages.find(value => value.leaveType == leaveRequest.type);
+  isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {
+    const leaveUsage = leaveUsages.find(value => value.leaveType == leaveRequest.type);
     if (leaveUsage == null) return true;
     if (leaveUsage.left <= 1) return true;
     return leaveUsage.left - leaveRequest.days < 0;

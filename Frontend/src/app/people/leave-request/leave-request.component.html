@@ -122,7 +122,7 @@
       <div class="span-2-columns" *ngIf="selectedPerson">
         <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
         <mat-chip-list>
-          <ng-container *ngFor="let leave of selectedPerson?.leaveUseages">
+          <ng-container *ngFor="let leave of selectedPerson?.leaveUsages">
             <mat-chip *ngIf="showLeaveUsage(leave)"
                       color="accent" selected="true">
               {{typeName(leave.leaveType)}} {{leave.used}}/{{leave.totalAllowed}}

@@ -110,28 +110,28 @@ namespace Backend.Services
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
             OrgGroupWithSupervisor supervisorGroup,
-            LeaveUseage leaveUseage)
+            LeaveUsage leaveUsage)
         {
-            return await DoNotifyWork(leaveRequest, requestedBy, department, leaveUseage) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, devision, leaveUseage) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup, leaveUseage);
+            return await DoNotifyWork(leaveRequest, requestedBy, department, leaveUsage) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, devision, leaveUsage) ??
+                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup, leaveUsage);
         }
 
         private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor orgGroup, LeaveUseage leaveUseage)
+            OrgGroupWithSupervisor orgGroup, LeaveUsage leaveUsage)
         {
             //super and requested by will be the same if the requester is a supervisor
             if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor) return null;
             if (orgGroup.ApproverIsSupervisor && orgGroup.SupervisorPerson != null)
             {
-                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUseage);
+                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUsage);
                 return orgGroup.SupervisorPerson;
             }
 
             if (orgGroup.SupervisorPerson != null)
             {
-                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUseage);
+                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUsage);
             }
 
             return null;
@@ -139,7 +139,7 @@ namespace Backend.Services
 
         private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            PersonWithStaff supervisor, LeaveUseage leaveUseage)
+            PersonWithStaff supervisor, LeaveUsage leaveUsage)
         {
             //this is a list of substitutions avalible in the email template
             //these are used when notifying non approving supervisors of leave
@@ -152,7 +152,7 @@ namespace Backend.Services
                 {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
                 {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
-                {":left", $"{leaveUseage.Left} Day(s)"}
+                {":left", $"{leaveUsage.Left} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
@@ -161,9 +161,9 @@ namespace Backend.Services
                 supervisor);
         }
 
-        private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy, LeaveUseage leaveUseage)
+        private async Task NotifyHr(LeaveRequest leaveRequest, PersonWithStaff requestedBy, LeaveUsage leaveUsage)
         {
-            if (!ShouldNotifyHr(leaveRequest, leaveUseage)) return;
+            if (!ShouldNotifyHr(leaveRequest, leaveUsage)) return;
             //this is a list of substitutions avalible in the email template
             //these are used when notifying HR of leave
             //$LEAVE-SUBSTITUTIONS$
@@ -174,7 +174,7 @@ namespace Backend.Services
                 {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
                 {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
-                {":left", $"{leaveUseage.Left} Day(s)"}
+                {":left", $"{leaveUsage.Left} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
                 $"{requestedBy.PreferredName} has requested leave",
@@ -183,16 +183,16 @@ namespace Backend.Services
                 _personRepository.GetHrAdminStaff());
         }
 
-        public bool ShouldNotifyHr(LeaveRequest leaveRequest, LeaveUseage leaveUseage)
+        public bool ShouldNotifyHr(LeaveRequest leaveRequest, LeaveUsage leaveUsage)
         {
             if (leaveRequest.Type == LeaveType.Other) return true;
-            return leaveUseage.Left < leaveRequest.Days;
+            return leaveUsage.Left < leaveRequest.Days;
         }
 
         private async Task SendRequestApproval(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
             PersonWithStaff supervisor,
-            LeaveUseage leaveUseage)
+            LeaveUsage leaveUsage)
         {
             //this is a list of substitutions avalible in the email template
             //these are used when notifying the approving supervisor of leave
@@ -207,8 +207,8 @@ namespace Backend.Services
                 {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
                 {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
-                {":left", $"{leaveUseage.Left} Day(s)"},
-                {":totalDays", $"{leaveUseage.TotalAllowed} Day(s)"},
+                {":left", $"{leaveUsage.Left} Day(s)"},
+                {":totalDays", $"{leaveUsage.TotalAllowed} Day(s)"},
                 {":reason", leaveRequest.Reason}
             };
 
@@ -243,11 +243,11 @@ namespace Backend.Services
                 .Where(request => request.PersonId == personId && request.StartDate.InSchoolYear(schoolYear));
             return new LeaveDetails
             {
-                LeaveUseages = CalculateLeaveDetails(personRoles, leaveRequests)
+                LeaveUsages = CalculateLeaveDetails(personRoles, leaveRequests)
             };
         }
 
-        private List<LeaveUseage> CalculateLeaveDetails(IEnumerable<PersonRoleWithJob> personRoles,
+        private List<LeaveUsage> CalculateLeaveDetails(IEnumerable<PersonRoleWithJob> personRoles,
             IEnumerable<LeaveRequest> leaveRequests)
         {
             var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
@@ -256,7 +256,7 @@ namespace Backend.Services
             return leaveTypes.GroupJoin(leaveRequests,
                 type => type,
                 request => request.Type,
-                (type, requests) => new LeaveUseage
+                (type, requests) => new LeaveUsage
                 {
                     LeaveType = type,
                     Used = TotalLeaveUsed(requests),
@@ -267,14 +267,14 @@ namespace Backend.Services
             ).ToList();
         }
 
-        public LeaveUseage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
+        public LeaveUsage GetCurrentLeaveUseage(LeaveType leaveType, Guid personId)
         {
             return GetLeaveUseage(leaveType, personId, DateTime.Now.SchoolYear());
         }
 
-        private LeaveUseage GetLeaveUseage(LeaveType leaveType, Guid personId, int schoolYear)
+        private LeaveUsage GetLeaveUseage(LeaveType leaveType, Guid personId, int schoolYear)
         {
-            return new LeaveUseage
+            return new LeaveUsage
             {
                 LeaveType = leaveType,
                 TotalAllowed = LeaveAllowed(leaveType, personId),
@@ -290,11 +290,10 @@ namespace Backend.Services
 
         public decimal TotalLeaveUsed(LeaveType leaveType, Guid personId, int schoolYear)
         {
-            return _personRepository.LeaveRequests
+            return TotalLeaveUsed(_personRepository.LeaveRequests
                 .Where(request => request.PersonId == personId
                                   && request.StartDate.InSchoolYear(schoolYear)
-                                  && request.Type == leaveType)
-                .Sum(request => request.Days);
+                                  && request.Type == leaveType).ToList());
         }
 
         public int LeaveAllowed(LeaveType leaveType, Guid personId)
@@ -346,7 +345,7 @@ namespace Backend.Services
                     new PersonAndLeaveDetails
                     {
                         Person = person,
-                        LeaveUseages = GetCurrentLeaveDetails(personId.Value).LeaveUseages
+                        LeaveUsages = GetCurrentLeaveDetails(personId.Value).LeaveUsages
                     }
                 };
             }
@@ -361,7 +360,7 @@ namespace Backend.Services
                 people.Select(person => new PersonAndLeaveDetails
                 {
                     Person = person,
-                    LeaveUseages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
+                    LeaveUsages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
                 }).ToList();
         }
 

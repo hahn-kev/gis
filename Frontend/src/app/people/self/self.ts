@@ -6,10 +6,10 @@ export class Self {
 }
 
 export class LeaveDetails {
-  public leaveUseages: LeaveUseage[];
+  public leaveUsages: LeaveUsage[];
 }
 
-export class LeaveUseage {
+export class LeaveUsage {
   public leaveType: LeaveType;
   public used = 0;
   public totalAllowed = 0;

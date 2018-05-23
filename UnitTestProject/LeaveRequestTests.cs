@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -439,7 +439,7 @@ namespace UnitTestProject
                 department,
                 devision,
                 supervisorGroup,
-                new LeaveUseage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
+                new LeaveUsage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
                 Assert.Equal(expectedApproverId, actualApprover.Id);

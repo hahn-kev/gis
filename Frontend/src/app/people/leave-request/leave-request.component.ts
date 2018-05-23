@@ -10,7 +10,7 @@ import { PersonService } from '../person.service';
 import { UserToken } from '../../login/user-token';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { LeaveType, LeaveTypeName, LeaveUseage } from '../self/self';
+import { LeaveType, LeaveTypeName, LeaveUsage } from '../self/self';
 import { Gender } from '../person';
 import { BaseEditComponent } from '../../components/base-edit-component';
 
@@ -104,7 +104,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     if (this.isNew) {
       let overUsingLeave = this.leaveRequestService.isOverUsingLeave(
         this.leaveRequest,
-        this.selectedPerson.leaveUseages);
+        this.selectedPerson.leaveUsages);
       let doctorsNote = this.leaveRequest.type == LeaveType.Sick && (this.leaveRequest.days > 2);
       if (overUsingLeave || doctorsNote) {
 
@@ -172,9 +172,9 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     this.location.back();
   }
 
-  showLeaveUsage(leaveUseage: LeaveUseage) {
-    if (!this.showLeaveType(leaveUseage.leaveType)) return false;
-    return leaveUseage.totalAllowed != 0 || leaveUseage.used != 0;
+  showLeaveUsage(leaveUsage: LeaveUsage) {
+    if (!this.showLeaveType(leaveUsage.leaveType)) return false;
+    return leaveUsage.totalAllowed != 0 || leaveUsage.used != 0;
   }
 
   showLeaveType(leaveType: LeaveType) {

@@ -301,7 +301,7 @@
         </mat-grid-tile>
         <mat-grid-tile>Left</mat-grid-tile>
         <mat-grid-tile>Total</mat-grid-tile>
-        <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUseages">
+        <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUsages">
           <ng-container *ngIf="leaveUsed.leaveType != (person.gender == 'Male' ? 'Maternity' : 'Paternity')">
             <mat-grid-tile [colspan]="2" class="left">{{ leaveTypeName(leaveUsed.leaveType) }}</mat-grid-tile>
             <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>

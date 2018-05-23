@@ -81,11 +81,11 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     }) => {
       this.person = value.person;
       if (this.person.leaveDetails) {
-        this.person.leaveDetails.leaveUseages = [
-          ...this.person.leaveDetails.leaveUseages
+        this.person.leaveDetails.leaveUsages = [
+          ...this.person.leaveDetails.leaveUsages
             .filter(l => l.leaveType != LeaveType.Other)
             .sort((a, b) => a.leaveType.localeCompare(b.leaveType)),
-          this.person.leaveDetails.leaveUseages.find(l => l.leaveType == LeaveType.Other)
+          this.person.leaveDetails.leaveUsages.find(l => l.leaveType == LeaveType.Other)
         ];
       }
 
