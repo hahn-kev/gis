@@ -1,23 +1,22 @@
 <ng-container *appTemplateContent="'title'">Required Training Report</ng-container>
 <ng-container *appToolbarContent>
-
   <mat-slide-toggle name="showCompleted" [ngModel]="showCompleted | async"
                     (ngModelChange)="setShowCompleted($event)">Show Completed
   </mat-slide-toggle>
   <button (click)="setYear(selectedYear.value - 1)" [disabled]="isFirstYear" mat-icon-button>
     <mat-icon>navigate_before</mat-icon>
   </button>
-  <button mat-button [matMenuTriggerFor]="yearMenu">
-    School year {{selectedYear?.name}}
-    <mat-icon mat-list-icon>arrow_drop_down</mat-icon>
-  </button>
+
+  <mat-form-field style="padding-left: 8px; width: 100px">
+    <mat-select [(ngModel)]="selectedYear" (ngModelChange)="setYear($event.value)"
+                placeholder="School Year">
+      <mat-option *ngFor="let year of years" [value]="year">{{year.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
 
   <button (click)="setYear(selectedYear.value + 1)" [disabled]="isLastYear" mat-icon-button>
     <mat-icon>navigate_next</mat-icon>
   </button>
-  <mat-menu #yearMenu="matMenu" [overlapTrigger]="false">
-    <button mat-menu-item *ngFor="let year of years" (click)="setYear(year.value)">{{year.name}}</button>
-  </mat-menu>
 </ng-container>
 <div class="training-report">
   <mat-accordion>
