@@ -31,7 +31,8 @@ namespace Backend.Entities
         Poor,
         [MapValue(nameof(Good))]
         Good,
-        [MapValue(nameof(Excelent))]
-        Excelent
+        [MapValue("Excelent")]
+        [MapValue(nameof(Excellent))]
+        Excellent
     }
 }

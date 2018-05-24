@@ -18,5 +18,5 @@ export class EvaluationWithNames extends Evaluation {
 export enum EvaluationResult {
   Poor = 'Poor',
   Good = 'Good',
-  Excelent = 'Excelent'
+  Excellent = 'Excellent'
 }
