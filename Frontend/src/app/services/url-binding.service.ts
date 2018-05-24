@@ -166,7 +166,8 @@ export class UrlBindingService<T_VALUES> {
       }
       this.router.navigate(commands, {
         relativeTo: this.route,
-        queryParams: params
+        queryParams: params,
+        replaceUrl: true
       });
       this.onParamsUpdated(this.values);
     });
