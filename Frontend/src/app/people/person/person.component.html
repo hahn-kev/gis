@@ -372,7 +372,7 @@
           </mat-form-field>
           <div *ngIf="person.staff.orgGroupId" class="span-2-columns org-chain">
             <span class="mat-caption">Department Hierarchy</span>
-            <ng-container *ngFor="let link of orgChain(groups|async).links; last as isLast">
+            <ng-container *ngFor="let link of orgChain(groups|async).links; last as isLast; trackBy: trackLinksBy">
               <a mat-button
                  [disabled]="!link.id || isSelf"
                  [routerLink]="['/' + link.type, 'edit', link.id]">

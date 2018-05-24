@@ -17,7 +17,7 @@ import { endorsments } from '../teacher-endorsements';
 import { Job } from '../../job/job';
 import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
-import { OrgChain } from '../groups/org-chain';
+import { OrgChain, OrgChainLink } from '../groups/org-chain';
 import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
@@ -120,6 +120,10 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     if (this.person.staff == null || groups == null) return new OrgChain([]);
     let orgGroup = groups.find(value => value.id == this.person.staff.orgGroupId);
     return this.groupService.buildOrgChain(orgGroup, this.people.concat([this.person]), groups);
+  }
+
+  trackLinksBy(index: number, link: OrgChainLink) {
+    return link.id;
   }
 
   async isStaffChanged(isStaff: boolean): Promise<void> {
