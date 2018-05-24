@@ -4,16 +4,20 @@ import { PersonAndLeaveDetails } from '../person-and-leave-details';
 import { ActivatedRoute } from '@angular/router';
 import { Person } from '../../person';
 import { LeaveType, LeaveUsage } from '../../self/self';
+import { UrlBindingService } from '../../../services/url-binding.service';
 
 @Component({
   selector: 'app-leave-report',
   templateUrl: './leave-report.component.html',
-  styleUrls: ['./leave-report.component.scss']
+  styleUrls: ['./leave-report.component.scss'],
+  providers: [UrlBindingService]
 })
 export class LeaveReportComponent implements OnInit {
   public dataSource = new AppDataSource<PersonLeaveModel>();
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
+    this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.trim().toUpperCase());
+    this.urlBinding.loadFromParams();
     this.dataSource.filterPredicate = ((data, filter) =>
       data.person.firstName.toUpperCase().startsWith(filter)
       || data.person.lastName.toUpperCase().startsWith(filter)
@@ -31,10 +35,6 @@ export class LeaveReportComponent implements OnInit {
   }
 
   ngOnInit() {
-  }
-
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toUpperCase();
   }
 }
 
