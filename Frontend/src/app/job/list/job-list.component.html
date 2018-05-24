@@ -3,7 +3,7 @@
   <button mat-icon-button>
     <mat-icon>search</mat-icon>
   </button>
-  <mat-form-field style="padding-left: 0" floatLabel="never">
+  <mat-form-field floatLabel="never">
     <input autofocus matInput [ngModel]="urlBinding.values.search"
            (keyup)="urlBinding.values.search = $event.target.value" placeholder="Search">
   </mat-form-field>
