@@ -151,7 +151,7 @@ export class OrgTreeComponent implements OnInit {
       return node.value.positions - node.filteredChildren.filter(child => child.value.active).length;
     } else if (this.isOrg(node)) {
       return node.filteredChildren.reduce((previousValue,
-                                           currentValue) => previousValue + this.filledJobs(currentValue), 0);
+                                           currentValue) => previousValue + this.openJobs(currentValue), 0);
     }
     return 0;
   }
