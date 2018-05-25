@@ -146,7 +146,7 @@ namespace Backend.DataLayer
             };
 
         public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>
-            from personRole in _dbConnection.PersonRoles
+            (from personRole in _dbConnection.PersonRoles
             join person in People on personRole.PersonId equals person.Id
             join job in JobsWithOrgGroup on personRole.JobId equals job.Id
             select new PersonRoleWithJob
@@ -160,7 +160,7 @@ namespace Backend.DataLayer
                 PreferredName = person.PreferredName,
                 LastName = person.LastName,
                 Job = job
-            };
+            }).OrderByDescending(job => job.StartDate);
 
         public IQueryable<Staff> Staff => _dbConnection.Staff;
 
@@ -242,7 +242,7 @@ namespace Backend.DataLayer
             if (person != null)
             {
                 person.Roles = GetPersonRolesWithJob(id).ToList();
-                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
+                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).OrderBy(contact => contact.ContactPreferedName).ToList();
                 person.Evaluations = (from eval in _dbConnection.Evaluations
                     from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
                     from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
@@ -259,7 +259,7 @@ namespace Backend.DataLayer
                         Score = eval.Score,
                         Total = eval.Total,
                         JobTitle = job.Title
-                    }).ToList();
+                    }).OrderByDescending(eval => eval.Date).ToList();
             }
 
             return person;
