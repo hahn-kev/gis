@@ -17,6 +17,7 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
         data = data[sortHeaderId.substring(index, paramIndex)];
         index = paramIndex + 1;
         paramIndex = sortHeaderId.indexOf('.', index);
+        if (data === null || data === undefined) return null;
       }
       if (index > 0) {
         sortHeaderId = sortHeaderId.substring(index);
