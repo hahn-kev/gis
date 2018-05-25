@@ -147,20 +147,20 @@ namespace Backend.DataLayer
 
         public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>
             (from personRole in _dbConnection.PersonRoles
-            join person in People on personRole.PersonId equals person.Id
-            join job in JobsWithOrgGroup on personRole.JobId equals job.Id
-            select new PersonRoleWithJob
-            {
-                Id = personRole.Id,
-                JobId = personRole.JobId,
-                PersonId = personRole.PersonId,
-                Active = personRole.Active,
-                StartDate = personRole.StartDate,
-                EndDate = personRole.EndDate,
-                PreferredName = person.PreferredName,
-                LastName = person.LastName,
-                Job = job
-            }).OrderByDescending(job => job.StartDate);
+                join person in People on personRole.PersonId equals person.Id
+                join job in JobsWithOrgGroup on personRole.JobId equals job.Id
+                select new PersonRoleWithJob
+                {
+                    Id = personRole.Id,
+                    JobId = personRole.JobId,
+                    PersonId = personRole.PersonId,
+                    Active = personRole.Active,
+                    StartDate = personRole.StartDate,
+                    EndDate = personRole.EndDate,
+                    PreferredName = person.PreferredName,
+                    LastName = person.LastName,
+                    Job = job
+                }).OrderByDescending(job => job.StartDate);
 
         public IQueryable<Staff> Staff => _dbConnection.Staff;
 
@@ -242,24 +242,28 @@ namespace Backend.DataLayer
             if (person != null)
             {
                 person.Roles = GetPersonRolesWithJob(id).ToList();
-                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).OrderBy(contact => contact.ContactPreferedName).ToList();
-                person.Evaluations = (from eval in _dbConnection.Evaluations
-                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
-                    from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
-                    where eval.PersonId == person.Id
-                    select new EvaluationWithNames
-                    {
-                        Id = eval.Id,
-                        PersonId = eval.PersonId,
-                        Evaluator = eval.Evaluator,
-                        RoleId = eval.RoleId,
-                        Date = eval.Date,
-                        Notes = eval.Notes,
-                        Result = eval.Result,
-                        Score = eval.Score,
-                        Total = eval.Total,
-                        JobTitle = job.Title
-                    }).OrderByDescending(eval => eval.Date).ToList();
+                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
+                    .OrderBy(contact => contact.ContactPreferedName).ToList();
+                if (person.StaffId.HasValue)
+                {
+                    person.Evaluations = (from eval in _dbConnection.Evaluations
+                        from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
+                        from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                        where eval.PersonId == person.Id
+                        select new EvaluationWithNames
+                        {
+                            Id = eval.Id,
+                            PersonId = eval.PersonId,
+                            Evaluator = eval.Evaluator,
+                            RoleId = eval.RoleId,
+                            Date = eval.Date,
+                            Notes = eval.Notes,
+                            Result = eval.Result,
+                            Score = eval.Score,
+                            Total = eval.Total,
+                            JobTitle = job.Title
+                        }).OrderByDescending(eval => eval.Date).ToList();
+                }
             }
 
             return person;
