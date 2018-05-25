@@ -38,7 +38,7 @@
               </a>
 
               <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
-              <mat-chip *ngIf="openJobs(node) > 0" [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              <mat-chip [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
               </mat-chip>
             </mat-chip-list>
           </div>
@@ -66,7 +66,7 @@
             <span class="spacer"></span>
             <mat-chip-list>
               <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
-              <mat-chip *ngIf="openJobs(node) > 0" [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              <mat-chip [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
               </mat-chip>
             </mat-chip-list>
           </div>
