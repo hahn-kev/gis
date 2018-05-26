@@ -199,6 +199,7 @@ namespace Backend.DataLayer
         public IQueryable<StaffWithOrgName> StaffWithOrgNames =>
             from staff in _dbConnection.Staff
             from missionOrg in _dbConnection.MissionOrgs.LeftJoin(org => staff.MissionOrgId == org.Id).DefaultIfEmpty()
+            from orgGroup in _dbConnection.OrgGroups.LeftJoin(org => org.Id == staff.OrgGroupId).DefaultIfEmpty()
             select new StaffWithOrgName
             {
                 Id = staff.Id,
@@ -221,7 +222,8 @@ namespace Backend.DataLayer
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
                 YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
-                PhoneExt = staff.PhoneExt
+                PhoneExt = staff.PhoneExt,
+                OrgGroupName = orgGroup.GroupName
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
@@ -242,32 +244,10 @@ namespace Backend.DataLayer
         public PersonWithOthers GetById(Guid id)
         {
             var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
-            if (person != null)
-            {
-                person.Roles = GetPersonRolesWithJob(id).ToList();
-                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
-                    .OrderBy(contact => contact.ContactPreferedName).ToList();
-                if (person.StaffId.HasValue)
-                {
-                    person.Evaluations = (from eval in _dbConnection.Evaluations
-                        from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
-                        from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
-                        where eval.PersonId == person.Id
-                        select new EvaluationWithNames
-                        {
-                            Id = eval.Id,
-                            PersonId = eval.PersonId,
-                            Evaluator = eval.Evaluator,
-                            RoleId = eval.RoleId,
-                            Date = eval.Date,
-                            Notes = eval.Notes,
-                            Result = eval.Result,
-                            Score = eval.Score,
-                            Total = eval.Total,
-                            JobTitle = job.Title
-                        }).OrderByDescending(eval => eval.Date).ToList();
-                }
-            }
+            if (person == null) throw new NullReferenceException($"Unable to find person with ID {id}");
+            person.Roles = GetPersonRolesWithJob(id).ToList();
+            person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
+                .OrderBy(contact => contact.ContactPreferedName).ToList();
 
             return person;
         }

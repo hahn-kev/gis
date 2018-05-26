@@ -115,6 +115,7 @@ import { AccordionListFormDirective } from './components/accordion-list/accordio
 import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
 import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { DialogDirective } from './components/render-template-dialog/dialog.directive';
+import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -173,6 +174,8 @@ if (environment.production) {
     RenderTemplateBottomSheetComponent,
     DialogDirective,
     OrgTreeComponent
+    ,
+    EvaluationReportComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

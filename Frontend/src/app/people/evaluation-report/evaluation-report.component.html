@@ -1,0 +1,89 @@
+<ng-container *appTemplateContent="'title'">Evaluations Report ({{dataSource.filteredData.length}})</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button>
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never">
+    <input autofocus matInput
+           [(ngModel)]="urlBinding.values.search"
+           placeholder="Search">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Thai" [(ngModel)]="urlBinding.values.show" multiple>
+      <mat-option value="thai">Thai</mat-option>
+      <mat-option value="nonThai">Non-Thai</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-export-button [values]="dataSource" fileName="evaluationSummaries"></app-export-button>
+</ng-container>
+<mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="preferredName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="person.preferredName">Preferred Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.preferredName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="lastName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="person.lastName">Last Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.lastName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="person.staff.orgGroupName">
+    <mat-header-cell *matHeaderCellDef>Department/Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.staff.orgGroupName}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="score">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="averagePercentage">Average Percent</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.averagePercentage | number: '1.0-2'}}%</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="evaluations">
+    <mat-header-cell *matHeaderCellDef>Evaluations</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.evaluations}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="excelentEvaluations">
+    <mat-header-cell *matHeaderCellDef>Excelent Evaluations</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.excellentEvaluations}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="goodEvaluations">
+    <mat-header-cell *matHeaderCellDef>Good Evaluations</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.goodEvaluations}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="poorEvaluations">
+    <mat-header-cell *matHeaderCellDef>Poor Evaluations</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.poorEvaluations}}</mat-cell>
+  </ng-container>
+
+  <!-- Header and Row Declarations -->
+  <mat-header-row
+    *matHeaderRowDef="['preferredName', 'lastName', 'person.staff.orgGroupName', 'score', 'evaluations', 'excelentEvaluations', 'goodEvaluations', 'poorEvaluations']"></mat-header-row>
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: ['preferredName', 'lastName', 'person.staff.orgGroupName', 'score', 'evaluations', 'excelentEvaluations', 'goodEvaluations', 'poorEvaluations']"
+           (click)="openEvaluationList(row.person)"></mat-row>
+</mat-table>
+
+<ng-template appTemplateContent="evaluationList" let-sheet let-person="person" let-evaluations="evaluations">
+  <a mat-button (click)="sheet.dismiss()" [routerLink]="['/people', 'edit', person.id]">
+    <mat-icon>person</mat-icon>
+    View {{person.preferredName}} {{person.lastName}}
+  </a>
+  <mat-list *ngIf="evaluations.length > 0; else empty">
+    <h3 mat-subheader>Evaluations</h3>
+    <mat-list-item *ngFor="let eval of evaluations">
+      <h4 mat-line>
+        By {{eval.evaluatorPreferredName}} {{eval.evaluatorLastName}}: {{eval.result}} ({{eval.score/eval.total * 100 |
+        number:'1.0-0'}}%)
+      </h4>
+      <p mat-line>{{eval.jobTitle}} on {{eval.date | date}}</p>
+      <button mat-icon-button *ngIf="eval.notes" [matTooltip]="eval.notes">
+        <mat-icon>info</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #empty>
+    <h3>No Evaluations Found</h3>
+  </ng-template>
+</ng-template>

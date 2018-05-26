@@ -71,7 +71,7 @@ export class PersonService {
   }
 
   updateEmergencyContact(emergencyContact: EmergencyContactExtended) {
-    return this.http.post<EmergencyContactExtended>('api/person/emergency', emergencyContact).toPromise();
+    return this.http.post<EmergencyContactExtended>('/api/person/emergency', emergencyContact).toPromise();
   }
 
   deleteEmergencyContact(id: string) {

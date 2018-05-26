@@ -22,6 +22,8 @@ namespace Backend.Entities
     public class EvaluationWithNames : Evaluation
     {
         public string JobTitle { get; set; }
+        public string EvaluatorPreferredName { get; set; }
+        public string EvaluatorLastName { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

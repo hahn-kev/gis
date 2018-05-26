@@ -13,6 +13,8 @@ export class Evaluation extends BaseEntity {
 
 export class EvaluationWithNames extends Evaluation {
   public jobTitle: string;
+  public evaluatorPreferredName: string;
+  public evaluatorLastName: string;
 }
 
 export enum EvaluationResult {

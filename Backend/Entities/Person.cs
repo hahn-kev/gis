@@ -91,6 +91,16 @@ namespace Backend.Entities
         public IList<EvaluationWithNames> Evaluations { get; set; } = new List<EvaluationWithNames>(0);
     }
 
+    public class PersonEvaluationSummary
+    {
+        public PersonWithStaff Person { get; set; }
+        public int Evaluations { get; set; }
+        public int GoodEvaluations { get; set; }
+        public int PoorEvaluations { get; set; }
+        public int ExcellentEvaluations { get; set; }
+        public decimal AveragePercentage { get; set; }
+    }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Gender
     {

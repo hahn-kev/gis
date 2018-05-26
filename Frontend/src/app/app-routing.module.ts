@@ -56,6 +56,8 @@ import { StaffSummariesResolveService } from './people/staff/staff-report/staff-
 import { PersonRequiredGuard } from './services/person-required.guard';
 import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
+import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
+import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
 
 const routes: Routes = [
   {
@@ -117,6 +119,18 @@ const routes: Routes = [
                 data: {title: 'School Aids'},
                 resolve: {
                   people: SchoolAidResolveService
+                }
+              }
+            ]
+          },
+          {
+            path: 'report',
+            children: [
+              {
+                path: 'evaluations',
+                component: EvaluationReportComponent,
+                resolve: {
+                  evaluationSummary: EvaluationSummaryResolveService
                 }
               }
             ]
@@ -440,7 +454,8 @@ const routes: Routes = [
     SchoolAidResolveService,
     StaffSummariesResolveService,
     PersonRequiredGuard,
-    AllRolesResolverService
+    AllRolesResolverService,
+    EvaluationSummaryResolveService
   ]
 })
 export class AppRoutingModule {

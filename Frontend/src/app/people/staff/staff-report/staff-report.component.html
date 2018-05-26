@@ -25,6 +25,10 @@
      routerLink="/job/report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
+  <a mat-icon-button class="print-hide" matTooltip="Evaluations Report" matTooltipPosition="before"
+     routerLink="/people/report/evaluations">
+    <mat-icon>assignment_ind</mat-icon>
+  </a>
   <app-export-button fileName="staff" [values]="dataSource"></app-export-button>
 </ng-container>
 <ng-container *appTemplateContent="'dialog:filter'">

@@ -17,30 +17,34 @@ namespace Backend.Services
         private readonly IEntityService _entityService;
         private readonly JobRepository _jobRepository;
         private readonly LeaveService _leaveService;
+        private readonly EvaluationRepository _evaluationRepository;
 
         public PersonService(PersonRepository personRepository,
             IEntityService entityService,
             UsersRepository usersRepository,
-            JobRepository jobRepository, LeaveService leaveService)
+            JobRepository jobRepository,
+            LeaveService leaveService,
+            EvaluationRepository evaluationRepository)
         {
             _personRepository = personRepository;
             _entityService = entityService;
             _usersRepository = usersRepository;
             _jobRepository = jobRepository;
             _leaveService = leaveService;
+            _evaluationRepository = evaluationRepository;
         }
 
         #region people
 
-        public IList<Person> People() =>
-            _personRepository.People.Where(person => !person.Deleted).ToList();
+        public IList<Person> People() => _personRepository.People.Where(person => !person.Deleted).ToList();
 
-        public IList<Person> SchoolAids() =>
-            _personRepository.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
+        public IList<Person> SchoolAids() => _personRepository.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
 
         public PersonWithOthers GetById(Guid id)
         {
             var personWithOthers = _personRepository.GetById(id);
+            personWithOthers.Evaluations = _evaluationRepository.EvaluationWithNames
+                .Where(eval => eval.PersonId == id).ToList();
             personWithOthers.LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers);
             return personWithOthers;
         }

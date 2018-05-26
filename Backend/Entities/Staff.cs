@@ -52,5 +52,8 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string MissionOrgEmail { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public string OrgGroupName { get; set; }
     }
 }
