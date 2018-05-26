@@ -17,7 +17,7 @@ namespace Backend.DataLayer
 
         public MissionOrgWithYearSummaries GetOrg(Guid id)
         {
-            var missionOrg = _dbConnection.MissionOrgs.Select(org => new MissionOrgWithYearSummaries()
+            var missionOrg = _dbConnection.MissionOrgs.Select(org => new MissionOrgWithYearSummaries
             {
                 Id = org.Id,
                 Name = org.Name,
@@ -33,6 +33,7 @@ namespace Backend.DataLayer
             if (missionOrg == null) throw new NullReferenceException("No Mission org found matching ID");
             missionOrg.YearSummaries = _dbConnection.MissionOrgYearSummaries
                 .Where(year => year.MissionOrgId == id)
+                .OrderByDescending(yearSummary => yearSummary.Year)
                 .ToList();
             return missionOrg;
         }
