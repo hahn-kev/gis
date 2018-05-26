@@ -192,6 +192,7 @@ namespace Backend.DataLayer
                 WorkPermitType = staff.WorkPermitType,
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
+                YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
                 PhoneExt = staff.PhoneExt
             };
 
@@ -219,6 +220,7 @@ namespace Backend.DataLayer
                 WorkPermitType = staff.WorkPermitType,
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
+                YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
                 PhoneExt = staff.PhoneExt
             };
 

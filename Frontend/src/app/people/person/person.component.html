@@ -475,6 +475,14 @@
               <mat-option value="Other">Other</mat-option>
             </mat-select>
           </mat-form-field>
+          <mat-form-field>
+            <input matInput type="number" [readonly]="isSelf"
+                   name="yearsOfServiceAdjustment"
+                   required
+                   placeholder="Years of Service Adjustment"
+                   [(ngModel)]="person.staff.yearsOfServiceAdjustment">
+            <mat-hint>Negative numbers remove years</mat-hint>
+          </mat-form-field>
           <!--<mat-form-field>-->
           <!--<input matInput-->
           <!--name="endorsmentAgency"-->

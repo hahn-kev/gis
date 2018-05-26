@@ -18,6 +18,7 @@ export class Staff extends BaseEntity {
   public workPermitType: string;
   public endorsements: string;
   public endorsementAgency: string;
+  public yearsOfServiceAdjustment: number = 0;
 
   constructor(id?: string) {
     super();

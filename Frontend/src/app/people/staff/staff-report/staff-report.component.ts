@@ -65,6 +65,10 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
+    this.dataSource.customColumnAccessor('serviceLength',
+      data => moment.duration(data.daysOfService / 356.24, 'years')
+        .add(data.staff.yearsOfServiceAdjustment, 'years')
+        .asDays());
     this.dataSource.bindToRouteData(this.route, 'staff');
     this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
       return data.preferredName.toUpperCase().startsWith(filter)
@@ -111,7 +115,6 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-
   static age(date: MomentInput) {
     return moment().diff(moment(date), 'years');
   }
@@ -122,8 +125,10 @@ export class StaffReportComponent implements OnInit {
     return mDate;
   }
 
-  daysAsYears(days: number) {
-    if (days < 1) return 'None';
-    return moment.duration(days, 'days').humanize();
+  daysAsYears(person: PersonWithStaffSummaries) {
+    if (person.daysOfService < 1 && person.staff.yearsOfServiceAdjustment === 0) return 'None';
+    return moment.duration(person.daysOfService / 365.25, 'years')
+      .add(person.staff.yearsOfServiceAdjustment, 'years')
+      .humanize();
   }
 }
