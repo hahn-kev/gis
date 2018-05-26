@@ -157,6 +157,7 @@ namespace Backend.DataLayer
                     Active = personRole.Active,
                     StartDate = personRole.StartDate,
                     EndDate = personRole.EndDate,
+                    Notes = personRole.Notes,
                     PreferredName = person.PreferredName,
                     LastName = person.LastName,
                     Job = job

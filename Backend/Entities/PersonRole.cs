@@ -13,6 +13,7 @@ namespace Backend.Entities
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool Active { get; set; }
+        public string Notes { get; set; }
 
         public TimeSpan LengthOfService()
         {

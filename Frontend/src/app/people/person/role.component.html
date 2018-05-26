@@ -21,7 +21,9 @@
     <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
     <mat-datepicker [disabled]="readonly" #startDatePicker></mat-datepicker>
   </mat-form-field>
-  <mat-slide-toggle #activeToggle [disabled]="readonly" name="active" [(ngModel)]="role.active">Active</mat-slide-toggle>
+  <mat-slide-toggle #activeToggle [disabled]="readonly" name="active" [(ngModel)]="role.active">
+    Active
+  </mat-slide-toggle>
   <mat-form-field>
     <input name="endDate"
            [disabled]="role.active"
@@ -33,5 +35,12 @@
            placeholder="End Date">
     <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
     <mat-datepicker [disabled]="readonly" #endDatePicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field class="span-2-columns">
+    <textarea name="notes" matInput
+              [readonly]="readonly"
+              [(ngModel)]="role.notes"
+              placeholder="Notes"></textarea>
   </mat-form-field>
 </form>
