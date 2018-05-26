@@ -5,7 +5,7 @@
   </button>
 </ng-container>
 <ng-container *appTemplateContent="'staff'; let sheet">
-  <mat-nav-list *ngIf="peopleInOrgQuery | async as peopleInOrg; else empty">
+  <mat-nav-list *ngIf="peopleInOrg.length > 0; else empty">
     <h3 mat-subheader>
       <mat-icon mat-list-icon>person</mat-icon>
       Staff ({{peopleInOrg.length}})

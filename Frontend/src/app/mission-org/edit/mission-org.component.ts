@@ -9,7 +9,6 @@ import { BaseEditComponent } from '../../components/base-edit-component';
 import { MissionOrgLevel, MissionOrgYearSummary } from '../mission-org-year-summary';
 import { Year } from '../../people/training-requirement/year';
 import { RenderTemplateBottomSheetComponent } from '../../components/render-template-bottom-sheet/render-template-bottom-sheet.component';
-import { Observable } from 'rxjs/Rx';
 
 @Component({
   selector: 'app-mission-org',
@@ -23,7 +22,7 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
   public missionOrg: MissionOrgWithYearSummaries;
   public people: Person[];
   public isNew = false;
-  public peopleInOrgQuery: Observable<Person[]>;
+  public peopleInOrg: Person[];
 
   constructor(private missionOrgService: MissionOrgService,
               private route: ActivatedRoute,
@@ -39,7 +38,6 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
       this.missionOrg = value.missionOrg;
       this.people = value.people;
       this.isNew = !this.missionOrg.id;
-      this.peopleInOrgQuery = !this.isNew ? this.missionOrgService.listPeople(this.missionOrg.id) : Observable.of(null);
     });
   }
 
@@ -88,7 +86,12 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
     this.snackBar.open(`Year Summary Saved`, null, {duration: 2000});
   }
 
-  showStaff() {
+  async showStaff() {
+    if (this.isNew) {
+      this.peopleInOrg = [];
+    } else if (!this.peopleInOrg) {
+      this.peopleInOrg = await this.missionOrgService.listPeople(this.missionOrg.id).toPromise();
+    }
     RenderTemplateBottomSheetComponent.Open(this.bottomSheet, 'staff');
   }
 }
