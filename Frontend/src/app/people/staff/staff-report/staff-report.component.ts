@@ -16,6 +16,8 @@ import { UrlBindingService } from '../../../services/url-binding.service';
 })
 export class StaffReportComponent implements OnInit {
   public dataSource: AppDataSource<PersonWithStaffSummaries>;
+  public allOrgGroups: string[] = [];
+  public allMissionOrgs: string[] = [];
   age = StaffReportComponent.age;
   public avalibleColumns = [
     'preferredName',
@@ -30,6 +32,8 @@ export class StaffReportComponent implements OnInit {
     'serviceLength',
     'isActive',
     'startDate',
+    'department /Division',
+    'sendingOrg',
 
     'birthdate',
     'age',
@@ -59,7 +63,9 @@ export class StaffReportComponent implements OnInit {
                 filterOlderThan: boolean,
                 olderThanFilter: number,
                 filterYoungerThan: boolean,
-                youngerThanFilter: number
+                youngerThanFilter: number,
+                group: string[],
+                sendingOrg: string[]
               }>) {
     this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
@@ -70,6 +76,13 @@ export class StaffReportComponent implements OnInit {
         .add(data.staff.yearsOfServiceAdjustment, 'years')
         .asDays());
     this.dataSource.bindToRouteData(this.route, 'staff');
+    //filter list to distinct
+    this.allOrgGroups = this.dataSource.filteredData
+      .map(value => value.staff.orgGroupName)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null);
+    this.allMissionOrgs = this.dataSource.filteredData
+      .map(value => value.staff.missionOrgName)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null);
     this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
       return data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
@@ -89,6 +102,8 @@ export class StaffReportComponent implements OnInit {
       if ((this.urlBinding.values.filterYoungerThan || this.urlBinding.values.filterOlderThan) && Number.isNaN(yearsOld)) return false;
       if (this.urlBinding.values.filterOlderThan && this.urlBinding.values.olderThanFilter >= yearsOld) return false;
       if (this.urlBinding.values.filterYoungerThan && this.urlBinding.values.youngerThanFilter <= yearsOld) return false;
+      if (this.urlBinding.values.group.length > 0 && !this.urlBinding.values.group.includes(person.staff.orgGroupName)) return false;
+      if (this.urlBinding.values.sendingOrg.length > 0 && !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
       return true;
     };
 
@@ -103,6 +118,8 @@ export class StaffReportComponent implements OnInit {
     this.urlBinding.addParam('olderThanFilter', 0);
     this.urlBinding.addParam('filterYoungerThan', false);
     this.urlBinding.addParam('youngerThanFilter', 0);
+    this.urlBinding.addParam('group', []);
+    this.urlBinding.addParam('sendingOrg', []);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }

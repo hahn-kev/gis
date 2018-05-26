@@ -61,6 +61,16 @@
              [(ngModel)]="urlBinding.values.youngerThanFilter"
              placeholder="Years">
     </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+        <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Filter Sending Org" [(ngModel)]="urlBinding.values.sendingOrg" multiple>
+        <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
@@ -159,6 +169,16 @@
     <mat-cell *matCellDef="let row">
       <mat-checkbox disabled [checked]="row.isActive"></mat-checkbox>
     </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="department /Division">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="">Department / Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.staff.orgGroupName}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="sendingOrg">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.missionOrgName">Sending Org</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.staff.missionOrgName}}</mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->
