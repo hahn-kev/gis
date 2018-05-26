@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { Job } from '../job/job';
+import { Job, JobStatus } from '../job/job';
 import { RoleExtended } from '../people/role';
 import { OrgGroupWithSupervisor } from '../people/groups/org-group';
-import { OrgNode } from './org-node';
+import { GroupOrgNode, JobOrgNode, OrgNode, RoleOrgNode } from './org-node';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { Observable } from 'rxjs/Rx';
 import { UrlBindingService } from '../services/url-binding.service';
@@ -29,9 +29,10 @@ export class OrgTreeComponent implements OnInit {
   rootId: string;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean }>) {
+              public urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean, show: string[] }>) {
     this.urlBinding.addParam('allRoles', false);
     this.urlBinding.addParam('allJobs', false);
+    this.urlBinding.addParam('show', ['staff']);
     this.treeControl = new NestedTreeControl<OrgNode>(dataNode => dataNode.observableChildren);
     this.treeControl.getLevel = dataNode => dataNode.level;
     combineLatest(this.route.params, this.route.data).subscribe(([params, data]: [
@@ -60,7 +61,7 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildJobNode(job: Job, data: Data) {
-    return new OrgNode(job.id,
+    return new JobOrgNode(job.id,
       job,
       'job',
       data.roles
@@ -72,12 +73,12 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildRoleNode(role: RoleExtended, data: Data) {
-    return new OrgNode(role.personId, role, 'role', [], Observable.of(() => true));
+    return new RoleOrgNode(role.personId, role, 'role', [], Observable.of(() => true));
   }
 
 
   buildOrgNode(org: OrgGroupWithSupervisor, data: Data) {
-    return new OrgNode(org.id, org, 'org', [
+    return new GroupOrgNode(org.id, org, 'org', [
         ...data.jobs
           .filter(value => value.orgGroupId == org.id && (this.urlBinding.values.allJobs || value.current))
           .map(value => this.buildJobNode(value, data)),
@@ -86,14 +87,15 @@ export class OrgTreeComponent implements OnInit {
           .filter(value => value.parentId == org.id)
           .map(value => this.buildOrgNode(value, data))
       ],
-      combineLatest(this.urlBinding.observableValues.allJobs)
-        .pipe(map(([allJobs]: [boolean]) =>
+      combineLatest(this.urlBinding.observableValues.allJobs, this.urlBinding.observableValues.show)
+        .pipe(map(([allJobs, show]: [boolean, string[]]) =>
           (child: OrgGroupWithSupervisor | Job) => {
             if ('title' in child) {
-              return allJobs || child.current;
-            } else {
-              return true;
+              if (!allJobs && !child.current) return false;
+              if (child.status == JobStatus.SchoolAid && !show.includes('aids')) return false;
+              if (child.status != JobStatus.SchoolAid && !show.includes('staff')) return false;
             }
+            return true;
           }))
     );
   }
@@ -110,50 +112,8 @@ export class OrgTreeComponent implements OnInit {
     return node.type == 'role';
   };
 
-  isOrg(node: OrgNode): node is OrgNode<OrgGroupWithSupervisor, Job | OrgGroupWithSupervisor, OrgGroupWithSupervisor> {
-    return node.type == 'org';
-  }
-
-  isJob(node: OrgNode): node is OrgNode<Job, RoleExtended, OrgGroupWithSupervisor> {
-    return node.type == 'job';
-  }
-
-  isRole(node: OrgNode): node is OrgNode<RoleExtended, never, Job> {
-    return node.type == 'role';
-  }
-
   trackBy(i: number, node: OrgNode) {
     return node.id;
-  }
-
-  filledJobs(node: OrgNode) {
-    if (this.isJob(node)) {
-      return node.filteredChildren.filter(child => child.value.active).length;
-    } else if (this.isOrg(node)) {
-      return node.filteredChildren.reduce((previousValue,
-                                           currentValue) => previousValue + this.filledJobs(currentValue), 0);
-    }
-    return 0;
-  }
-
-  jobsAvalible(node: OrgNode) {
-    if (this.isJob(node)) {
-      return node.value.positions;
-    } else if (this.isOrg(node)) {
-      return node.filteredChildren
-        .reduce((previousValue, currentValue) => previousValue + this.jobsAvalible(currentValue), 0);
-    }
-    return 0;
-  }
-
-  openJobs(node: OrgNode) {
-    if (this.isJob(node)) {
-      return node.value.positions - node.filteredChildren.filter(child => child.value.active).length;
-    } else if (this.isOrg(node)) {
-      return node.filteredChildren.reduce((previousValue,
-                                           currentValue) => previousValue + this.openJobs(currentValue), 0);
-    }
-    return 0;
   }
 
   findNode(nodes: OrgNode[], id: string): OrgNode {

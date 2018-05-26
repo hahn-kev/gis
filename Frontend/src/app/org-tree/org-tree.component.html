@@ -7,6 +7,13 @@
     Show Role History
   </mat-slide-toggle>
 
+  <mat-form-field>
+    <mat-select multiple [(ngModel)]="urlBinding.values.show" placeholder="Show">
+      <mat-option value="staff">Staff</mat-option>
+      <mat-option value="aids">School Aids</mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <a mat-icon-button class="print-hide" matTooltip="Org List" matTooltipPosition="before"
      routerLink="/groups/list">
     <mat-icon>list_alt</mat-icon>
@@ -36,10 +43,15 @@
                 Supervisor {{person.preferredName}} {{person.lastName}}
                 <mat-icon matChipRemove>person</mat-icon>
               </a>
-
-              <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
-              <mat-chip [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              <mat-chip *ngIf="urlBinding.values.show.includes('staff')"
+                        [selected]="true" color="accent">
+                Staff: {{node.activeStaff}}
               </mat-chip>
+              <mat-chip *ngIf="urlBinding.values.show.includes('aids')"
+                        [selected]="true" color="accent">
+                Aids: {{node.activeAids}}
+              </mat-chip>
+              <mat-chip [selected]="true" color="primary">Open Jobs: {{node.openJobs}}</mat-chip>
             </mat-chip-list>
           </div>
           <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
@@ -65,9 +77,15 @@
             </a>
             <span class="spacer"></span>
             <mat-chip-list>
-              <mat-chip [selected]="true" color="accent">Staff: {{filledJobs(node)}}</mat-chip>
-              <mat-chip [selected]="true" color="primary">Open Jobs: {{openJobs(node)}}
+              <mat-chip *ngIf="urlBinding.values.show.includes('staff')"
+                        [selected]="true" color="accent">
+                Staff: {{node.activeStaff}}
               </mat-chip>
+              <mat-chip *ngIf="urlBinding.values.show.includes('aids')"
+                        [selected]="true" color="accent">
+                Aids: {{node.activeAids}}
+              </mat-chip>
+              <mat-chip [selected]="true" color="primary">Open Jobs: {{node.openJobs}}</mat-chip>
             </mat-chip-list>
           </div>
           <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
