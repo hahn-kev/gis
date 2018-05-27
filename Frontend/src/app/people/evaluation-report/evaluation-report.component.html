@@ -31,7 +31,7 @@
     <mat-cell *matCellDef="let row"> {{row.person.lastName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="person.staff.orgGroupName">
-    <mat-header-cell *matHeaderCellDef>Department/Division</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Department/Division</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.person.staff.orgGroupName}}</mat-cell>
   </ng-container>
 
@@ -41,19 +41,19 @@
   </ng-container>
 
   <ng-container matColumnDef="evaluations">
-    <mat-header-cell *matHeaderCellDef>Evaluations</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Evaluations</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.evaluations}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="excelentEvaluations">
-    <mat-header-cell *matHeaderCellDef>Excelent Evaluations</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Excelent Evaluations</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.excellentEvaluations}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="goodEvaluations">
-    <mat-header-cell *matHeaderCellDef>Good Evaluations</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Good Evaluations</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.goodEvaluations}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="poorEvaluations">
-    <mat-header-cell *matHeaderCellDef>Poor Evaluations</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Poor Evaluations</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.poorEvaluations}}</mat-cell>
   </ng-container>
 
