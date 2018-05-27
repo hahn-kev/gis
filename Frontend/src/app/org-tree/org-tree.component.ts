@@ -9,12 +9,8 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { Observable } from 'rxjs/Rx';
 import { UrlBindingService } from '../services/url-binding.service';
 import { map } from 'rxjs/operators';
+import { OrgTreeData } from './org-tree-data';
 
-interface Data {
-  roles: RoleExtended[];
-  jobs: Job[];
-  groups: OrgGroupWithSupervisor[];
-}
 
 @Component({
   selector: 'app-org-tree',
@@ -25,7 +21,7 @@ interface Data {
 export class OrgTreeComponent implements OnInit {
   treeControl: NestedTreeControl<OrgNode>;
   nodes: OrgNode[];
-  data: Data;
+  data: OrgTreeData;
   rootId: string;
 
   constructor(private route: ActivatedRoute,
@@ -38,9 +34,10 @@ export class OrgTreeComponent implements OnInit {
     combineLatest(this.route.params, this.route.data).subscribe(([params, data]: [
       {
         rootId: string
-      }, Data
+      },
+      { treeData: OrgTreeData }
       ]) => {
-      this.data = data;
+      this.data = data.treeData;
       this.rootId = params.rootId;
       this.urlBinding.loadFromParams();
       this.buildList();
@@ -48,19 +45,14 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildList() {
-    this.nodes = this.data.groups.filter(org => org.parentId == null)
+    this.nodes = this.data.groups.filter(org => org.parentId == null || org.id == this.rootId)
       .map(org => this.buildOrgNode(org, this.data));
-    if (this.rootId) {
-      this.nodes = [this.findNode(this.nodes, this.rootId)].filter(value => value != null);
-      //we're setting the parent to null here so that the level property works
-      if (this.nodes.length == 1) this.nodes[0].parent = null;
-    }
     for (let node of this.nodes) {
       this.treeControl.expand(node);
     }
   }
 
-  buildJobNode(job: Job, data: Data) {
+  buildJobNode(job: Job, data: OrgTreeData) {
     return new JobOrgNode(job.id,
       job,
       'job',
@@ -72,12 +64,12 @@ export class OrgTreeComponent implements OnInit {
     );
   }
 
-  buildRoleNode(role: RoleExtended, data: Data) {
+  buildRoleNode(role: RoleExtended, data: OrgTreeData) {
     return new RoleOrgNode(role.personId, role, 'role', [], Observable.of(() => true));
   }
 
 
-  buildOrgNode(org: OrgGroupWithSupervisor, data: Data) {
+  buildOrgNode(org: OrgGroupWithSupervisor, data: OrgTreeData) {
     return new GroupOrgNode(org.id, org, 'org', [
         ...data.jobs
           .filter(value => value.orgGroupId == org.id && (this.urlBinding.values.allJobs || value.current))

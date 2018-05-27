@@ -41,7 +41,7 @@
           <mat-icon mat-list-icon>home</mat-icon>
           <a mat-line i18n="take user to home page link@@homeLink">Home</a>
         </a>
-        <ng-container *ngIf="currentUser|async">
+        <ng-container *ngIf="currentUser|async as user">
 
           <mat-divider></mat-divider>
           <h3 mat-subheader>Me!</h3>
@@ -58,6 +58,11 @@
             <a mat-list-item routerLink="/self" routerLinkActive="active-link">
               <mat-icon mat-list-icon>face</mat-icon>
               <span mat-line>My Details</span>
+            </a>
+            <a *ngIf="user.isSupervisor" mat-list-item [routerLink]="['/org-tree', user.orgGroupId]"
+               routerLinkActive="active-link">
+              <mat-icon mat-list-icon>location_city</mat-icon>
+              <span mat-line>My Department</span>
             </a>
           </ng-container>
 

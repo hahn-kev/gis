@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { Person } from '../person';
 import { LinkType, OrgChain, OrgChainLink } from './org-chain';
 import { map } from 'rxjs/internal/operators';
+import { OrgTreeData } from '../../org-tree/org-tree-data';
 
 @Injectable()
 export class GroupService {
@@ -42,7 +43,8 @@ export class GroupService {
       currentGroup = groups.find(value => currentGroup.parentId == value.id);
       if (currentGroup == null) break;
       if (currentGroup.id == orgGroup.id) currentGroup = orgGroup;
-      if (chainList.length > 1 && currentGroup == orgGroup) throw new Error('Circular Orginization chart detected, please resolve');
+      if (chainList.length > 1 && currentGroup == orgGroup) throw new Error(
+        'Circular Orginization chart detected, please resolve');
     }
     let supervisor = null;
     if (currentGroup != null && currentGroup.supervisor != null)
@@ -71,5 +73,9 @@ export class GroupService {
       groupId = group.parentId;
       if (groupId == childOrgId) throw new Error('Circular Orginization chart detected, please resolve');
     }
+  }
+
+  getOrgTreeData(rootId: string) {
+    return this.http.get<OrgTreeData>('/api/orgGroup/orgTreeData/' + (rootId || ''));
   }
 }

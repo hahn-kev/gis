@@ -58,6 +58,7 @@ import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
 import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
 import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
+import { OrgTreeDataResolverService } from './org-tree/org-tree-data-resolver.service';
 
 const routes: Routes = [
   {
@@ -368,18 +369,14 @@ const routes: Routes = [
             path: '',
             component: OrgTreeComponent,
             resolve: {
-              roles: AllRolesResolverService,
-              jobs: JobListResolverService,
-              groups: GroupsResolveService,
+              treeData: OrgTreeDataResolverService
             }
           },
           {
             path: ':rootId',
             component: OrgTreeComponent,
             resolve: {
-              roles: AllRolesResolverService,
-              jobs: JobListResolverService,
-              groups: GroupsResolveService,
+              treeData: OrgTreeDataResolverService
             }
           }
         ]
@@ -455,7 +452,8 @@ const routes: Routes = [
     StaffSummariesResolveService,
     PersonRequiredGuard,
     AllRolesResolverService,
-    EvaluationSummaryResolveService
+    EvaluationSummaryResolveService,
+    OrgTreeDataResolverService
   ]
 })
 export class AppRoutingModule {

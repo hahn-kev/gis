@@ -91,8 +91,8 @@ namespace Backend
                     options.Filters.Add(typeof(AllowAnonymousFilter));
 #else
 //require auth on every controller by default
-                options.Filters.Add(
-                    new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+                    options.Filters.Add(
+                        new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 #endif
                     options.Filters.Add(typeof(GlobalExceptionHandler));
                 })
@@ -169,12 +169,16 @@ namespace Backend
                 options.AddPolicy("evaluations", builder => builder.RequireRole("admin", "hr"));
                 options.AddPolicy("staff", builder => builder.RequireRole("admin", "hr"));
                 options.AddPolicy("contact", builder => builder.RequireRole("admin", "hr"));
-                options.AddPolicy("isSupervisor", builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
+                options.AddPolicy("isSupervisor",
+                    builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
                 options.AddPolicy("leaveRequest", builder => builder.RequireRole("admin", "hr"));
                 options.AddPolicy("training", builder => builder.RequireRole("admin", "hr"));
                 options.AddPolicy("orgGroup", builder => builder.RequireRole("admin", "hr"));
                 options.AddPolicy("people", builder => builder.RequireRole("admin", "hr", "registrar"));
                 options.AddPolicy("sendingOrg", builder => builder.RequireRole("admin", "hr", "registrar"));
+                options.AddPolicy("orgTreeData",
+                    builder => builder.RequireAssertion(context =>
+                        context.User.IsSupervisor() || context.User.IsAdminOrHr()));
             });
             foreach (var type in GetType().Assembly.GetTypes()
                 .Where(type =>

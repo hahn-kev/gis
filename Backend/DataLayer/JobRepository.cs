@@ -14,7 +14,7 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public IQueryable<Job> Job => _dbConnection.Job;
+        public IQueryable<Job> Job => _dbConnection.Job.OrderBy(job => job.Title);
 
         public IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job
@@ -88,7 +88,7 @@ namespace Backend.DataLayer
 
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
-            from personRole in _dbConnection.PersonRoles
+            (from personRole in _dbConnection.PersonRoles
             join person in _dbConnection.People on personRole.PersonId equals person.Id
             join job in _dbConnection.Job on personRole.JobId equals job.Id
             select new PersonRoleExtended
@@ -102,6 +102,6 @@ namespace Backend.DataLayer
                 Notes = personRole.Notes,
                 PreferredName = person.PreferredName,
                 LastName = person.LastName
-            };
+            }).OrderByDescending(extended => extended.StartDate);
     }
 }

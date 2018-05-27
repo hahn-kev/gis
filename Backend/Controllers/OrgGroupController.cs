@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -41,6 +42,14 @@ namespace Backend.Controllers
         {
             _orgGroupService.Delete(id);
             return Ok();
+        }
+
+        [HttpGet("orgTreeData/{groupId}")]
+        [HttpGet("orgTreeData")]
+        [Authorize("orgTreeData")]
+        public OrgTreeData OrgTreeData(Guid? groupId = null)
+        {
+            return _orgGroupService.OrgTreeData(groupId);
         }
     }
 }

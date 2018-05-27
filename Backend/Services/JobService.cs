@@ -17,9 +17,9 @@ namespace Backend.Services
             _entityService = entityService;
         }
 
-        public IList<Job> Jobs()
+        public List<Job> Jobs()
         {
-            return _jobRepository.Job.OrderBy(job => job.Title).ToList();
+            return _jobRepository.Job.ToList();
         }
 
         public IList<JobWithOrgGroup> JobsWithOrgGroup()
@@ -67,6 +67,6 @@ namespace Backend.Services
             _entityService.Delete<Grade>(id);
         }
 
-        public IList<PersonRoleExtended> PersonRolesExtended => _jobRepository.PersonRolesExtended.OrderByDescending(extended => extended.StartDate).ToList();
+        public List<PersonRoleExtended> PersonRolesExtended => _jobRepository.PersonRolesExtended.ToList();
     }
 }
