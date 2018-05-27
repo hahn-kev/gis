@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin,hr")]
+    [Authorize(Policy = "evaluations")]
     public class EvaluationController : MyController
     {
         private readonly EvaluationService _evaluationService;

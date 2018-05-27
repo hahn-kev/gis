@@ -512,30 +512,31 @@
       <span class="mat-caption">Roles</span>
       <mat-accordion class="roles">
         <!--new role-->
-        <mat-expansion-panel #newRolePanel
-                             *ngIf="!isSelf"
-                             [disabled]="isNew"
-                             [matTooltipDisabled]="!isNew"
-                             matTooltip="To add a role first save the person">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Add new Role</mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-role [role]="newRole"
-                      #newRoleEl
-                      formId="newRoleForm"
-                      (submit)="saveRole(newRole, newRolePanel, true)">
-            </app-role>
-            <mat-action-row>
-              <button type="submit"
-                      form="newRoleForm"
-                      [disabled]="newRoleEl.form.invalid"
-                      mat-button>Add
-              </button>
-            </mat-action-row>
-          </ng-template>
-        </mat-expansion-panel>
-
+        <ng-container *requireRole="'admin,hr'">
+          <mat-expansion-panel #newRolePanel
+                               *ngIf="!isSelf"
+                               [disabled]="isNew"
+                               [matTooltipDisabled]="!isNew"
+                               matTooltip="To add a role first save the person">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Add new Role</mat-panel-title>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
+              <app-role [role]="newRole"
+                        #newRoleEl
+                        formId="newRoleForm"
+                        (submit)="saveRole(newRole, newRolePanel, true)">
+              </app-role>
+              <mat-action-row>
+                <button type="submit"
+                        form="newRoleForm"
+                        [disabled]="newRoleEl.form.invalid"
+                        mat-button>Add
+                </button>
+              </mat-action-row>
+            </ng-template>
+          </mat-expansion-panel>
+        </ng-container>
         <!--roles list-->
         <mat-expansion-panel #rolePanel *ngFor="let role of person.roles">
           <mat-expansion-panel-header>
@@ -580,33 +581,35 @@
       <span class="mat-caption">Evaluations</span>
       <mat-accordion class="evaluations">
         <!--new evaluation-->
-        <mat-expansion-panel #newEvalPanel
-                             *ngIf="!isSelf"
-                             [disabled]="isNew"
-                             [matTooltipDisabled]="!isNew"
-                             matTooltip="To add an Evaluation first save the person">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Add new Evaluation</mat-panel-title>
-          </mat-expansion-panel-header>
+        <ng-container *requireRole="'admin,hr'">
+          <mat-expansion-panel #newEvalPanel
+                               *ngIf="!isSelf"
+                               [disabled]="isNew"
+                               [matTooltipDisabled]="!isNew"
+                               matTooltip="To add an Evaluation first save the person">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Add new Evaluation</mat-panel-title>
+            </mat-expansion-panel-header>
 
-          <ng-template matExpansionPanelContent>
-            <app-evaluation
-              #newEvalEl
-              [roles]="person.roles"
-              [evaluation]="newEvaluation"
-              (submit)="saveEvaluation(newEvaluation, newEvalPanel, newEvalEl, true)"
-              formId="newEvalForm">
-            </app-evaluation>
+            <ng-template matExpansionPanelContent>
+              <app-evaluation
+                #newEvalEl
+                [roles]="person.roles"
+                [evaluation]="newEvaluation"
+                (submit)="saveEvaluation(newEvaluation, newEvalPanel, newEvalEl, true)"
+                formId="newEvalForm">
+              </app-evaluation>
 
-            <mat-action-row>
-              <button type="submit"
-                      form="newEvalForm"
-                      [disabled]="newEvalEl.form.invalid"
-                      mat-button>Add
-              </button>
-            </mat-action-row>
-          </ng-template>
-        </mat-expansion-panel>
+              <mat-action-row>
+                <button type="submit"
+                        form="newEvalForm"
+                        [disabled]="newEvalEl.form.invalid"
+                        mat-button>Add
+                </button>
+              </mat-action-row>
+            </ng-template>
+          </mat-expansion-panel>
+        </ng-container>
 
         <!--evaluations list-->
         <mat-expansion-panel #evalPanel *ngFor="let eval of person.evaluations">

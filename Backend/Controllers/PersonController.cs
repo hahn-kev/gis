@@ -28,14 +28,14 @@ namespace Backend.Controllers
         }
 
         [HttpGet("school-aids")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "people")]
         public IList<Person> ListSchoolAids()
         {
             return _personService.SchoolAids();
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr,registrar")]
+        [Authorize(Policy = "people")]
         public PersonWithOthers Get(Guid id)
         {
             return _personService.GetById(id);
@@ -54,7 +54,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr,registrar")]
+        [Authorize(Policy = "people")]
         public IActionResult Update([FromBody] PersonWithStaff person)
         {
             _personService.Save(person);
@@ -62,7 +62,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "people")]
         public IActionResult DeletePerson(Guid id)
         {
             _personService.DeletePerson(id);
@@ -70,7 +70,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("role")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "role")]
         public IActionResult UpdateRole([FromBody] PersonRole role)
         {
             _personService.Save(role);
@@ -79,7 +79,7 @@ namespace Backend.Controllers
 
 
         [HttpDelete("role/{roleId}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "role")]
         public IActionResult DeleteRole(Guid roleId)
         {
             _personService.DeleteRole(roleId);
@@ -87,42 +87,42 @@ namespace Backend.Controllers
         }
 
         [HttpGet("role")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "role")]
         public IList<PersonRoleWithJob> Roles(bool canStartDuringRange, DateTime beginRange, DateTime endRange)
         {
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }
 
         [HttpGet("staff")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "staff")]
         public IList<StaffWithName> Staff()
         {
             return _personService.StaffWithNames.ForEach(s => s.RemoveSalary());
         }
 
         [HttpGet("staff/all")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "staff")]
         public IList<PersonWithStaff> StaffAll()
         {
             return _personService.StaffAll.ForEach(p => p?.Staff.RemoveSalary());
         }
 
         [HttpGet("staff/summaries")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "staff")]
         public IList<PersonWithStaffSummaries> StaffSummaries()
         {
             return _personService.StaffSummaries.ForEach(p => p?.Staff.RemoveSalary());
         }
 
         [HttpGet("{personId}/emergency")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "contact")]
         public IList<EmergencyContactExtended> GetEmergencyContacts(Guid personId)
         {
             return _personService.GetEmergencyContacts(personId);
         }
 
         [HttpPost("emergency")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "contact")]
         public EmergencyContactExtended UpdateEmergencyContact([FromBody] EmergencyContactExtended emergencyContact)
         {
             _personService.Save(emergencyContact);
@@ -130,7 +130,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("emergency/{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "contact")]
         public void DeleteEmergencyContact(Guid id)
         {
             _personService.DeleteEmergencyContact(id);

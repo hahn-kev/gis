@@ -103,7 +103,7 @@ namespace Backend
                 });
             //todo response caching?
 //            services.AddResponseCaching();
-            services.AddLocalization();
+//            services.AddLocalization();
 
             //todo localization?
 //            services.Configure<RequestLocalizationOptions>(options =>
@@ -160,7 +160,22 @@ namespace Backend
                     };
                 });
             //todo addGoogle for authentication
-//            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("attachments", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("jobs", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("grades", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("role", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("evaluations", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("staff", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("contact", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("isSupervisor", builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
+                options.AddPolicy("leaveRequest", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("training", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("orgGroup", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("people", builder => builder.RequireRole("admin", "hr", "registrar"));
+                options.AddPolicy("sendingOrg", builder => builder.RequireRole("admin", "hr", "registrar"));
+            });
             foreach (var type in GetType().Assembly.GetTypes()
                 .Where(type =>
                     (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))

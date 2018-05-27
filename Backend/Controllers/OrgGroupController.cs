@@ -18,7 +18,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public OrgGroup Get(Guid id)
         {
             return _orgGroupService.GetById(id);
@@ -28,7 +28,7 @@ namespace Backend.Controllers
         public List<OrgGroupWithSupervisor> OrgGroups() => _orgGroupService.OrgGroups;
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public OrgGroup Save([FromBody] OrgGroup orgGroup)
         {
             _orgGroupService.Save(orgGroup);
@@ -36,7 +36,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public IActionResult Delete(Guid id)
         {
             _orgGroupService.Delete(id);

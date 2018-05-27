@@ -24,7 +24,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "attachments")]
         public Attachment Attach([FromBody] Attachment attachment)
         {
             _attachmentService.Save(attachment);
@@ -32,7 +32,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "attachments")]
         public IActionResult Delete(Guid id)
         {
             _attachmentService.Delete(id);

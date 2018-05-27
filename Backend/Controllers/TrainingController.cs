@@ -10,10 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin,hr")]
     public class TrainingController : Controller
     {
-        private TrainingService _trainingService;
+        private readonly TrainingService _trainingService;
 
         public TrainingController(TrainingService trainingService)
         {
@@ -21,18 +20,21 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "training")]
         public IList<TrainingRequirement> List()
         {
             return _trainingService.TrainingRequirements;
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "training")]
         public TrainingRequirement Get(Guid id)
         {
             return _trainingService.GetById(id);
         }
 
         [HttpPost]
+        [Authorize(Policy = "training")]
         public TrainingRequirement Save([FromBody] TrainingRequirement requirement)
         {
             _trainingService.Save(requirement);
@@ -40,12 +42,14 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "training")]
         public void DeleteRequirement(Guid id)
         {
             _trainingService.DeleteRequirement(id);
         }
 
         [HttpGet("staff/year/{year}")]
+        [Authorize(Policy = "training")]
         public IList<StaffTraining> StaffTrainings(int year)
         {
             return _trainingService.GetByYear(year);
@@ -58,6 +62,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("staff")]
+        [Authorize(Policy = "training")]
         public StaffTraining Save([FromBody] StaffTraining staffTraining)
         {
             _trainingService.Save(staffTraining);
@@ -65,12 +70,14 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("staff/{id}")]
+        [Authorize(Policy = "training")]
         public void DeleteStaffTraining(Guid id)
         {
             _trainingService.DeleteStaffTraining(id);
         }
 
         [HttpPost("staff/allComplete")]
+        [Authorize(Policy = "training")]
         public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds, Guid? requirementId,
             DateTime? completeDate)
         {

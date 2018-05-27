@@ -25,7 +25,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "leaveRequest")]
         public IList<LeaveRequestWithNames> List()
         {
             return _leaveService.LeaveRequestsWithNames;
@@ -93,9 +93,9 @@ namespace Backend.Controllers
         }
 
         [HttpGet("approve/{leaveRequestId}")]
+        [Authorize("isSupervisor")]
         public IActionResult Approve(Guid leaveRequestId)
         {
-            //todo validate that logged in user is HR/ADMIN or is the supervisor of the person who created the leave request
             var personId = User.PersonId();
             if (personId == null)
                 throw new UnauthorizedAccessException(
