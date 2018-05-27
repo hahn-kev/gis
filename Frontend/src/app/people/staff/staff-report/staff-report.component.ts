@@ -60,10 +60,10 @@ export class StaffReportComponent implements OnInit {
                 showNonThai: boolean,
                 showMen: boolean,
                 showWomen: boolean,
-                filterOlderThan: boolean,
-                olderThanFilter: number,
-                filterYoungerThan: boolean,
-                youngerThanFilter: number,
+                age: number,
+                ageType: string,
+                serviceLength: number,
+                serviceLengthType: string,
                 group: string[],
                 sendingOrg: string[]
               }>) {
@@ -71,10 +71,7 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
-    this.dataSource.customColumnAccessor('serviceLength',
-      data => moment.duration(data.daysOfService / 356.24, 'years')
-        .add(data.staff.yearsOfServiceAdjustment, 'years')
-        .asDays());
+    this.dataSource.customColumnAccessor('serviceLength', data => this.serviceLength(data).asDays());
     this.dataSource.bindToRouteData(this.route, 'staff');
     //filter list to distinct
     this.allOrgGroups = this.dataSource.filteredData
@@ -99,9 +96,10 @@ export class StaffReportComponent implements OnInit {
       if (!this.urlBinding.values.showMen && person.gender === Gender.Male) return false;
       if (!this.urlBinding.values.showWomen && person.gender === Gender.Female) return false;
       const yearsOld = StaffReportComponent.age(person.birthdate);
-      if ((this.urlBinding.values.filterYoungerThan || this.urlBinding.values.filterOlderThan) && Number.isNaN(yearsOld)) return false;
-      if (this.urlBinding.values.filterOlderThan && this.urlBinding.values.olderThanFilter >= yearsOld) return false;
-      if (this.urlBinding.values.filterYoungerThan && this.urlBinding.values.youngerThanFilter <= yearsOld) return false;
+      if (!this.testNumber(this.urlBinding.values.ageType, this.urlBinding.values.age, yearsOld)) return false;
+      if (!this.testNumber(this.urlBinding.values.serviceLengthType,
+        this.urlBinding.values.serviceLength,
+        this.serviceLength(person).asYears())) return false;
       if (this.urlBinding.values.group.length > 0 && !this.urlBinding.values.group.includes(person.staff.orgGroupName)) return false;
       if (this.urlBinding.values.sendingOrg.length > 0 && !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
       return true;
@@ -114,12 +112,13 @@ export class StaffReportComponent implements OnInit {
     this.urlBinding.addParam('showNonThai', true);
     this.urlBinding.addParam('showMen', true);
     this.urlBinding.addParam('showWomen', true);
-    this.urlBinding.addParam('filterOlderThan', false);
-    this.urlBinding.addParam('olderThanFilter', 0);
-    this.urlBinding.addParam('filterYoungerThan', false);
-    this.urlBinding.addParam('youngerThanFilter', 0);
+
     this.urlBinding.addParam('group', []);
     this.urlBinding.addParam('sendingOrg', []);
+    this.urlBinding.addParam('age', 0);
+    this.urlBinding.addParam('ageType', null);
+    this.urlBinding.addParam('serviceLength', 0);
+    this.urlBinding.addParam('serviceLengthType', null);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }
@@ -142,10 +141,27 @@ export class StaffReportComponent implements OnInit {
     return mDate;
   }
 
+  serviceLength(person: PersonWithStaffSummaries) {
+    return moment.duration(person.daysOfService / 365.25, 'years')
+      .add(person.staff.yearsOfServiceAdjustment, 'years');
+  }
+
   daysAsYears(person: PersonWithStaffSummaries) {
     if (person.daysOfService < 1 && person.staff.yearsOfServiceAdjustment === 0) return 'None';
-    return moment.duration(person.daysOfService / 365.25, 'years')
-      .add(person.staff.yearsOfServiceAdjustment, 'years')
-      .humanize();
+    return this.serviceLength(person).humanize();
+  }
+
+  testNumber(type: string, constraint: number, test: number) {
+    if (!type) return true;
+    switch (type) {
+      case '<':
+        return test < constraint;
+      case '>':
+        return test > constraint;
+      case '<>':
+        return test != constraint;
+      case '=':
+        return test == constraint;
+    }
   }
 }

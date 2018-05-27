@@ -45,22 +45,32 @@
     <mat-checkbox [(ngModel)]="urlBinding.values.showWomen">
       Show Women Staff
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="urlBinding.values.filterOlderThan">
-      Older than
-    </mat-checkbox>
-    <mat-form-field>
-      <input type="number" matInput
-             [(ngModel)]="urlBinding.values.olderThanFilter"
-             placeholder="Years">
-    </mat-form-field>
-    <mat-checkbox [(ngModel)]="urlBinding.values.filterYoungerThan">
-      Younger than
-    </mat-checkbox>
-    <mat-form-field>
-      <input type="number" matInput
-             [(ngModel)]="urlBinding.values.youngerThanFilter"
-             placeholder="Years">
-    </mat-form-field>
+    <div class="span-2-columns age">
+      <span>Age</span>
+      <mat-button-toggle-group [(ngModel)]="urlBinding.values.ageType">
+        <mat-button-toggle [value]="null">None</mat-button-toggle>
+        <mat-button-toggle value="=">=</mat-button-toggle>
+        <mat-button-toggle value="<>"><></mat-button-toggle>
+        <mat-button-toggle value="<"> <</mat-button-toggle>
+        <mat-button-toggle value=">"> ></mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-form-field>
+        <input matInput type="number" [(ngModel)]="urlBinding.values.age" placeholder="Age">
+      </mat-form-field>
+    </div>
+    <div class="span-2-columns service-length">
+      <span>Service Length</span>
+      <mat-button-toggle-group [(ngModel)]="urlBinding.values.serviceLengthType">
+        <mat-button-toggle [value]="null">None</mat-button-toggle>
+        <mat-button-toggle value="=">=</mat-button-toggle>
+        <mat-button-toggle value="<>"><></mat-button-toggle>
+        <mat-button-toggle value="<"> <</mat-button-toggle>
+        <mat-button-toggle value=">"> ></mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-form-field>
+        <input matInput type="number" [(ngModel)]="urlBinding.values.serviceLength" placeholder="Service Length">
+      </mat-form-field>
+    </div>
     <mat-form-field>
       <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
         <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
