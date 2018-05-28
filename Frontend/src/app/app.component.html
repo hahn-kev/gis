@@ -71,6 +71,28 @@
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
             <ng-container *appTemplateContent="'sidenav:hr'">
+              <a mat-list-item routerLink="/staff/report" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>business</mat-icon>
+                <span mat-line>Staff</span>
+              </a>
+              <a mat-list-item routerLink="/job/report/roles" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>work</mat-icon>
+                <span mat-line>Roles</span>
+              </a>
+              <a mat-list-item routerLink="/people/report/evaluations" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>assignment_ind</mat-icon>
+                <span mat-line>Evaluations</span>
+              </a>
+              <a mat-list-item routerLink="/leave-request/report" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+                <span mat-line>Leave</span>
+              </a>
+              <a mat-list-item routerLink="/training/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>school</mat-icon>
+                <span mat-line>Training</span>
+              </a>
+              <mat-divider></mat-divider>
+
               <a mat-list-item
                  [routerLink]="['/job','list']"
                  [queryParams]="{status: nonSchoolAidJobStatus}"
@@ -78,33 +100,19 @@
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
-              <a mat-list-item routerLink="/job/report/roles" routerLinkActive="active-link">
-                <mat-icon mat-list-icon>work</mat-icon>
-                <span mat-line>Roles</span>
-              </a>
-              <a mat-list-item routerLink="/leave-request/report" routerLinkActive="active-link">
-                <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
-                <span mat-line>Leave</span>
-              </a>
-              <a mat-list-item routerLink="/mission-org/list" routerLinkActive="active-link">
-                <mat-icon mat-list-icon>account_balance</mat-icon>
-                <span mat-line>Sending Org</span>
-              </a>
               <a mat-list-item *requireRole="'admin,hradmin'" routerLink="/org-tree" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>location_city</mat-icon>
                 <span mat-line>Organization</span>
               </a>
+              <mat-divider></mat-divider>
+
               <a mat-list-item routerLink="/people/list" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>supervisor_account</mat-icon>
                 <span mat-line>People</span>
               </a>
-              <a mat-list-item routerLink="/staff/report" routerLinkActive="active-link">
-                <mat-icon mat-list-icon>business</mat-icon>
-                <span mat-line>Staff</span>
-              </a>
-              <a mat-list-item routerLink="/training/list" routerLinkActive="active-link">
-                <mat-icon mat-list-icon>school</mat-icon>
-                <span mat-line>Required Training</span>
+              <a mat-list-item routerLink="/mission-org/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>account_balance</mat-icon>
+                <span mat-line>Sending Org</span>
               </a>
             </ng-container>
 
