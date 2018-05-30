@@ -45,6 +45,8 @@ export class PersonExtended extends Person {
   public thaiAmphur: string;
   public thaiProvince: string;
   public thaiZip: string;
+
+  public profilePicDriveId: string;
 }
 
 export class PersonWithStaff extends PersonExtended {

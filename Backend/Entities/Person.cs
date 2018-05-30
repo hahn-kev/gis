@@ -62,6 +62,8 @@ namespace Backend.Entities
         public string ThaiAmphur { get; set; }
         public string ThaiProvince { get; set; }
         public string ThaiZip { get; set; }
+        
+        public string ProfilePicDriveId { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]

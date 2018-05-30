@@ -75,6 +75,7 @@ namespace Backend.DataLayer
                         ThaiSoi = g.Key.person.ThaiSoi,
                         ThaiTambon = g.Key.person.ThaiTambon,
                         ThaiZip = g.Key.person.ThaiZip,
+                        ProfilePicDriveId = g.Key.person.ProfilePicDriveId,
                         Deleted = g.Key.person.Deleted,
                         //summary here
                         DaysOfService = g.Sum(r =>
@@ -123,6 +124,7 @@ namespace Backend.DataLayer
                     ThaiSoi = person.ThaiSoi,
                     ThaiTambon = person.ThaiTambon,
                     ThaiZip = person.ThaiZip,
+                    ProfilePicDriveId = person.ProfilePicDriveId,
                     Deleted = person.Deleted
                 }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 

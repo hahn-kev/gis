@@ -116,6 +116,8 @@ import { RenderTemplateBottomSheetComponent } from './components/render-template
 import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { DialogDirective } from './components/render-template-dialog/dialog.directive';
 import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
+import { ProfilePictureComponent } from './people/person/profile-picture/profile-picture.component';
+import { PickFileDirective } from './google-picker/pick-file.directive';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -176,6 +178,10 @@ if (environment.production) {
     OrgTreeComponent
     ,
     EvaluationReportComponent
+    ,
+    ProfilePictureComponent
+    ,
+    PickFileDirective
   ],
   entryComponents: [
     ConfirmDialogComponent,

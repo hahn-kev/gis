@@ -1,0 +1,8 @@
+<mat-card>
+  <img mat-card-image *ngIf="person.profilePicDriveId"
+       src="https://drive.google.com/uc?export=view&id={{person.profilePicDriveId}}">
+  <button mat-button (appPickFile)="person.profilePicDriveId = $event.googleId">
+    <mat-icon>face</mat-icon>
+    Profile Picture
+  </button>
+</mat-card>
