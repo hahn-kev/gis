@@ -10,7 +10,8 @@ export class StaffSummariesResolveService implements Resolve<PersonWithStaffSumm
   constructor(private personService: PersonService) {
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PersonWithStaffSummaries[]> | Promise<PersonWithStaffSummaries[]> | PersonWithStaffSummaries[] {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<PersonWithStaffSummaries[]> | Promise<PersonWithStaffSummaries[]> | PersonWithStaffSummaries[] {
     return this.personService.getStaffSummaries();
   }
 

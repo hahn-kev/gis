@@ -7,14 +7,14 @@ import { RenderTemplateDialogComponent } from './render-template-dialog.componen
   exportAs: 'dialog'
 })
 export class DialogDirective {
-  @Input('appDialog') title: string;
+  @Input('appDialog') appDialog: string;
 
   constructor(private templateRef: TemplateRef<any>, private dialog: MatDialog) {
 
   }
 
   show() {
-    return RenderTemplateDialogComponent.Open(this.dialog, this.title, this.templateRef);
+    return RenderTemplateDialogComponent.Open(this.dialog, this.appDialog, this.templateRef);
   }
 
 }

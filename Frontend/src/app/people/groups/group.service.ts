@@ -60,14 +60,13 @@ export class GroupService {
   isChildOf(childOrgId: string, parentOrgId: string, orgGroups: OrgGroup[] | Map<string, OrgGroup>) {
     if (childOrgId == parentOrgId) return true;
     if (orgGroups instanceof Array) {
-      orgGroups = new Map<string, OrgGroup>(orgGroups.map((group): [string, OrgGroup] => [group.id, group]));
+      orgGroups = new Map<string, OrgGroup>(orgGroups.map((g): [string, OrgGroup] => [g.id, g]));
     }
-    let map = (<Map<string, OrgGroup>>orgGroups);
     let groupId = childOrgId;
     let group: OrgGroup;
 
     while (true) {
-      group = map.get(groupId);
+      group = orgGroups.get(groupId);
       if (group == undefined) return false;
       if (group.parentId == parentOrgId) return true;
       groupId = group.parentId;

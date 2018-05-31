@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { PersonEvluationSummary } from './person-evluation-summary';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { EvaluationService } from '../person/evaluation/evaluation.service';
 
 @Injectable()

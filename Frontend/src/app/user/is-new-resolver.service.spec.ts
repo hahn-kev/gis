@@ -1,6 +1,6 @@
-import { inject, TestBed } from "@angular/core/testing";
+import { inject, TestBed } from '@angular/core/testing';
 
-import { IsNewResolverService } from "./is-new-resolver.service";
+import { IsNewResolverService } from './is-new-resolver.service';
 
 describe('IsNewResolverService', () => {
   beforeEach(() => {

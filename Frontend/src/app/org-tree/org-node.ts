@@ -1,8 +1,7 @@
 ﻿import { RoleExtended } from '../people/role';
 import { OrgGroup, OrgGroupWithSupervisor } from '../people/groups/org-group';
 import { Job, JobStatus } from '../job/job';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export class OrgNode<T = RoleExtended | OrgGroupWithSupervisor | Job,

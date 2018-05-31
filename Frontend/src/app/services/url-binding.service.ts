@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { isArray } from 'util';
-import { Observable } from 'rxjs/Observable';
 
 type ObservableValues<T> = {
   [K in keyof T]: Observable<T[K]>

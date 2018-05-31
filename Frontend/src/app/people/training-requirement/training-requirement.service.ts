@@ -1,16 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TrainingRequirement } from './training-requirement';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
 import { StaffWithName } from '../staff';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
 import { OrgGroup } from 'app/people/groups/org-group';
 import { GroupService } from 'app/people/groups/group.service';
-import 'rxjs/add/observable/of';
 
 @Injectable()
 export class TrainingRequirementService {
@@ -85,7 +82,7 @@ export class TrainingRequirementService {
       requirementsObservable,
       yearObservable,
       showCompletedObservable,
-      of([]))
+      Observable.of([]))
       .pipe(
         debounceTime(20),
         map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {

@@ -5,6 +5,11 @@ import { LeaveDetails } from './self/self';
 import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
 
+export enum Gender {
+  Male = 'Male',
+  Female = 'Female'
+}
+
 export class Person extends BaseEntity {
   public firstName: string;
   public lastName: string;
@@ -15,11 +20,6 @@ export class Person extends BaseEntity {
   public gender = Gender.Male;
   public isThai: boolean;
   public isSchoolAid: boolean;
-}
-
-export enum Gender {
-  Male = 'Male',
-  Female = 'Female'
 }
 
 export class PersonExtended extends Person {

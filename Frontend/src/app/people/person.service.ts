@@ -30,8 +30,8 @@ export class PersonService {
   }
 
   updatePerson(person: PersonWithStaff, isSelf = false): Promise<PersonWithStaff> {
-    if (isSelf) return this.http.post<PersonWithStaff>('/api/person/self', person,).toPromise();
-    return this.http.post<PersonWithStaff>('/api/person', person,).toPromise();
+    if (isSelf) return this.http.post<PersonWithStaff>('/api/person/self', person).toPromise();
+    return this.http.post<PersonWithStaff>('/api/person', person).toPromise();
   }
 
   deletePerson(personId: string): Promise<string> {

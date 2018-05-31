@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Rx';
 import { AppTemplateService } from '../../toolbar/app-template.service';
 
 interface RenderDialogContext {
-  $implicit: MatDialogRef<RenderTemplateDialogComponent>
+  $implicit: MatDialogRef<RenderTemplateDialogComponent>;
 }
 
 @Component({

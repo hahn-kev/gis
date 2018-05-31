@@ -16,8 +16,8 @@ export class GradeService {
     return this.http.get<Grade>('/api/job/grade/' + id);
   }
 
-  save(Grade: Grade) {
-    return this.http.post<Grade>('/api/job/grade', Grade).toPromise();
+  save(grade: Grade) {
+    return this.http.post<Grade>('/api/job/grade', grade).toPromise();
   }
 
   delete(gradeId: string) {

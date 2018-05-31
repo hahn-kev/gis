@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class StaffResolveService implements Resolve<PersonWithStaff[]> {
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PersonWithStaff[]> | Promise<PersonWithStaff[]> | PersonWithStaff[] {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<PersonWithStaff[]> | Promise<PersonWithStaff[]> | PersonWithStaff[] {
     return this.personService.getStaffAll();
   }
 

@@ -61,11 +61,16 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
   async save(navigateTo = ['/groups/list']): Promise<void> {
     await this.groupService.updateGroup(this.group);
     this.router.navigate(navigateTo);
-    this.snackBar.open(`${this.group.groupName} ${this.isNew ? 'Added' : 'Saved'}`, null, {duration: 2000});
+    this.snackBar.open(`${this.group.groupName} ${this.isNew ? 'Added' : 'Saved'}`,
+      null,
+      {duration: 2000});
   }
 
   async deleteGroup() {
-    let result = await ConfirmDialogComponent.OpenWait(this.dialog, `Delete ${this.group.type} ${this.group.groupName}`, 'Delete', 'Cancel');
+    let result = await ConfirmDialogComponent.OpenWait(this.dialog,
+      `Delete ${this.group.type} ${this.group.groupName}`,
+      'Delete',
+      'Cancel');
     if (!result) return;
     await this.groupService.deleteGroup(this.group.id);
     this.snackBar.open(`${this.group.type} ${this.group.groupName} deleted`, null, {duration: 2000});

@@ -1,6 +1,6 @@
-import { inject, TestBed } from "@angular/core/testing";
+import { inject, TestBed } from '@angular/core/testing';
 
-import { JwtHelperService } from "./jwt-helper.service";
+import { JwtHelperService } from './jwt-helper.service';
 
 describe('JwtHelperService', () => {
   beforeEach(() => {

@@ -100,8 +100,10 @@ export class StaffReportComponent implements OnInit {
       if (!this.testNumber(this.urlBinding.values.serviceLengthType,
         this.urlBinding.values.serviceLength,
         this.serviceLength(person).asYears())) return false;
-      if (this.urlBinding.values.group.length > 0 && !this.urlBinding.values.group.includes(person.staff.orgGroupName)) return false;
-      if (this.urlBinding.values.sendingOrg.length > 0 && !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
+      if (this.urlBinding.values.group.length > 0 &&
+        !this.urlBinding.values.group.includes(person.staff.orgGroupName)) return false;
+      if (this.urlBinding.values.sendingOrg.length > 0 &&
+        !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
       return true;
     };
 

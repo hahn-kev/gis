@@ -21,7 +21,7 @@ export class JwtHelperService {
         break;
       }
       default: {
-        throw 'Illegal base64url string!';
+        throw new Error('Illegal base64url string!');
       }
     }
     return JwtHelperService.b64DecodeUnicode(output);
@@ -30,17 +30,17 @@ export class JwtHelperService {
   // credits for decoder goes to https://github.com/atk
   private static b64decode(str: string): string {
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-    let output: string = '';
+    let output = '';
 
     str = String(str).replace(/=+$/, '');
 
     if (str.length % 4 == 1) {
-      throw new Error("'atob' failed: The string to be decoded is not correctly encoded.");
+      throw new Error(`'atob' failed: The string to be decoded is not correctly encoded.`);
     }
 
     for (
       // initialize result and counters
-      let bc: number = 0, bs: any, buffer: any, idx: number = 0;
+      let bc = 0, bs: any, buffer: any, idx = 0;
       // get next character
       buffer = str.charAt(idx++);
       // character found in table? initialize bit storage and add its ascii value;

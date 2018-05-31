@@ -5,7 +5,7 @@ import { Grade } from './grade';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class GradeResolverService implements Resolve<Grade>{
+export class GradeResolverService implements Resolve<Grade> {
 
   constructor(private gradeService: GradeService) {
   }
