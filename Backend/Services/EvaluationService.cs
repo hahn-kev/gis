@@ -4,7 +4,6 @@ using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
-using Microsoft.CodeAnalysis.Semantics;
 
 namespace Backend.Services
 {

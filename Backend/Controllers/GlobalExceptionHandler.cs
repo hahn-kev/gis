@@ -81,9 +81,9 @@ namespace Backend.Controllers
             };
             sentryEvent.Tags.Add("logger", ".NET");
             sentryEvent.Request.Headers.Remove("Cookie");
-            if (sentryEvent.User.Username.IsNullOrEmpty())
+            if (sentryEvent.User.UserName.IsNullOrEmpty())
             {
-                sentryEvent.User.Username = "anonymous";
+                sentryEvent.User.UserName = "anonymous";
             }
 
             return sentryEvent;

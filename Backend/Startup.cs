@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
-using Backend.Entities;
 using Backend.Services;
-using LinqToDB.Common;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +28,6 @@ using Newtonsoft.Json;
 using Npgsql;
 using Sentinel.Sdk.Extensions;
 using Sentinel.Sdk.Middleware;
-using Serilog;
 using IdentityUser = Backend.Entities.IdentityUser;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -233,7 +225,7 @@ namespace Backend
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
