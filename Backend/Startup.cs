@@ -97,7 +97,11 @@ namespace Backend
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
             services.AddResponseCaching();
-            services.AddResponseCompression(options => { options.Providers.Add(new BrotliCompressionProvider()); });
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add(new BrotliCompressionProvider());
+                options.EnableForHttps = true;
+            });
 //            services.AddLocalization();
 
             //todo localization?
