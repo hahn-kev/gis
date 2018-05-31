@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Services;
+using Backend.Utils;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
@@ -24,6 +25,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Npgsql;
 using Sentinel.Sdk.Extensions;
@@ -93,8 +95,8 @@ namespace Backend
                     //time zone info won't be included, this is so we can pass a date from the front end without the timezone
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
-            //todo response caching?
-//            services.AddResponseCaching();
+            services.AddResponseCaching();
+            services.AddResponseCompression(options => { options.Providers.Add(new BrotliCompressionProvider()); });
 //            services.AddLocalization();
 
             //todo localization?
@@ -225,7 +227,7 @@ namespace Backend
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -250,8 +252,17 @@ namespace Backend
                     await next();
                 }
             });
-            app.UseStaticFiles();
-//            app.UseResponseCaching();
+            app.UseResponseCaching();
+            app.UseResponseCompression();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = context => context.Context.Response.GetTypedHeaders().CacheControl =
+                    new CacheControlHeaderValue
+                    {
+                        Public = true,
+                        MaxAge = TimeSpan.FromSeconds(30)
+                    }
+            });
             app.UseAuthentication();
             app.UseSentinel();
             app.UseMvc();
