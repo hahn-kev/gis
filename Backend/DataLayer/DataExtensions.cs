@@ -112,11 +112,5 @@ namespace Backend.DataLayer
         {
             return (endDate - startDate).TotalDays;
         }
-
-        [Sql.Expression("DateTime({0}, {1} || ' Month')", PreferServerSide = true)]
-        public static DateTime AddMonths(DateTime date, int months)
-        {
-            return date.AddMonths(months);
-        }
     }
 }

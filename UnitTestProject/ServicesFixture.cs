@@ -111,10 +111,6 @@ namespace UnitTestProject
                 DbConnection.InsertId(
                     new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
-
-            LinqToDB.Linq.Expressions.MapMember<DateTime, int, DateTime>(ProviderName.SQLiteMS,
-                (date, months) => date.AddMonths(months),
-                (date, months) => DataExtensions.AddMonths(date, months));
         }
 
         private void TryCreateTable<T>()
