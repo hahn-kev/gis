@@ -69,6 +69,10 @@
                 <mat-icon>work</mat-icon>
                 View Roles
               </a>
+              <a routerLink="/staff/report" [queryParams]="{group: node.allDecendantsGroups}" mat-menu-item>
+                <mat-icon>business</mat-icon>
+                View Staff
+              </a>
             </mat-menu>
           </div>
           <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
