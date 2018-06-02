@@ -17,6 +17,7 @@
   <a mat-icon-button class="print-hide" matTooltip="Job Grades" matTooltipPosition="before" routerLink="../grade/list">
     <mat-icon>attach_money</mat-icon>
   </a>
+  <app-export-button [values]="dataSource" fileName="jobsData"></app-export-button>
 </ng-container>
 <ng-template #filterDialog="dialog" appDialog="Filters">
   <div class="two-colum-grid">
