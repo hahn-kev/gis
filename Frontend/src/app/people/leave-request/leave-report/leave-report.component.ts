@@ -46,10 +46,12 @@ export class LeaveReportComponent implements OnInit {
       //filter list to distinct
       this.allOrgGroups = value.people
         .map(v => v.person.staff.orgGroupName)
-        .filter((v, index, array) => array.indexOf(v) == index && v != null);
+        .filter((v, index, array) => array.indexOf(v) == index && v != null)
+        .sort();
       this.allMissionOrgs = value.people
         .map(v => v.person.staff.missionOrgName)
-        .filter((v, index, array) => array.indexOf(v) == index && v != null);
+        .filter((v, index, array) => array.indexOf(v) == index && v != null)
+        .sort();
     });
   }
 

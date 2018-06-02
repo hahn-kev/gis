@@ -78,10 +78,12 @@ export class StaffReportComponent implements OnInit {
       .map(value => {
         return {name: value.staff.orgGroupName, superId: value.staff.orgGroupSupervisor};
       })
-      .filter((value, index, array) => array.map(_ => _.name).indexOf(value.name) == index && value.name != null);
+      .filter((value, index, array) => array.map(_ => _.name).indexOf(value.name) == index && value.name != null)
+      .sort((a, b) => a.name.localeCompare(b.name));
     this.allMissionOrgs = this.dataSource.filteredData
       .map(value => value.staff.missionOrgName)
-      .filter((value, index, array) => array.indexOf(value) == index && value != null);
+      .filter((value, index, array) => array.indexOf(value) == index && value != null)
+      .sort();
     this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
       return data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)

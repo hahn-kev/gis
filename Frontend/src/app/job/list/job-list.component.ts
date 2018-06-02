@@ -42,7 +42,8 @@ export class JobListComponent implements OnInit {
     //filter list to distinct
     this.allOrgGroups = this.dataSource.filteredData
       .map(value => value.orgGroupName)
-      .filter((value, index, array) => array.indexOf(value) == index && value != null);
+      .filter((value, index, array) => array.indexOf(value) == index && value != null)
+      .sort();
 
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
       const values = this.urlBinding.values;
