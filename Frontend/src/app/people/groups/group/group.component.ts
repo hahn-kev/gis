@@ -7,6 +7,7 @@ import { OrgChain } from '../org-chain';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import { BaseEditComponent } from '../../../components/base-edit-component';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-group',
@@ -26,6 +27,7 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
               private router: Router,
               private groupService: GroupService,
               private snackBar: MatSnackBar,
+              private location: Location,
               dialog: MatDialog) {
     super(dialog);
   }
@@ -58,9 +60,10 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
     this.orgChain = this.groupService.buildOrgChain(this.group, this.people, this.groups);
   }
 
-  async save(navigateTo = ['/groups/list']): Promise<void> {
+  async save(navigateTo = null): Promise<void> {
     await this.groupService.updateGroup(this.group);
-    this.router.navigate(navigateTo);
+    if (navigateTo) this.router.navigate(navigateTo);
+    else this.location.back();
     this.snackBar.open(`${this.group.groupName} ${this.isNew ? 'Added' : 'Saved'}`,
       null,
       {duration: 2000});
