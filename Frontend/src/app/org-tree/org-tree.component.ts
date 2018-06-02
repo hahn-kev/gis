@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { Job, JobStatus } from '../job/job';
 import { RoleExtended } from '../people/role';
 import { OrgGroupWithSupervisor } from '../people/groups/org-group';
 import { GroupOrgNode, JobOrgNode, OrgNode, RoleOrgNode } from './org-node';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Observable } from 'rxjs/Rx';
 import { UrlBindingService } from '../services/url-binding.service';
 import { map } from 'rxjs/operators';
 import { OrgTreeData } from './org-tree-data';

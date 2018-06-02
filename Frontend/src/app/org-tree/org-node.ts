@@ -41,6 +41,10 @@ export class OrgNode<T = RoleExtended | OrgGroupWithSupervisor | Job,
     return 0;
   }
 
+  get allDecendantsGroups(): string[] {
+    return [];
+  }
+
   observableChildren: BehaviorSubject<OrgNode<C>[]>;
 
 
@@ -99,6 +103,15 @@ export class GroupOrgNode extends OrgNode<OrgGroupWithSupervisor, Job | OrgGroup
 
   get activeAids(): number {
     return this.filteredChildren.reduce((previousValue, currentValue) => previousValue + currentValue.activeAids, 0);
+  }
+
+  _allDecendantsGroups: string[] = null;
+  get allDecendantsGroups(): string[] {
+    if (this._allDecendantsGroups == null) {
+      this._allDecendantsGroups = [this.value.groupName].concat(...this.allChildren.map(
+        value => value.allDecendantsGroups));
+    }
+    return this._allDecendantsGroups;
   }
 }
 

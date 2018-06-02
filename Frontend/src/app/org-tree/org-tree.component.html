@@ -53,6 +53,23 @@
               </mat-chip>
               <mat-chip [selected]="true" color="primary">Open Jobs: {{node.openJobs}}</mat-chip>
             </mat-chip-list>
+            <button mat-icon-button [matMenuTriggerFor]="groupMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #groupMenu>
+              <a [routerLink]="['/groups', 'edit', node.id]" mat-menu-item>
+                <mat-icon>edit</mat-icon>
+                Edit {{node.value.groupName}}
+              </a>
+              <a routerLink="/job/list" [queryParams]="{group: node.allDecendantsGroups}" mat-menu-item>
+                <mat-icon>work</mat-icon>
+                View Jobs
+              </a>
+              <a routerLink="/job/report/roles" [queryParams]="{group: node.allDecendantsGroups}" mat-menu-item>
+                <mat-icon>work</mat-icon>
+                View Roles
+              </a>
+            </mat-menu>
           </div>
           <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
                        [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
@@ -87,6 +104,15 @@
               </mat-chip>
               <mat-chip [selected]="true" color="primary">Open Jobs: {{node.openJobs}}</mat-chip>
             </mat-chip-list>
+            <button mat-icon-button [matMenuTriggerFor]="jobMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #jobMenu>
+              <a [routerLink]="['/job', 'edit', node.id]" mat-menu-item>
+                <mat-icon>edit</mat-icon>
+                Edit Job
+              </a>
+            </mat-menu>
           </div>
           <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
                        [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
@@ -111,6 +137,15 @@
               {{node.value.active ? 'now' : (node.value.endDate | date)}}
             </mat-chip>
           </mat-chip-list>
+          <button mat-icon-button [matMenuTriggerFor]="roleMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #roleMenu>
+            <a [routerLink]="['/people', 'edit', node.id]" mat-menu-item>
+              <mat-icon>edit</mat-icon>
+              Edit Person
+            </a>
+          </mat-menu>
         </mat-tree-node>
         <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
                      [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
