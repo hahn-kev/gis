@@ -44,6 +44,11 @@
         <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>
       </mat-select>
     </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+        <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 </ng-template>
 <mat-table [dataSource]="dataSource" matSort>
