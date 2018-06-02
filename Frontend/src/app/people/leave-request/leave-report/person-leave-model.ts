@@ -1,8 +1,8 @@
-import { Person } from '../../person';
+import { PersonWithStaff } from '../../person';
 import { LeaveType, LeaveUsage } from '../../self/self';
 
 export class PersonLeaveModel {
-  public person: Person;
+  public person: PersonWithStaff;
   public sick: LeaveUsage;
   public vacation: LeaveUsage;
   public personal: LeaveUsage;

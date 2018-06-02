@@ -348,34 +348,24 @@ namespace Backend.Services
 
         public IList<PersonAndLeaveDetails> PeopleWithLeave(Guid? personId, int schoolYear)
         {
-            if (personId != null)
-            {
-                var person = _personRepository.People.SingleOrDefault(p => p.Id == personId && p.StaffId != null);
-                if (person == null) return new List<PersonAndLeaveDetails>();
-                return new List<PersonAndLeaveDetails>
-                {
-                    new PersonAndLeaveDetails
-                    {
-                        Person = person,
-                        LeaveUsages = GetLeaveDetails(personId.Value, schoolYear).LeaveUsages
-                    }
-                };
-            }
-
-            var people = _personRepository.People.Where(person => person.StaffId != null).ToList();
-            var peopleIds = people.Select(person => person.Id).ToList();
-            var leaveRequests = _personRepository.LeaveRequestsInYear(schoolYear)
-                .Where(request => peopleIds.Contains(request.PersonId))
+            var peopleQueryable = _personRepository.PeopleWithStaff.Where(person =>
+                person.StaffId != null && (personId == null || person.Id == personId));
+            var leaveRequests = (
+                    from request in _personRepository.LeaveRequestsInYear(schoolYear)
+                    from p in peopleQueryable.InnerJoin(person => person.Id == request.PersonId)
+                    select request)
                 .ToLookup(request => request.PersonId);
-            var personRoles = _personRepository.PersonRolesWithJob
-                .Where(role => peopleIds.Contains(role.PersonId))
+            var personRoles = (
+                    from role in _personRepository.PersonRolesWithJob
+                    from person in peopleQueryable.InnerJoin(person => person.Id == role.PersonId)
+                    select role)
                 .ToLookup(role => role.PersonId);
-            return
-                people.Select(person => new PersonAndLeaveDetails
-                {
-                    Person = person,
-                    LeaveUsages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
-                }).ToList();
+            
+            return peopleQueryable.Select(person => new PersonAndLeaveDetails
+            {
+                Person = person,
+                LeaveUsages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
+            }).ToList();
         }
 
         public void ThrowIfHrRequiredForUpdate(LeaveRequest updatedLeaveRequest, Guid? personMakingChanges)

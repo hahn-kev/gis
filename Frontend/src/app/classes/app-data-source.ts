@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 export class AppDataSource<T> extends MatTableDataSource<T> {
   private customColumnAccessors: { [key: string]: (data: T) => string | number } = {};
-  private unfilteredData: T[];
+  unfilteredData: T[];
 
   constructor() {
     super();
