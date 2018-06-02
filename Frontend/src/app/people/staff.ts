@@ -41,4 +41,5 @@ export class StaffWithOrgName extends Staff {
   public missionOrgName: string;
   public missionOrgEmail: string;
   public orgGroupName: string;
+  public orgGroupSupervisor: string;
 }

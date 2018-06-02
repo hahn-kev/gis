@@ -55,5 +55,8 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string OrgGroupName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public Guid? OrgGroupSupervisor { get; set; }
     }
 }

@@ -16,7 +16,7 @@ import { UrlBindingService } from '../../../services/url-binding.service';
 })
 export class StaffReportComponent implements OnInit {
   public dataSource: AppDataSource<PersonWithStaffSummaries>;
-  public allOrgGroups: string[] = [];
+  public allOrgGroups: { name: string, superId: string }[] = [];
   public allMissionOrgs: string[] = [];
   age = StaffReportComponent.age;
   public avalibleColumns = [
@@ -75,8 +75,10 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.bindToRouteData(this.route, 'staff');
     //filter list to distinct
     this.allOrgGroups = this.dataSource.filteredData
-      .map(value => value.staff.orgGroupName)
-      .filter((value, index, array) => array.indexOf(value) == index && value != null);
+      .map(value => {
+        return {name: value.staff.orgGroupName, superId: value.staff.orgGroupSupervisor};
+      })
+      .filter((value, index, array) => array.map(_ => _.name).indexOf(value.name) == index && value.name != null);
     this.allMissionOrgs = this.dataSource.filteredData
       .map(value => value.staff.missionOrgName)
       .filter((value, index, array) => array.indexOf(value) == index && value != null);
@@ -100,8 +102,7 @@ export class StaffReportComponent implements OnInit {
       if (!this.testNumber(this.urlBinding.values.serviceLengthType,
         this.urlBinding.values.serviceLength,
         this.serviceLength(person).asYears())) return false;
-      if (this.urlBinding.values.group.length > 0 &&
-        !this.urlBinding.values.group.includes(person.staff.orgGroupName)) return false;
+      if (!this.matchesOrgGroupFilter(person)) return false;
       if (this.urlBinding.values.sendingOrg.length > 0 &&
         !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
       return true;
@@ -165,5 +166,14 @@ export class StaffReportComponent implements OnInit {
       case '=':
         return test == constraint;
     }
+  }
+
+  matchesOrgGroupFilter(person: PersonWithStaffSummaries) {
+    let groups = this.urlBinding.values.group;
+    if (groups.length == 0) return true;
+    if (groups.includes(person.staff.orgGroupName)) return true;
+    let group = this.allOrgGroups.find(value => value.superId == person.id);
+    if (!group) return false;
+    return groups.includes(group.name);
   }
 }

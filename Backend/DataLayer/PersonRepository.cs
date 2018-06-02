@@ -225,7 +225,8 @@ namespace Backend.DataLayer
                 Endorsements = staff.Endorsements,
                 YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
                 PhoneExt = staff.PhoneExt,
-                OrgGroupName = orgGroup.GroupName
+                OrgGroupName = orgGroup.GroupName,
+                OrgGroupSupervisor = orgGroup.Supervisor
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>

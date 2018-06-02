@@ -73,7 +73,7 @@
     </div>
     <mat-form-field>
       <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
-        <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+        <mat-option *ngFor="let group of allOrgGroups" [value]="group.name">{{group.name}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field>
