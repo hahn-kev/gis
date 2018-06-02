@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
@@ -15,6 +15,7 @@ import { UrlBindingService } from '../../services/url-binding.service';
 })
 export class RolesReportComponent implements OnInit {
   public dataSource: AppDataSource<RoleWithJob>;
+  public allOrgGroups: string[] = [];
   public typeName = jobTypeName;
   public statusName = jobStatusName;
   public jobStatus = Object.keys(JobStatus);
@@ -24,14 +25,24 @@ export class RolesReportComponent implements OnInit {
 
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              public urlBinding: UrlBindingService<{ year: number, type: JobType[], status: JobStatus[], search: string }>) {
+              public urlBinding: UrlBindingService<{
+                year: number,
+                type: JobType[],
+                status: JobStatus[],
+                search: string,
+                group: string[]
+              }>) {
     this.dataSource = new AppDataSource<RoleWithJob>();
-
     this.dataSource.bindToRouteData(this.route, 'roles');
+    //filter list to distinct
+    this.allOrgGroups = this.dataSource.filteredData
+      .map(value => value.job.orgGroup ? value.job.orgGroup.groupName : null)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null);
+
     this.urlBinding.addParam('year', Year.CurrentSchoolYear(), true);
     this.urlBinding.addParam('type', AllJobTypes);
     this.urlBinding.addParam('status', NonSchoolAidJobStatus);
+    this.urlBinding.addParam('group', []);
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     // this.route.params.subscribe((params: { start }) => this.during = params.start === 'during');
     // this.route.queryParams.subscribe((params: { begin, end }) => {
@@ -48,6 +59,8 @@ export class RolesReportComponent implements OnInit {
       const values = this.urlBinding.values;
       if (values.status.length != this.jobStatus.length && !values.status.includes(value.job.status)) return false;
       if (values.type.length != this.jobTypes.length && !values.type.includes(value.job.type)) return false;
+      if (this.urlBinding.values.group.length > 0 && (!value.job.orgGroup ||
+        !this.urlBinding.values.group.includes(value.job.orgGroup.groupName))) return false;
       return true;
     };
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();

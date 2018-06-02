@@ -1,6 +1,5 @@
 <ng-container *appTemplateContent="'title'">Roles Report ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <!--<span class="mat-body-2">Roles Starting:</span>-->
   <mat-form-field floatLabel="never" class="print-hide">
     <input autofocus matInput [value]="urlBinding.values.search"
            (keyup)="urlBinding.values.search = ($event.target.value)"
@@ -28,6 +27,11 @@
     <mat-select [(ngModel)]="urlBinding.values.year"
                 placeholder="Year">
       <mat-option *ngFor="let year of schoolYears" [value]="year.value">{{year.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
     </mat-select>
   </mat-form-field>
 </ng-container>
