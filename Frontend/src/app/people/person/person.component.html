@@ -411,13 +411,6 @@
                    [(ngModel)]="person.staff.renwebId"
                    placeholder="Renweb Id">
           </mat-form-field>
-          <mat-form-field>
-            <input matInput
-                   name="moeLicenseNumber"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.moeLicenseNumber"
-                   placeholder="MOE License Number">
-          </mat-form-field>
 
           <mat-form-field>
             <mat-select [(ngModel)]="staffInsurer"
@@ -433,21 +426,6 @@
 
           </mat-form-field>
 
-          <mat-form-field>
-            <input matInput
-                   name="teacherLicenseOrg"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.teacherLicenseOrg"
-                   placeholder="Teacher License Organization">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput
-                   name="teacherLicenseNo"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.teacherLicenseNo"
-                   placeholder="Teacher License #">
-          </mat-form-field>
           <mat-form-field>
             <mat-select [(ngModel)]="person.staff.visaType"
                         [disabled]="isSelf"
