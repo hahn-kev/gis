@@ -20,9 +20,31 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
   </ng-container>
+
+  <ng-container matColumnDef="staffId">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Staff</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.staffId"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="isSchoolAid">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is School Aide</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.isSchoolAid"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="donorId">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Donor</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.donorId"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['preferredName', 'lastName']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['preferredName', 'lastName']"
+  <mat-header-row
+    *matHeaderRowDef="['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId']"></mat-header-row>
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId']"
            [routerLink]="'/people/edit/' + row.id"></mat-row>
 </mat-table>
 
