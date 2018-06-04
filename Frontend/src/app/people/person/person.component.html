@@ -79,7 +79,7 @@
                             name="isStaff"
                             #isStaff="ngModel"
                             [ngModel]="person.staff"
-                            (ngModelChange)="isStaffChanged($event)"
+                            (ngModelChange)="isStaffChanged($event, isStaff)"
                             matTooltip="A person can't be a school aid and Staff at the same time"
                             [matTooltipDisabled]="!person.isSchoolAid">
             Is Staff
@@ -91,6 +91,15 @@
                             matTooltip="A person can't be a School Aide and Staff at the same time"
                             [matTooltipDisabled]="!person.staff">
             Is School Aide
+          </mat-slide-toggle>
+          <mat-slide-toggle
+            #isDonor="ngModel"
+            class="span-2-columns"
+            name="isDonor"
+            [disabled]="isSelf"
+            [ngModel]="person.donor"
+            (ngModelChange)="isDonorChanged($event, isDonor)">
+            Is Donor
           </mat-slide-toggle>
 
 
@@ -190,6 +199,17 @@
                    name="thaiZip"
                    placeholder="Zip">
           </mat-form-field>
+        </mat-expansion-panel>
+
+        <!--donor-->
+        <mat-expansion-panel *ngIf="person.donor">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Donor</mat-panel-title>
+            <mat-panel-description>{{person.donor.status}}</mat-panel-description>
+            <ng-template matExpansionPanelContent>
+              <app-donor [donor]="person.donor"></app-donor>
+            </ng-template>
+          </mat-expansion-panel-header>
         </mat-expansion-panel>
       </mat-accordion>
     </form>

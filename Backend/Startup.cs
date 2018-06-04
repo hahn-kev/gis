@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
+using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
 using LinqToDB.Data;
@@ -285,6 +286,7 @@ namespace Backend
                     roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();
                 }
 
+                dbConnection.TryCreateTable<Donor>();
                 //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {

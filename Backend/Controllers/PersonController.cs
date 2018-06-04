@@ -42,7 +42,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("self")]
-        public IActionResult UpdateSelf([FromBody] PersonWithStaff person)
+        public IActionResult UpdateSelf([FromBody] PersonWithOthers person)
         {
             if (User.PersonId() != person.Id)
             {
@@ -55,7 +55,7 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Authorize(Policy = "people")]
-        public IActionResult Update([FromBody] PersonWithStaff person)
+        public IActionResult Update([FromBody] PersonWithOthers person)
         {
             _personService.Save(person);
             return Json(person);

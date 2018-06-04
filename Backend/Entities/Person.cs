@@ -14,6 +14,7 @@ namespace Backend.Entities
         public Guid? StaffId { get; set; }
         public string Email { get; set; }
         public bool Deleted { get; set; }
+        public Guid? DonorId { get; set; }
 
         public Gender Gender { get; set; }
         public bool IsThai { get; set; }
@@ -62,7 +63,7 @@ namespace Backend.Entities
         public string ThaiAmphur { get; set; }
         public string ThaiProvince { get; set; }
         public string ThaiZip { get; set; }
-        
+
         public string ProfilePicDriveId { get; set; }
     }
 
@@ -88,6 +89,9 @@ namespace Backend.Entities
         public IList<PersonRoleWithJob> Roles { get; set; } = new List<PersonRoleWithJob>(0);
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; } = new List<EmergencyContactExtended>(0);
         public IList<EvaluationWithNames> Evaluations { get; set; } = new List<EvaluationWithNames>(0);
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public Donor Donor { get; set; }
     }
 
     public class PersonEvaluationSummary
@@ -103,7 +107,10 @@ namespace Backend.Entities
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Gender
     {
+        [MapValue(0, true), MapValue(nameof(Male))]
         Male,
+
+        [MapValue(1, true), MapValue(nameof(Female))]
         Female
     }
 }

@@ -29,6 +29,7 @@ import { EvaluationService } from './evaluation/evaluation.service';
 import { EvaluationComponent } from './evaluation/evaluation.component';
 import { LoginService } from '../../services/auth/login.service';
 import { first } from 'rxjs/internal/operators';
+import { Donor } from '../donor';
 
 @Component({
   selector: 'app-person',
@@ -57,7 +58,6 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
   @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
   @ViewChild('newRoleEl') newRoleEl: RoleComponent;
-  @ViewChild('isStaff') isStaffElement: NgModel;
   @ViewChild('countriesControl') countriesControl: NgModel;
 
   constructor(private route: ActivatedRoute,
@@ -126,13 +126,13 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     return link.id;
   }
 
-  async isStaffChanged(isStaff: boolean): Promise<void> {
+  async isStaffChanged(isStaff: boolean, isStaffElement: NgModel): Promise<void> {
     if (isStaff) {
       this.person.staff = new StaffWithOrgName();
       return;
     }
     //deleting?
-    if (!this.isNew) {
+    if (!this.isNew && this.person.staff.id) {
       let result = false;
       if (this.isAdmin) {
         result = await ConfirmDialogComponent.OpenWait(
@@ -145,11 +145,36 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       }
       if (!result) {
         //roll back switch
-        this.isStaffElement.control.setValue(true, {emitEvent: false});
+        isStaffElement.control.setValue(true, {emitEvent: false});
         return;
       }
     }
     this.person.staff = null;
+  }
+
+  async isDonorChanged(isDonor: boolean, isDonorElement: NgModel) {
+    if (isDonor) {
+      this.person.donor = new Donor();
+      return;
+    }
+    if (!this.isNew && this.person.donor.id) {
+      let result = false;
+      if (this.isAdmin) {
+        result = await ConfirmDialogComponent.OpenWait(
+          this.dialog,
+          `Deleting donor, data will be lost, this can not be undone`,
+          'Delete',
+          'Cancel');
+      } else {
+        this.snackBar.open(`Only an Admin can mark someone as not a donor, this will delete data`, 'Dismiss');
+      }
+      if (!result) {
+        //roll back switch
+        isDonorElement.control.setValue(true, {emitEvent: false});
+        return;
+      }
+    }
+    this.person.donor = null;
   }
 
   async save(): Promise<void> {

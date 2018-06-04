@@ -4,6 +4,7 @@ import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
 import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
+import { Donor } from './donor';
 
 export enum Gender {
   Male = 'Male',
@@ -15,6 +16,7 @@ export class Person extends BaseEntity {
   public lastName: string;
   public email: string;
   public staffId?: string;
+  public donorId?: string;
 
   public preferredName: string;
   public gender = Gender.Male;
@@ -64,6 +66,7 @@ export class PersonWithOthers extends PersonWithStaff {
   public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
   public evaluations: EvaluationWithNames[] = [];
+  public donor: Donor;
 }
 
 export class PersonWithDaysOfLeave extends Person {

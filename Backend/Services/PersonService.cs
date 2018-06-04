@@ -49,7 +49,7 @@ namespace Backend.Services
             return personWithOthers;
         }
 
-        public void Save(PersonWithStaff person)
+        public void Save(PersonWithOthers person)
         {
             if (string.IsNullOrEmpty(person.PreferredName))
             {
@@ -65,6 +65,17 @@ namespace Backend.Services
             {
                 if (person.StaffId.HasValue) _personRepository.DeleteStaff(person.StaffId.Value);
                 person.StaffId = null;
+            }
+
+            if (person.Donor != null)
+            {
+                _entityService.Save(person.Donor);
+                person.DonorId = person.Donor.Id;
+            }
+            else
+            {
+                if (person.DonorId.HasValue) _personRepository.DeleteDonor(person.DonorId.Value);
+                person.DonorId = null;
             }
 
             _entityService.Save<PersonExtended>(person);

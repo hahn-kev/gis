@@ -99,6 +99,7 @@ namespace UnitTestProject
             TryCreateTable<Staff>();
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
+            TryCreateTable<Donor>();
             TryCreateTable<Evaluation>();
             TryCreateTable<Attachment>();
             TryCreateTable<MissionOrg>();
@@ -134,6 +135,10 @@ namespace UnitTestProject
             var jacobWife = faker.Generate();
             jacobWife.SpouseId = jacob.Id;
             jacob.SpouseId = jacobWife.Id;
+
+            var jacobDonor = AutoFaker.Generate<Donor>();
+            jacob.DonorId = jacobDonor.Id;
+            
             Assert.Empty(_dbConnection.People);
             _dbConnection.Insert(jacob);
             _dbConnection.Insert(jacobWife);
@@ -141,6 +146,7 @@ namespace UnitTestProject
             _dbConnection.BulkCopy(faker.Generate(5));
             _dbConnection.Insert(jacob.Staff);
             _dbConnection.Insert(bob.Staff);
+            _dbConnection.Insert(jacobDonor);
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
             jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
             jacobGroup.Supervisor = bob.Id;

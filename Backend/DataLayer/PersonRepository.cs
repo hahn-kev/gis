@@ -58,6 +58,7 @@ namespace Backend.DataLayer
                         SpeaksEnglish = g.Key.person.SpeaksEnglish,
                         Staff = g.Key.person.Staff,
                         StaffId = g.Key.person.StaffId,
+                        DonorId = g.Key.person.DonorId,
                         PhoneNumber = g.Key.person.PhoneNumber,
                         SpouseId = g.Key.person.SpouseId,
                         Birthdate = g.Key.person.Birthdate,
@@ -89,7 +90,8 @@ namespace Backend.DataLayer
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
-                from staff in StaffWithOrgNames.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+                from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
+                    .DefaultIfEmpty()
                 where !person.Deleted
                 select new TPerson
                 {
@@ -105,6 +107,7 @@ namespace Backend.DataLayer
                     SpeaksEnglish = person.SpeaksEnglish,
                     Staff = staff,
                     StaffId = person.StaffId,
+                    DonorId = person.DonorId,
                     PhoneNumber = person.PhoneNumber,
                     SpouseId = person.SpouseId,
                     Birthdate = person.Birthdate,
@@ -122,7 +125,7 @@ namespace Backend.DataLayer
                     ThaiTambon = person.ThaiTambon,
                     ThaiZip = person.ThaiZip,
                     ProfilePicDriveId = person.ProfilePicDriveId,
-                    Deleted = person.Deleted
+                    Deleted = person.Deleted,
                 }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
@@ -243,8 +246,13 @@ namespace Backend.DataLayer
 
         public PersonWithOthers GetById(Guid id)
         {
-            var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
-            if (person == null) throw new NullReferenceException($"Unable to find person with ID {id}");
+            var result = (from p in PeopleGeneric<PersonWithOthers>()
+                from donor in _dbConnection.Donors.LeftJoin(donor => p.DonorId.HasValue && donor.Id == p.DonorId)
+                    .DefaultIfEmpty()
+                select new {person = p, donor}).FirstOrDefault(arg => arg.person.Id == id);
+            if (result == null) throw new NullReferenceException($"Unable to find person with ID {id}");
+            var person = result.person;
+            person.Donor = result.donor;
             person.Roles = GetPersonRolesWithJob(id).ToList();
             person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
                 .OrderBy(contact => contact.ContactPreferedName).ToList();
@@ -285,6 +293,11 @@ namespace Backend.DataLayer
                 from role in _dbConnection.Roles.InnerJoin(role => role.Id == userRole.RoleId)
                 where role.NormalizedName == roleName.ToUpper()
                 select person;
+        }
+
+        public void DeleteDonor(Guid donorId)
+        {
+            _dbConnection.Donors.Delete(donor => donor.Id == donorId);
         }
     }
 }
