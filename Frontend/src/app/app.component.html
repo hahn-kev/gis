@@ -1,5 +1,4 @@
-﻿<mat-progress-bar class="activity-indicator" color="accent" [hidden]="!(indicatorStatus | async)"
-                  mode="query"></mat-progress-bar>
+﻿
 <div class="main">
   <mat-toolbar color="primary">
     <button id="open-menu-button" mat-icon-button (click)="sidenav.toggle()">
@@ -18,6 +17,11 @@
       <mat-icon>attach_file</mat-icon>
     </button>
   </mat-toolbar>
+  <mat-progress-bar class="activity-indicator"
+                    color="accent"
+                    mode="indeterminate"
+                    [hidden]="!(indicatorStatus | async)">
+  </mat-progress-bar>
   <mat-sidenav-container>
     <mat-sidenav position="start" #sidenav>
       <mat-nav-list>
