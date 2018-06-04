@@ -70,9 +70,6 @@ namespace Backend.Entities
     public class PersonWithStaff : PersonExtended
     {
         public StaffWithOrgName Staff { get; set; }
-
-        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
-        public string SpousePreferedName { get; set; }
     }
 
     public class PersonWithStaffSummaries : PersonWithStaff

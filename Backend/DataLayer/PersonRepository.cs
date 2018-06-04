@@ -60,7 +60,6 @@ namespace Backend.DataLayer
                         StaffId = g.Key.person.StaffId,
                         PhoneNumber = g.Key.person.PhoneNumber,
                         SpouseId = g.Key.person.SpouseId,
-                        SpousePreferedName = g.Key.person.SpousePreferedName,
                         Birthdate = g.Key.person.Birthdate,
                         Gender = g.Key.person.Gender,
                         PassportAddress = g.Key.person.PassportAddress,
@@ -90,7 +89,6 @@ namespace Backend.DataLayer
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
-                from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
                 from staff in StaffWithOrgNames.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
                 where !person.Deleted
                 select new TPerson
@@ -109,7 +107,6 @@ namespace Backend.DataLayer
                     StaffId = person.StaffId,
                     PhoneNumber = person.PhoneNumber,
                     SpouseId = person.SpouseId,
-                    SpousePreferedName = spouse.PreferredName,
                     Birthdate = person.Birthdate,
                     Gender = person.Gender,
                     PassportAddress = person.PassportAddress,

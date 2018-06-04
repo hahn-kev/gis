@@ -51,7 +51,6 @@ export class PersonExtended extends Person {
 
 export class PersonWithStaff extends PersonExtended {
   public staff: StaffWithOrgName;
-  public spousePreferedName: string;
 }
 
 export class PersonWithStaffSummaries extends PersonWithStaff {
