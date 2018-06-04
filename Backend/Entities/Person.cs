@@ -19,7 +19,9 @@ namespace Backend.Entities
         public Gender Gender { get; set; }
         public bool IsThai { get; set; }
         public bool IsSchoolAid { get; set; }
-
+        public bool IsParent { get; set; }
+        public bool IsAlumni { get; set; }
+        
         private string _preferredName;
 
         public string PreferredName

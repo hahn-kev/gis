@@ -22,6 +22,8 @@ export class Person extends BaseEntity {
   public gender = Gender.Male;
   public isThai: boolean;
   public isSchoolAid: boolean;
+  public isParent: boolean;
+  public isAlumni: boolean;
 }
 
 export class PersonExtended extends Person {

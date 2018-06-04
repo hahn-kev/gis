@@ -75,6 +75,16 @@
                             [(ngModel)]="person.isThai">
             Is Thai
           </mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="isParent"
+                            [(ngModel)]="person.isParent">
+            Is Parent
+          </mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="isAlumni"
+                            [(ngModel)]="person.isAlumni">
+            Is Alumni
+          </mat-slide-toggle>
           <mat-slide-toggle [disabled]="isSelf || person.isSchoolAid"
                             name="isStaff"
                             #isStaff="ngModel"
@@ -92,6 +102,8 @@
                             [matTooltipDisabled]="!person.staff">
             Is School Aide
           </mat-slide-toggle>
+
+
           <mat-slide-toggle
             #isDonor="ngModel"
             class="span-2-columns"

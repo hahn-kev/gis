@@ -39,12 +39,24 @@
       <mat-checkbox disabled [checked]="row.donorId"></mat-checkbox>
     </mat-cell>
   </ng-container>
+  <ng-container matColumnDef="isParent">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Parent</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.isParent"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="isAlumni">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Alumni</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox disabled [checked]="row.isAlumni"></mat-checkbox>
+    </mat-cell>
+  </ng-container>
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId']"></mat-header-row>
+    *matHeaderRowDef="['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId']"
+           *matRowDef="let row; columns: ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni']"
            [routerLink]="'/people/edit/' + row.id"></mat-row>
 </mat-table>
 
