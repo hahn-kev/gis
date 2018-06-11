@@ -13,6 +13,8 @@ import { AdminComponent } from './user/admin/admin.component';
 import { HomeComponent } from './home/home.component';
 import {
   MatAutocompleteModule,
+  MatBadgeModule,
+  MatBottomSheetModule,
   MatButtonModule,
   MatButtonToggleModule,
   MatCardModule,
@@ -35,7 +37,8 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
@@ -104,6 +107,18 @@ import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { EvaluationComponent } from './people/person/evaluation/evaluation.component';
 import { EvaluationService } from './people/person/evaluation/evaluation.service';
 import { TitleCasePipe } from './services/title-case.pipe';
+import { QuickAddButtonComponent } from './people/person/quick-add/quick-add-button.component';
+import { AccordionListComponent } from './components/accordion-list/accordion-list.component';
+import { AccordionListHeaderDirective } from './components/accordion-list/accordion-list-header.directive';
+import { AccordionListContentDirective } from './components/accordion-list/accordion-list-content.directive';
+import { AccordionListFormDirective } from './components/accordion-list/accordion-list-form.directive';
+import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
+import { OrgTreeComponent } from './org-tree/org-tree.component';
+import { DialogDirective } from './components/render-template-dialog/dialog.directive';
+import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
+import { ProfilePictureComponent } from './people/person/profile-picture/profile-picture.component';
+import { PickFileDirective } from './google-picker/pick-file.directive';
+import { DonorComponent } from './people/person/donor/donor.component';
 import { EndorsmentListComponent } from './endorsment/list/endorsment-list.component';
 import { EndorsmentComponent } from './endorsment/edit/endorsment.component';
 
@@ -156,13 +171,27 @@ if (environment.production) {
     SandboxComponent,
     EvaluationComponent,
     TitleCasePipe,
+    QuickAddButtonComponent,
+    AccordionListComponent,
+    AccordionListHeaderDirective,
+    AccordionListContentDirective,
+    AccordionListFormDirective,
+    RenderTemplateBottomSheetComponent,
+    DialogDirective,
+    OrgTreeComponent,
+    EvaluationReportComponent,
+    ProfilePictureComponent,
+    PickFileDirective,
+    DonorComponent,
+    TitleCasePipe,
     EndorsmentListComponent,
     EndorsmentComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
     QuickAddComponent,
-    RenderTemplateDialogComponent
+    RenderTemplateDialogComponent,
+    RenderTemplateBottomSheetComponent
   ],
   imports: [
     LocalStorageModule.withConfig({
@@ -199,6 +228,9 @@ if (environment.production) {
     MatExpansionModule,
     MatAutocompleteModule,
     MatGridListModule,
+    MatBottomSheetModule,
+    MatTreeModule,
+    MatBadgeModule,
     FormsModule,
     AppRoutingModule,
     ClipboardModule,

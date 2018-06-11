@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,17 +19,17 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public OrgGroup Get(Guid id)
         {
             return _orgGroupService.GetById(id);
         }
 
         [HttpGet]
-        public List<OrgGroup> OrgGroups() => _orgGroupService.OrgGroups;
+        public List<OrgGroupWithSupervisor> OrgGroups() => _orgGroupService.OrgGroups;
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public OrgGroup Save([FromBody] OrgGroup orgGroup)
         {
             _orgGroupService.Save(orgGroup);
@@ -36,11 +37,19 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "orgGroup")]
         public IActionResult Delete(Guid id)
         {
             _orgGroupService.Delete(id);
             return Ok();
+        }
+
+        [HttpGet("orgTreeData/{groupId}")]
+        [HttpGet("orgTreeData")]
+        [Authorize("orgTreeData")]
+        public OrgTreeData OrgTreeData(Guid? groupId = null)
+        {
+            return _orgGroupService.OrgTreeData(groupId);
         }
     }
 }

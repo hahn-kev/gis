@@ -11,7 +11,7 @@ import { AttachmentService } from './components/attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
 import { JobStatus, NonSchoolAidJobStatus } from './job/job';
-import { map } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -43,9 +43,9 @@ export class AppComponent implements OnInit {
               private titleService: Title,
               meta: Meta) {
     this.currentUser = loginService.currentUserToken();
-    this.indicatorStatus = activityIndicatorService.observeIndicator();
+    this.indicatorStatus = activityIndicatorService.observeIndicator().pipe(delay(1));
     this.version = settings.get<string>('version');
-    meta.addTag({name:'theme-color', content: '#283593'});
+    meta.addTag({name: 'theme-color', content: '#283593'});
   }
 
   ngOnInit(): void {

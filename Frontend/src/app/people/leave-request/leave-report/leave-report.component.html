@@ -4,7 +4,17 @@
     <mat-icon>search</mat-icon>
   </button>
   <mat-form-field floatLabel="never">
-    <input autofocus matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+    <input autofocus matInput [(ngModel)]="urlBinding.values.search" placeholder="Search">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Sending Org" [(ngModel)]="urlBinding.values.sendingOrg" multiple>
+      <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
+    </mat-select>
   </mat-form-field>
   <a mat-button routerLink="/leave-request/list">
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
@@ -12,11 +22,20 @@
   </a>
   <app-export-button [values]="dataSource" fileName="leaveSummaryData"></app-export-button>
 </ng-container>
-<mat-table [dataSource]="dataSource">
+<mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="staff">
-    <mat-header-cell *matHeaderCellDef>Staff</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Staff</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.person.preferredName}} {{row.person.lastName}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="person.staff.orgGroupName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Department / Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.staff.orgGroupName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="person.staff.missionOrgName">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Sending Org</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.person.staff.missionOrgName}}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="vacation">
     <mat-header-cell *matHeaderCellDef>Vacation</mat-header-cell>
     <mat-cell *matCellDef="let row"
@@ -77,9 +96,9 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']"></mat-header-row>
+    *matHeaderRowDef="['staff', 'person.staff.orgGroupName', 'person.staff.missionOrgName', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/list/' + row.person.id"
-           *matRowDef="let row; columns: ['staff', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']">
+           *matRowDef="let row; columns: ['staff', 'person.staff.orgGroupName', 'person.staff.missionOrgName', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']">
   </mat-row>
 </mat-table>
 

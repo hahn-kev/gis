@@ -23,6 +23,7 @@ namespace Backend.Entities
 
         public string Endorsements { get; set; }
         public string EndorsementAgency { get; set; }
+        public decimal YearsOfServiceAdjustment { get; set; }
 
         public void RemoveSalary()
         {
@@ -51,5 +52,11 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string MissionOrgEmail { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public string OrgGroupName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public Guid? OrgGroupSupervisor { get; set; }
     }
 }

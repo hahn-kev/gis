@@ -9,7 +9,6 @@ using Backend.Entities;
 using Backend.Utils;
 using LinqToDB.Common;
 using Microsoft.Extensions.Options;
-using RestEase;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -50,7 +49,7 @@ namespace Backend.Services
 
     public class EmailService : IEmailService
     {
-        private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
+//        private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
         private readonly string _domain;
         private readonly TemplateSettings _templateSettings;
@@ -71,9 +70,9 @@ namespace Backend.Services
         public async Task<MailgunReponse> SendEmail(string to, string subject, string body)
         {
             throw new NotImplementedException("mailgun email isn't implemented yet");
-            var mailgunReponse =
-                await MailGunApi.SendEmail(_domain, "GIS GIS@" + _domain, to, subject, body);
-            return mailgunReponse;
+//            var mailgunReponse =
+//                await MailGunApi.SendEmail(_domain, "GIS GIS@" + _domain, to, subject, body);
+//            return mailgunReponse;
         }
 
         public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, EmailTemplate emailTemplate,
@@ -178,10 +177,11 @@ namespace Backend.Services
 
     public interface IMailGunApi
     {
-        [Header("Authorization")] AuthenticationHeaderValue Authorization { get; set; }
+//        [Header("Authorization")] 
+        AuthenticationHeaderValue Authorization { get; set; }
 
-        [Post("{domain}/messages")]
-        Task<MailgunReponse> SendEmail([Path] string domain, string from, string to, string subject, string text);
+//        [Post("{domain}/messages")]
+//        Task<MailgunReponse> SendEmail([Path] string domain, string from, string to, string subject, string text);
     }
 
     public class MailgunReponse

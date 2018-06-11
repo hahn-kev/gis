@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { User } from '../user';
 import { UserService } from '../user.service';
 import { AppDataSource } from '../../classes/app-data-source';
-import 'rxjs/add/operator/take';
 
 @Component({
   selector: 'app-admin',

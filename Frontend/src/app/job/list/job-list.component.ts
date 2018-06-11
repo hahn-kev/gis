@@ -23,19 +23,36 @@ export class JobListComponent implements OnInit {
   public jobStatus = Object.keys(JobStatus);
   public jobTypes = Object.keys(JobType);
   public dataSource: AppDataSource<JobWithFilledInfo>;
+  public allOrgGroups: string[] = [];
   public statusName = jobStatusName;
   public typeName = jobTypeName;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ search: string, showOnlyOpen: boolean, status: JobStatus[], type: JobType[] }>) {
+              public urlBinding: UrlBindingService<{
+                search: string,
+                showOnlyOpen: boolean,
+                status: JobStatus[],
+                type: JobType[],
+                showInactive: boolean,
+                group: string[]
+              }>) {
     this.dataSource = new AppDataSource<JobWithFilledInfo>();
     this.dataSource.bindToRouteData(this.route, 'jobs');
+    //filter list to distinct
+    this.allOrgGroups = this.dataSource.filteredData
+      .map(value => value.orgGroupName)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null)
+      .sort();
+
     this.dataSource.customFilter = (row: JobWithFilledInfo) => {
       const values = this.urlBinding.values;
       if (values.showOnlyOpen && row.open <= 0) return false;
+      if (!values.showInactive && !row.current) return false;
       if (values.status.length != this.jobStatus.length && !values.status.includes(row.status)) return false;
       if (values.type.length != this.jobTypes.length && !values.type.includes(row.type)) return false;
+      if (this.urlBinding.values.group.length > 0 &&
+        !this.urlBinding.values.group.includes(row.orgGroupName)) return false;
       return true;
     };
     this.dataSource.filterPredicate = ((data, filter) =>
@@ -48,6 +65,8 @@ export class JobListComponent implements OnInit {
     this.urlBinding.addParam('showOnlyOpen', false);
     this.urlBinding.addParam('status', NonSchoolAidJobStatus);
     this.urlBinding.addParam('type', AllJobTypes);
+    this.urlBinding.addParam('showInactive', false);
+    this.urlBinding.addParam('group', []);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     //load returns true if params updated
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();

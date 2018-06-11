@@ -1,6 +1,11 @@
 import { OrgGroup } from './org-group';
 import { Person } from '../person';
 
+export enum LinkType {
+  Group = 'groups',
+  Person = 'people'
+}
+
 export class OrgChain {
   public linkStart: OrgChainLink;
   public linkEnd: OrgChainLink;
@@ -22,9 +27,4 @@ export class OrgChainLink {
 
   constructor(public type: LinkType, public id: string, public title: string) {
   }
-}
-
-export enum LinkType {
-  Group = 'groups',
-  Person = 'people'
 }

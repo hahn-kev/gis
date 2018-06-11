@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   passwordReset = false;
 
   get redirectUrl(): string {
-    return this.loginService.redirectTo;
+    return this.route.snapshot.queryParams['redirect'] || this.loginService.redirectTo;
   }
 
   constructor(private authenticateService: AuthenticateService,

@@ -2,7 +2,7 @@ import { isArray } from 'util';
 
 export class UserToken {
 
-  constructor(private token: any) {
+  constructor(private token: { [key: string]: any }) {
   }
 
 
@@ -34,6 +34,16 @@ export class UserToken {
   get oauth(): string | null {
     if (!this.token) return null;
     return this.token['oauth'];
+  }
+
+  get isSupervisor(): boolean {
+    if (!this.token) return false;
+    return !!this.token['supervisesGroupId'];
+  }
+
+  get orgGroupId(): string {
+    if (!this.isSupervisor) return null;
+    return this.token['supervisesGroupId'];
   }
 
   hasAnyRole(roles: string[]) {

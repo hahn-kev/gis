@@ -1,4 +1,4 @@
-﻿export var countries = [
+﻿export const countries = [
   'Afghanistan',
   'Albania',
   'Algeria',

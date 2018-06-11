@@ -18,27 +18,33 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public IList<JobWithOrgGroup> Jobs()
+        public IList<Job> Jobs()
         {
             return _jobService.Jobs();
         }
 
+        [HttpGet("orgGroups")]
+        public IList<JobWithOrgGroup> JobsWithOrgGroup()
+        {
+            return _jobService.JobsWithOrgGroup();
+        }
+
         [HttpGet("filled")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "jobs")]
         public IList<JobWithFilledInfo> JobsFilled()
         {
             return _jobService.JobWithFilledInfos();
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "jobs")]
         public JobWithRoles GetById(Guid id)
         {
             return _jobService.GetById(id);
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "jobs")]
         public Job Save([FromBody] Job job)
         {
             _jobService.Save(job);
@@ -46,7 +52,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "jobs")]
         public IActionResult Delete(Guid id)
         {
             _jobService.DeleteJob(id);
@@ -55,21 +61,21 @@ namespace Backend.Controllers
 
 
         [HttpGet("grade")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "grades")]
         public IList<Grade> Grades()
         {
             return _jobService.JobGrades();
         }
 
         [HttpGet("grade/{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "grades")]
         public Grade GetGradeById(Guid id)
         {
             return _jobService.GetGradeById(id);
         }
 
         [HttpPost("grade")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "grades")]
         public Grade Save([FromBody] Grade grade)
         {
             _jobService.Save(grade);
@@ -77,11 +83,18 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("grade/{id}")]
-        [Authorize(Roles = "admin,hr")]
+        [Authorize(Policy = "grades")]
         public IActionResult DeleteGrade(Guid id)
         {
             _jobService.DeleteGrade(id);
             return Ok();
+        }
+
+        [HttpGet("roles/all")]
+        [Authorize(Policy = "role")]
+        public IList<PersonRoleExtended> AllRoles()
+        {
+            return _jobService.PersonRolesExtended;
         }
     }
 }

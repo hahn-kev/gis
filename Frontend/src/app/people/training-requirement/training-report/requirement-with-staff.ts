@@ -21,6 +21,7 @@ export class RequirementWithStaff {
 }
 
 export class StaffWithTraining {
+  public selected = false;
   public staff: StaffWithName;
   public training: StaffTraining;
 

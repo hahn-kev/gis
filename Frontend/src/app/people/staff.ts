@@ -18,6 +18,7 @@ export class Staff extends BaseEntity {
   public workPermitType: string;
   public endorsements: string;
   public endorsementAgency: string;
+  public yearsOfServiceAdjustment = 0;
 
   constructor(id?: string) {
     super();
@@ -39,4 +40,6 @@ export class StaffWithName extends Staff {
 export class StaffWithOrgName extends Staff {
   public missionOrgName: string;
   public missionOrgEmail: string;
+  public orgGroupName: string;
+  public orgGroupSupervisor: string;
 }

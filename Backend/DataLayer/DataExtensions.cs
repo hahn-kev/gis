@@ -17,30 +17,34 @@ namespace Backend.DataLayer
         [ExpressionMethod(nameof(InSchoolYearImp))]
         public static bool InSchoolYear(this DateTime date, int year)
         {
-            return date >= new DateTime(year, SchoolStartMonth, 1) && date <= new DateTime(year - 1, SchoolEndMonth, 1);
+            return date >= new DateTime(year, SchoolStartMonth, 1) && date <=
+                   new DateTime(year + 1, SchoolStartMonth, 1) -
+                   TimeSpan.FromTicks(1);
         }
 
         public static Expression<Func<DateTime, int, bool>> InSchoolYearImp()
         {
             return (date, year) => date.Between(Sql.ToSql(new DateTime(year, SchoolStartMonth, 1)),
-                Sql.ToSql(new DateTime(year + 1, SchoolEndMonth, 1)));
+                Sql.ToSql(new DateTime(year + 1, SchoolStartMonth, 1) - TimeSpan.FromTicks(1)));
         }
 
         [ExpressionMethod(nameof(InSchoolYearNullImp))]
         public static bool InSchoolYear(this DateTime? date, int year)
         {
-            return date >= new DateTime(year, SchoolStartMonth, 1) && date <= new DateTime(year - 1, SchoolEndMonth, 1);
+            return date >= new DateTime(year, SchoolStartMonth, 1) && date <=
+                   new DateTime(year + 1, SchoolStartMonth, 1) -
+                   TimeSpan.FromTicks(1);
         }
 
         public static Expression<Func<DateTime?, int, bool>> InSchoolYearNullImp()
         {
             return (date, year) => date.Between(Sql.ToSql(new DateTime(year, SchoolStartMonth, 1)),
-                Sql.ToSql(new DateTime(year + 1, SchoolEndMonth, 1)));
+                Sql.ToSql(new DateTime(year + 1, SchoolStartMonth, 1) - TimeSpan.FromTicks(1)));
         }
 
         public static int SchoolYear(this DateTime date)
         {
-            return date.Month >= 7 ? date.Year : date.Year - 1;
+            return date.Month >= SchoolStartMonth ? date.Year : date.Year - 1;
         }
 
         /// <summary>
@@ -107,12 +111,6 @@ namespace Backend.DataLayer
         public static double DayDiff(this DateTime startDate, DateTime endDate)
         {
             return (endDate - startDate).TotalDays;
-        }
-
-        [Sql.Expression("DateTime({0}, {1} || ' Month')", PreferServerSide = true)]
-        public static DateTime AddMonths(DateTime date, int months)
-        {
-            return date.AddMonths(months);
         }
     }
 }

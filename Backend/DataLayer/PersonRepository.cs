@@ -22,6 +22,9 @@ namespace Backend.DataLayer
 
         public IQueryable<LeaveRequest> LeaveRequests => _dbConnection.LeaveRequests;
 
+        public IQueryable<LeaveRequest> LeaveRequestsInYear(int year) =>
+            _dbConnection.LeaveRequests.Where(request => request.StartDate.InSchoolYear(year));
+
         public IQueryable<PersonExtended> PeopleExtended =>
             _dbConnection.PeopleExtended
                 .OrderBy(person => person.PreferredName ?? person.FirstName)
@@ -34,8 +37,12 @@ namespace Backend.DataLayer
             get
             {
                 return from person in PeopleGeneric<PersonWithStaffSummaries>()
-                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
-                    group role by new {person}
+                    from r in (
+                        from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
+                        from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                        select new {role, job}
+                    )
+                    group r by new {person}
                     into g
                     select new PersonWithStaffSummaries
                     {
@@ -44,6 +51,8 @@ namespace Backend.DataLayer
                         FirstName = g.Key.person.FirstName,
                         IsThai = g.Key.person.IsThai,
                         IsSchoolAid = g.Key.person.IsSchoolAid,
+                        IsAlumni = g.Key.person.IsAlumni,
+                        IsParent = g.Key.person.IsParent,
                         LastName = g.Key.person.LastName,
                         ThaiFirstName = g.Key.person.ThaiFirstName,
                         ThaiLastName = g.Key.person.ThaiLastName,
@@ -51,12 +60,11 @@ namespace Backend.DataLayer
                         SpeaksEnglish = g.Key.person.SpeaksEnglish,
                         Staff = g.Key.person.Staff,
                         StaffId = g.Key.person.StaffId,
+                        DonorId = g.Key.person.DonorId,
                         PhoneNumber = g.Key.person.PhoneNumber,
                         SpouseId = g.Key.person.SpouseId,
-                        SpousePreferedName = g.Key.person.SpousePreferedName,
                         Birthdate = g.Key.person.Birthdate,
                         Gender = g.Key.person.Gender,
-                        Nationality = g.Key.person.Nationality,
                         PassportAddress = g.Key.person.PassportAddress,
                         PassportCity = g.Key.person.PassportCity,
                         PassportCountry = g.Key.person.PassportCountry,
@@ -69,19 +77,23 @@ namespace Backend.DataLayer
                         ThaiSoi = g.Key.person.ThaiSoi,
                         ThaiTambon = g.Key.person.ThaiTambon,
                         ThaiZip = g.Key.person.ThaiZip,
+                        ProfilePicDriveId = g.Key.person.ProfilePicDriveId,
                         Deleted = g.Key.person.Deleted,
                         //summary here
-                        DaysOfService = g.Sum(role => role.StartDate.DayDiff(role.EndDate ?? DateTime.Now)),
-                        IsActive = g.Sum(role => role.Active ? 1 : 0) > 0,
-                        StartDate = g.Min(role => (DateTime?) role.StartDate)
+                        DaysOfService = g.Sum(r =>
+                            r.job.Status == JobStatus.SchoolAid
+                                ? 0
+                                : r.role.StartDate.DayDiff(r.role.EndDate ?? DateTime.Now)),
+                        IsActive = g.Sum(r => r.role.Active ? 1 : 0) > 0,
+                        StartDate = g.Min(r => (DateTime?) r.role.StartDate)
                     };
             }
         }
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             (from person in _dbConnection.PeopleExtended
-                from spouse in _dbConnection.People.LeftJoin(person1 => person1.Id == person.SpouseId).DefaultIfEmpty()
-                from staff in StaffWithOrgNames.LeftJoin(staff => staff.Id == person.StaffId).DefaultIfEmpty()
+                from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
+                    .DefaultIfEmpty()
                 where !person.Deleted
                 select new TPerson
                 {
@@ -90,6 +102,8 @@ namespace Backend.DataLayer
                     FirstName = person.FirstName,
                     IsThai = person.IsThai,
                     IsSchoolAid = person.IsSchoolAid,
+                    IsAlumni = person.IsAlumni,
+                    IsParent = person.IsParent,
                     LastName = person.LastName,
                     ThaiFirstName = person.ThaiFirstName,
                     ThaiLastName = person.ThaiLastName,
@@ -97,12 +111,11 @@ namespace Backend.DataLayer
                     SpeaksEnglish = person.SpeaksEnglish,
                     Staff = staff,
                     StaffId = person.StaffId,
+                    DonorId = person.DonorId,
                     PhoneNumber = person.PhoneNumber,
                     SpouseId = person.SpouseId,
-                    SpousePreferedName = spouse.PreferredName,
                     Birthdate = person.Birthdate,
                     Gender = person.Gender,
-                    Nationality = person.Nationality,
                     PassportAddress = person.PassportAddress,
                     PassportCity = person.PassportCity,
                     PassportCountry = person.PassportCountry,
@@ -115,12 +128,14 @@ namespace Backend.DataLayer
                     ThaiSoi = person.ThaiSoi,
                     ThaiTambon = person.ThaiTambon,
                     ThaiZip = person.ThaiZip,
-                    Deleted = person.Deleted
+                    ProfilePicDriveId = person.ProfilePicDriveId,
+                    Deleted = person.Deleted,
                 }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job
             from orgGroup in _dbConnection.OrgGroups.LeftJoin(g => g.Id == job.OrgGroupId).DefaultIfEmpty()
+            from grade in _dbConnection.JobGrades.LeftJoin(grade => grade.Id == job.GradeId).DefaultIfEmpty()
             select new JobWithOrgGroup
             {
                 Current = job.Current,
@@ -132,25 +147,27 @@ namespace Backend.DataLayer
                 Positions = job.Positions,
                 Status = job.Status,
                 Type = job.Type,
-                OrgGroup = orgGroup
+                OrgGroup = orgGroup,
+                GradeNo = (int?) grade.GradeNo
             };
 
         public IQueryable<PersonRoleWithJob> PersonRolesWithJob =>
-            from personRole in _dbConnection.PersonRoles
-            join person in People on personRole.PersonId equals person.Id
-            join job in JobsWithOrgGroup on personRole.JobId equals job.Id
-            select new PersonRoleWithJob
-            {
-                Id = personRole.Id,
-                JobId = personRole.JobId,
-                PersonId = personRole.PersonId,
-                Active = personRole.Active,
-                StartDate = personRole.StartDate,
-                EndDate = personRole.EndDate,
-                PreferredName = person.PreferredName,
-                LastName = person.LastName,
-                Job = job
-            };
+            (from personRole in _dbConnection.PersonRoles
+                join person in People on personRole.PersonId equals person.Id
+                join job in JobsWithOrgGroup on personRole.JobId equals job.Id
+                select new PersonRoleWithJob
+                {
+                    Id = personRole.Id,
+                    JobId = personRole.JobId,
+                    PersonId = personRole.PersonId,
+                    Active = personRole.Active,
+                    StartDate = personRole.StartDate,
+                    EndDate = personRole.EndDate,
+                    Notes = personRole.Notes,
+                    PreferredName = person.PreferredName,
+                    LastName = person.LastName,
+                    Job = job
+                }).OrderByDescending(job => job.StartDate);
 
         public IQueryable<Staff> Staff => _dbConnection.Staff;
 
@@ -181,12 +198,14 @@ namespace Backend.DataLayer
                 WorkPermitType = staff.WorkPermitType,
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
+                YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
                 PhoneExt = staff.PhoneExt
             };
 
         public IQueryable<StaffWithOrgName> StaffWithOrgNames =>
             from staff in _dbConnection.Staff
             from missionOrg in _dbConnection.MissionOrgs.LeftJoin(org => staff.MissionOrgId == org.Id).DefaultIfEmpty()
+            from orgGroup in _dbConnection.OrgGroups.LeftJoin(org => org.Id == staff.OrgGroupId).DefaultIfEmpty()
             select new StaffWithOrgName
             {
                 Id = staff.Id,
@@ -208,7 +227,10 @@ namespace Backend.DataLayer
                 WorkPermitType = staff.WorkPermitType,
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
-                PhoneExt = staff.PhoneExt
+                YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
+                PhoneExt = staff.PhoneExt,
+                OrgGroupName = orgGroup.GroupName,
+                OrgGroupSupervisor = orgGroup.Supervisor
             };
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
@@ -228,29 +250,16 @@ namespace Backend.DataLayer
 
         public PersonWithOthers GetById(Guid id)
         {
-            var person = PeopleGeneric<PersonWithOthers>().FirstOrDefault(selectedPerson => selectedPerson.Id == id);
-            if (person != null)
-            {
-                person.Roles = GetPersonRolesWithJob(id).ToList();
-                person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
-                person.Evaluations = (from eval in _dbConnection.Evaluations
-                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.Id == eval.RoleId)
-                    from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
-                    where eval.PersonId == person.Id
-                    select new EvaluationWithNames
-                    {
-                        Id = eval.Id,
-                        PersonId = eval.PersonId,
-                        Evaluator = eval.Evaluator,
-                        RoleId = eval.RoleId,
-                        Date = eval.Date,
-                        Notes = eval.Notes,
-                        Result = eval.Result,
-                        Score = eval.Score,
-                        Total = eval.Total,
-                        JobTitle = job.Title
-                    }).ToList();
-            }
+            var result = (from p in PeopleGeneric<PersonWithOthers>()
+                from donor in _dbConnection.Donors.LeftJoin(donor => p.DonorId.HasValue && donor.Id == p.DonorId)
+                    .DefaultIfEmpty()
+                select new {person = p, donor}).FirstOrDefault(arg => arg.person.Id == id);
+            if (result == null) throw new NullReferenceException($"Unable to find person with ID {id}");
+            var person = result.person;
+            person.Donor = result.donor;
+            person.Roles = GetPersonRolesWithJob(id).ToList();
+            person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
+                .OrderBy(contact => contact.ContactPreferedName).ToList();
 
             return person;
         }
@@ -288,6 +297,11 @@ namespace Backend.DataLayer
                 from role in _dbConnection.Roles.InnerJoin(role => role.Id == userRole.RoleId)
                 where role.NormalizedName == roleName.ToUpper()
                 select person;
+        }
+
+        public void DeleteDonor(Guid donorId)
+        {
+            _dbConnection.Donors.Delete(donor => donor.Id == donorId);
         }
     }
 }

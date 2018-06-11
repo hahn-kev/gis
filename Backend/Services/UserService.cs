@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
+using LinqToDB;
 using Microsoft.AspNetCore.Identity;
 using IdentityUser = Backend.Entities.IdentityUser;
 
@@ -13,14 +14,17 @@ namespace Backend.Services
         private readonly UsersRepository _usersRepository;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly PersonRepository _personRepository;
+        private readonly OrgGroupRepository _orgGroupRepository;
 
         public UserService(UsersRepository usersRepository,
             UserManager<IdentityUser> userManager,
-            PersonRepository personRepository)
+            PersonRepository personRepository,
+            OrgGroupRepository orgGroupRepository)
         {
             _usersRepository = usersRepository;
             _userManager = userManager;
             _personRepository = personRepository;
+            _orgGroupRepository = orgGroupRepository;
         }
 
         public IQueryable<UserProfile> Users => _usersRepository.Users;
@@ -103,6 +107,14 @@ namespace Backend.Services
         public Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             return _userManager.AddToRoleAsync(user, role);
+        }
+
+        public Guid? FindGroupIdIfSupervisor(Guid personId)
+        {
+            return (from person in _personRepository.People
+                from orgGroup in _orgGroupRepository.OrgGroups.LeftJoin(g => g.Supervisor == person.Id).DefaultIfEmpty()
+                where person.Id == personId
+                select orgGroup.Id).SingleOrDefault();
         }
     }
 }

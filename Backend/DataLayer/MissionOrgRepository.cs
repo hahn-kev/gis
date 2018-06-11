@@ -15,9 +15,27 @@ namespace Backend.DataLayer
             _dbConnection = dbConnection;
         }
 
-        public MissionOrg GetOrg(Guid id)
+        public MissionOrgWithYearSummaries GetOrg(Guid id)
         {
-            return _dbConnection.MissionOrgs.SingleOrDefault(org => org.Id == id);
+            var missionOrg = _dbConnection.MissionOrgs.Select(org => new MissionOrgWithYearSummaries
+            {
+                Id = org.Id,
+                Name = org.Name,
+                RepId = org.RepId,
+                Phone = org.Phone,
+                Email = org.Email,
+                Address = org.Address,
+                AddressLocal = org.AddressLocal,
+                ApprovedDate = org.ApprovedDate,
+                OfficeInThailand = org.OfficeInThailand,
+                Status = org.Status
+            }).SingleOrDefault(org => org.Id == id);
+            if (missionOrg == null) throw new NullReferenceException("No Mission org found matching ID");
+            missionOrg.YearSummaries = _dbConnection.MissionOrgYearSummaries
+                .Where(year => year.MissionOrgId == id)
+                .OrderByDescending(yearSummary => yearSummary.Year)
+                .ToList();
+            return missionOrg;
         }
 
         public IQueryable<MissionOrgWithNames> MissionOrgsWithNames =>
@@ -27,6 +45,7 @@ namespace Backend.DataLayer
             {
                 Id = org.Id,
                 Address = org.Address,
+                AddressLocal = org.AddressLocal,
                 ApprovedDate = org.ApprovedDate,
                 Email = org.Email,
                 Name = org.Name,
@@ -36,5 +55,14 @@ namespace Backend.DataLayer
                 Status = org.Status,
                 ContactName = (person.PreferredName ?? person.FirstName) + " " + person.LastName
             };
+
+        public IQueryable<Person> PeopleInOrg(Guid orgId)
+        {
+            return from p in _dbConnection.People
+                from staff in _dbConnection.Staff.InnerJoin(staff => staff.Id == p.StaffId)
+                from missionOrg in _dbConnection.MissionOrgs.InnerJoin(org => org.Id == staff.MissionOrgId)
+                where missionOrg.Id == orgId
+                select p;
+        }
     }
 }

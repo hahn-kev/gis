@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../../classes/app-data-source';
-import { Gender, NationalityName, PersonWithStaffSummaries } from '../../person';
+import { Gender, PersonWithStaffSummaries } from '../../person';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
@@ -15,8 +15,9 @@ import { UrlBindingService } from '../../../services/url-binding.service';
   providers: [UrlBindingService]
 })
 export class StaffReportComponent implements OnInit {
-  public nationalityName = NationalityName;
   public dataSource: AppDataSource<PersonWithStaffSummaries>;
+  public allOrgGroups: { name: string, superId: string }[] = [];
+  public allMissionOrgs: string[] = [];
   age = StaffReportComponent.age;
   public avalibleColumns = [
     'preferredName',
@@ -31,6 +32,8 @@ export class StaffReportComponent implements OnInit {
     'serviceLength',
     'isActive',
     'startDate',
+    'department /Division',
+    'sendingOrg',
 
     'birthdate',
     'age',
@@ -40,8 +43,7 @@ export class StaffReportComponent implements OnInit {
     'endorsementAgency',
     'legalStatus',
     'isThai',
-    'speaksEnglish',
-    'nationality'
+    'speaksEnglish'
   ];
 
 
@@ -58,16 +60,30 @@ export class StaffReportComponent implements OnInit {
                 showNonThai: boolean,
                 showMen: boolean,
                 showWomen: boolean,
-                filterOlderThan: boolean,
-                olderThanFilter: number,
-                filterYoungerThan: boolean,
-                youngerThanFilter: number
+                age: number,
+                ageType: string,
+                serviceLength: number,
+                serviceLengthType: string,
+                group: string[],
+                sendingOrg: string[]
               }>) {
     this.dataSource = new AppDataSource<PersonWithStaffSummaries>();
     this.dataSource.customColumnAccessor('country', data => data.isThai ? 'Thailand' : data.passportCountry);
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
+    this.dataSource.customColumnAccessor('serviceLength', data => this.serviceLength(data).asDays());
     this.dataSource.bindToRouteData(this.route, 'staff');
+    //filter list to distinct
+    this.allOrgGroups = this.dataSource.filteredData
+      .map(value => {
+        return {name: value.staff.orgGroupName, superId: value.staff.orgGroupSupervisor};
+      })
+      .filter((value, index, array) => array.map(_ => _.name).indexOf(value.name) == index && value.name != null)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    this.allMissionOrgs = this.dataSource.filteredData
+      .map(value => value.staff.missionOrgName)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null)
+      .sort();
     this.dataSource.filterPredicate = (data: PersonWithStaffSummaries, filter: string) => {
       return data.preferredName.toUpperCase().startsWith(filter)
         || data.lastName.toUpperCase().startsWith(filter)
@@ -84,9 +100,13 @@ export class StaffReportComponent implements OnInit {
       if (!this.urlBinding.values.showMen && person.gender === Gender.Male) return false;
       if (!this.urlBinding.values.showWomen && person.gender === Gender.Female) return false;
       const yearsOld = StaffReportComponent.age(person.birthdate);
-      if ((this.urlBinding.values.filterYoungerThan || this.urlBinding.values.filterOlderThan) && Number.isNaN(yearsOld)) return false;
-      if (this.urlBinding.values.filterOlderThan && this.urlBinding.values.olderThanFilter >= yearsOld) return false;
-      if (this.urlBinding.values.filterYoungerThan && this.urlBinding.values.youngerThanFilter <= yearsOld) return false;
+      if (!this.testNumber(this.urlBinding.values.ageType, this.urlBinding.values.age, yearsOld)) return false;
+      if (!this.testNumber(this.urlBinding.values.serviceLengthType,
+        this.urlBinding.values.serviceLength,
+        this.serviceLength(person).asYears())) return false;
+      if (!this.matchesOrgGroupFilter(person)) return false;
+      if (this.urlBinding.values.sendingOrg.length > 0 &&
+        !this.urlBinding.values.sendingOrg.includes(person.staff.missionOrgName)) return false;
       return true;
     };
 
@@ -97,10 +117,13 @@ export class StaffReportComponent implements OnInit {
     this.urlBinding.addParam('showNonThai', true);
     this.urlBinding.addParam('showMen', true);
     this.urlBinding.addParam('showWomen', true);
-    this.urlBinding.addParam('filterOlderThan', false);
-    this.urlBinding.addParam('olderThanFilter', 0);
-    this.urlBinding.addParam('filterYoungerThan', false);
-    this.urlBinding.addParam('youngerThanFilter', 0);
+
+    this.urlBinding.addParam('group', []);
+    this.urlBinding.addParam('sendingOrg', []);
+    this.urlBinding.addParam('age', 0);
+    this.urlBinding.addParam('ageType', null);
+    this.urlBinding.addParam('serviceLength', 0);
+    this.urlBinding.addParam('serviceLengthType', null);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
   }
@@ -113,7 +136,6 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-
   static age(date: MomentInput) {
     return moment().diff(moment(date), 'years');
   }
@@ -124,8 +146,36 @@ export class StaffReportComponent implements OnInit {
     return mDate;
   }
 
-  daysAsYears(days: number) {
-    if (days < 1) return 'None';
-    return moment.duration(days, 'days').humanize();
+  serviceLength(person: PersonWithStaffSummaries) {
+    return moment.duration(person.daysOfService / 365.25, 'years')
+      .add(person.staff.yearsOfServiceAdjustment, 'years');
+  }
+
+  daysAsYears(person: PersonWithStaffSummaries) {
+    if (person.daysOfService < 1 && person.staff.yearsOfServiceAdjustment === 0) return 'None';
+    return this.serviceLength(person).humanize();
+  }
+
+  testNumber(type: string, constraint: number, test: number) {
+    if (!type) return true;
+    switch (type) {
+      case '<':
+        return test < constraint;
+      case '>':
+        return test > constraint;
+      case '<>':
+        return test != constraint;
+      case '=':
+        return test == constraint;
+    }
+  }
+
+  matchesOrgGroupFilter(person: PersonWithStaffSummaries) {
+    let groups = this.urlBinding.values.group;
+    if (groups.length == 0) return true;
+    if (groups.includes(person.staff.orgGroupName)) return true;
+    let group = this.allOrgGroups.find(value => value.superId == person.id);
+    if (!group) return false;
+    return groups.includes(group.name);
   }
 }

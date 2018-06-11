@@ -92,6 +92,7 @@ namespace Backend.Controllers
         public const string ClaimTypeLastName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname";
         public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
         public const string ClaimPersonId = "personId";
+        public const string ClaimSupervisor = "supervisesGroupId";
         public const string GoogleOAuthTokenName = "access_token";
 
         public const string GisEmailSufix = "@gisthailand.org";
@@ -216,15 +217,22 @@ namespace Backend.Controllers
             );
         }
 
-        private static IEnumerable<Claim> GetTokenClaims(IdentityUser identityUser, string googleOauthToken)
+        private IEnumerable<Claim> GetTokenClaims(IdentityUser identityUser, string googleOauthToken)
         {
-            return new List<Claim>
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, identityUser.Email ?? string.Empty),
-                new Claim(ClaimPersonId, identityUser.PersonId?.ToString() ?? string.Empty),
                 new Claim("oauth", googleOauthToken ?? string.Empty)
             };
+            if (identityUser.PersonId.HasValue)
+            {
+                claims.Add(new Claim(ClaimPersonId, identityUser.PersonId.ToString()));
+                var groupId = _userService.FindGroupIdIfSupervisor(identityUser.PersonId.Value);
+                if (groupId.HasValue) claims.Add(new Claim(ClaimSupervisor, groupId.Value.ToString()));
+            }
+
+            return claims;
         }
 
         private Exception ThrowLoginFailed()

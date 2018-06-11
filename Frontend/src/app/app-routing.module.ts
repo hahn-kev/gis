@@ -53,6 +53,12 @@ import { CanDeactivateGuard } from './services/can-deactivate.guard';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 import { StaffSummariesResolveService } from './people/staff/staff-report/staff-summaries-resolve.service';
+import { PersonRequiredGuard } from './services/person-required.guard';
+import { OrgTreeComponent } from './org-tree/org-tree.component';
+import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
+import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
+import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
+import { OrgTreeDataResolverService } from './org-tree/org-tree-data-resolver.service';
 
 const routes: Routes = [
   {
@@ -114,6 +120,18 @@ const routes: Routes = [
                 data: {title: 'School Aids'},
                 resolve: {
                   people: SchoolAidResolveService
+                }
+              }
+            ]
+          },
+          {
+            path: 'report',
+            children: [
+              {
+                path: 'evaluations',
+                component: EvaluationReportComponent,
+                resolve: {
+                  evaluationSummary: EvaluationSummaryResolveService
                 }
               }
             ]
@@ -200,7 +218,6 @@ const routes: Routes = [
             ]
           }
         ]
-
       },
       {
         path: 'groups',
@@ -234,13 +251,21 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: LeaveRequestComponent,
+            canActivate: [PersonRequiredGuard],
             canDeactivate: [CanDeactivateGuard],
             resolve: {
               leaveRequest: LeaveRequestResolverService,
               people: PeopleWithLeaveResolverService
             }
           },
-
+          {
+            path: 'list/mine',
+            canActivate: [PersonRequiredGuard],
+            component: LeaveListComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            }
+          },
           {
             path: 'list/:personId',
             component: LeaveListComponent,
@@ -334,20 +359,36 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'self',
+        path: 'org-tree',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
         children: [
           {
             path: '',
-            component: PersonComponent,
+            component: OrgTreeComponent,
             resolve: {
-              person: SelfService,
-              groups: GroupsResolveService,
-              people: PeopleResolveService,
-              jobs: JobListResolverService,
-              missionOrgs: MissionOrgListResolverService
+              treeData: OrgTreeDataResolverService
+            }
+          },
+          {
+            path: ':rootId',
+            component: OrgTreeComponent,
+            resolve: {
+              treeData: OrgTreeDataResolverService
             }
           }
         ]
+      },
+      {
+        path: 'self',
+        canActivate: [PersonRequiredGuard],
+        component: PersonComponent,
+        resolve: {
+          person: SelfService,
+          people: PeopleResolveService
+        }
       },
       {
         path: 'sandbox',
@@ -408,7 +449,11 @@ const routes: Routes = [
     JobFilledListResolverService,
     CanDeactivateGuard,
     SchoolAidResolveService,
-    StaffSummariesResolveService
+    StaffSummariesResolveService,
+    PersonRequiredGuard,
+    AllRolesResolverService,
+    EvaluationSummaryResolveService,
+    OrgTreeDataResolverService
   ]
 })
 export class AppRoutingModule {

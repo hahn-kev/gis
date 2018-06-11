@@ -1,5 +1,10 @@
 import { BaseEntity } from '../../classes/base-entity';
 
+export enum TrainingScope {
+  AllStaff = 'AllStaff',
+  Department = 'Department'
+}
+
 export class TrainingRequirement extends BaseEntity {
   public name: string;
   public firstYear: number;
@@ -16,9 +21,4 @@ export class TrainingRequirement extends BaseEntity {
     this.scope = TrainingScope.AllStaff;
     this.firstYear = new Date().getUTCFullYear();
   }
-}
-
-export enum TrainingScope {
-  AllStaff = 'AllStaff',
-  Department = 'Department'
 }

@@ -1,5 +1,5 @@
 <mat-accordion>
-  <mat-expansion-panel [disabled]="isNew" [matTooltipDisabled]="!isNew"
+  <mat-expansion-panel *requireRole="'admin,hr'" [disabled]="isNew" [matTooltipDisabled]="!isNew"
                        matTooltip="To add a Training record first save the person"
                        #newExpansionPanel>
     <mat-expansion-panel-header>

@@ -1,20 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="node_modules\**" />
     <Compile Remove="dist\**"/>
+    <Compile Remove="coverage\**"/>
+    <Compile Remove="out-tsc\**"/>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="node_modules\**" />
     <EmbeddedResource Remove="dist\**"/>
+    <EmbeddedResource Remove="coverage\**"/>
+    <EmbeddedResource Remove="out-tsc\**"/>
   </ItemGroup>
   <ItemGroup>
     <None Remove="node_modules\**" />
     <None Remove="dist\**"/>
+    <None Remove="coverage\**"/>
+    <None Remove="out-tsc\**"/>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\assets\img" />
+    <Folder Include="src\assets\js"/>
   </ItemGroup>
 </Project>

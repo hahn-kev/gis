@@ -25,6 +25,10 @@
      routerLink="/job/report/roles">
     <mat-icon>insert_chart</mat-icon>
   </a>
+  <a mat-icon-button class="print-hide" matTooltip="Evaluations Report" matTooltipPosition="before"
+     routerLink="/people/report/evaluations">
+    <mat-icon>assignment_ind</mat-icon>
+  </a>
   <app-export-button fileName="staff" [values]="dataSource"></app-export-button>
 </ng-container>
 <ng-container *appTemplateContent="'dialog:filter'">
@@ -41,21 +45,41 @@
     <mat-checkbox [(ngModel)]="urlBinding.values.showWomen">
       Show Women Staff
     </mat-checkbox>
-    <mat-checkbox [(ngModel)]="urlBinding.values.filterOlderThan">
-      Older than
-    </mat-checkbox>
+    <div class="span-2-columns age">
+      <span>Age</span>
+      <mat-button-toggle-group [(ngModel)]="urlBinding.values.ageType">
+        <mat-button-toggle [value]="null">None</mat-button-toggle>
+        <mat-button-toggle value="=">=</mat-button-toggle>
+        <mat-button-toggle value="<>"><></mat-button-toggle>
+        <mat-button-toggle value="<"> <</mat-button-toggle>
+        <mat-button-toggle value=">"> ></mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-form-field>
+        <input matInput type="number" [(ngModel)]="urlBinding.values.age" placeholder="Age">
+      </mat-form-field>
+    </div>
+    <div class="span-2-columns service-length">
+      <span>Service Length</span>
+      <mat-button-toggle-group [(ngModel)]="urlBinding.values.serviceLengthType">
+        <mat-button-toggle [value]="null">None</mat-button-toggle>
+        <mat-button-toggle value="=">=</mat-button-toggle>
+        <mat-button-toggle value="<>"><></mat-button-toggle>
+        <mat-button-toggle value="<"> <</mat-button-toggle>
+        <mat-button-toggle value=">"> ></mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-form-field>
+        <input matInput type="number" [(ngModel)]="urlBinding.values.serviceLength" placeholder="Service Length">
+      </mat-form-field>
+    </div>
     <mat-form-field>
-      <input type="number" matInput
-             [(ngModel)]="urlBinding.values.olderThanFilter"
-             placeholder="Years">
+      <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+        <mat-option *ngFor="let group of allOrgGroups" [value]="group.name">{{group.name}}</mat-option>
+      </mat-select>
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="urlBinding.values.filterYoungerThan">
-      Younger than
-    </mat-checkbox>
     <mat-form-field>
-      <input type="number" matInput
-             [(ngModel)]="urlBinding.values.youngerThanFilter"
-             placeholder="Years">
+      <mat-select placeholder="Filter Sending Org" [(ngModel)]="urlBinding.values.sendingOrg" multiple>
+        <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
+      </mat-select>
     </mat-form-field>
   </div>
 </ng-container>
@@ -139,10 +163,6 @@
       <mat-checkbox disabled [checked]="row.speaksEnglish"></mat-checkbox>
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="nationality">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Nationality</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{nationalityName(row.nationality)}}</mat-cell>
-  </ng-container>
 
   <ng-container matColumnDef="startDate">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</mat-header-cell>
@@ -150,8 +170,8 @@
   </ng-container>
 
   <ng-container matColumnDef="serviceLength">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="daysOfService">Service Length</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{daysAsYears(row.daysOfService)}}</mat-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Service Length</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{daysAsYears(row)}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="isActive">
@@ -159,6 +179,16 @@
     <mat-cell *matCellDef="let row">
       <mat-checkbox disabled [checked]="row.isActive"></mat-checkbox>
     </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="department /Division">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="">Department / Division</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.staff.orgGroupName}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="sendingOrg">
+    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.missionOrgName">Sending Org</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.staff.missionOrgName}}</mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->

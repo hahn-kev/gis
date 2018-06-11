@@ -15,7 +15,7 @@ export class MyErrorHandlerService implements ErrorHandler {
 
   }
 
-  timeSinceLast(){
+  timeSinceLast() {
     if (this.lastTime == null) {
       this.lastTime = new Date();
       return Number.MAX_SAFE_INTEGER;

@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { JobWithOrgGroup } from '../../job/job';
 import { JobService } from '../../job/job.service';
 import { LazyLoadService } from '../../services/lazy-load.service';
-import { take } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs/Rx';
 
 @Component({
   selector: 'app-role',
@@ -19,11 +20,12 @@ export class RoleComponent implements OnInit {
   @Input() formId: string;
   @ViewChild('form') form: NgForm;
   jobs: JobWithOrgGroup[] = [];
+  jobsObservable: Observable<JobWithOrgGroup[]>;
 
   constructor(private route: ActivatedRoute, lazyLoadService: LazyLoadService, jobService: JobService) {
-    lazyLoadService.share('jobs', () => jobService.list())
-      .pipe(take(1))
-      .subscribe(value => this.jobs = value);
+    this.jobsObservable = lazyLoadService
+      .share('jobs', () => jobService.list())
+      .pipe(tap(x => this.jobs = x));
   }
 
   ngOnInit() {

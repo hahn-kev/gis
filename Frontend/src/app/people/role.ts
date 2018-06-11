@@ -7,6 +7,7 @@ export class Role extends BaseEntity {
   public endDate?: Date;
   public personId: string;
   public jobId: string;
+  public notes: string;
 }
 
 export class RoleExtended extends Role {

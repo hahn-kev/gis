@@ -112,7 +112,7 @@ namespace UnitTestProject
 
             var currentLeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithStaff.Id);
             var leaveUseage =
-                currentLeaveDetails.LeaveUseages.SingleOrDefault(useage => useage.LeaveType == LeaveType.Other);
+                currentLeaveDetails.LeaveUsages.SingleOrDefault(useage => useage.LeaveType == LeaveType.Other);
             Assert.NotNull(leaveUseage);
             Assert.Equal(expectedDays, leaveUseage.Used);
         }
@@ -205,7 +205,7 @@ namespace UnitTestProject
         [Fact]
         public void ListAllLeaveWorks()
         {
-            var personAndLeaveDetailses = _leaveService.PeopleWithLeave(null);
+            var personAndLeaveDetailses = _leaveService.PeopleWithCurrentLeave(null);
             Assert.NotEmpty(personAndLeaveDetailses);
         }
     }

@@ -1,4 +1,12 @@
 <ng-container *appTemplateContent="'title'">Departments/Divisions ({{dataSource.filteredData.length}})</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button>
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never">
+    <input autofocus matInput placeholder="Search" [(ngModel)]="urlBinding.values.search">
+  </mat-form-field>
+</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="groupName">
     <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>

@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
-using LinqToDB.Common;
+using Backend.Utils;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,11 +27,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Npgsql;
 using Sentinel.Sdk.Extensions;
 using Sentinel.Sdk.Middleware;
-using Serilog;
 using IdentityUser = Backend.Entities.IdentityUser;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -91,18 +87,23 @@ namespace Backend
                     options.Filters.Add(typeof(AllowAnonymousFilter));
 #else
 //require auth on every controller by default
-                options.Filters.Add(
-                    new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+                    options.Filters.Add(
+                        new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 #endif
                     options.Filters.Add(typeof(GlobalExceptionHandler));
                 })
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    //time zone info won't be included, this is so we can pass a date from the front end without the timezone
+                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
-            //todo response caching?
-//            services.AddResponseCaching();
-            services.AddLocalization();
+            services.AddResponseCaching();
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add(new BrotliCompressionProvider());
+                options.EnableForHttps = true;
+            });
+//            services.AddLocalization();
 
             //todo localization?
 //            services.Configure<RequestLocalizationOptions>(options =>
@@ -122,7 +123,7 @@ namespace Backend
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
 
                         ValidateIssuer = true,
                         ValidIssuer = jwtSettings.Issuer,
@@ -159,7 +160,26 @@ namespace Backend
                     };
                 });
             //todo addGoogle for authentication
-//            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("attachments", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("jobs", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("grades", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("role", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("evaluations", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("staff", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("contact", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("isSupervisor",
+                    builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
+                options.AddPolicy("leaveRequest", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("training", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("orgGroup", builder => builder.RequireRole("admin", "hr"));
+                options.AddPolicy("people", builder => builder.RequireRole("admin", "hr", "registrar"));
+                options.AddPolicy("sendingOrg", builder => builder.RequireRole("admin", "hr", "registrar"));
+                options.AddPolicy("orgTreeData",
+                    builder => builder.RequireAssertion(context =>
+                        context.User.IsSupervisor() || context.User.IsAdminOrHr()));
+            });
             foreach (var type in GetType().Assembly.GetTypes()
                 .Where(type =>
                     (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
@@ -238,8 +258,17 @@ namespace Backend
                     await next();
                 }
             });
-            app.UseStaticFiles();
-//            app.UseResponseCaching();
+            app.UseResponseCaching();
+            app.UseResponseCompression();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = context => context.Context.Response.GetTypedHeaders().CacheControl =
+                    new CacheControlHeaderValue
+                    {
+                        Public = true,
+                        MaxAge = TimeSpan.FromSeconds(30)
+                    }
+            });
             app.UseAuthentication();
             app.UseSentinel();
             app.UseMvc();
@@ -262,6 +291,7 @@ namespace Backend
                 dbConnection.TryCreateTable<StaffEndorsment>();
                 dbConnection.TryCreateTable<RequiredEndorsment>();
 
+                dbConnection.TryCreateTable<Donor>();
                 //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {

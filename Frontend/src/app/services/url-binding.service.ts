@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { isArray } from 'util';
 
+type ObservableValues<T> = {
+  [K in keyof T]: Observable<T[K]>
+};
+
 @Injectable()
 export class UrlBindingService<T_VALUES> {
-  private _values: T_VALUES = null;
+  public subjects: BehaviorSubject<any>[] = [];
   public get values(): T_VALUES {
     if (this._values) return this._values;
     this._values = {} as T_VALUES;
@@ -25,7 +29,21 @@ export class UrlBindingService<T_VALUES> {
     return this._values;
   }
 
-  public subjects: BehaviorSubject<any>[] = [];
+  public get observableValues(): ObservableValues<T_VALUES> {
+    if (this._observableValues) return this._observableValues;
+    this._observableValues = {} as ObservableValues<T_VALUES>;
+    for (let i = 0; i < this.params.length; i++) {
+      const name = this.params[i];
+      const subject = this.subjects[i];
+      Object.defineProperty(this._observableValues, name, {
+        value: subject
+      });
+    }
+    return this._observableValues;
+  }
+
+  private _observableValues: ObservableValues<T_VALUES> = null;
+  private _values: T_VALUES = null;
   private params: string[] = [];
   private defaultValues = [];
   private pathParams: boolean[] = [];
@@ -45,6 +63,19 @@ export class UrlBindingService<T_VALUES> {
 
   public loadFromParams() {
     return this._loadFromParams(this.route.snapshot.paramMap, this.route.snapshot.queryParamMap);
+  }
+
+
+  addParam<K extends keyof T_VALUES>(name: K, defaultValue: T_VALUES[K], pathParam = false) {
+    this.params.push(name);
+    this.pathParams.push(pathParam);
+    this.defaultValues.push(defaultValue);
+    const subject = new BehaviorSubject<T_VALUES[K]>(defaultValue);
+    this.subjects.push(subject);
+    this.ignoreUpdates = true;
+    this.updateSubscription();
+    this.ignoreUpdates = false;
+    return subject.asObservable();
   }
 
   private _loadFromParams(params: ParamMap, queryParams: ParamMap) {
@@ -93,7 +124,7 @@ export class UrlBindingService<T_VALUES> {
     return hadUpdate;
   }
 
-  areListsEqual(a: any[], b: any[]) {
+  private areListsEqual(a: any[], b: any[]) {
     if (a === b) return true;
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
@@ -109,18 +140,6 @@ export class UrlBindingService<T_VALUES> {
       if (a[i] !== b[i]) return false;
     }
     return true;
-  }
-
-  addParam<T_VALUE>(name: string, defaultValue: T_VALUE, pathParam = false) {
-    this.params.push(name);
-    this.pathParams.push(pathParam);
-    this.defaultValues.push(defaultValue);
-    const subject = new BehaviorSubject<T_VALUE>(defaultValue);
-    this.subjects.push(subject);
-    this.ignoreUpdates = true;
-    this.updateSubscription();
-    this.ignoreUpdates = false;
-    return subject.asObservable();
   }
 
   private updateSubscription() {
@@ -146,7 +165,8 @@ export class UrlBindingService<T_VALUES> {
       }
       this.router.navigate(commands, {
         relativeTo: this.route,
-        queryParams: params
+        queryParams: params,
+        replaceUrl: true
       });
       this.onParamsUpdated(this.values);
     });

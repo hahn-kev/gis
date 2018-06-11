@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material';
 
 export class BaseEditComponent implements CanComponentDeactivate {
   @ViewChild(NgForm) form: NgForm;
-  formSubmitted: boolean = false;
+  formSubmitted = false;
 
   constructor(protected dialog: MatDialog) {
 

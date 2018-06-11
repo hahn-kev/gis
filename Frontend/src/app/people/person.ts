@@ -4,22 +4,26 @@ import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
 import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
+import { Donor } from './donor';
+
+export enum Gender {
+  Male = 'Male',
+  Female = 'Female'
+}
 
 export class Person extends BaseEntity {
   public firstName: string;
   public lastName: string;
   public email: string;
   public staffId?: string;
+  public donorId?: string;
 
   public preferredName: string;
   public gender = Gender.Male;
   public isThai: boolean;
   public isSchoolAid: boolean;
-}
-
-export enum Gender {
-  Male = 'Male',
-  Female = 'Female'
+  public isParent: boolean;
+  public isAlumni: boolean;
 }
 
 export class PersonExtended extends Person {
@@ -30,7 +34,6 @@ export class PersonExtended extends Person {
   public spouseId: string;
   public spouseChanged: boolean;
 
-  public nationality?: Nationality;
   public birthdate?: Date;
 
   public passportAddress: string;
@@ -46,11 +49,12 @@ export class PersonExtended extends Person {
   public thaiAmphur: string;
   public thaiProvince: string;
   public thaiZip: string;
+
+  public profilePicDriveId: string;
 }
 
 export class PersonWithStaff extends PersonExtended {
   public staff: StaffWithOrgName;
-  public spousePreferedName: string;
 }
 
 export class PersonWithStaffSummaries extends PersonWithStaff {
@@ -64,37 +68,10 @@ export class PersonWithOthers extends PersonWithStaff {
   public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
   public evaluations: EvaluationWithNames[] = [];
+  public donor: Donor;
 }
 
 export class PersonWithDaysOfLeave extends Person {
   public sickDaysOfLeaveUsed: number;
   public vacationDaysOfLeaveUsed: number;
-}
-
-export enum Nationality {
-  NorthAmerica = 'NorthAmerica',
-  CentralSouthAmerica = 'CentralSouthAmerica',
-  Africa = 'Africa',
-  MiddleEast = 'MiddleEast',
-  Europe = 'Europe',
-  CentralAsia = 'CentralAsia',
-  EastAsia = 'EastAsia',
-  Oceania = 'Oceania',
-}
-
-export function NationalityName(nationality: Nationality): string {
-  switch (nationality) {
-    case Nationality.NorthAmerica:
-      return 'North America';
-    case Nationality.CentralSouthAmerica:
-      return 'Central South America';
-    case Nationality.MiddleEast:
-      return 'Middle East';
-    case Nationality.CentralAsia:
-      return 'Central Asia';
-    case Nationality.EastAsia:
-      return 'East Asia';
-    default:
-      return nationality;
-  }
 }

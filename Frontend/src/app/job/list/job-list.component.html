@@ -1,8 +1,5 @@
 <ng-container *appTemplateContent="'title'">Jobs ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <mat-slide-toggle [(ngModel)]="urlBinding.values.showOnlyOpen">
-    Only Open Jobs
-  </mat-slide-toggle>
   <button mat-icon-button>
     <mat-icon>search</mat-icon>
   </button>
@@ -10,24 +7,9 @@
     <input autofocus matInput [ngModel]="urlBinding.values.search"
            (keyup)="urlBinding.values.search = $event.target.value" placeholder="Search">
   </mat-form-field>
-  <mat-form-field style="padding-left: 8px">
-    <mat-select [(ngModel)]="urlBinding.values.type"
-                name="type"
-                multiple
-                placeholder="Show Job Type">
-      <mat-select-trigger>{{jobTypeSelectLabel(urlBinding.values.type)}}</mat-select-trigger>
-      <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field style="padding-left: 8px">
-    <mat-select [(ngModel)]="urlBinding.values.status"
-                name="type"
-                multiple
-                placeholder="Show Job Status">
-      <mat-select-trigger>{{jobSelectLabel(urlBinding.values.status)}}</mat-select-trigger>
-      <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <button mat-icon-button (click)="filterDialog.show()" class="print-hide" matTooltip="Filters">
+    <mat-icon>filter_list</mat-icon>
+  </button>
   <a mat-icon-button class="print-hide" matTooltip="Role Report" matTooltipPosition="before"
      routerLink="../report/roles">
     <mat-icon>insert_chart</mat-icon>
@@ -35,7 +17,41 @@
   <a mat-icon-button class="print-hide" matTooltip="Job Grades" matTooltipPosition="before" routerLink="../grade/list">
     <mat-icon>attach_money</mat-icon>
   </a>
+  <app-export-button [values]="dataSource" fileName="jobsData"></app-export-button>
 </ng-container>
+<ng-template #filterDialog="dialog" appDialog="Filters">
+  <div class="two-colum-grid">
+    <mat-slide-toggle [(ngModel)]="urlBinding.values.showInactive">
+      Show Inactive Jobs
+    </mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="urlBinding.values.showOnlyOpen">
+      Only Open Jobs
+    </mat-slide-toggle>
+    <mat-form-field>
+      <mat-select [(ngModel)]="urlBinding.values.type"
+                  name="type"
+                  multiple
+                  placeholder="Show Job Type">
+        <mat-select-trigger>{{jobTypeSelectLabel(urlBinding.values.type)}}</mat-select-trigger>
+        <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select [(ngModel)]="urlBinding.values.status"
+                  name="type"
+                  multiple
+                  placeholder="Show Job Status">
+        <mat-select-trigger>{{jobSelectLabel(urlBinding.values.status)}}</mat-select-trigger>
+        <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+        <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>
 <mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="title">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Title</mat-header-cell>

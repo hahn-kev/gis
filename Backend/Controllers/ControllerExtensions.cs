@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Net.Http.Headers;
 
 namespace Backend.Controllers
@@ -57,6 +58,11 @@ namespace Backend.Controllers
         public static bool IsHr(this ClaimsPrincipal user)
         {
             return user.IsInRole("hr");
+        }
+
+        public static bool IsSupervisor(this ClaimsPrincipal user)
+        {
+            return user.HasClaim(claim => claim.Type == AuthenticateController.ClaimSupervisor);
         }
 
         static readonly MediaTypeHeaderValue JsonMediaType = MediaTypeHeaderValue.Parse("application/json");

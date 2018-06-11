@@ -1,4 +1,4 @@
-﻿export var endorsments = [
+﻿export const endorsments = [
   'Administration/Leadership',
   'All Grades Art',
   'All Grades Chinese',

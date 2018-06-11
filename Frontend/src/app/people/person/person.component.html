@@ -76,17 +76,42 @@
             Is Thai
           </mat-slide-toggle>
           <mat-slide-toggle [disabled]="isSelf"
+                            name="isParent"
+                            [(ngModel)]="person.isParent">
+            Is Parent
+          </mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf"
+                            name="isAlumni"
+                            [(ngModel)]="person.isAlumni">
+            Is Alumni
+          </mat-slide-toggle>
+          <mat-slide-toggle [disabled]="isSelf || person.isSchoolAid"
                             name="isStaff"
                             #isStaff="ngModel"
                             [ngModel]="person.staff"
-                            (ngModelChange)="isStaffChanged($event)">
+                            (ngModelChange)="isStaffChanged($event, isStaff)"
+                            matTooltip="A person can't be a school aid and Staff at the same time"
+                            [matTooltipDisabled]="!person.isSchoolAid">
             Is Staff
           </mat-slide-toggle>
 
-          <mat-slide-toggle [disabled]="isSelf"
+          <mat-slide-toggle [disabled]="isSelf || person.staff"
                             name="isSchoolAid"
-                            [(ngModel)]="person.isSchoolAid">
+                            [(ngModel)]="person.isSchoolAid"
+                            matTooltip="A person can't be a School Aide and Staff at the same time"
+                            [matTooltipDisabled]="!person.staff">
             Is School Aide
+          </mat-slide-toggle>
+
+
+          <mat-slide-toggle
+            #isDonor="ngModel"
+            class="span-2-columns"
+            name="isDonor"
+            [disabled]="isSelf"
+            [ngModel]="person.donor"
+            (ngModelChange)="isDonorChanged($event, isDonor)">
+            Is Donor
           </mat-slide-toggle>
 
 
@@ -102,19 +127,13 @@
                    name="phone"
                    placeholder="Phone Number">
           </mat-form-field>
-
-          <mat-form-field>
-            <mat-select [(ngModel)]="person.nationality" name="nationality"
-                        placeholder="Nationality">
-              <mat-option *ngFor="let nat of nationalities" [value]="nat">{{nationalityName(nat)}}</mat-option>
-            </mat-select>
-          </mat-form-field>
         </mat-expansion-panel>
 
         <!--passport address-->
         <mat-expansion-panel class="two-colum-grid">
           <mat-expansion-panel-header>
             <mat-panel-title>Passport Address</mat-panel-title>
+            <mat-panel-description>{{person.passportCountry}}</mat-panel-description>
           </mat-expansion-panel-header>
           <mat-form-field class="span-2-columns">
           <textarea matInput [(ngModel)]="person.passportAddress"
@@ -193,6 +212,17 @@
                    placeholder="Zip">
           </mat-form-field>
         </mat-expansion-panel>
+
+        <!--donor-->
+        <mat-expansion-panel *ngIf="person.donor">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Donor</mat-panel-title>
+            <mat-panel-description>{{person.donor.status}}</mat-panel-description>
+            <ng-template matExpansionPanelContent>
+              <app-donor [donor]="person.donor"></app-donor>
+            </ng-template>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
       </mat-accordion>
     </form>
 
@@ -251,7 +281,7 @@
             <mat-panel-description class="secondary-text">{{person.staff.missionOrgEmail || 'Email unknown'}}
               <a mat-icon-button [routerLink]="'/mission-org/edit/' + person.staff.missionOrgId">
                 <mat-icon class="foreground-text"
-                          [matTooltip]="'View Mission Org'"
+                          [matTooltip]="'View Sending Org'"
                           matTooltipPosition="before">
                   account_balance
                 </mat-icon>
@@ -303,7 +333,7 @@
         </mat-grid-tile>
         <mat-grid-tile>Left</mat-grid-tile>
         <mat-grid-tile>Total</mat-grid-tile>
-        <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUseages">
+        <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUsages">
           <ng-container *ngIf="leaveUsed.leaveType != (person.gender == 'Male' ? 'Maternity' : 'Paternity')">
             <mat-grid-tile [colspan]="2" class="left">{{ leaveTypeName(leaveUsed.leaveType) }}</mat-grid-tile>
             <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
@@ -367,14 +397,14 @@
             <mat-select name="missionOrg"
                         [disabled]="isSelf"
                         [(ngModel)]="person.staff.missionOrgId"
-                        placeholder="Mission Org">
+                        placeholder="Sending Org">
               <mat-option [value]="null">None</mat-option>
               <mat-option *ngFor="let org of missionOrgs | async" [value]="org.id">{{org.name}}</mat-option>
             </mat-select>
           </mat-form-field>
           <div *ngIf="person.staff.orgGroupId" class="span-2-columns org-chain">
             <span class="mat-caption">Department Hierarchy</span>
-            <ng-container *ngFor="let link of orgChain(groups|async).links; last as isLast">
+            <ng-container *ngFor="let link of orgChain(groups|async).links; last as isLast; trackBy: trackLinksBy">
               <a mat-button
                  [disabled]="!link.id || isSelf"
                  [routerLink]="['/' + link.type, 'edit', link.id]">
@@ -413,13 +443,6 @@
                    [(ngModel)]="person.staff.renwebId"
                    placeholder="Renweb Id">
           </mat-form-field>
-          <mat-form-field>
-            <input matInput
-                   name="moeLicenseNumber"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.moeLicenseNumber"
-                   placeholder="MOE License Number">
-          </mat-form-field>
 
           <mat-form-field>
             <mat-select [(ngModel)]="staffInsurer"
@@ -435,21 +458,6 @@
 
           </mat-form-field>
 
-          <mat-form-field>
-            <input matInput
-                   name="teacherLicenseOrg"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.teacherLicenseOrg"
-                   placeholder="Teacher License Organization">
-          </mat-form-field>
-
-          <mat-form-field>
-            <input matInput
-                   name="teacherLicenseNo"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.teacherLicenseNo"
-                   placeholder="Teacher License #">
-          </mat-form-field>
           <mat-form-field>
             <mat-select [(ngModel)]="person.staff.visaType"
                         [disabled]="isSelf"
@@ -473,27 +481,37 @@
               <mat-option value="Teacher">Teacher</mat-option>
               <mat-option value="EducationalPersonnel">Educational Personnel</mat-option>
               <mat-option value="Consultant">Consultant</mat-option>
+              <mat-option value="NationalThai">National Thai</mat-option>
+              <mat-option value="Other">Other</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field>
-            <input matInput
-                   name="endorsmentAgency"
-                   [readonly]="isSelf"
-                   [(ngModel)]="person.staff.endorsementAgency"
-                   placeholder="Endorsment Agency">
+            <input matInput type="number" [readonly]="isSelf"
+                   name="yearsOfServiceAdjustment"
+                   required
+                   placeholder="Years of Service Adjustment"
+                   [(ngModel)]="person.staff.yearsOfServiceAdjustment">
+            <mat-hint>Negative numbers remove years</mat-hint>
           </mat-form-field>
-          <mat-form-field>
-            <mat-select [(ngModel)]="staffEndorsments"
-                        (ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"
-                        [disabled]="isSelf"
-                        multiple
-                        name="endorsements"
-                        placeholder="Endorsements">
-              <mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">
-                {{endorsment}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <!--<mat-form-field>-->
+          <!--<input matInput-->
+          <!--name="endorsmentAgency"-->
+          <!--[readonly]="isSelf"-->
+          <!--[(ngModel)]="person.staff.endorsementAgency"-->
+          <!--placeholder="Endorsment Agency">-->
+          <!--</mat-form-field>-->
+          <!--<mat-form-field>-->
+          <!--<mat-select [(ngModel)]="staffEndorsments"-->
+          <!--(ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"-->
+          <!--[disabled]="isSelf"-->
+          <!--multiple-->
+          <!--name="endorsements"-->
+          <!--placeholder="Endorsements">-->
+          <!--<mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">-->
+          <!--{{endorsment}}-->
+          <!--</mat-option>-->
+          <!--</mat-select>-->
+          <!--</mat-form-field>-->
 
         </ng-template>
       </mat-expansion-panel>
@@ -504,30 +522,31 @@
       <span class="mat-caption">Roles</span>
       <mat-accordion class="roles">
         <!--new role-->
-        <mat-expansion-panel #newRolePanel
-                             *ngIf="!isSelf"
-                             [disabled]="isNew"
-                             [matTooltipDisabled]="!isNew"
-                             matTooltip="To add a role first save the person">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Add new Role</mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-role [role]="newRole"
-                      #newRoleEl
-                      formId="newRoleForm"
-                      (submit)="saveRole(newRole, newRolePanel, true)">
-            </app-role>
-            <mat-action-row>
-              <button type="submit"
-                      form="newRoleForm"
-                      [disabled]="newRoleEl.form.invalid"
-                      mat-button>Add
-              </button>
-            </mat-action-row>
-          </ng-template>
-        </mat-expansion-panel>
-
+        <ng-container *requireRole="'admin,hr'">
+          <mat-expansion-panel #newRolePanel
+                               *ngIf="!isSelf"
+                               [disabled]="isNew"
+                               [matTooltipDisabled]="!isNew"
+                               matTooltip="To add a role first save the person">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Add new Role</mat-panel-title>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
+              <app-role [role]="newRole"
+                        #newRoleEl
+                        formId="newRoleForm"
+                        (submit)="saveRole(newRole, newRolePanel, true)">
+              </app-role>
+              <mat-action-row>
+                <button type="submit"
+                        form="newRoleForm"
+                        [disabled]="newRoleEl.form.invalid"
+                        mat-button>Add
+                </button>
+              </mat-action-row>
+            </ng-template>
+          </mat-expansion-panel>
+        </ng-container>
         <!--roles list-->
         <mat-expansion-panel #rolePanel *ngFor="let role of person.roles">
           <mat-expansion-panel-header>
@@ -568,37 +587,39 @@
       <app-staff-training [staffId]="person.staffId"></app-staff-training>
     </ng-container>
     <!--evaluations-->
-    <ng-container *ngIf="!isSelf || person.evaluations.length != 0">
+    <ng-container *ngIf="(!isSelf || person.evaluations.length != 0) && person.staffId">
       <span class="mat-caption">Evaluations</span>
       <mat-accordion class="evaluations">
         <!--new evaluation-->
-        <mat-expansion-panel #newEvalPanel
-                             *ngIf="!isSelf"
-                             [disabled]="isNew"
-                             [matTooltipDisabled]="!isNew"
-                             matTooltip="To add an Evaluation first save the person">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Add new Evaluation</mat-panel-title>
-          </mat-expansion-panel-header>
+        <ng-container *requireRole="'admin,hr'">
+          <mat-expansion-panel #newEvalPanel
+                               *ngIf="!isSelf"
+                               [disabled]="isNew"
+                               [matTooltipDisabled]="!isNew"
+                               matTooltip="To add an Evaluation first save the person">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Add new Evaluation</mat-panel-title>
+            </mat-expansion-panel-header>
 
-          <ng-template matExpansionPanelContent>
-            <app-evaluation
-              #newEvalEl
-              [roles]="person.roles"
-              [evaluation]="newEvaluation"
-              (submit)="saveEvaluation(newEvaluation, newEvalPanel, newEvalEl, true)"
-              formId="newEvalForm">
-            </app-evaluation>
+            <ng-template matExpansionPanelContent>
+              <app-evaluation
+                #newEvalEl
+                [roles]="person.roles"
+                [evaluation]="newEvaluation"
+                (submit)="saveEvaluation(newEvaluation, newEvalPanel, newEvalEl, true)"
+                formId="newEvalForm">
+              </app-evaluation>
 
-            <mat-action-row>
-              <button type="submit"
-                      form="newEvalForm"
-                      [disabled]="newEvalEl.form.invalid"
-                      mat-button>Add
-              </button>
-            </mat-action-row>
-          </ng-template>
-        </mat-expansion-panel>
+              <mat-action-row>
+                <button type="submit"
+                        form="newEvalForm"
+                        [disabled]="newEvalEl.form.invalid"
+                        mat-button>Add
+                </button>
+              </mat-action-row>
+            </ng-template>
+          </mat-expansion-panel>
+        </ng-container>
 
         <!--evaluations list-->
         <mat-expansion-panel #evalPanel *ngFor="let eval of person.evaluations">
@@ -631,4 +652,6 @@
     </ng-container>
 
   </div>
+
+  <app-profile-picture class="picture-column" [person]="person"></app-profile-picture>
 </div>

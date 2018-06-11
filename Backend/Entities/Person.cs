@@ -14,11 +14,14 @@ namespace Backend.Entities
         public Guid? StaffId { get; set; }
         public string Email { get; set; }
         public bool Deleted { get; set; }
+        public Guid? DonorId { get; set; }
 
         public Gender Gender { get; set; }
         public bool IsThai { get; set; }
         public bool IsSchoolAid { get; set; }
-
+        public bool IsParent { get; set; }
+        public bool IsAlumni { get; set; }
+        
         private string _preferredName;
 
         public string PreferredName
@@ -42,7 +45,6 @@ namespace Backend.Entities
         public string PhoneNumber { get; set; }
         public Guid? SpouseId { get; set; }
 
-        [Column(DataType = DataType.VarChar)] public Nationality? Nationality { get; set; }
 
         public DateTime? Birthdate { get; set; }
 
@@ -63,15 +65,14 @@ namespace Backend.Entities
         public string ThaiAmphur { get; set; }
         public string ThaiProvince { get; set; }
         public string ThaiZip { get; set; }
+
+        public string ProfilePicDriveId { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithStaff : PersonExtended
     {
         public StaffWithOrgName Staff { get; set; }
-
-        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
-        public string SpousePreferedName { get; set; }
     }
 
     public class PersonWithStaffSummaries : PersonWithStaff
@@ -90,33 +91,28 @@ namespace Backend.Entities
         public IList<PersonRoleWithJob> Roles { get; set; } = new List<PersonRoleWithJob>(0);
         public IList<EmergencyContactExtended> EmergencyContacts { get; set; } = new List<EmergencyContactExtended>(0);
         public IList<EvaluationWithNames> Evaluations { get; set; } = new List<EvaluationWithNames>(0);
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public Donor Donor { get; set; }
+    }
+
+    public class PersonEvaluationSummary
+    {
+        public PersonWithStaff Person { get; set; }
+        public int Evaluations { get; set; }
+        public int GoodEvaluations { get; set; }
+        public int PoorEvaluations { get; set; }
+        public int ExcellentEvaluations { get; set; }
+        public decimal AveragePercentage { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Gender
     {
+        [MapValue(0, true), MapValue(nameof(Male))]
         Male,
+
+        [MapValue(1, true), MapValue(nameof(Female))]
         Female
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Nationality
-    {
-        [MapValue(nameof(NorthAmerica))] NorthAmerica,
-
-        [MapValue(nameof(CentralSouthAmerica))]
-        CentralSouthAmerica,
-
-        [MapValue(nameof(Africa))] Africa,
-
-        [MapValue(nameof(MiddleEast))] MiddleEast,
-
-        [MapValue(nameof(Europe))] Europe,
-
-        [MapValue(nameof(CentralAsia))] CentralAsia,
-
-        [MapValue(nameof(EastAsia))] EastAsia,
-
-        [MapValue(nameof(Oceania))] Oceania
     }
 }

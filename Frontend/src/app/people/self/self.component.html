@@ -38,9 +38,6 @@
              placeholder="Birthday"
              [ngModel]="self.person.birthdate | date">
     </mat-form-field>
-    <mat-form-field>
-      <input matInput [ngModel]="self.person.nationality" readonly placeholder="Nationality">
-    </mat-form-field>
     <div>
       <mat-icon matPrefix>email</mat-icon>
       <mat-form-field>
@@ -72,7 +69,7 @@
       </mat-grid-tile>
       <mat-grid-tile>Left</mat-grid-tile>
       <mat-grid-tile>Total</mat-grid-tile>
-      <ng-container *ngFor="let leaveUsed of self.leaveDetails.leaveUseages">
+      <ng-container *ngFor="let leaveUsed of self.leaveDetails.leaveUsages">
         <ng-container *ngIf="leaveUsed.leaveType != (self.person.gender == 'Male' ? 'Maternity' : 'Paternity')">
           <mat-grid-tile>{{leaveUsed.leaveType}}</mat-grid-tile>
           <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>

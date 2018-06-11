@@ -28,14 +28,14 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "admin,hr,registrar")]
-        public MissionOrg GetOrg(Guid id)
+        [Authorize(Policy = "sendingOrg")]
+        public MissionOrgWithYearSummaries GetOrg(Guid id)
         {
             return _orgRepository.GetOrg(id);
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,hr,registrar")]
+        [Authorize(Policy = "sendingOrg")]
         public MissionOrg Save([FromBody] MissionOrg org)
         {
             _entityService.Save(org);
@@ -43,11 +43,34 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,hr,registrar")]
+        [Authorize(Policy = "sendingOrg")]
         public IActionResult Delete(Guid id)
         {
             _entityService.Delete<MissionOrg>(id);
             return Ok();
+        }
+
+        [HttpPost("year")]
+        [Authorize(Policy = "sendingOrg")]
+        public MissionOrgYearSummary Save([FromBody] MissionOrgYearSummary yearSummary)
+        {
+            _entityService.Save(yearSummary);
+            return yearSummary;
+        }
+
+        [HttpDelete("year/{id}")]
+        [Authorize(Policy = "sendingOrg")]
+        public IActionResult DeleteYear(Guid id)
+        {
+            _entityService.Delete<MissionOrgYearSummary>(id);
+            return Ok();
+        }
+
+        [HttpGet("{id}/people")]
+        [Authorize(Policy = "sendingOrg")]
+        public IList<Person> People(Guid id)
+        {
+            return _orgRepository.PeopleInOrg(id).ToList();
         }
     }
 }

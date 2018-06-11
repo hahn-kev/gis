@@ -9,7 +9,8 @@ import { Year } from './year';
 export class StaffTrainingResolverService implements Resolve<Map<string, StaffTraining>> {
 
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Map<string, StaffTraining>> | Promise<Map<string, StaffTraining>> | Map<string, StaffTraining> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<Map<string, StaffTraining>> | Promise<Map<string, StaffTraining>> | Map<string, StaffTraining> {
     return this.trainingService.getStaffTrainingByYearMapped(route.params['year'] ||  Year.CurrentSchoolYear());
   }
 

@@ -1,6 +1,5 @@
 <ng-container *appTemplateContent="'title'">Roles Report ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <!--<span class="mat-body-2">Roles Starting:</span>-->
   <mat-form-field floatLabel="never" class="print-hide">
     <input autofocus matInput [value]="urlBinding.values.search"
            (keyup)="urlBinding.values.search = ($event.target.value)"
@@ -30,6 +29,12 @@
       <mat-option *ngFor="let year of schoolYears" [value]="year.value">{{year.name}}</mat-option>
     </mat-select>
   </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <app-export-button [values]="dataSource" fileName="rolesData"></app-export-button>
 </ng-container>
 
 <mat-table [dataSource]="dataSource" matSort>
@@ -49,6 +54,10 @@
   <ng-container matColumnDef="job.orgGroup.groupName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Department/Division</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.job.orgGroup?.groupName}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="job.gradeNo">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Grade #</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.job.gradeNo}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="preferredName">
@@ -76,8 +85,8 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+    *matHeaderRowDef="['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'job.gradeNo', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           *matRowDef="let row; columns: ['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'job.gradeNo', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
            [routerLink]="'/people/edit/' + row.personId"></mat-row>
 </mat-table>

@@ -13,15 +13,16 @@ using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Logging.Debug;
 using Microsoft.Extensions.Options;
 using Moq;
 using Npgsql;
 using SendGrid.Helpers.Mail;
+using Serilog.Extensions.Logging;
 using Xunit;
 using Attachment = Backend.Entities.Attachment;
 using DataExtensions = Backend.DataLayer.DataExtensions;
@@ -101,9 +102,11 @@ namespace UnitTestProject
             TryCreateTable<Staff>();
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
+            TryCreateTable<Donor>();
             TryCreateTable<Evaluation>();
             TryCreateTable<Attachment>();
             TryCreateTable<MissionOrg>();
+            TryCreateTable<MissionOrgYearSummary>();
 
             var roles = new[] {"admin", "hr", "hradmin"};
             var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
@@ -112,10 +115,6 @@ namespace UnitTestProject
                 DbConnection.InsertId(
                     new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
-
-            LinqToDB.Linq.Expressions.MapMember<DateTime, int, DateTime>(ProviderName.SQLiteMS,
-                (date, months) => date.AddMonths(months),
-                (date, months) => DataExtensions.AddMonths(date, months));
         }
 
         private void TryCreateTable<T>()
@@ -139,6 +138,10 @@ namespace UnitTestProject
             var jacobWife = faker.Generate();
             jacobWife.SpouseId = jacob.Id;
             jacob.SpouseId = jacobWife.Id;
+
+            var jacobDonor = AutoFaker.Generate<Donor>();
+            jacob.DonorId = jacobDonor.Id;
+            
             Assert.Empty(_dbConnection.People);
             _dbConnection.Insert(jacob);
             _dbConnection.Insert(jacobWife);
@@ -146,6 +149,7 @@ namespace UnitTestProject
             _dbConnection.BulkCopy(faker.Generate(5));
             _dbConnection.Insert(jacob.Staff);
             _dbConnection.Insert(bob.Staff);
+            _dbConnection.Insert(jacobDonor);
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
             jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
             jacobGroup.Supervisor = bob.Id;
@@ -154,6 +158,9 @@ namespace UnitTestProject
             var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
             jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
             _dbConnection.Insert(jacobMissionOrg);
+            var jacobMissionOrgYear = AutoFaker.Generate<MissionOrgYearSummary>();
+            jacobMissionOrgYear.MissionOrgId = jacobMissionOrg.Id;
+            _dbConnection.Insert(jacobMissionOrgYear);
             var jacobJob = InsertJob();
             InsertRole(role =>
             {
@@ -238,6 +245,14 @@ namespace UnitTestProject
             });
         }
 
+        public PersonRole InsertRole(Action<PersonRole> action = null)
+        {
+            var role = AutoFaker.Generate<PersonRole>();
+            action?.Invoke(role);
+            _dbConnection.Insert(role);
+            return role;
+        }
+
         public LeaveRequest InsertLeaveRequest(LeaveType leaveType, Guid personId, int days)
         {
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
@@ -250,14 +265,6 @@ namespace UnitTestProject
             leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4);
             _dbConnection.Insert(leaveRequest);
             return leaveRequest;
-        }
-
-        public PersonRole InsertRole(Action<PersonRole> action = null)
-        {
-            var role = AutoFaker.Generate<PersonRole>();
-            action?.Invoke(role);
-            _dbConnection.Insert(role);
-            return role;
         }
 
         public IdentityUser InsertUser(Action<IdentityUser> modify = null, params string[] roles)

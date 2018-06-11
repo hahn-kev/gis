@@ -1,7 +1,7 @@
-﻿import { Person } from '../person';
-import { LeaveUseage } from '../self/self';
+﻿import { PersonWithStaff } from '../person';
+import { LeaveUsage } from '../self/self';
 
 export class PersonAndLeaveDetails {
-  person: Person;
-  leaveUseages: LeaveUseage[];
+  person: PersonWithStaff;
+  leaveUsages: LeaveUsage[];
 }

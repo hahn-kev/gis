@@ -11,7 +11,7 @@ export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]
   resolve(route: ActivatedRouteSnapshot,
           state: RouterStateSnapshot): Observable<LeaveRequestWithNames[]> | Promise<LeaveRequestWithNames[]> | LeaveRequestWithNames[] {
     const personId = route.params['personId'];
-    if (personId === 'mine') {
+    if (personId === 'mine' || state.url.endsWith('mine')) {
       return this.loginService.currentUserToken()
         .pipe(first(),
           switchMap(userToken => this.leaveService.listByPersonId(userToken.personId)));

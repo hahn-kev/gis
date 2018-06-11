@@ -50,6 +50,10 @@ html, body {
   padding-right: 0 !important;
 }
 
+.mat-nav-list .mat-subheader .mat-list-icon {
+  margin-right: 4px;
+}
+
 .main-card {
   min-height: 100%;
   padding: 12px;
@@ -57,7 +61,7 @@ html, body {
   justify-content: center;
   align-content: center;
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto;
   grid-template-columns: auto;
 }
 
@@ -113,9 +117,10 @@ html, body {
     @media (max-width: 460px) {
       grid-template-columns: 1fr;
     }
-    .mat-slide-toggle {
-      padding-bottom: 16px;
-    }
+  }
+
+  .mat-slide-toggle {
+    margin-bottom: 16px;
   }
 }
 
@@ -147,6 +152,10 @@ html, body {
   .mat-form-field {
     flex-grow: 1;
   }
+  .mat-icon-button .mat-icon {
+    vertical-align: text-top;
+    padding-top: 2px;
+  }
 }
 
 .mat-toolbar {
@@ -157,15 +166,30 @@ html, body {
     caret-color: currentColor;
   }
 
+  .mat-icon-button + .mat-form-field {
+    padding-left: 0;
+  }
+
   .mat-form-field {
     font-size: 16px;
     padding-top: 6px;
-    &.mat-focused .mat-form-field-label {
-      color: mat-color(map-get($theme-contrast, foreground), secondary-text);
+    padding-left: 8px;
+
+    &.mat-focused {
+      .mat-form-field-ripple {
+        background-color: currentColor;
+      }
+      .mat-form-field-label {
+        color: mat-color(map-get($theme-contrast, foreground), secondary-text);
+      }
     }
   }
   .mat-form-field-ripple {
     background-color: currentColor;
+  }
+
+  .mat-slide-toggle {
+    padding-left: 8px;
   }
 }
 

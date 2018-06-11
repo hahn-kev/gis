@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { OrgGroup } from './org-group';
+import { OrgGroup, OrgGroupWithSupervisor } from './org-group';
 import { Observable } from 'rxjs';
 import { Person } from '../person';
 import { LinkType, OrgChain, OrgChainLink } from './org-chain';
 import { map } from 'rxjs/internal/operators';
+import { OrgTreeData } from '../../org-tree/org-tree-data';
 
 @Injectable()
 export class GroupService {
@@ -16,8 +17,8 @@ export class GroupService {
     return this.http.get<OrgGroup>('/api/orggroup/' + id);
   }
 
-  getAll(): Observable<OrgGroup[]> {
-    return this.http.get<OrgGroup[]>('/api/orggroup');
+  getAll(): Observable<OrgGroupWithSupervisor[]> {
+    return this.http.get<OrgGroupWithSupervisor[]>('/api/orggroup');
   }
 
   getAllMap() {
@@ -42,7 +43,8 @@ export class GroupService {
       currentGroup = groups.find(value => currentGroup.parentId == value.id);
       if (currentGroup == null) break;
       if (currentGroup.id == orgGroup.id) currentGroup = orgGroup;
-      if (chainList.length > 1 && currentGroup == orgGroup) throw new Error('Circular Orginization chart detected, please resolve');
+      if (chainList.length > 1 && currentGroup == orgGroup) throw new Error(
+        'Circular Orginization chart detected, please resolve');
     }
     let supervisor = null;
     if (currentGroup != null && currentGroup.supervisor != null)
@@ -58,18 +60,21 @@ export class GroupService {
   isChildOf(childOrgId: string, parentOrgId: string, orgGroups: OrgGroup[] | Map<string, OrgGroup>) {
     if (childOrgId == parentOrgId) return true;
     if (orgGroups instanceof Array) {
-      orgGroups = new Map<string, OrgGroup>(orgGroups.map((group): [string, OrgGroup] => [group.id, group]));
+      orgGroups = new Map<string, OrgGroup>(orgGroups.map((g): [string, OrgGroup] => [g.id, g]));
     }
-    let map = (<Map<string, OrgGroup>>orgGroups);
     let groupId = childOrgId;
     let group: OrgGroup;
 
     while (true) {
-      group = map.get(groupId);
+      group = orgGroups.get(groupId);
       if (group == undefined) return false;
       if (group.parentId == parentOrgId) return true;
       groupId = group.parentId;
       if (groupId == childOrgId) throw new Error('Circular Orginization chart detected, please resolve');
     }
+  }
+
+  getOrgTreeData(rootId: string) {
+    return this.http.get<OrgTreeData>('/api/orgGroup/orgTreeData/' + (rootId || ''));
   }
 }
