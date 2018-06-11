@@ -1,0 +1,6 @@
+.cal-table {
+  display               : grid;
+  grid-template-columns : repeat(7, auto);
+  grid-gap              : 8px;
+  padding               : 16px;
+}

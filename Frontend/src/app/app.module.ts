@@ -119,6 +119,7 @@ import { EvaluationReportComponent } from './people/evaluation-report/evaluation
 import { ProfilePictureComponent } from './people/person/profile-picture/profile-picture.component';
 import { PickFileDirective } from './google-picker/pick-file.directive';
 import { DonorComponent } from './people/person/donor/donor.component';
+import { CalendarComponent } from './calendar/calendar.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -181,6 +182,8 @@ if (environment.production) {
     ProfilePictureComponent,
     PickFileDirective,
     DonorComponent
+    ,
+    CalendarComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

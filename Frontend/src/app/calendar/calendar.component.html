@@ -1,0 +1,19 @@
+<ng-container *appToolbarContent>
+  <button mat-icon-button (click)="incrementMonth(-1)">
+    <mat-icon>navigate_before</mat-icon>
+  </button>
+  <span>{{month.format('MMMM YY')}}</span>
+  <button mat-icon-button (click)="incrementMonth(1)">
+    <mat-icon>navigate_next</mat-icon>
+  </button>
+</ng-container>
+
+<div class="cal-table">
+  <mat-card *ngFor="let model of models">{{model.dayOfMonth}}
+    <mat-chip-list class="mat-chip-list-stacked">
+      <mat-chip color="accent" [selected]="true" *ngFor="let req of model.items">{{req.requesterName}} | Type:
+        {{req.type}}
+      </mat-chip>
+    </mat-chip-list>
+  </mat-card>
+</div>
