@@ -119,8 +119,8 @@ import { EvaluationReportComponent } from './people/evaluation-report/evaluation
 import { ProfilePictureComponent } from './people/person/profile-picture/profile-picture.component';
 import { PickFileDirective } from './google-picker/pick-file.directive';
 import { DonorComponent } from './people/person/donor/donor.component';
-import { EndorsmentListComponent } from './endorsment/list/endorsment-list.component';
-import { EndorsmentComponent } from './endorsment/edit/endorsment.component';
+import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
+import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -184,8 +184,8 @@ if (environment.production) {
     PickFileDirective,
     DonorComponent,
     TitleCasePipe,
-    EndorsmentListComponent,
-    EndorsmentComponent
+    EndorsementListComponent,
+    EndorsementComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

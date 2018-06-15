@@ -59,6 +59,7 @@ import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
 import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
 import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
 import { OrgTreeDataResolverService } from './org-tree/org-tree-data-resolver.service';
+import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
 
 const routes: Routes = [
   {
@@ -378,6 +379,19 @@ const routes: Routes = [
             resolve: {
               treeData: OrgTreeDataResolverService
             }
+          }
+        ]
+      },
+      {
+        path: 'endorsements',
+        canActivate: [RoleGuardService],
+        data: {
+          requireRole: ['admin', 'hr']
+        },
+        children: [
+          {
+            path: 'list',
+            component: EndorsementListComponent
           }
         ]
       },

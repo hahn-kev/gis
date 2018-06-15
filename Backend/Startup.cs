@@ -287,9 +287,9 @@ namespace Backend
                 }
                 
                 
-                dbConnection.TryCreateTable<Endorsment>();
-                dbConnection.TryCreateTable<StaffEndorsment>();
-                dbConnection.TryCreateTable<RequiredEndorsment>();
+                dbConnection.TryCreateTable<Endorsement>();
+                dbConnection.TryCreateTable<StaffEndorsement>();
+                dbConnection.TryCreateTable<RequiredEndorsement>();
 
                 dbConnection.TryCreateTable<Donor>();
                 //to configure db look at ServiceFixture.SetupSchema

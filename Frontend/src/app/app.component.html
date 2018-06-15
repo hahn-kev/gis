@@ -75,6 +75,11 @@
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
             <ng-container *appTemplateContent="'sidenav:hr'">
+              <a mat-list-item routerLink="/endorsements/list" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>school</mat-icon>
+                <span mat-line>Endorsements</span>
+              </a>
+
               <a mat-list-item routerLink="/staff/report" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>business</mat-icon>
                 <span mat-line>Staff</span>
