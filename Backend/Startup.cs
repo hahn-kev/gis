@@ -285,13 +285,6 @@ namespace Backend
                 {
                     roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();
                 }
-                
-                
-                dbConnection.TryCreateTable<Endorsement>();
-                dbConnection.TryCreateTable<StaffEndorsement>();
-                dbConnection.TryCreateTable<RequiredEndorsement>();
-
-                dbConnection.TryCreateTable<Donor>();
                 //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {
