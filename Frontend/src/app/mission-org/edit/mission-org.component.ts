@@ -64,27 +64,13 @@ export class MissionOrgComponent extends BaseEditComponent implements OnInit {
     this.snackBar.open(`${this.missionOrg.name} Deleted`, null, {duration: 2000});
   }
 
-  async deleteYear(yearSummary: MissionOrgYearSummary) {
-    let result = await ConfirmDialogComponent.OpenWait(
-      this.dialog,
-      `Delete Year Summary ${Year.yearName(yearSummary.year)}?`,
-      'Delete',
-      'Cancel');
-    if (!result) return;
-    await this.missionOrgService.deleteYear(yearSummary.id);
-    //todo update year list
-    this.missionOrg.yearSummaries = this.missionOrg.yearSummaries.filter(value => value.id != yearSummary.id);
-    this.snackBar.open(`Year Summary Deleted`, null, {duration: 2000});
-  }
+  deleteYear = async (yearSummary: MissionOrgYearSummary) => {
+    return await this.missionOrgService.deleteYear(yearSummary.id);
+  };
 
-  async saveYear(yearSummary: MissionOrgYearSummary) {
-    let isNew = !yearSummary.id;
-    yearSummary = await this.missionOrgService.saveYear(yearSummary);
-    if (isNew) {
-      this.missionOrg.yearSummaries = [yearSummary, ...this.missionOrg.yearSummaries];
-    }
-    this.snackBar.open(`Year Summary Saved`, null, {duration: 2000});
-  }
+  saveYear = async (yearSummary: MissionOrgYearSummary) => {
+    return {...yearSummary, ... await this.missionOrgService.saveYear(yearSummary)};
+  };
 
   async showStaff() {
     if (this.isNew) {

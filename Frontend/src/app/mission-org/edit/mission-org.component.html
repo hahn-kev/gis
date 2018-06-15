@@ -91,8 +91,12 @@
       <button type="button" *ngIf="!isNew" color="warn" (click)="delete()" mat-button>Delete</button>
     </mat-card-actions>
   </mat-card>
-  <app-accordion-list [createNewItem]="createNewYear" [items]="missionOrg.yearSummaries" title="Year Summaries"
-                      itemTitle="Year" (save)="saveYear($event)" (delete)="deleteYear($event)">
+  <app-accordion-list [createNewItem]="createNewYear"
+                      [save]="saveYear"
+                      [delete]="deleteYear"
+                      [(items)]="missionOrg.yearSummaries"
+                      title="Year Summaries"
+                      itemTitle="Year">
     <ng-container *appAccordionListHeader="let item;">
       <mat-panel-title>{{item.year}}</mat-panel-title>
       <mat-panel-description>{{item.level}}</mat-panel-description>
