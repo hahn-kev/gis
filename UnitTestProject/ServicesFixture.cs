@@ -167,6 +167,18 @@ namespace UnitTestProject
                 role.PersonId = jacob.Id;
                 role.JobId = jacobJob.Id;
             });
+            
+            //endorsments
+            var endorsement = AutoFaker.Generate<Endorsement>();
+            _dbConnection.Insert(endorsement);
+            var jacobEndorsement = AutoFaker.Generate<StaffEndorsement>();
+            jacobEndorsement.EndorsementId = endorsement.Id;
+            jacobEndorsement.PersonId = jacob.Id;
+            _dbConnection.Insert(jacobEndorsement);
+            var requiredEndorsement = AutoFaker.Generate<RequiredEndorsement>();
+            requiredEndorsement.EndorsementId = endorsement.Id;
+            requiredEndorsement.JobId = jacobJob.Id;
+            _dbConnection.Insert(requiredEndorsement);
         }
 
         public Faker<PersonWithStaff> PersonFaker() =>
