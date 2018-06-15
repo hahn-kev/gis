@@ -40,6 +40,7 @@ export class AppDataSource<T> extends MatTableDataSource<T> {
   bindToRouteData(route: ActivatedRoute, dataName: string): void {
     route.data.subscribe((value) => {
       this.unfilteredData = value[dataName];
+      if (!this.unfilteredData) throw new Error('unable to find data for table using property ' + dataName);
       this.filterUpdated();
     });
   }
