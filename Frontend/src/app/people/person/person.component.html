@@ -641,7 +641,8 @@
       itemTitle="Endorsement">
       <ng-container *appAccordionListHeader="let item">
         <mat-panel-title>{{item.endorsementName}}</mat-panel-title>
-        <mat-panel-description>{{item.agency}}: {{item.endorsementDate | date}}</mat-panel-description>
+        <mat-panel-description>{{item.agency}}{{item.endorsementDate ? ':' : ''}} {{item.endorsementDate | date}}
+        </mat-panel-description>
       </ng-container>
       <ng-container *appAccordionListContent="let item;">
         <form appAccordionListForm class="two-colum-grid">
