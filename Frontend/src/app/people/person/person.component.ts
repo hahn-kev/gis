@@ -13,7 +13,6 @@ import { RoleComponent } from './role.component';
 import { countries } from '../countries';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { endorsments } from '../teacher-endorsements';
 import { Job } from '../../job/job';
 import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
@@ -30,6 +29,8 @@ import { EvaluationComponent } from './evaluation/evaluation.component';
 import { LoginService } from '../../services/auth/login.service';
 import { first } from 'rxjs/internal/operators';
 import { Donor } from '../donor';
+import { EndorsementService } from '../../endorsement/endorsement.service';
+import { Endorsement, StaffEndorsementWithName } from '../../endorsement/endorsement';
 
 @Component({
   selector: 'app-person',
@@ -46,13 +47,13 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public person: PersonWithOthers;
   public groups: Observable<OrgGroup[]>;
   public missionOrgs: Observable<MissionOrg[]>;
+  public endorsements: Observable<Endorsement[]>;
   public people: Person[];
   public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
   public newRole = new RoleWithJob();
   public newEvaluation = new EvaluationWithNames();
-  public endorsmentsList = endorsments;
   public staffEndorsments: Array<string> = [];
   public staffInsurer: string[] = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
@@ -66,6 +67,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
               missionOrgService: MissionOrgService,
               loginService: LoginService,
               private evaluationService: EvaluationService,
+              private endorsementService: EndorsementService,
               private router: Router,
               private dialog: MatDialog,
               private snackBar: MatSnackBar,
@@ -75,6 +77,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     this.isSelf = this.router.url.indexOf('self') != -1;
     this.groups = this.lazyLoadService.share('orgGroups', () => this.groupService.getAll());
     this.missionOrgs = this.lazyLoadService.share('missionOrgs', () => missionOrgService.list());
+    this.endorsements = this.lazyLoadService.share('endorsements', () => this.endorsementService.list());
     this.route.data.subscribe((value: {
       person: PersonWithOthers,
       people: Person[]
@@ -296,4 +299,13 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     if (!this.forms.some(value => !value.pristine && !value.submitted)) return true;
     return ConfirmDialogComponent.OpenWait(this.dialog, 'Discard Changes?', 'Discard', 'Cancel');
   }
+
+  createNewStaffEndorsement = () => new StaffEndorsementWithName(this.person.id);
+  saveStaffEndorsement = async (item: StaffEndorsementWithName) => {
+    return {...item, ... await this.endorsementService.saveStaffEndorsement(item)};
+  };
+
+  deleteStaffEndorsement = (item: StaffEndorsementWithName) => {
+    return this.endorsementService.deleteStaffEndorsement(item.id);
+  };
 }

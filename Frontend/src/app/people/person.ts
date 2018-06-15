@@ -5,6 +5,7 @@ import { LeaveDetails } from './self/self';
 import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
 import { Donor } from './donor';
+import { StaffEndorsementWithName } from '../endorsement/endorsement';
 
 export enum Gender {
   Male = 'Male',
@@ -68,6 +69,7 @@ export class PersonWithOthers extends PersonWithStaff {
   public roles: RoleWithJob[] = [];
   public emergencyContacts: EmergencyContactExtended[] = [];
   public evaluations: EvaluationWithNames[] = [];
+  public staffEndorsements: StaffEndorsementWithName[] = [];
   public donor: Donor;
 }
 

@@ -18,13 +18,15 @@ namespace Backend.Services
         private readonly JobRepository _jobRepository;
         private readonly LeaveService _leaveService;
         private readonly EvaluationRepository _evaluationRepository;
+        private readonly EndorsementService _endorsementService;
 
         public PersonService(PersonRepository personRepository,
             IEntityService entityService,
             UsersRepository usersRepository,
             JobRepository jobRepository,
             LeaveService leaveService,
-            EvaluationRepository evaluationRepository)
+            EvaluationRepository evaluationRepository,
+            EndorsementService endorsementService)
         {
             _personRepository = personRepository;
             _entityService = entityService;
@@ -32,6 +34,7 @@ namespace Backend.Services
             _jobRepository = jobRepository;
             _leaveService = leaveService;
             _evaluationRepository = evaluationRepository;
+            _endorsementService = endorsementService;
         }
 
         #region people
@@ -43,9 +46,13 @@ namespace Backend.Services
         public PersonWithOthers GetById(Guid id)
         {
             var personWithOthers = _personRepository.GetById(id);
-            personWithOthers.Evaluations = _evaluationRepository.EvaluationWithNames
-                .Where(eval => eval.PersonId == id).ToList();
-            personWithOthers.LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers);
+            if (personWithOthers.StaffId.HasValue)
+            {
+                personWithOthers.Evaluations = _evaluationRepository.EvaluationWithNames
+                    .Where(eval => eval.PersonId == id).ToList();
+                personWithOthers.LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers);
+                personWithOthers.StaffEndorsements = _endorsementService.ListStaffEndorsements(id);
+            }
             return personWithOthers;
         }
 

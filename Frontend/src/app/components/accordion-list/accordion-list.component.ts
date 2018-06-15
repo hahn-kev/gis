@@ -58,5 +58,7 @@ export class AccordionListComponent<T> implements OnInit {
   ngOnInit() {
     if (this.save == null) throw new Error('Save callback not provided');
     if (this.delete == null) throw new Error('Delete callback not provided');
+    if (this.header == null) throw new Error('Missing *appAccordionListHeader');
+    if (this.content == null) throw new Error('Missing *appAccordionListContent');
   }
 }

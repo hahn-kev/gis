@@ -493,26 +493,6 @@
                    [(ngModel)]="person.staff.yearsOfServiceAdjustment">
             <mat-hint>Negative numbers remove years</mat-hint>
           </mat-form-field>
-          <!--<mat-form-field>-->
-          <!--<input matInput-->
-          <!--name="endorsmentAgency"-->
-          <!--[readonly]="isSelf"-->
-          <!--[(ngModel)]="person.staff.endorsementAgency"-->
-          <!--placeholder="Endorsment Agency">-->
-          <!--</mat-form-field>-->
-          <!--<mat-form-field>-->
-          <!--<mat-select [(ngModel)]="staffEndorsments"-->
-          <!--(ngModelChange)="person.staff.endorsements = staffEndorsments.join(',')"-->
-          <!--[disabled]="isSelf"-->
-          <!--multiple-->
-          <!--name="endorsements"-->
-          <!--placeholder="Endorsements">-->
-          <!--<mat-option *ngFor="let endorsment of endorsmentsList" [value]="endorsment">-->
-          <!--{{endorsment}}-->
-          <!--</mat-option>-->
-          <!--</mat-select>-->
-          <!--</mat-form-field>-->
-
         </ng-template>
       </mat-expansion-panel>
     </mat-accordion>
@@ -651,6 +631,47 @@
       </mat-accordion>
     </ng-container>
 
+    <app-accordion-list
+      *ngIf="person.staffId && (person.staffEndorsements.length > 0 || !isSelf)"
+      [(items)]="person.staffEndorsements"
+      [createNewItem]="createNewStaffEndorsement"
+      [save]="saveStaffEndorsement"
+      [delete]="deleteStaffEndorsement"
+      title="Endorsements"
+      itemTitle="Endorsement">
+      <ng-container *appAccordionListHeader="let item">
+        <mat-panel-title>{{item.endorsementName}}</mat-panel-title>
+        <mat-panel-description>{{item.agency}}: {{item.endorsementDate | date}}</mat-panel-description>
+      </ng-container>
+      <ng-container *appAccordionListContent="let item;">
+        <form appAccordionListForm class="two-colum-grid">
+          <mat-form-field>
+            <mat-select name="endorsement"
+                        [required]="true"
+                        placeholder="Endorsement"
+                        [(ngModel)]="item.endorsementId">
+              <mat-option [value]="null">None</mat-option>
+              <mat-option *ngFor="let endorsement of (endorsements | async)"
+                          [value]="endorsement.id"
+                          (onSelectionChange)="$event.source.selected ? (item.endorsementName = endorsement.name) : void">
+                {{endorsement.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <input name="endorsementDate" matInput [(ngModel)]="item.endorsementDate"
+                   [matDatepicker]="endorsementDatePicker"
+                   placeholder="Endorsement Date">
+            <mat-datepicker-toggle matSuffix [for]="endorsementDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #endorsementDatePicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput name="agency" placeholder="Agency" [(ngModel)]="item.agency">
+          </mat-form-field>
+        </form>
+      </ng-container>
+    </app-accordion-list>
   </div>
 
   <app-profile-picture class="picture-column" [person]="person"></app-profile-picture>

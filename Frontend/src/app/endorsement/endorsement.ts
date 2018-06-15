@@ -11,6 +11,15 @@ export class StaffEndorsement extends BaseEntity {
   agency: string;
 }
 
+export class StaffEndorsementWithName extends StaffEndorsement {
+  constructor(personId: string) {
+    super();
+    this.personId = personId;
+  }
+
+  endorsementName: string;
+}
+
 export class RequiredEndorsement extends BaseEntity {
   jobId: string;
   endorsementId: string;
