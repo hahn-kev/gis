@@ -60,34 +60,61 @@
     </mat-card-actions>
   </mat-card>
 
+  <div *ngIf="job.roles.length > 0">
+    <span class="mat-caption">Roles</span>
+    <mat-accordion class="roles">
+      <!--roles list-->
+      <mat-expansion-panel #rolePanel *ngFor="let role of job.roles">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{role.preferredName}} {{role.lastName}}</mat-panel-title>
+          <mat-panel-description>
+            {{role.startDate | date}} till {{role.active ? 'now' : (role.endDate | date)}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-role [role]="role"
+                  [hideJob]="true"
+                  #roleEl
+                  [formId]="'form_' + role.id"
+                  (submit)="saveRole(role); rolePanel.close();">
+        </app-role>
+        <mat-action-row>
+          <a [routerLink]="'/people/edit/' + role.personId"
+             [matTooltip]="'View ' + role.preferredName + ' ' + role.lastName"
+             matTooltipPosition="after"
+             mat-icon-button>
+            <mat-icon>person</mat-icon>
+          </a>
+          <span class="spacer"></span>
+          <button type="button" mat-button (click)="deleteRole(role)" color="warn">Delete</button>
+          <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+  <app-accordion-list [(items)]="job.requiredEndorsements"
+                      title="Required Endorsements"
+                      itemTitle="Required Endorsement"
+                      [createNewItem]="createNewRequiredEndorsement"
+                      [save]="saveRequiredEndorsement"
+                      [delete]="deleteRequiredEndorsement">
+    <ng-container *appAccordionListHeader="let item;">
+      <mat-panel-title>{{item.endorsementName}}</mat-panel-title>
+    </ng-container>
 
-  <mat-accordion class="roles">
-    <!--roles list-->
-    <mat-expansion-panel #rolePanel *ngFor="let role of job.roles">
-      <mat-expansion-panel-header>
-        <mat-panel-title>{{role.preferredName}} {{role.lastName}}</mat-panel-title>
-        <mat-panel-description>
-          {{role.startDate | date}} till {{role.active ? 'now' : (role.endDate | date)}}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <app-role [role]="role"
-                [hideJob]="true"
-                #roleEl
-                [formId]="'form_' + role.id"
-                (submit)="saveRole(role); rolePanel.close();">
-      </app-role>
-      <mat-action-row>
-        <a [routerLink]="'/people/edit/' + role.personId"
-           [matTooltip]="'View ' + role.preferredName + ' ' + role.lastName"
-           matTooltipPosition="after"
-           mat-icon-button>
-          <mat-icon>person</mat-icon>
-        </a>
-        <span class="spacer"></span>
-        <button type="button" mat-button (click)="deleteRole(role)" color="warn">Delete</button>
-        <button type="submit" [attr.form]="'form_' + role.id" [disabled]="roleEl.form.invalid" mat-button>Save
-        </button>
-      </mat-action-row>
-    </mat-expansion-panel>
-  </mat-accordion>
+    <ng-container *appAccordionListContent="let item;">
+      <form appAccordionListForm>
+        <mat-form-field>
+          <mat-select [(ngModel)]="item.endorsementId" [required]="true" placeholder="Endorsement" name="endorsementId">
+            <mat-option [value]="null">None</mat-option>
+            <mat-option *ngFor="let endorsement of (endorsements | async)"
+                        [value]="endorsement.id"
+                        (onSelectionChange)="$event.source.selected ? (item.endorsementName = endorsement.name) : void">
+              {{endorsement.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </ng-container>
+  </app-accordion-list>
 </form>

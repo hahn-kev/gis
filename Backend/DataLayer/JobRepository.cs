@@ -62,10 +62,11 @@ namespace Backend.DataLayer
 
         public JobWithRoles GetById(Guid jobId)
         {
-            var job = JobsWithRoles.SingleOrDefault(j => j.Id == jobId);
+            var job = JobsWithRoles.Single(j => j.Id == jobId);
             if (job != null)
             {
                 job.Roles = PersonRolesExtended.Where(role => role.JobId == jobId).ToList();
+                job.RequiredEndorsements = _requiredEndorsementsWithName.Where(re => re.JobId == jobId).ToList();
             }
 
             return job;
@@ -86,22 +87,34 @@ namespace Backend.DataLayer
                 Type = job.Type
             };
 
+        private IQueryable<RequiredEndorsementWithName> _requiredEndorsementsWithName =>
+            (from requiredEndorsement in _dbConnection.RequiredEndorsements
+                from endorsment in _dbConnection.Endorsements.LeftJoin(endorsement =>
+                    endorsement.Id == requiredEndorsement.EndorsementId)
+                select new RequiredEndorsementWithName
+                {
+                    Id = requiredEndorsement.Id,
+                    JobId = requiredEndorsement.JobId,
+                    EndorsementId = requiredEndorsement.EndorsementId,
+                    EndorsementName = endorsment.Name
+                });
+
 
         public IQueryable<PersonRoleExtended> PersonRolesExtended =>
             (from personRole in _dbConnection.PersonRoles
-            join person in _dbConnection.People on personRole.PersonId equals person.Id
-            join job in _dbConnection.Job on personRole.JobId equals job.Id
-            select new PersonRoleExtended
-            {
-                Id = personRole.Id,
-                JobId = personRole.JobId,
-                PersonId = personRole.PersonId,
-                Active = personRole.Active,
-                StartDate = personRole.StartDate,
-                EndDate = personRole.EndDate,
-                Notes = personRole.Notes,
-                PreferredName = person.PreferredName,
-                LastName = person.LastName
-            }).OrderByDescending(extended => extended.StartDate);
+                join person in _dbConnection.People on personRole.PersonId equals person.Id
+                join job in _dbConnection.Job on personRole.JobId equals job.Id
+                select new PersonRoleExtended
+                {
+                    Id = personRole.Id,
+                    JobId = personRole.JobId,
+                    PersonId = personRole.PersonId,
+                    Active = personRole.Active,
+                    StartDate = personRole.StartDate,
+                    EndDate = personRole.EndDate,
+                    Notes = personRole.Notes,
+                    PreferredName = person.PreferredName,
+                    LastName = person.LastName
+                }).OrderByDescending(extended => extended.StartDate);
     }
 }

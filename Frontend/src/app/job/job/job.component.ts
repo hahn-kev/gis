@@ -1,16 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { JobService } from '../job.service';
-import { Job, JobStatus, jobStatusName, JobType, jobTypeName, JobWithRoles } from '../job';
+import { JobStatus, jobStatusName, JobType, jobTypeName, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { OrgGroup } from '../../people/groups/org-group';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { Role, RoleExtended, RoleWithJob } from '../../people/role';
+import { Role, RoleExtended } from '../../people/role';
 import { PersonService } from '../../people/person.service';
 import { Grade } from '../grade/grade';
 import { BaseEditComponent } from '../../components/base-edit-component';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { Location } from '@angular/common';
+import { Endorsement, RequiredEndorsement, RequiredEndorsementWithName } from '../../endorsement/endorsement';
+import { Observable } from 'rxjs';
+import { EndorsementService } from '../../endorsement/endorsement.service';
 
 @Component({
   selector: 'app-job',
@@ -29,6 +32,7 @@ export class JobComponent extends BaseEditComponent implements OnInit {
   public groups: OrgGroup[];
   public grades: Grade[];
   public isNew = false;
+  public endorsements: Observable<Endorsement[]>;
 
   constructor(private jobService: JobService,
               private personService: PersonService,
@@ -36,8 +40,11 @@ export class JobComponent extends BaseEditComponent implements OnInit {
               private router: Router,
               private snackBar: MatSnackBar,
               private location: Location,
+              lazyLoad: LazyLoadService,
+              private endorsementService: EndorsementService,
               dialog: MatDialog) {
     super(dialog);
+    this.endorsements = lazyLoad.share('endorsements', () => this.endorsementService.list());
   }
 
   ngOnInit() {
@@ -79,5 +86,15 @@ export class JobComponent extends BaseEditComponent implements OnInit {
     await this.personService.deleteRole(role.id);
     this.job.roles = this.job.roles.filter(value => value.id != role.id);
     this.snackBar.open(`Role Deleted`, null, {duration: 2000});
+  }
+
+  createNewRequiredEndorsement = () => new RequiredEndorsementWithName(this.job.id);
+  saveRequiredEndorsement = async (item: RequiredEndorsementWithName) => {
+    let result = await this.endorsementService.saveRequiredEndorsement(item);
+    return {...item, ...result};
+  };
+
+  deleteRequiredEndorsement = (item: RequiredEndorsement) => {
+    return this.endorsementService.deleteRequiredEndorsement(item.id);
   }
 }

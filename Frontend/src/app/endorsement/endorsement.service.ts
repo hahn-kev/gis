@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Endorsement } from './endorsement';
+import { Endorsement, RequiredEndorsement } from './endorsement';
 
 @Injectable({
   providedIn: 'root'
@@ -24,5 +24,13 @@ export class EndorsementService {
 
   deleteEndorsement(id: string) {
     return this.http.delete('/api/endorsement/' + id, {responseType: 'text'});
+  }
+
+  saveRequiredEndorsement(requiredEndorsement: RequiredEndorsement) {
+    return this.http.post<RequiredEndorsement>('/api/endorsement/required', requiredEndorsement).toPromise();
+  }
+
+  deleteRequiredEndorsement(id: string) {
+    return this.http.delete('/api/endorsement/required/' + id, {responseType: 'text'}).toPromise();
   }
 }

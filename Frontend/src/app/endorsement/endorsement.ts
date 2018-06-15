@@ -15,3 +15,12 @@ export class RequiredEndorsement extends BaseEntity {
   jobId: string;
   endorsementId: string;
 }
+
+export class RequiredEndorsementWithName extends RequiredEndorsement {
+  constructor(jobId: string) {
+    super();
+    this.jobId = jobId;
+  }
+
+  endorsementName: string;
+}

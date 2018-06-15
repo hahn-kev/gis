@@ -36,6 +36,7 @@ namespace Backend.Entities
     public class JobWithRoles : Job
     {
         public IList<PersonRoleExtended> Roles { get; set; }
+        public IList<RequiredEndorsementWithName> RequiredEndorsements { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

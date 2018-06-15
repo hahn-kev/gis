@@ -1,6 +1,7 @@
 ﻿import { RoleExtended } from '../people/role';
 import { BaseEntity } from '../classes/base-entity';
 import { OrgGroup } from '../people/groups/org-group';
+import { RequiredEndorsementWithName } from '../endorsement/endorsement';
 
 export class Job extends BaseEntity {
   public title: string;
@@ -31,7 +32,8 @@ export class JobWithOrgGroup extends Job {
 }
 
 export class JobWithRoles extends Job {
-  public roles: RoleExtended[];
+  public roles: RoleExtended[] = [];
+  public requiredEndorsements: RequiredEndorsementWithName[] = [];
 }
 
 export enum JobStatus {
