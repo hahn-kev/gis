@@ -132,10 +132,6 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Country</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.isThai ? 'Thailand' : row.passportCountry }}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="endorsementAgency">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.endorsementAgency">Endorsment Agency</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{ row.staff.endorsementAgency }}</mat-cell>
-  </ng-container>
   <ng-container matColumnDef="age">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Age</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.birthdate ? (age(row.birthdate) + ' Years old') : '' }}</mat-cell>

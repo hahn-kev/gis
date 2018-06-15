@@ -40,7 +40,6 @@ export class StaffReportComponent implements OnInit {
     'untilBirthday',
     'gender',
     'country',
-    'endorsementAgency',
     'legalStatus',
     'isThai',
     'speaksEnglish'
