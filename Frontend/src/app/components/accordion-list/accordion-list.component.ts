@@ -1,16 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, TemplateRef, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { AccordionListContentDirective } from './accordion-list-content.directive';
 import { AccordionListFormDirective } from './accordion-list-form.directive';
 import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
 import { NgForm } from '@angular/forms';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { BaseEntity } from '../../classes/base-entity';
+import { AccordionListHeaderDirective } from './accordion-list-header.directive';
 
 @Component({
   selector: 'app-accordion-list',
   templateUrl: './accordion-list.component.html',
   styleUrls: ['./accordion-list.component.scss']
 })
-export class AccordionListComponent<T> implements OnInit {
+export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   @Input() title: string = null;
   @Input() createNewItem: () => T;
   newItem: T;
@@ -25,7 +27,7 @@ export class AccordionListComponent<T> implements OnInit {
   @ViewChildren(MatExpansionPanel) expansionPanels: QueryList<MatExpansionPanel>;
   newForm: AccordionListFormDirective<T>;
   forms: AccordionListFormDirective<T>[] = [];
-  public header: TemplateRef<{ $implicit: T, index: number }>;
+  public header: AccordionListHeaderDirective<T>;
   public content: AccordionListContentDirective<T>;
 
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {

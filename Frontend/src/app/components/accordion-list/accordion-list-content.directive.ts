@@ -1,10 +1,11 @@
 import { Directive, EmbeddedViewRef, Host, TemplateRef } from '@angular/core';
 import { AccordionListComponent } from './accordion-list.component';
+import { BaseEntity } from '../../classes/base-entity';
 
 @Directive({
   selector: '[appAccordionListContent]'
 })
-export class AccordionListContentDirective<T> extends TemplateRef<{ $implicit: T, index: number }> {
+export class AccordionListContentDirective<T extends BaseEntity> extends TemplateRef<{ $implicit: T, index: number }> {
   lastCreatedTemplateContext: { $implicit: T; index: number };
 
   constructor(@Host() parent: AccordionListComponent<T>,

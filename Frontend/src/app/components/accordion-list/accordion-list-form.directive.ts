@@ -1,11 +1,12 @@
 import { Directive, Host } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AccordionListComponent } from './accordion-list.component';
+import { BaseEntity } from '../../classes/base-entity';
 
 @Directive({
   selector: '[appAccordionListForm]'
 })
-export class AccordionListFormDirective<T> {
+export class AccordionListFormDirective<T extends BaseEntity> {
   public context: { $implicit: T; index: number };
 
   constructor(@Host() public ngForm: NgForm,
