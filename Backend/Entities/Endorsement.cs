@@ -5,7 +5,6 @@ namespace Backend.Entities
     public class Endorsement : BaseEntity
     {
         public string Name { get; set; }
-        public string Agency { get; set; }
     }
 
     public class StaffEndorsement : BaseEntity
@@ -14,12 +13,12 @@ namespace Backend.Entities
         
         public Guid EndorsementId { get; set; }
         public DateTime? EndorsementDate { get; set; }
+        public string Agency { get; set; }
     }
 
     public class StaffEndorsementWithName : StaffEndorsement
     {
         public string EndorsementName { get; set; }
-        public string EndorsementAgency { get; set; }
     }
 
     public class RequiredEndorsement : BaseEntity
@@ -31,6 +30,5 @@ namespace Backend.Entities
     public class RequiredEndorsementWithName : RequiredEndorsement
     {
         public string EndorsementName { get; set; }
-        public string EndorsementAgency { get; set; }
     }
 }

@@ -1,3 +1,15 @@
-<p>
-  endorsment works!
-</p>
+<ng-container *appTemplateContent="'title'">Endorsement {{endorsement.name}}</ng-container>
+<form class="main-card" (submit)="save()">
+  <mat-card>
+    <mat-card-content class="two-colum-grid">
+
+      <mat-form-field>
+        <input matInput name="name" [(ngModel)]="endorsement.name" required placeholder="Name">
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" mat-button>Save</button>
+      <button type="button" *ngIf="!isNew" color="warn" (click)="deleteEndorsement()" mat-button>Delete</button>
+    </mat-card-actions>
+  </mat-card>
+</form>

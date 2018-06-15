@@ -60,6 +60,9 @@ import { EvaluationReportComponent } from './people/evaluation-report/evaluation
 import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
 import { OrgTreeDataResolverService } from './org-tree/org-tree-data-resolver.service';
 import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
+import { EndorsementListResolverService } from './endorsement/endorsement-list-resolver.service';
+import { EndorsementComponent } from './endorsement/edit/endorsement.component';
+import { EndorsementResolverService } from './endorsement/endorsement-resolver.service';
 
 const routes: Routes = [
   {
@@ -383,7 +386,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'endorsements',
+        path: 'endorsement',
         canActivate: [RoleGuardService],
         data: {
           requireRole: ['admin', 'hr']
@@ -391,7 +394,17 @@ const routes: Routes = [
         children: [
           {
             path: 'list',
-            component: EndorsementListComponent
+            component: EndorsementListComponent,
+            resolve: {
+              endorsements: EndorsementListResolverService
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: EndorsementComponent,
+            resolve: {
+              endorsement: EndorsementResolverService
+            }
           }
         ]
       },
@@ -467,7 +480,9 @@ const routes: Routes = [
     PersonRequiredGuard,
     AllRolesResolverService,
     EvaluationSummaryResolveService,
-    OrgTreeDataResolverService
+    OrgTreeDataResolverService,
+    EndorsementListResolverService,
+    EndorsementResolverService
   ]
 })
 export class AppRoutingModule {

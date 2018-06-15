@@ -21,6 +21,9 @@ namespace Backend.Controllers
         [HttpGet]
         public IList<Endorsement> List() => _endorsementService.Endorsements;
 
+        [HttpGet("{id}")]
+        public Endorsement GetById(Guid id) => _endorsementService.GetById(id);
+
         [HttpGet("staff/{personId}")]
         public IList<StaffEndorsementWithName> ListStaffEndorsements(Guid personId)
         {

@@ -25,10 +25,10 @@ namespace Backend.DataLayer
             {
                 Id = se.Id,
                 PersonId = se.PersonId,
+                Agency = se.Agency,
                 EndorsementId = se.EndorsementId,
                 EndorsementDate = se.EndorsementDate,
-                EndorsementName = e.Name,
-                EndorsementAgency = e.Agency
+                EndorsementName = e.Name
             };
 
         public IQueryable<RequiredEndorsementWithName> RequiredEndorsementsWithName => from re in RequiredEndorsements
@@ -38,8 +38,7 @@ namespace Backend.DataLayer
                 Id = re.Id,
                 EndorsementId = re.EndorsementId,
                 JobId = re.JobId,
-                EndorsementName = e.Name,
-                EndorsementAgency = e.Agency
+                EndorsementName = e.Name
             };
     }
 }

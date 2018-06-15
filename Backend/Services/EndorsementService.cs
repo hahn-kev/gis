@@ -19,6 +19,9 @@ namespace Backend.Services
 
         public IList<Endorsement> Endorsements => _endorsementRepository.Endorsements.ToList();
 
+        public Endorsement GetById(Guid id) =>
+            _endorsementRepository.Endorsements.Single(endorsement => endorsement.Id == id);
+
         public IList<StaffEndorsementWithName> ListStaffEndorsements(Guid personId) =>
             _endorsementRepository.StaffEndorsementsWithName.Where(se => se.PersonId == personId).ToList();
 

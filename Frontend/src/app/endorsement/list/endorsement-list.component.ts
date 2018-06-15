@@ -20,11 +20,12 @@ export class EndorsementListComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new AppDataSource<Person>();
+    this.dataSource.bindToRouteData(this.route, 'endorsements');
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     this.dataSource.sort = this.sort;
-    this.dataSource.bindToRouteData(this.route, 'people');
     this.dataSource.filterPredicate = ((data, filter) =>
       data.firstName.toUpperCase().startsWith(filter) || data.lastName.toUpperCase().startsWith(filter));
+    this.urlBinding.loadFromParams();
   }
 
 }
