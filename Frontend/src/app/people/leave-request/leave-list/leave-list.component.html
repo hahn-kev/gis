@@ -38,6 +38,11 @@
     <mat-header-cell *matHeaderCellDef mat-sort-header>Length</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.days}}</mat-cell>
   </ng-container>
+
+  <ng-container matColumnDef="schoolYear">
+    <mat-header-cell *matHeaderCellDef>School Year</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{yearNameFromDate(row.startDate)}}</mat-cell>
+  </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="showingMine ? personColumns : hrColumns"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/edit/' + row.id"
