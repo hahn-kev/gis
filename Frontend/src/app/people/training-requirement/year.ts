@@ -56,7 +56,7 @@ export class Year {
 
   convertToSchoolYear(date: MomentInput) {
     const mDate = moment(date).year(this.value);
-    if (Year.InFirstHalf(mDate)) return mDate;
+    if ((mDate.month() + 1) >= Year.schoolStartMonth) return mDate;
     return mDate.add(1, 'y');
   }
 }
