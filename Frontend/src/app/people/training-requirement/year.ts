@@ -5,23 +5,15 @@ export class Year {
   static readonly schoolStartMonth = 7;
   static readonly schoolEndMonth = 6;
 
-  static InFirstHalf(date: MomentInput) {
-    return moment(date).month() >= Year.schoolStartMonth;
-  }
-
-  static InLastHalf(date: MomentInput) {
-    return moment(date).month() <= Year.schoolEndMonth;
-  }
-
   static CurrentSchoolYear() {
     const date = moment();
-    if (this.InFirstHalf(date)) return date.year();
+    if ((date.month() + 1) >= Year.schoolStartMonth) return date.year();
     return date.year() - 1;
   }
 
   static schoolYear(date: MomentInput) {
-    let momentDate = moment(date);
-    return momentDate.month() >= Year.schoolStartMonth ? momentDate.year() : momentDate.year() - 1;
+    const momentDate = moment(date);
+    return (momentDate.month() + 1) >= Year.schoolStartMonth ? momentDate.year() : momentDate.year() - 1;
   }
 
   static years(): Year[] {
