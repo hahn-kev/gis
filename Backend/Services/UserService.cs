@@ -109,12 +109,12 @@ namespace Backend.Services
             return _userManager.AddToRoleAsync(user, role);
         }
 
-        public Guid? FindGroupIdIfSupervisor(Guid personId)
+        public OrgGroup FindGroupIdIfSupervisor(Guid personId)
         {
             return (from person in _personRepository.People
                 from orgGroup in _orgGroupRepository.OrgGroups.LeftJoin(g => g.Supervisor == person.Id).DefaultIfEmpty()
                 where person.Id == personId
-                select orgGroup.Id).SingleOrDefault();
+                select orgGroup).SingleOrDefault();
         }
     }
 }

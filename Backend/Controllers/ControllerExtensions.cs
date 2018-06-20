@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using Backend.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace Backend.Controllers
         {
             return controller.Redirect(RedirectFrontendMessagePath(message));
         }
-        
+
         public static string RedirectFrontendMessagePath(string message)
         {
             return $"~/message?text={Uri.EscapeDataString(message)}";
@@ -58,6 +59,13 @@ namespace Backend.Controllers
         public static bool IsHr(this ClaimsPrincipal user)
         {
             return user.IsInRole("hr");
+        }
+
+        public static bool IsHighLevelSupervisor(this ClaimsPrincipal user)
+        {
+            return user.IsSupervisor() && user.HasClaim(claim =>
+                       claim.Type == AuthenticateController.ClaimSupervisorType &&
+                       claim.Value == GroupType.Supervisor.ToString());
         }
 
         public static bool IsSupervisor(this ClaimsPrincipal user)

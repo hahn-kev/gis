@@ -93,6 +93,7 @@ namespace Backend.Controllers
         public const string ClaimTypeEmail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
         public const string ClaimPersonId = "personId";
         public const string ClaimSupervisor = "supervisesGroupId";
+        public const string ClaimSupervisorType = "supervisesGroupType";
         public const string GoogleOAuthTokenName = "access_token";
 
         public const string GisEmailSufix = "@gisthailand.org";
@@ -228,8 +229,12 @@ namespace Backend.Controllers
             if (identityUser.PersonId.HasValue)
             {
                 claims.Add(new Claim(ClaimPersonId, identityUser.PersonId.ToString()));
-                var groupId = _userService.FindGroupIdIfSupervisor(identityUser.PersonId.Value);
-                if (groupId.HasValue) claims.Add(new Claim(ClaimSupervisor, groupId.Value.ToString()));
+                var group = _userService.FindGroupIdIfSupervisor(identityUser.PersonId.Value);
+                if (group != null)
+                {
+                    claims.Add(new Claim(ClaimSupervisor, group.Id.ToString()));
+                    claims.Add(new Claim(ClaimSupervisorType, group.Type.ToString()));
+                }
             }
 
             return claims;
