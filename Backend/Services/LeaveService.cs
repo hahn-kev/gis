@@ -84,7 +84,7 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
-            var leaveUsage = GetCurrentLeaveUseage(leaveRequest.Type, result.personOnLeave.Id);
+            var leaveUsage = GetLeaveUseage(leaveRequest.Type, result.personOnLeave.Id, leaveRequest.StartDate.SchoolYear());
             var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
             try

@@ -10,7 +10,7 @@ import { PersonService } from '../person.service';
 import { UserToken } from '../../login/user-token';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { LeaveType, LeaveTypeName, LeaveUsage } from '../self/self';
+import { LeaveType, LeaveUsage } from '../self/self';
 import { Gender } from '../person';
 import { BaseEditComponent } from '../../components/base-edit-component';
 
@@ -21,7 +21,6 @@ import { BaseEditComponent } from '../../components/base-edit-component';
 })
 export class LeaveRequestComponent extends BaseEditComponent implements OnInit, OnDestroy {
   public typesOfLeave = Object.keys(LeaveType);
-  public typeName = LeaveTypeName;
   public people: PersonAndLeaveDetails[];
   public leaveRequest: LeaveRequestWithNames;
   public daysUsed = 0;

@@ -28,7 +28,7 @@
       <mat-form-field>
         <mat-select name="type" required [disabled]="isReadonly" placeholder="Type" [(ngModel)]="leaveRequest.type">
           <ng-container *ngFor="let type of typesOfLeave">
-            <mat-option [value]="type" *ngIf="showLeaveType(type)">{{typeName(type)}}</mat-option>
+            <mat-option [value]="type" *ngIf="showLeaveType(type)">{{type | titleCase}}</mat-option>
           </ng-container>
         </mat-select>
       </mat-form-field>
@@ -120,12 +120,12 @@
       </mat-form-field>
 
       <div class="span-2-columns" *ngIf="selectedPerson">
-        <div class="mat-caption">{{selectedPerson?.person.preferredName}} Leave used/total</div>
+        <div class="mat-caption">Current Leave (used/total)</div>
         <mat-chip-list>
           <ng-container *ngFor="let leave of selectedPerson?.leaveUsages">
             <mat-chip *ngIf="showLeaveUsage(leave)"
                       color="accent" selected="true">
-              {{typeName(leave.leaveType)}} {{leave.used}}/{{leave.totalAllowed}}
+              {{leave.leaveType | titleCase}} {{leave.used}}/{{leave.totalAllowed}}
             </mat-chip>
           </ng-container>
         </mat-chip-list>
