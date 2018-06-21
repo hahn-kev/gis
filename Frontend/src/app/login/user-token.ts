@@ -1,4 +1,5 @@
 import { isArray } from 'util';
+import { GroupType } from '../people/groups/org-group';
 
 export class UserToken {
 
@@ -44,6 +45,15 @@ export class UserToken {
   get orgGroupId(): string {
     if (!this.isSupervisor) return null;
     return this.token['supervisesGroupId'];
+  }
+
+  get orgGroupType(): GroupType {
+    if (!this.isSupervisor) return null;
+    return this.token['supervisesGroupType'];
+  }
+
+  get isHigherup(): boolean {
+    return this.orgGroupType == GroupType.Supervisor;
   }
 
   hasAnyRole(roles: string[]) {

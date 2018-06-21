@@ -3,7 +3,7 @@
 </ng-container>
 
 <div class="home">
-  <mat-card class="mat-elevation-z6" *requireRole="'hr,admin'">
+  <mat-card class="mat-elevation-z6" *ngIf="'hrEdit' | isUserPolicy">
     <!--<img mat-card-image src="assets/img/believe-home.jpg" alt="Believe">-->
     <mat-card-title>HR</mat-card-title>
     <mat-card-content>
@@ -13,7 +13,7 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="mat-elevation-z6" *requireRole="'hr,admin'">
+  <mat-card class="mat-elevation-z6" *ngIf="'hrEdit' | isUserPolicy">
     <!--<img mat-card-image src="assets/img/believe-home.jpg" alt="Believe">-->
     <mat-card-title>School Aide</mat-card-title>
     <mat-card-content>
@@ -32,7 +32,7 @@
       </mat-nav-list>
     </mat-card-content>
   </mat-card>
-  <mat-card class="mat-elevation-z6" *requireRole="'registrar,admin'">
+  <mat-card class="mat-elevation-z6" *ngIf="'registrarEdit' | isUserPolicy">
     <!--<img mat-card-image src="assets/img/pexels-photo-592940.jpeg" alt="Live">-->
     <mat-card-title>Registrar</mat-card-title>
     <mat-card-content>

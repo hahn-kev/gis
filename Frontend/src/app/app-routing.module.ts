@@ -9,7 +9,6 @@ import { IsNewResolverService } from './user/is-new-resolver.service';
 import { MessageComponent } from './message/message.component';
 import { IsSelfResolverService } from './user/is-self-resolver.service';
 import { LoginService } from './services/auth/login.service';
-import { RoleGuardService } from './services/auth/role-guard.service';
 import { PersonComponent } from './people/person/person.component';
 import { PersonResolverService } from './people/person-resolver.service';
 import { PeopleListComponent } from './people/list/people-list.component';
@@ -63,6 +62,7 @@ import { EndorsementListComponent } from './endorsement/list/endorsement-list.co
 import { EndorsementListResolverService } from './endorsement/endorsement-list-resolver.service';
 import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { EndorsementResolverService } from './endorsement/endorsement-resolver.service';
+import { PolicyGuard } from './services/auth/policy.guard';
 
 const routes: Routes = [
   {
@@ -75,9 +75,9 @@ const routes: Routes = [
           {
             path: 'admin',
             component: AdminComponent,
-            canActivate: [RoleGuardService],
+            canActivate: [PolicyGuard],
             data: {
-              requireRole: 'admin'
+              requirePolicy: 'userManager'
             }
           },
           {
@@ -94,9 +94,9 @@ const routes: Routes = [
       },
       {
         path: 'people',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr', 'registrar']
+          requirePolicy: 'peopleEdit'
         },
         children: [
           {
@@ -144,9 +144,9 @@ const routes: Routes = [
       },
       {
         path: 'staff',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr']
+          requirePolicy: 'hrEdit'
         },
         children: [
           {
@@ -160,9 +160,9 @@ const routes: Routes = [
       },
       {
         path: 'job',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr']
+          requirePolicy: 'hrEdit'
         },
         children: [
           {
@@ -225,9 +225,9 @@ const routes: Routes = [
       },
       {
         path: 'groups',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hradmin']
+          requirePolicy: 'orgGroupManager'
         },
         children: [
           {
@@ -271,37 +271,42 @@ const routes: Routes = [
             }
           },
           {
-            path: 'list/:personId',
-            component: LeaveListComponent,
-            resolve: {
-              leave: LeaveListResolverService
-            }
-          },
-          {
-            path: 'list',
-            component: LeaveListComponent,
-            resolve: {
-              leave: LeaveListResolverService
-            },
-            canActivate: [RoleGuardService],
+            path: '',
+            canActivate: [PolicyGuard],
             data: {
-              requireRole: ['admin', 'hr']
-            }
-          },
-          {
-            path: 'report',
-            component: LeaveReportComponent,
-            resolve: {
-              people: PeopleWithLeaveResolverService
-            }
+              requirePolicy: 'leaveManager'
+            },
+            children: [
+              {
+                path: 'list/:personId',
+                component: LeaveListComponent,
+                resolve: {
+                  leave: LeaveListResolverService
+                }
+              },
+              {
+                path: 'list',
+                component: LeaveListComponent,
+                resolve: {
+                  leave: LeaveListResolverService
+                }
+              },
+              {
+                path: 'report',
+                component: LeaveReportComponent,
+                resolve: {
+                  people: PeopleWithLeaveResolverService
+                }
+              }
+            ]
           }
         ]
       },
       {
         path: 'training',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr']
+          requirePolicy: 'hrEdit'
         },
         children: [
           {
@@ -339,9 +344,9 @@ const routes: Routes = [
       },
       {
         path: 'mission-org',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr', 'registrar']
+          requirePolicy: 'missionOrgManager'
         },
         children: [
           {
@@ -364,9 +369,9 @@ const routes: Routes = [
       },
       {
         path: 'org-tree',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr']
+          requirePolicy: 'orgChart'
         },
         children: [
           {
@@ -387,9 +392,9 @@ const routes: Routes = [
       },
       {
         path: 'endorsement',
-        canActivate: [RoleGuardService],
+        canActivate: [PolicyGuard],
         data: {
-          requireRole: ['admin', 'hr']
+          requirePolicy: 'endorsementManager'
         },
         children: [
           {

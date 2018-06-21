@@ -1,11 +1,9 @@
 <ng-container *appToolbarContent>
-  <ng-container *ngIf="!isNew && isDev">
-
-    <button *requireRole="'admin'" (click)="impersonate()" mat-button>
-      <mat-icon mat-list-icon>face</mat-icon>
-      Impersonate
-    </button>
-  </ng-container>
+  <button *ngIf="!isNew && isDev && ('impersonate' | isUserPolicy)" (click)="impersonate()"
+          mat-button>
+    <mat-icon mat-list-icon>face</mat-icon>
+    Impersonate
+  </button>
 </ng-container>
 
 <div class="main-card">
@@ -53,7 +51,7 @@
           Passwords must match
         </mat-error>
       </mat-form-field>
-      <ng-container *requireRole="'admin,hr'">
+      <ng-container *ngIf="'userManager' | isUserPolicy">
         <mat-slide-toggle name="resetPassword"
                           [(ngModel)]="user.resetPassword"
                           matTooltip="Next time a user logs in with a password, they will be required to change it">

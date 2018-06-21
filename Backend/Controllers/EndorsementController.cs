@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin,hr")]
+    [Authorize(Policy = "endorsement")]
     public class EndorsementController : MyController
     {
         private readonly EndorsementService _endorsementService;

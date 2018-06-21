@@ -70,7 +70,7 @@
             </a>
           </ng-container>
 
-          <ng-container *requireRole="'admin,hr'">
+          <ng-container *ngIf="'hrEdit' | isUserPolicy">
             <mat-divider></mat-divider>
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
@@ -108,7 +108,7 @@
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
-              <a mat-list-item *requireRole="'admin,hradmin'" routerLink="/org-tree" routerLinkActive="active-link">
+              <a mat-list-item *ngIf="'orgChart' | isUserPolicy" routerLink="/org-tree" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>location_city</mat-icon>
                 <span mat-line>Organization</span>
               </a>
@@ -148,7 +148,7 @@
 
           </ng-container>
 
-          <ng-container *requireRole="'admin,registrar'">
+          <ng-container *ngIf="'registrarEdit' | isUserPolicy">
             <mat-divider></mat-divider>
             <h3 mat-subheader>Registrar</h3>
             <ng-container appRenderTemplate="sidenav:registrar"></ng-container>
@@ -164,7 +164,7 @@
             </ng-container>
           </ng-container>
 
-          <ng-container *requireRole="'admin'">
+          <ng-container *ngIf="'userManager' | isUserPolicy">
             <mat-divider></mat-divider>
             <h3 mat-subheader>Admin</h3>
             <a mat-list-item routerLink="/user/admin" routerLinkActive="active-link">

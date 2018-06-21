@@ -121,6 +121,8 @@ import { PickFileDirective } from './google-picker/pick-file.directive';
 import { DonorComponent } from './people/person/donor/donor.component';
 import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
 import { EndorsementComponent } from './endorsement/edit/endorsement.component';
+import { IsUserPolicyPipe } from './services/auth/is-user-policy.pipe';
+import { PolicyGuard } from './services/auth/policy.guard';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -185,7 +187,8 @@ if (environment.production) {
     DonorComponent,
     TitleCasePipe,
     EndorsementListComponent,
-    EndorsementComponent
+    EndorsementComponent,
+    IsUserPolicyPipe
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -287,7 +290,8 @@ if (environment.production) {
       provide: LocationStrategy,
       useClass: PathLocationStrategy
     },
-    EvaluationService
+    EvaluationService,
+    PolicyGuard
   ],
   bootstrap: [AppComponent]
 })

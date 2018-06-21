@@ -354,8 +354,7 @@
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
 
-          <ng-container *ngIf="person.isThai">
-            <ng-container *requireRole="'admin,hradmin'">
+          <ng-container *ngIf="person.isThai && ('viewSalary' | isUserPolicy)">
               <mat-form-field>
                 <span matPrefix>฿</span>
                 <input matInput
@@ -366,7 +365,6 @@
                        placeholder="Annual Salary">
               </mat-form-field>
               <span></span>
-            </ng-container>
           </ng-container>
           <mat-form-field>
             <input matInput [(ngModel)]="person.staff.email"
@@ -502,7 +500,7 @@
       <span class="mat-caption">Roles</span>
       <mat-accordion class="roles">
         <!--new role-->
-        <ng-container *requireRole="'admin,hr'">
+        <ng-container *ngIf="'addRoles' | isUserPolicy">
           <mat-expansion-panel #newRolePanel
                                *ngIf="!isSelf"
                                [disabled]="isNew"
@@ -571,7 +569,7 @@
       <span class="mat-caption">Evaluations</span>
       <mat-accordion class="evaluations">
         <!--new evaluation-->
-        <ng-container *requireRole="'admin,hr'">
+        <ng-container *ngIf="'addEvaluations' | isUserPolicy">
           <mat-expansion-panel #newEvalPanel
                                *ngIf="!isSelf"
                                [disabled]="isNew"
