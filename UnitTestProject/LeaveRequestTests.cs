@@ -42,7 +42,7 @@ namespace UnitTestProject
             Assert.NotNull(jacob);
             var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
             Assert.NotNull(expectedSupervisor);
-            var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
+            var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
             Assert.NotNull(actualSupervisor);
             Assert.Equal(expectedSupervisor.FirstName, actualSupervisor.FirstName);
         }
@@ -58,7 +58,7 @@ namespace UnitTestProject
                 It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id});
+            await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
@@ -83,7 +83,7 @@ namespace UnitTestProject
         {
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id};
+            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
             await _leaveService.RequestLeave(expectedLeaveRequest);
             _servicesFixture.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
         }
@@ -97,7 +97,7 @@ namespace UnitTestProject
                 .Throws(expectedException);
             var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id};
+            var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
             var actualException =
                 await Assert.ThrowsAsync<Exception>(() => _leaveService.RequestLeave(expectedLeaveRequest));
             Assert.Same(expectedException, actualException);
