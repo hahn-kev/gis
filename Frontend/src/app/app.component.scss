@@ -1,44 +1,52 @@
 .main {
-  top: 64px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  @media (max-width: 599px) {
-    top: 56px;
+  top    : 64px;
+  left   : 0;
+  right  : 0;
+  bottom : 0;
+  @media (max-width : 599px) {
+    top : 56px;
+    .nav-drawer {
+      top : 56px !important;
+    }
+  }
+
+  .nav-drawer {
+    position : fixed;
+    top      : 64px;
   }
 
   @media not print {
-    position: absolute;
+    position : absolute;
     .mat-toolbar {
-      position: fixed;
-      top: 0;
-      z-index: 2;
+      position : fixed;
+      top      : 0;
+      z-index  : 2;
     }
   }
   .mat-sidenav-container {
-    min-height: 100%;
+    min-height : 100%;
   }
 }
 
 @media print {
   #open-menu-button {
-    display: none;
+    display : none;
   }
 }
 
 .mat-subheader {
-  margin: 0;
+  margin : 0;
 }
 
 #user {
-  padding: 16px;
-  margin: 0;
+  padding : 16px;
+  margin  : 0;
   h2 {
-    margin-bottom: 0px;
+    margin-bottom : 0px;
   }
 }
 
 .activity-indicator {
-  position: absolute;
-  z-index: 10;
+  position : absolute;
+  z-index  : 10;
 }

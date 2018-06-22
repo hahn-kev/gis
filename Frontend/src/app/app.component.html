@@ -23,7 +23,7 @@
                     [hidden]="!(indicatorStatus | async)">
   </mat-progress-bar>
   <mat-sidenav-container>
-    <mat-sidenav position="start" #sidenav>
+    <mat-sidenav position="start" class="nav-drawer" #sidenav>
       <mat-nav-list>
         <div id="user" *ngIf="currentUser | async as user">
           <h2>
