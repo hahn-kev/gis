@@ -63,6 +63,13 @@ export class JobComponent extends BaseEditComponent implements OnInit {
   }
 
   async deleteJob() {
+    if (this.job.roles.length > 0) {
+      await ConfirmDialogComponent.OpenWait(this.dialog,
+        'To delete this job you must first delete all the Roles below, or you could make the job as not current',
+        'Close');
+      return;
+    }
+
     let result = await ConfirmDialogComponent.OpenWait(this.dialog, 'Delete Job?', 'Delete', 'Cancel');
     if (!result) return;
     await this.jobService.delete(this.job.id).toPromise();

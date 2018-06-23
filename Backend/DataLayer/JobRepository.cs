@@ -15,6 +15,7 @@ namespace Backend.DataLayer
         }
 
         public IQueryable<Job> Job => _dbConnection.Job.OrderBy(job => job.Title);
+        public IQueryable<PersonRole> PersonRoles => _dbConnection.PersonRoles;
 
         public IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job

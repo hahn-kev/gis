@@ -19,6 +19,7 @@
       <mat-form-field>
 
         <mat-select [(ngModel)]="job.status" name="status"
+                    [required]="true"
                     placeholder="Status">
           <mat-option [value]="null">None</mat-option>
           <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>

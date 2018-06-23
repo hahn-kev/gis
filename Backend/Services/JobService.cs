@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
+using LinqToDB;
 
 namespace Backend.Services
 {
@@ -60,6 +61,7 @@ namespace Backend.Services
         public void DeleteJob(Guid jobId)
         {
             _entityService.Delete<Job>(jobId);
+            _jobRepository.PersonRoles.Where(role => role.JobId == jobId).Delete();
         }
 
         public void DeleteGrade(Guid id)
