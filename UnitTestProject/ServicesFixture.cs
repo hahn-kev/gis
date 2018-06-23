@@ -103,6 +103,7 @@ namespace UnitTestProject
             TryCreateTable<StaffTraining>();
             TryCreateTable<EmergencyContact>();
             TryCreateTable<Donor>();
+            TryCreateTable<Donation>();
             TryCreateTable<Evaluation>();
             TryCreateTable<Attachment>();
             TryCreateTable<MissionOrg>();
@@ -161,6 +162,11 @@ namespace UnitTestProject
             var jacobMissionOrgYear = AutoFaker.Generate<MissionOrgYearSummary>();
             jacobMissionOrgYear.MissionOrgId = jacobMissionOrg.Id;
             _dbConnection.Insert(jacobMissionOrgYear);
+
+            var jacobDonation = AutoFaker.Generate<Donation>();
+            jacobDonation.PersonId = jacob.Id;
+            jacobDonation.MissionOrgId = jacobMissionOrg.Id;
+            _dbConnection.Insert(jacobDonation);
             var jacobJob = InsertJob();
             InsertRole(role =>
             {
