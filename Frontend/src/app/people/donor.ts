@@ -11,3 +11,10 @@ export enum DonorStatus {
   Active = 'Active',
   Inactive = 'Inactive'
 }
+
+export class Donation extends BaseEntity {
+  public date: Date;
+  public money: number;
+  public personId: string;
+  public missionOrgId: string;
+}

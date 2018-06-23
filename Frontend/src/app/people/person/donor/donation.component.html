@@ -1,0 +1,48 @@
+<app-accordion-list [(items)]="person.donations"
+                    [createNewItem]="createDonation"
+                    [save]="save"
+                    [delete]="deleteDonation"
+                    [showActions]="!readonly"
+                    [addNew]="!readonly"
+                    itemTitle="Donation"
+                    title="Donations">
+  <ng-container *appAccordionListHeader="let donation">
+    <mat-panel-title>{{donation.date | date}}</mat-panel-title>
+    <mat-panel-description>{{donation.money | currency: 'THB'}}</mat-panel-description>
+  </ng-container>
+  <ng-container *appAccordionListContent="let donation">
+    <form appAccordionListForm class="two-colum-grid">
+      <mat-form-field>
+        <input name="donationDate" matInput
+               [readonly]="readonly"
+               required
+               [(ngModel)]="donation.date"
+               [matDatepicker]="donationDatePicker"
+               placeholder="Donation Date">
+        <mat-datepicker-toggle matSuffix [disabled]="readonly" [for]="donationDatePicker">
+        </mat-datepicker-toggle>
+        <mat-datepicker #donationDatePicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-icon matPrefix>฿</mat-icon>
+        <input name="money" matInput
+               [readonly]="readonly"
+               required
+               [(ngModel)]="donation.money"
+               type="number"
+               placeholder="Money">
+      </mat-form-field>
+
+
+      <mat-form-field>
+        <mat-select name="missionOrg"
+                    [disabled]="isSelf"
+                    [(ngModel)]="donation.missionOrgId"
+                    placeholder="Sending Org">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let org of missionOrgs | async" [value]="org.id">{{org.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </ng-container>
+</app-accordion-list>

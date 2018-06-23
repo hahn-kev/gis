@@ -21,6 +21,7 @@ namespace Backend.DataLayer
         IQueryable<PersonExtended> PeopleExtended { get; }
         IQueryable<EmergencyContact> EmergencyContacts { get; }
         IQueryable<Donor> Donors { get; }
+        IQueryable<Donation> Donations { get; }
         IQueryable<OrgGroup> OrgGroups { get; }
         IQueryable<MissionOrg> MissionOrgs { get; }
         IQueryable<MissionOrgYearSummary> MissionOrgYearSummaries { get; }
@@ -102,6 +103,7 @@ namespace Backend.DataLayer
         public IQueryable<PersonExtended> PeopleExtended => GetTable<PersonExtended>();
         public IQueryable<EmergencyContact> EmergencyContacts => GetTable<EmergencyContact>();
         public IQueryable<Donor> Donors => GetTable<Donor>();
+        public IQueryable<Donation> Donations => GetTable<Donation>();
         public IQueryable<OrgGroup> OrgGroups => GetTable<OrgGroup>();
         public IQueryable<MissionOrg> MissionOrgs => GetTable<MissionOrg>();
         public IQueryable<MissionOrgYearSummary> MissionOrgYearSummaries => GetTable<MissionOrgYearSummary>();

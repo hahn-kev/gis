@@ -9,6 +9,7 @@ import { Donor, DonorStatus } from '../../donor';
 export class DonorComponent implements OnInit {
   readonly donorStatusList = Object.keys(DonorStatus);
   @Input() donor: Donor;
+  @Input() readonly: boolean;
 
   constructor() {
   }

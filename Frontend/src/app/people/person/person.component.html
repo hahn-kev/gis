@@ -219,12 +219,14 @@
             <mat-panel-title>Donor</mat-panel-title>
             <mat-panel-description>{{person.donor.status}}</mat-panel-description>
             <ng-template matExpansionPanelContent>
-              <app-donor [donor]="person.donor"></app-donor>
+              <app-donor [readonly]="isSelf" [donor]="person.donor"></app-donor>
             </ng-template>
           </mat-expansion-panel-header>
         </mat-expansion-panel>
       </mat-accordion>
     </form>
+
+    <app-donation *ngIf="person.donorId" [readonly]="isSelf" [person]="person"></app-donation>
 
     <!--emergency contacts-->
     <ng-container
@@ -356,7 +358,7 @@
 
           <ng-container *ngIf="person.isThai && ('viewSalary' | isUserPolicy)">
               <mat-form-field>
-                <span matPrefix>฿</span>
+                <mat-icon matPrefix>฿</mat-icon>
                 <input matInput
                        name="annualSalary"
                        type="number"

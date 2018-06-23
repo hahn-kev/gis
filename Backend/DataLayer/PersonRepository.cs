@@ -257,6 +257,13 @@ namespace Backend.DataLayer
             if (result == null) throw new NullReferenceException($"Unable to find person with ID {id}");
             var person = result.person;
             person.Donor = result.donor;
+            if (person.DonorId.HasValue)
+            {
+                person.Donations = _dbConnection.Donations
+                    .Where(donation => donation.PersonId == person.Id)
+                    .OrderBy(d => d.Date)
+                    .ToList();
+            }
             person.Roles = GetPersonRolesWithJob(id).ToList();
             person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
                 .OrderBy(contact => contact.ContactPreferedName).ToList();

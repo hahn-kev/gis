@@ -123,6 +123,7 @@ import { EndorsementListComponent } from './endorsement/list/endorsement-list.co
 import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { IsUserPolicyPipe } from './services/auth/is-user-policy.pipe';
 import { PolicyGuard } from './services/auth/policy.guard';
+import { DonationComponent } from './people/person/donor/donation.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -189,6 +190,8 @@ if (environment.production) {
     EndorsementListComponent,
     EndorsementComponent,
     IsUserPolicyPipe
+    ,
+    DonationComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

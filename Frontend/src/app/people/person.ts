@@ -4,7 +4,7 @@ import { BaseEntity } from '../classes/base-entity';
 import { LeaveDetails } from './self/self';
 import { StaffWithOrgName } from './staff';
 import { EvaluationWithNames } from './person/evaluation/evaluation';
-import { Donor } from './donor';
+import { Donation, Donor } from './donor';
 import { StaffEndorsementWithName } from '../endorsement/endorsement';
 
 export enum Gender {
@@ -70,6 +70,7 @@ export class PersonWithOthers extends PersonWithStaff {
   public emergencyContacts: EmergencyContactExtended[] = [];
   public evaluations: EvaluationWithNames[] = [];
   public staffEndorsements: StaffEndorsementWithName[] = [];
+  public donations: Donation[] = [];
   public donor: Donor;
 }
 

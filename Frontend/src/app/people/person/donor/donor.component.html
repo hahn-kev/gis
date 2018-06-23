@@ -1,12 +1,14 @@
 <form class="two-colum-grid">
   <mat-form-field class="span-2-columns">
-    <textarea matInput [(ngModel)]="donor.notes" name="notes" placeholder="Notes" rows="3"></textarea>
+    <textarea matInput [(ngModel)]="donor.notes" [readonly]="readonly" name="notes" placeholder="Notes"
+              rows="3"></textarea>
   </mat-form-field>
   <mat-form-field>
-    <mat-select placeholder="Status" name="status" [(ngModel)]="donor.status">
+    <mat-select placeholder="Status" [disabled]="readonly" name="status" [(ngModel)]="donor.status">
       <mat-option *ngFor="let status of donorStatusList" [value]="status">{{status}}</mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-slide-toggle name="isBigDonor" [(ngModel)]="donor.isBigDonor"> Is Big Donor</mat-slide-toggle>
+  <mat-slide-toggle name="isBigDonor" [disabled]="readonly" [(ngModel)]="donor.isBigDonor"> Is Big Donor
+  </mat-slide-toggle>
 </form>
