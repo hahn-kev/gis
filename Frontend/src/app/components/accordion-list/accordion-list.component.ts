@@ -6,6 +6,7 @@ import { NgForm } from '@angular/forms';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { BaseEntity } from '../../classes/base-entity';
 import { AccordionListHeaderDirective } from './accordion-list-header.directive';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-accordion-list',
@@ -22,8 +23,8 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   @Input() items: T[] = [];
   @Output() itemsChange = new EventEmitter<T[]>();
 
-  @Input() save: (item: T) => Promise<T>;
-  @Input() delete: (item: T) => Promise<boolean>;
+  @Input() save: (item: T) => Promise<T> | Observable<T>;
+  @Input() delete: (item: T) => Promise<boolean> | Observable<boolean>;
   @ViewChildren(MatExpansionPanel) expansionPanels: QueryList<MatExpansionPanel>;
   newForm: AccordionListFormDirective<T>;
   forms: AccordionListFormDirective<T>[] = [];
@@ -40,7 +41,9 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
       'Delete',
       'Cancel');
     if (!result) return;
-    await this.delete(item);
+    let deleteResult = this.delete(item);
+    if ('toPromise' in deleteResult) deleteResult = deleteResult.toPromise();
+    await deleteResult;
     if ('id' in item) {
       this.itemsChange.emit(this.items.filter(value => value.id != item.id));
     }
@@ -48,12 +51,15 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   }
 
   async onSave(item: T, panel: MatExpansionPanel, form: NgForm, isNew = false) {
-    item = await this.save(item);
+    let saveResult = this.save(item);
+    if ('toPromise' in saveResult) saveResult = saveResult.toPromise();
+    item = await saveResult;
     this.snackBar.open(`${this.itemTitle} ${isNew ? 'Added' : 'Saved'}`, null, {duration: 2000});
     panel.close();
     if (isNew) {
-      form.resetForm();
       this.itemsChange.emit([...this.items, item]);
+      this.newItem = this.createNewItem();
+      form.resetForm();
     }
   }
 
