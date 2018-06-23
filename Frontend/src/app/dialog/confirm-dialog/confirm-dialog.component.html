@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>{{data.title}}</h2>
 <mat-dialog-actions>
-  <button (click)="reject()" mat-button>{{data.rejectText}}</button>
+  <button *ngIf="data.rejectText" (click)="reject()" mat-button>{{data.rejectText}}</button>
   <button color="primary" [mat-dialog-close]="true" mat-button>{{data.acceptText}}</button>
 </mat-dialog-actions>

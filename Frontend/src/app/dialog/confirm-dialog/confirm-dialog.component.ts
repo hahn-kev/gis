@@ -11,7 +11,7 @@ export class ConfirmDialogComponent {
     return {title: title, acceptText: acceptText, rejectText: rejectText};
   }
 
-  static OpenWait(dialog: MatDialog, title: string, acceptText: string, rejectText: string): Promise<boolean> {
+  static OpenWait(dialog: MatDialog, title: string, acceptText: string, rejectText: string = null): Promise<boolean> {
     return dialog.open(ConfirmDialogComponent, {data: {title: title, acceptText: acceptText, rejectText: rejectText}})
       .afterClosed()
       .toPromise();
