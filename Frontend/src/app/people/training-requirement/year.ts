@@ -2,6 +2,7 @@ import * as moment from 'moment';
 import { MomentInput } from 'moment';
 
 export class Year {
+  //month in base 1 for months
   static readonly schoolStartMonth = 7;
   static readonly schoolEndMonth = 6;
 
@@ -30,6 +31,12 @@ export class Year {
     return Year.yearName(Year.schoolYear(date));
   }
 
+  static dateRangeIntersectsWithYear(startDate: MomentInput, endDate: MomentInput | null, year: number) {
+    if (endDate == null) return Year.endOfYear(year).isAfter(startDate);
+    if (Year.startOfYear(year).isBetween(startDate, endDate)) return true;
+    return Year.endOfYear(year).isBetween(startDate, endDate);
+  }
+
   static yearName(year: number) {
     year -= 2000;
     if (year < 9) {
@@ -41,17 +48,25 @@ export class Year {
     }
   }
 
+  static startOfYear(year: number) {
+    return moment(new Date(year, Year.schoolStartMonth + 1, 1));
+  }
+
+  static endOfYear(year: number) {
+    return moment(new Date(year + 1, Year.schoolEndMonth + 1, 30));
+  }
+
   constructor(public value: number, public name?: string) {
   }
 
   get startOfYear() {
-    //month is 0 based, 7 is august
-    return new Date(this.value, 7, 1);
+    //month is 0 based
+    return new Date(this.value, Year.schoolStartMonth + 1, 1);
   }
 
   get endOfYear() {
-    //month is 0 based, 4 is may
-    return new Date(this.value + 1, 4, 31);
+    //month is 0 based
+    return new Date(this.value + 1, Year.schoolEndMonth + 1, 30);
   }
 
   convertToSchoolYear(date: MomentInput) {

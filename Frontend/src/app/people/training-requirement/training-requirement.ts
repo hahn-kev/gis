@@ -1,4 +1,5 @@
 import { BaseEntity } from '../../classes/base-entity';
+import { JobType } from '../../job/job';
 
 export enum TrainingScope {
   AllStaff = 'AllStaff',
@@ -10,6 +11,7 @@ export class TrainingRequirement extends BaseEntity {
   public firstYear: number;
   public lastYear: number;
   public scope: TrainingScope;
+  public jobScope: JobType[];
   public departmentId: string;
   public renewMonthsCount: number;
   public ownerId: string;

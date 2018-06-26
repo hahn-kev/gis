@@ -5,9 +5,10 @@ import { combineLatest, Observable } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
-import { StaffWithName } from '../staff';
-import { OrgGroup } from 'app/people/groups/org-group';
+import { StaffWithRoles } from '../staff';
+import { OrgGroup, OrgGroupWithSupervisor } from 'app/people/groups/org-group';
 import { GroupService } from 'app/people/groups/group.service';
+import { Year } from './year';
 
 @Injectable()
 export class TrainingRequirementService {
@@ -72,7 +73,8 @@ export class TrainingRequirementService {
       }).toPromise();
   }
 
-  buildRequirementsWithStaff(staffObservable: Observable<StaffWithName[]>,
+  buildRequirementsWithStaff(staffObservable: Observable<StaffWithRoles[]>,
+                             orgGroupsObservable: Observable<OrgGroupWithSupervisor[]>,
                              requirementsObservable: Observable<TrainingRequirement[]>,
                              staffTrainingObservable: Observable<Map<string, StaffTraining>>,
                              yearObservable: Observable<number>,
@@ -82,7 +84,7 @@ export class TrainingRequirementService {
       requirementsObservable,
       yearObservable,
       showCompletedObservable,
-      Observable.of([]))
+      orgGroupsObservable)
       .pipe(
         debounceTime(20),
         map(([staffTraining, staff, requirements, year, showCompleted, orgGroups]) => {
@@ -94,8 +96,11 @@ export class TrainingRequirementService {
                 staffTraining,
                 orgGroups,
                 showCompleted,
-                requirement))
-            .filter((requirement, i, a) => showCompleted ? true : (requirement.staffsWithTraining.length > 0));
+                requirement,
+                year))
+            .filter((requirement, i, a) => requirement.totalStaff > 0 && showCompleted ?
+              true :
+              (requirement.staffsWithTraining.length > 0));
         }));
   }
 
@@ -104,15 +109,21 @@ export class TrainingRequirementService {
     return requirement.firstYear <= year && (!requirement.lastYear || requirement.lastYear >= year);
   }
 
-  buildRequirementWithStaff(staff: StaffWithName[],
+  buildRequirementWithStaff(staff: StaffWithRoles[],
                             staffTraining: Map<string, StaffTraining>,
                             orgGroups: OrgGroup[],
                             showCompleted: boolean,
-                            requirement: TrainingRequirement): RequirementWithStaff {
-    const training = staff.filter(this.isInOrgGroup.bind(this, orgGroups, requirement))
-      .map(staffMember => new StaffWithTraining(staffMember, staffTraining.get(staffMember.id + '_' + requirement.id)))
-      .filter(this.filterCompletedTraining.bind(this, showCompleted));
-    return new RequirementWithStaff(requirement, training, staff.length);
+                            requirement: TrainingRequirement,
+                            year: number): RequirementWithStaff {
+    const trainingForStaff = staff
+      .map(staffMember => new StaffWithTraining(staffMember,
+        staffTraining.get(staffMember.staffWithName.id + '_' + requirement.id)))
+      .filter(this.matchesTrainingSpecs.bind(this, orgGroups, requirement, year));
+    const trainingFilteredByComplete = trainingForStaff.filter(this.filterCompletedTraining.bind(this, showCompleted));
+    return new RequirementWithStaff(requirement,
+      trainingFilteredByComplete,
+      orgGroups.find(value => value.id == requirement.departmentId),
+      trainingForStaff.length);
   }
 
   filterCompletedTraining(showCompleted: boolean, staffTraining: StaffWithTraining) {
@@ -120,15 +131,31 @@ export class TrainingRequirementService {
     return staffTraining.training.completedDate == null;
   }
 
+  matchesTrainingSpecs(orgGroups: OrgGroup[] | Map<string, OrgGroup>,
+                       requirement: TrainingRequirement,
+                       year: number,
+                       staff: StaffWithTraining) {
+    if (requirement.jobScope && requirement.jobScope.length > 0) {
+      if (!requirement.jobScope.some(value => staff.roles.some(role => role.job.type == value))) return false;
+      if (!staff.roles.some(role => Year.dateRangeIntersectsWithYear(role.startDate, role.endDate, year))) return false;
+    }
+    return this.isInOrgGroup(orgGroups, requirement, staff);
+  }
+
   isInOrgGroup(orgGroups: OrgGroup[] | Map<string, OrgGroup>,
                requirement: TrainingRequirement,
-               staff: StaffWithName): boolean {
+               staff: StaffWithTraining): boolean {
     if (requirement.scope !== 'Department') {
       return true;
     }
     if (requirement.departmentId == null) {
       throw new Error('training requirement corupt, missing department id');
     }
-    return this.groupService.isChildOf(staff.orgGroupId, requirement.departmentId, orgGroups);
+    if (staff.roles.length > 0) {
+      for (let role of staff.roles) {
+        if (this.groupService.isChildOf(role.job.orgGroupId, requirement.departmentId, orgGroups)) return true;
+      }
+    }
+    return this.groupService.isChildOf(staff.staff.orgGroupId, requirement.departmentId, orgGroups);
   }
 }

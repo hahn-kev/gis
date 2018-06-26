@@ -41,6 +41,16 @@
               <mat-icon mat-list-icon>done_all</mat-icon>
               Complete Selected
             </button>
+            <span style="padding-left: 8px;">
+              <ng-container *ngIf="reqObj.requirement.jobScope?.length > 0">
+                Job Scope: [
+              <ng-container *ngFor="let jobType of reqObj.requirement.jobScope; let last = last">{{(jobType | titleCase) + (last ? '' :', ')}}</ng-container>
+                ]
+              </ng-container>
+              <ng-container *ngIf="reqObj.orgGroup">
+                Department: {{reqObj.orgGroup?.groupName}}
+              </ng-container>
+            </span>
             <span class="spacer"></span>
             <mat-form-field>
               <input name="completedDate" matInput

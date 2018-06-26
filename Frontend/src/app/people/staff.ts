@@ -1,4 +1,5 @@
 import { BaseEntity } from '../classes/base-entity';
+import { RoleWithJob } from './role';
 
 export class Staff extends BaseEntity {
   public email: string;
@@ -42,4 +43,9 @@ export class StaffWithOrgName extends Staff {
   public missionOrgEmail: string;
   public orgGroupName: string;
   public orgGroupSupervisor: string;
+}
+
+export class StaffWithRoles {
+  staffWithName: StaffWithName;
+  personRolesWithJob: RoleWithJob[];
 }

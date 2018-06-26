@@ -8,6 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, pluck, share } from 'rxjs/operators';
 import { PersonService } from '../../person.service';
 import * as moment from 'moment';
+import { GroupService } from '../../groups/group.service';
 
 @Component({
   selector: 'app-training-report',
@@ -27,6 +28,7 @@ export class TrainingReportComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private trainingService: TrainingRequirementService,
               private personService: PersonService,
+              private orgGroupService: GroupService,
               private router: Router) {
     this.years = Year.years();
     this.selectedYearSubject = new BehaviorSubject(null);
@@ -42,11 +44,13 @@ export class TrainingReportComponent implements OnInit {
     this.route.queryParamMap.pipe(map(params => {
       return params.has('showCompleted') ? params.get('showCompleted') == 'true' : true;
     })).subscribe(this.showCompleted);
-    let staff = this.personService.getStaff().pipe(share());
+    let groups = this.orgGroupService.getAll().pipe(share());
+    let staff = this.personService.getStaffWithRoles().pipe(share());
     let trainingRequirements = this.trainingService.list().pipe(share());
 
     this.route.data.pipe(pluck('staffTraining')).subscribe(this.staffTraining);
     this.requirementsWithStaff = this.trainingService.buildRequirementsWithStaff(staff,
+      groups,
       trainingRequirements,
       this.staffTraining.asObservable(),
       this.selectedYearSubject.pipe(pluck('value')),

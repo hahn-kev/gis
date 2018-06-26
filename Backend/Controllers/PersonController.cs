@@ -114,6 +114,13 @@ namespace Backend.Controllers
             return _personService.StaffSummaries.ForEach(p => p?.Staff.RemoveSalary());
         }
 
+        [HttpGet("staff/roles")]
+        [Authorize(Policy = "staff")]
+        public IList<StaffWithRoles> StaffWithRoles()
+        {
+            return _personService.StaffWithRoles.ForEach(p => p?.StaffWithName.RemoveSalary());
+        }
+
         [HttpGet("{personId}/emergency")]
         [Authorize(Policy = "contact")]
         public IList<EmergencyContactExtended> GetEmergencyContacts(Guid personId)

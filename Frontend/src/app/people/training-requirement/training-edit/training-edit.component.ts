@@ -8,6 +8,7 @@ import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-d
 import { BaseEditComponent } from '../../../components/base-edit-component';
 import { Person } from '../../person';
 import { OrgGroup } from '../../groups/org-group';
+import { JobType } from '../../../job/job';
 
 @Component({
   selector: 'app-training-edit',
@@ -15,6 +16,7 @@ import { OrgGroup } from '../../groups/org-group';
   styleUrls: ['./training-edit.component.scss']
 })
 export class TrainingEditComponent extends BaseEditComponent implements OnInit {
+  public jobTypes = Object.keys(JobType);
   public training: TrainingRequirement;
   public years: Year[];
   public people: Person[];

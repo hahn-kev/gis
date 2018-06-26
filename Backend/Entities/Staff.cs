@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LinqToDB.Mapping;
 
 namespace Backend.Entities
@@ -58,5 +59,11 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public Guid? OrgGroupSupervisor { get; set; }
+    }
+
+    public class StaffWithRoles
+    {
+        public StaffWithName StaffWithName { get; set; }
+        public IList<PersonRoleWithJob> PersonRolesWithJob { get; set; }
     }
 }

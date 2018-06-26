@@ -169,6 +169,20 @@ namespace Backend.DataLayer
                     Job = job
                 }).OrderByDescending(job => job.StartDate);
 
+        public IList<StaffWithRoles> StaffWithRoles
+        {
+            get
+            {
+                var lookup = PersonRolesWithJob.ToLookup(job => job.PersonId);
+                return StaffWithNames.Select(staff => new StaffWithRoles
+                    {
+                        StaffWithName = staff,
+                        PersonRolesWithJob = lookup[staff.PersonId].ToList()
+                    }
+                ).ToList();
+            }
+        }
+
         public IQueryable<Staff> Staff => _dbConnection.Staff;
 
         public IQueryable<StaffWithName> StaffWithNames =>
@@ -264,6 +278,7 @@ namespace Backend.DataLayer
                     .OrderBy(d => d.Date)
                     .ToList();
             }
+
             person.Roles = GetPersonRolesWithJob(id).ToList();
             person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
                 .OrderBy(contact => contact.ContactPreferedName).ToList();

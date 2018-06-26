@@ -38,6 +38,7 @@ namespace Backend.Services
 
         public void Save(TrainingRequirement entity)
         {
+            if (entity.Scope == TrainingScope.AllStaff) entity.DepartmentId = null;
             _entityService.Save(entity);
         }
 
