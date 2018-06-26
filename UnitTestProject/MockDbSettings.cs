@@ -14,7 +14,7 @@ namespace UnitTestProject
 
         public string DefaultConfiguration => "SqlLite";
 
-        public string DefaultDataProvider => ProviderName.SQLiteMS;
+        public string DefaultDataProvider => nameof(MyDataProvider);
 
         public IEnumerable<IConnectionStringSettings> ConnectionStrings
         {

@@ -12,6 +12,9 @@ using Bogus;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Identity;
+using LinqToDB.Linq;
+using LinqToDB.Reflection;
+using LinqToDB.SqlQuery;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -72,6 +75,7 @@ namespace UnitTestProject
             }));
 
             configure?.Invoke(ServiceCollection);
+            DataConnection.AddDataProvider(nameof(MyDataProvider), new MyDataProvider());
             ServiceProvider = ServiceCollection.BuildServiceProvider();
             startup.ConfigureDatabase(ServiceProvider, new ConsoleLogger("db", (s, level) => true, false));
             DataConnection.DefaultSettings = new MockDbSettings();
@@ -116,6 +120,9 @@ namespace UnitTestProject
                 DbConnection.InsertId(
                     new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
+            
+            DbConnection.MappingSchema.SetConvertExpression<string, string[]>(s => s.Split(',', StringSplitOptions.RemoveEmptyEntries), true);
+            DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
         }
 
         private void TryCreateTable<T>()
@@ -142,7 +149,7 @@ namespace UnitTestProject
 
             var jacobDonor = AutoFaker.Generate<Donor>();
             jacob.DonorId = jacobDonor.Id;
-            
+
             Assert.Empty(_dbConnection.People);
             _dbConnection.Insert(jacob);
             _dbConnection.Insert(jacobWife);
@@ -173,7 +180,7 @@ namespace UnitTestProject
                 role.PersonId = jacob.Id;
                 role.JobId = jacobJob.Id;
             });
-            
+
             //endorsments
             var endorsement = AutoFaker.Generate<Endorsement>();
             _dbConnection.Insert(endorsement);
@@ -209,7 +216,8 @@ namespace UnitTestProject
             return new AutoFaker<JobWithOrgGroup>()
                 .RuleFor(job => job.OrgGroupId, Guid.NewGuid)
                 .RuleFor(
-                    job => job.OrgGroup, (faker, job) =>
+                    job => job.OrgGroup,
+                    (faker, job) =>
                     {
                         var org = AutoFaker.Generate<OrgGroup>();
                         org.Id = job.OrgGroupId;
@@ -362,7 +370,7 @@ namespace UnitTestProject
             evaluation.Evaluator = leaveApprover.Id;
             evaluation.RoleId = personRoles[0].Id;
             _dbConnection.Insert(evaluation);
-            
+
             _dbConnection.BulkCopy<Job>(jobs);
             _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();

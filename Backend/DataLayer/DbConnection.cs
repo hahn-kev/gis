@@ -49,6 +49,7 @@ namespace Backend.DataLayer
         void RollbackTransaction();
         BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list);
         System.Data.IDbConnection Connection { get; }
+        IDataProvider DataProvider { get; }
     }
 
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
