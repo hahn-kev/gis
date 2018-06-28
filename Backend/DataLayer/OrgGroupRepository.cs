@@ -18,6 +18,23 @@ namespace Backend.DataLayer
 
         public IQueryable<OrgGroup> OrgGroups => _connection.OrgGroups;
 
+        public IQueryable<OrgGroup> GetByIdWithChildren(Guid? id)
+        {
+            return _connection.GetCte<OrgGroup>(parents =>
+            {
+                return (
+                        from orgGroup in OrgGroups
+                        where id.HasValue ? orgGroup.Id == id.Value : orgGroup.ParentId == null
+                        select orgGroup
+                    )
+                    .Union(
+                        from orgGroup in OrgGroups
+                        from parent in parents.InnerJoin(parent => parent.Id == orgGroup.ParentId)
+                        select orgGroup
+                    );
+            });
+        }
+
         public IQueryable<OrgGroupWithSupervisor> OrgGroupsWithSupervisor =>
             from orgGroup in OrgGroups
             from person in _personRepository.PeopleWithStaff

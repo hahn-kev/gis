@@ -4,6 +4,7 @@ using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
+using LinqToDB.Tools;
 
 namespace Backend.Services
 {
@@ -46,34 +47,21 @@ namespace Backend.Services
 
         public OrgTreeData OrgTreeData(Guid? groupId = null)
         {
+            var orgGroups = _orgGroupRepository.GetByIdWithChildren(groupId);
+
+            var jobs = from job in _jobRepository.Job
+                from orgGroup in orgGroups.InnerJoin(g => g.Id == job.OrgGroupId)
+                select job;
             var data = new OrgTreeData
             {
-                Groups = OrgGroups
+                Groups = (from orgGroup in _orgGroupRepository.OrgGroupsWithSupervisor
+                    where orgGroup.Id.In(orgGroups.Select(g => g.Id))
+                    select orgGroup).ToList(),
+                Jobs = jobs.ToList(),
+                Roles = (from role in _jobRepository.PersonRolesExtended
+                    from job in jobs.InnerJoin(job => job.Id == role.JobId)
+                    select role).ToList()
             };
-            if (groupId.HasValue)
-            {
-                var orgIds = new HashSet<Guid>(new[] {groupId.Value});
-                int oldCount;
-                do
-                {
-                    oldCount = orgIds.Count;
-                    orgIds.UnionWith(data.Groups
-                        .Where(org => org.ParentId.HasValue && orgIds.Contains(org.ParentId.Value))
-                        .Select(org => org.Id));
-                } while (oldCount < orgIds.Count);
-
-                data.Groups = data.Groups.FindAll(org => orgIds.Contains(org.Id));
-                data.Jobs = _jobRepository.Job
-                    .Where(job => orgIds.Contains(job.OrgGroupId)).ToList();
-                var jobIds = data.Jobs.Select(job => job.Id).ToList();
-                data.Roles = _jobRepository.PersonRolesExtended
-                    .Where(role => jobIds.Contains(role.JobId)).ToList();
-            }
-            else
-            {
-                data.Jobs = _jobRepository.Job.ToList();
-                data.Roles = _jobRepository.PersonRolesExtended.ToList();
-            }
 
             return data;
         }
