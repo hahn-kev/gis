@@ -39,9 +39,8 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
-  listPeopleWithLeave(listAll: boolean): Observable<PersonAndLeaveDetails[]> {
-    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people',
-      {params: {listAll: listAll ? 'true' : 'false'}});
+  listPeopleWithLeave(): Observable<PersonAndLeaveDetails[]> {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people');
   }
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {

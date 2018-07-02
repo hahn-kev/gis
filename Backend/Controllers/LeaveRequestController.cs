@@ -106,14 +106,10 @@ namespace Backend.Controllers
 
 
         [HttpGet("people")]
-        public IList<PersonAndLeaveDetails> PeopleWithLeave(bool listAll = false)
+        [Authorize(Policy = "leaveRequest")]
+        public IList<PersonAndLeaveDetails> PeopleWithLeave()
         {
-            if (listAll && !User.IsAdminOrHr())
-                throw new UnauthorizedAccessException("Only admin and hr users are allowed to see all leave");
-            return _leaveService.PeopleWithCurrentLeave(listAll
-                ? (Guid?) null
-                : (User.PersonId() ??
-                   throw new AuthenticationException("If user isn't admin or hr they must have a personId")));
+            return _leaveService.PeopleWithCurrentLeave(null);
         }
     }
 }
