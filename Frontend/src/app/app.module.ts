@@ -2,7 +2,6 @@
 import { FormsModule } from '@angular/forms';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserComponent } from './user/user.component';
@@ -192,10 +191,6 @@ if (environment.production) {
     RenderTemplateBottomSheetComponent
   ],
   imports: [
-    LocalStorageModule.withConfig({
-      prefix: 'app',
-      storageType: 'localStorage'
-    }),
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,
