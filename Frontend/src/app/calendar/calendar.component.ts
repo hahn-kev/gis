@@ -18,11 +18,11 @@ export class CalendarComponent implements OnInit {
   month: Moment;
 
   constructor(private leaveService: LeaveRequestService) {
+    this.month = moment().date(1);
     this.leaveService.list().subscribe(value => {
       this.groupLeaveRequestsByDate(value);
       this.generateModel();
     });
-    this.month = moment().date(1);
   }
 
   groupLeaveRequestsByDate(leaveRequests: LeaveRequestWithNames[]) {
@@ -30,7 +30,9 @@ export class CalendarComponent implements OnInit {
     this.leaveRequests = new Map<string, LeaveRequestWithNames[]>();
     for (let req of leaveRequests) {
       let startDate = moment(req.startDate);
-      for (let i = 0; i < req.days; i++) {
+      let endDate = moment(req.endDate);
+      let days = endDate.diff(startDate, 'd') + 1;
+      for (let i = 0; i < days; i++) {
         let date = startDate.clone().add(i, 'days').format(this.FORMAT);
         if (this.leaveRequests.has(date)) {
           this.leaveRequests.get(date).push(req);
@@ -42,11 +44,20 @@ export class CalendarComponent implements OnInit {
   }
 
   generateModel() {
-
-    this.models = new Array(this.month.daysInMonth());
-    for (let i = 1; i <= this.month.daysInMonth(); i++) {
-      let date = this.month.clone().date(i);
-      this.models[i - 1] = new DateModel<LeaveRequestWithNames>(date, this.leaveRequests.get(date.format(this.FORMAT)) || []);
+    let rows = 5;
+    let columns = 7;
+    let monthStartWeekday = this.month.weekday();
+    //calculate if we need an extra row for this month
+    if (monthStartWeekday + (this.month.daysInMonth() % 7) > 7) {
+      rows++;
+    }
+    let offset = monthStartWeekday;
+    this.models = new Array(rows * columns);
+    for (let i = 1; i <= this.models.length; i++) {
+      let date = this.month.clone().date(i - offset);
+      this.models[i - 1] = new DateModel<LeaveRequestWithNames>(date,
+        this.leaveRequests.get(date.format(this.FORMAT)) || [],
+        this.month.month() == date.month());
     }
   }
 
