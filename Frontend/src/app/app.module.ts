@@ -2,7 +2,6 @@
 import { FormsModule } from '@angular/forms';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserComponent } from './user/user.component';
@@ -124,6 +123,7 @@ import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { IsUserPolicyPipe } from './services/auth/is-user-policy.pipe';
 import { PolicyGuard } from './services/auth/policy.guard';
 import { DonationComponent } from './people/person/donor/donation.component';
+import { CalendarComponent } from './calendar/calendar.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -189,9 +189,9 @@ if (environment.production) {
     TitleCasePipe,
     EndorsementListComponent,
     EndorsementComponent,
-    IsUserPolicyPipe
-    ,
-    DonationComponent
+    IsUserPolicyPipe,
+    DonationComponent,
+    CalendarComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
@@ -200,10 +200,6 @@ if (environment.production) {
     RenderTemplateBottomSheetComponent
   ],
   imports: [
-    LocalStorageModule.withConfig({
-      prefix: 'app',
-      storageType: 'localStorage'
-    }),
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,

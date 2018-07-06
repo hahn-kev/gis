@@ -63,6 +63,7 @@ import { EndorsementListResolverService } from './endorsement/endorsement-list-r
 import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { EndorsementResolverService } from './endorsement/endorsement-resolver.service';
 import { PolicyGuard } from './services/auth/policy.guard';
+import { CalendarComponent } from './calendar/calendar.component';
 
 const routes: Routes = [
   {
@@ -412,6 +413,10 @@ const routes: Routes = [
             }
           }
         ]
+      },
+      {
+        path: 'calendar',
+        component: CalendarComponent
       },
       {
         path: 'self',

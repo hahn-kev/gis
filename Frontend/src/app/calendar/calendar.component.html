@@ -1,0 +1,28 @@
+<ng-container *appTemplateContent="'title'">Calendar</ng-container>
+<ng-container *appToolbarContent>
+  <div class="month-nav">
+    <button mat-icon-button (click)="incrementMonth(-1)">
+      <mat-icon>navigate_before</mat-icon>
+    </button>
+    <span>{{month.format('MMMM YY')}}</span>
+    <button mat-icon-button (click)="incrementMonth(1)">
+      <mat-icon>navigate_next</mat-icon>
+    </button>
+  </div>
+</ng-container>
+
+<div class="cal-table" id="calendar">
+  <span>Sunday</span>
+  <span>Monday</span>
+  <span>Tuesday</span>
+  <span>Wednesday</span>
+  <span>Thursday</span>
+  <span>Friday</span>
+  <span>Saturday</span>
+  <div *ngFor="let model of models" class="date-cell">
+    <ng-container *ngIf="model.dayOfMonth == 1">{{model.monthName}}</ng-container>
+    {{model.dayOfMonth}}
+    <a class="mat-link" [routerLink]="'/leave-request/edit/' + req.id" style="display: block"
+       *ngFor="let req of model.items">{{req.requesterName}} | Type: {{req.type}}</a>
+  </div>
+</div>

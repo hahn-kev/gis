@@ -75,6 +75,10 @@
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
             <ng-container *appTemplateContent="'sidenav:hr'">
+              <a mat-list-item routerLink="/calendar" routerLinkActive="active-link">
+                <mat-icon mat-list-icon>date_range</mat-icon>
+                <span mat-line>Calendar</span>
+              </a>
               <a mat-list-item routerLink="/staff/report" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>business</mat-icon>
                 <span mat-line>Staff</span>
@@ -170,6 +174,10 @@
             <a mat-list-item routerLink="/user/admin" routerLinkActive="active-link">
               <mat-icon mat-list-icon>face</mat-icon>
               <a mat-line>User Managment</a>
+            </a>
+            <a mat-list-item routerLink="/calendar" routerLinkActive="active-link">
+              <mat-icon mat-list-icon>date</mat-icon>
+              <a mat-line>Leave Calendar</a>
             </a>
             <a mat-list-item *ngIf="isDev" routerLink="/sandbox" routerLinkActive="active-link">Sandbox</a>
           </ng-container>

@@ -11,7 +11,7 @@
 
   @media (min-width: 320px * $number-of-cards + $spacing * 3) {
     //grid mode
-    min-height: 100%;
+    //min-height: 100%;
     align-content: center;
     justify-content: space-evenly;
     grid-template-columns: auto;
