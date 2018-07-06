@@ -30,6 +30,7 @@ import { EvaluationComponent } from './evaluation/evaluation.component';
 import { LoginService } from '../../services/auth/login.service';
 import { first } from 'rxjs/internal/operators';
 import { Donor } from '../donor';
+import { NavigationExtras } from '@angular/router/src/router';
 
 @Component({
   selector: 'app-person',
@@ -178,18 +179,20 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   }
 
   async save(): Promise<void> {
+    let extras: NavigationExtras = {};
     let savedPerson = await this.personService.updatePerson(this.person, this.isSelf);
     this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
     let commands: Array<any> = ['/people/list'];
     if (this.isNew) {
       commands = ['people', 'edit', savedPerson.id];
+      extras.replaceUrl = true;
     } else if (this.isSelf) {
       commands = ['home'];
     } else {
       this.location.back();
       return;
     }
-    this.router.navigate(commands);
+    this.router.navigate(commands, extras);
   }
 
   async deletePerson() {
