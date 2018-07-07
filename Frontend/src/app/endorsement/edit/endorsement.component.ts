@@ -39,7 +39,7 @@ export class EndorsementComponent extends BaseEditComponent implements OnInit {
   }
 
   async deleteEndorsement() {
-    let result = await ConfirmDialogComponent.OpenWait(this.dialog, 'Delete Endorsement?', 'Delete', 'Cancel');
+    let result = await ConfirmDialogComponent.OpenWait(this.dialog, 'Delete Certification?', 'Delete', 'Cancel');
     if (!result) return;
     await this.endorsementService.deleteEndorsement(this.endorsement.id).toPromise();
     this.location.back();

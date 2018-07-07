@@ -637,8 +637,8 @@
       [createNewItem]="createNewStaffEndorsement"
       [save]="saveStaffEndorsement"
       [delete]="deleteStaffEndorsement"
-      title="Endorsements"
-      itemTitle="Endorsement">
+      title="Certifications"
+      itemTitle="Certification">
       <ng-container *appAccordionListHeader="let item">
         <mat-panel-title>{{item.endorsementName}}</mat-panel-title>
         <mat-panel-description>{{item.agency}}{{(item.endorsementDate && item.agency) ? ':' : ''}}
@@ -650,7 +650,7 @@
           <mat-form-field>
             <mat-select name="endorsement"
                         [required]="true"
-                        placeholder="Endorsement"
+                        placeholder="Certification"
                         [(ngModel)]="item.endorsementId">
               <mat-option [value]="null">None</mat-option>
               <mat-option *ngFor="let endorsement of (endorsements | async)"
@@ -664,7 +664,7 @@
           <mat-form-field>
             <input name="endorsementDate" matInput [(ngModel)]="item.endorsementDate"
                    [matDatepicker]="endorsementDatePicker"
-                   placeholder="Endorsement Date">
+                   placeholder="Certification Date">
             <mat-datepicker-toggle matSuffix [for]="endorsementDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #endorsementDatePicker></mat-datepicker>
           </mat-form-field>

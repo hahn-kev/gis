@@ -94,8 +94,8 @@
     </mat-accordion>
   </div>
   <app-accordion-list [(items)]="job.requiredEndorsements"
-                      title="Required Endorsements"
-                      itemTitle="Required Endorsement"
+                      title="Required Certifications"
+                      itemTitle="Required Certification"
                       [createNewItem]="createNewRequiredEndorsement"
                       [save]="saveRequiredEndorsement"
                       [delete]="deleteRequiredEndorsement">
@@ -106,7 +106,8 @@
     <ng-container *appAccordionListContent="let item;">
       <form appAccordionListForm>
         <mat-form-field>
-          <mat-select [(ngModel)]="item.endorsementId" [required]="true" placeholder="Endorsement" name="endorsementId">
+          <mat-select [(ngModel)]="item.endorsementId" [required]="true" placeholder="Certification"
+                      name="endorsementId">
             <mat-option [value]="null">None</mat-option>
             <mat-option *ngFor="let endorsement of (endorsements | async)"
                         [value]="endorsement.id"

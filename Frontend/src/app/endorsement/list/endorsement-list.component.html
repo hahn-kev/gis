@@ -1,4 +1,4 @@
-<ng-container *appTemplateContent="'title'">Endorsements ({{dataSource.filteredData.length}})</ng-container>
+<ng-container *appTemplateContent="'title'">Certifications ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
   <button mat-icon-button>
     <mat-icon>search</mat-icon>
@@ -9,7 +9,7 @@
            (keyup)="urlBinding.values.search = $event.target.value"
            placeholder="Search">
   </mat-form-field>
-  <app-export-button [values]="dataSource" fileName="endorsementData"></app-export-button>
+  <app-export-button [values]="dataSource" fileName="certificationsData"></app-export-button>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="name">
@@ -25,7 +25,7 @@
            [routerLink]="'/endorsement/edit/' + row.id"></mat-row>
 </mat-table>
 
-<a routerLink="/endorsement/edit/new" class="add-button" mat-fab matTooltip="Add new Endorsement"
+<a routerLink="/endorsement/edit/new" class="add-button" mat-fab matTooltip="Add new Certification"
    matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>
