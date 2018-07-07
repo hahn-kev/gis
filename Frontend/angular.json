@@ -58,7 +58,6 @@
           "options": {
             "browserTarget": "frontend:build",
             "port": 4201,
-            "aot": true,
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
