@@ -4,21 +4,26 @@ import { LeaveRequestWithNames } from '../people/leave-request/leave-request';
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { DateModel } from './date-model';
+import { UrlBindingService } from '../services/url-binding.service';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.scss']
+  styleUrls: ['./calendar.component.scss'],
+  providers: [UrlBindingService]
 })
 export class CalendarComponent implements OnInit {
   readonly FORMAT = 'M-D-YYYY';
+  readonly URL_FORMAT = 'M-YYYY';
   // noinspection TypeScriptUnresolvedVariable
   leaveRequests: Map<string, LeaveRequestWithNames[]>;
   models: DateModel<LeaveRequestWithNames>[];
   month: Moment;
 
-  constructor(private leaveService: LeaveRequestService) {
-    this.month = moment().date(1);
+  constructor(private leaveService: LeaveRequestService, private urlBinding: UrlBindingService<{ date: string }>) {
+    this.urlBinding.addParam('date', moment().format(this.URL_FORMAT))
+      .subscribe(value => this.month = moment(value, this.URL_FORMAT));
+    this.urlBinding.loadFromParams();
     this.leaveService.list().subscribe(value => {
       this.groupLeaveRequestsByDate(value);
       this.generateModel();
@@ -63,6 +68,7 @@ export class CalendarComponent implements OnInit {
 
   incrementMonth(amount: number) {
     this.month.add(amount, 'month');
+    this.urlBinding.values.date = this.month.format(this.URL_FORMAT);
     this.generateModel();
   }
 
