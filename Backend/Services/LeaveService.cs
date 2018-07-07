@@ -325,16 +325,19 @@ namespace Backend.Services
 
             //calculation for vacation time is done here
             var totalServiceTime = TimeSpan.Zero;
+            var jobStatusWithLeave = new[] {JobStatus.FullTime, JobStatus.HalfTime, JobStatus.FullTime10Mo};
             foreach (var role in personRoles)
             {
                 if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
                     role.Active) return 20;
-                if (role.Job.Status == JobStatus.FullTime || role.Job.Status == JobStatus.HalfTime)
+                if (role.Job.Status.HasValue && jobStatusWithLeave.Contains(role.Job.Status.Value))
                     totalServiceTime = totalServiceTime + role.LengthOfService();
             }
 
             //no time has been spent as staff or a director, therefore no vacation time is allowed
             if (totalServiceTime == TimeSpan.Zero) return 0;
+            //todo pick cut off and days to count out of
+            if (totalServiceTime.Days < 300) return (int) Math.Truncate(totalServiceTime.Days / 365m * 10);
             var yearsOfService = totalServiceTime.Days / 365;
             if (yearsOfService < 10) return 10;
             if (yearsOfService < 20) return 15;
