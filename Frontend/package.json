@@ -34,7 +34,6 @@
     "moment": "2.22.2",
     "moment-business": "^3.0.1",
     "ng-gapi": "0.0.50",
-    "ngx-clipboard": "^10.0.0",
     "ngx-cookie": "^3.0.1",
     "raven-js": "3.24.2",
     "rxjs": "6.2.1",

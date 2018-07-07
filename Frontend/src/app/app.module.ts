@@ -48,7 +48,6 @@ import { ToolbarContentDirective } from './toolbar/toolbar-content.directive';
 import { AppTemplateService } from './toolbar/app-template.service';
 import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { configureSettings, SettingsService } from './services/settings.service';
-import { ClipboardModule } from 'ngx-clipboard';
 import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { MessageComponent } from './message/message.component';
 import { CookieModule } from 'ngx-cookie';
@@ -235,7 +234,6 @@ if (environment.production) {
     MatBadgeModule,
     FormsModule,
     AppRoutingModule,
-    ClipboardModule,
     CookieModule.forRoot(),
     GoogleApiModule.forRoot({
       provide: NG_GAPI_CONFIG,
