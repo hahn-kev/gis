@@ -24,6 +24,7 @@ namespace Backend.Entities
         public Guid? PersonId { get; set; }
         public string PersonName { get; set; }
         public List<string> Roles { get; set; } = new List<string>(0);
+        public bool SendHrLeaveEmails { get; set; }
     }
 
     public interface IUser
@@ -34,18 +35,21 @@ namespace Backend.Entities
         string PhoneNumber { get; set; }
         bool ResetPassword { get; set; }
         Guid? PersonId { get; set; }
+        bool SendHrLeaveEmails { get; set; }
     }
 
     public static class UserExtensions
     {
         public static T CopyFrom<T>(this T user, IUser from) where T : IUser
         {
+            //todo write unit test for this to make sure all new properties are covered
             if (from.Id != 0 && user.Id == 0)
                 user.Id = from.Id;
             user.UserName = from.UserName;
             user.Email = from.Email;
             user.PhoneNumber = from.PhoneNumber;
             user.ResetPassword = from.ResetPassword;
+            user.SendHrLeaveEmails = from.SendHrLeaveEmails;
             user.PersonId = from.PersonId;
             return user;
         }

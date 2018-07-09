@@ -182,7 +182,7 @@ namespace Backend.Services
                 $"{requestedBy.PreferredName} has requested leave",
                 EmailTemplate.NotifyHrLeaveRequest,
                 requestedBy,
-                _personRepository.GetHrAdminStaff());
+                _personRepository.GetStaffNotifyHr());
         }
 
         public bool ShouldNotifyHr(LeaveRequest leaveRequest, LeaveUsage leaveUsage)

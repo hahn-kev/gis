@@ -9,5 +9,6 @@ namespace Backend.Entities
     {
         public bool ResetPassword { get; set; }
         public Guid? PersonId { get; set; }
+        public bool SendHrLeaveEmails { get; set; }
     }
 }

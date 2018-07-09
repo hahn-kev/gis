@@ -26,34 +26,28 @@ export class UserService {
     } else if (isSelf) {
       return this.updateSelf(user, password);
     }
-    return this.http.put(`/api/user/${user.id}`, {
-      id: user.id,
-      password: password,
-      userName: user.userName,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      personId: user.personId
-    }, {responseType: 'text'}).toPromise();
+    return this.http.put(`/api/user/${user.id}`, this.userToPostBody(user, password), {responseType: 'text'})
+      .toPromise();
   }
 
   updateSelf(user: User, password: string): Promise<string> {
-    return this.http.put('/api/user/self', {
-      id: user.id,
-      password: password,
-      userName: user.userName,
-      phoneNumber: user.phoneNumber,
-      email: user.email
-    }, {responseType: 'text'}).toPromise();
+    return this.http.put('/api/user/self', this.userToPostBody(user, password), {responseType: 'text'}).toPromise();
   }
 
   registerUser(user: User, password: string): Promise<Object> {
-    return this.http.post<any>('/api/authenticate/register', {
+    return this.http.post<any>('/api/authenticate/register', this.userToPostBody(user, password)).toPromise();
+  }
+
+  private userToPostBody(user: User, password: string) {
+    return {
       password: password,
       userName: user.userName,
       phoneNumber: user.phoneNumber,
       email: user.email,
-      personId: user.personId
-    }).toPromise();
+      personId: user.personId,
+      resetPassword: user.resetPassword,
+      sendHrLeaveEmails: user.sendHrLeaveEmails
+    };
   }
 
   grantRole(role: string, id: number): Promise<string> {

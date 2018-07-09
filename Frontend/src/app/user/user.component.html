@@ -81,6 +81,10 @@
           </mat-select>
 
         </mat-form-field>
+        <mat-slide-toggle name="hrNotifications"
+                          [(ngModel)]="user.sendHrLeaveEmails">
+          Send HR Leave emails
+        </mat-slide-toggle>
       </ng-container>
 
 

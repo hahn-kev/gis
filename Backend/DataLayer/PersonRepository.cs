@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Backend.Entities;
 using LinqToDB;
 
@@ -299,6 +300,14 @@ namespace Backend.DataLayer
                 _dbConnection.Staff.Where(staff => staff.Id == staffId).Delete();
                 transaction.Commit();
             }
+        }
+
+        public IQueryable<PersonWithStaff> GetStaffNotifyHr()
+        {
+            return from person in PeopleWithStaff.Where(staff => staff.StaffId != null)
+                from user in _dbConnection.Users.InnerJoin(u => person.Id == u.PersonId)
+                where user.SendHrLeaveEmails
+                select person;
         }
 
         public IQueryable<PersonWithStaff> GetHrStaff()

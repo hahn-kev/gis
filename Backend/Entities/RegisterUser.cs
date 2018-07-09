@@ -12,5 +12,6 @@ namespace Backend.Entities
         public string PhoneNumber { get; set; }
         public bool ResetPassword { get; set; }
         public Guid? PersonId { get; set; }
+        public bool SendHrLeaveEmails { get; set; }
     }
 }

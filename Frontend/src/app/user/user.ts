@@ -7,4 +7,5 @@ export class User {
   public personId: string;
   public personName: string;
   public roles: string[] = [];
+  public sendHrLeaveEmails = false;
 }

@@ -26,7 +26,8 @@ namespace Backend.DataLayer
                 UserName = user.UserName,
                 PersonId = user.PersonId,
                 ResetPassword = user.ResetPassword,
-                PersonName = (person.PreferredName ?? person.FirstName) + " " + person.LastName
+                PersonName = (person.PreferredName ?? person.FirstName) + " " + person.LastName,
+                SendHrLeaveEmails = user.SendHrLeaveEmails
             };
 
         public UserProfile UserByName(string name)
