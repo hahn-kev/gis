@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Backend.Entities;
 using Backend.Utils;
 using LinqToDB.Common;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -53,9 +54,13 @@ namespace Backend.Services
         private readonly SendGridClient _sendGridClient;
         private readonly string _domain;
         private readonly TemplateSettings _templateSettings;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IOptions<Settings> options, IOptions<TemplateSettings> templateSettings)
+        public EmailService(IOptions<Settings> options,
+            IOptions<TemplateSettings> templateSettings,
+            ILogger<EmailService> logger)
         {
+            _logger = logger;
 //            var apiKey = options.Value.MailgunApiKey;
 //            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
 //            var value = Convert.ToBase64String(Encoding.ASCII.GetBytes("api:" + apiKey));
@@ -75,23 +80,30 @@ namespace Backend.Services
 //            return mailgunReponse;
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, EmailTemplate emailTemplate,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
+            EmailTemplate emailTemplate,
             PersonWithStaff @from,
             PersonWithStaff to)
         {
             return SendTemplateEmail(substituions,
-                subject, emailTemplate,
+                subject,
+                emailTemplate,
                 from.Staff.Email,
                 from.PreferredName,
                 to.Staff.Email,
                 to.PreferredName);
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions, string subject, EmailTemplate emailTemplate,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+            string subject,
+            EmailTemplate emailTemplate,
             PersonWithStaff @from,
             IEnumerable<PersonWithStaff> tos)
         {
-            return SendTemplateEmail(substituions, subject, emailTemplate,
+            return SendTemplateEmail(substituions,
+                subject,
+                emailTemplate,
                 from.Staff.Email,
                 from.PreferredName,
                 tos.Select(person => new EmailAddress(person.Staff.Email, person.PreferredName)).ToList());
@@ -122,7 +134,11 @@ namespace Backend.Services
         {
             if (toEmail == null)
                 throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
-            return SendTemplateEmail(substituions, subject, emailTemplate, fromEmail, fromName,
+            return SendTemplateEmail(substituions,
+                subject,
+                emailTemplate,
+                fromEmail,
+                fromName,
                 new List<EmailAddress> {new EmailAddress(toEmail, toName)});
         }
 
@@ -164,6 +180,8 @@ namespace Backend.Services
         public virtual async Task SendEmail(SendGridMessage message)
         {
 #if DEBUG
+            var to =string.Join(", ", message.Personalizations.Select(personalization => string.Join(", ", personalization.Tos.Select(address => $"{address.Name}:{address.Email}"))));
+            _logger.LogDebug("email not sent to: [{0}], subject: {1}, because of debugging", to, message.Subject);
             return;
 #endif
             var response = await _sendGridClient.SendEmailAsync(message);
