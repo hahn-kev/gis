@@ -62,7 +62,8 @@ namespace UnitTestProject
             ServiceCollection.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
             {
                 var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>(),
-                    provider.GetService<IOptions<TemplateSettings>>());
+                    provider.GetService<IOptions<TemplateSettings>>(),
+                    provider.GetService<ILogger<EmailService>>());
                 esm.CallBase = true;
                 esm.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>())).Returns(Task.CompletedTask);
                 return esm.Object;
