@@ -42,7 +42,6 @@ namespace Backend.Entities
     {
         public static T CopyFrom<T>(this T user, IUser from) where T : IUser
         {
-            //todo write unit test for this to make sure all new properties are covered
             if (from.Id != 0 && user.Id == 0)
                 user.Id = from.Id;
             user.UserName = from.UserName;
