@@ -532,7 +532,7 @@
           <mat-expansion-panel-header>
             <mat-panel-title>{{role.job.title}}</mat-panel-title>
             <mat-panel-description>
-              {{role.startDate | date}} till {{role.active ? 'now' : (role.endDate | date)}}
+              {{role.startDate | date: 'MMM yyyy'}} till {{role.active ? 'now' : (role.endDate | date: 'MMM yyyy')}}
             </mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
