@@ -101,6 +101,7 @@ namespace UnitTestProject
             TryCreateTable<Endorsement>();
             TryCreateTable<StaffEndorsement>();
             TryCreateTable<RequiredEndorsement>();
+            TryCreateTable<Education>();
             TryCreateTable<OrgGroup>();
             TryCreateTable<LeaveRequest>();
             TryCreateTable<TrainingRequirement>();
@@ -193,6 +194,10 @@ namespace UnitTestProject
             requiredEndorsement.EndorsementId = endorsement.Id;
             requiredEndorsement.JobId = jacobJob.Id;
             _dbConnection.Insert(requiredEndorsement);
+
+            var education = AutoFaker.Generate<Education>();
+            education.PersonId = jacob.Id;
+            _dbConnection.Insert(education);
         }
 
         public Faker<PersonWithStaff> PersonFaker() =>
