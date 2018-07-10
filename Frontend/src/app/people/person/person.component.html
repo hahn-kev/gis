@@ -674,6 +674,11 @@
         </form>
       </ng-container>
     </app-accordion-list>
+
+    <app-education
+      *ngIf="person.staffId && (person.education.length > 0 || !isSelf)"
+      [(education)]="person.education"
+      [personId]="person.id"></app-education>
   </div>
 
   <app-profile-picture class="picture-column" [person]="person"></app-profile-picture>

@@ -93,6 +93,7 @@ namespace Backend.Entities
         public IList<EvaluationWithNames> Evaluations { get; set; } = new List<EvaluationWithNames>(0);
         public IList<StaffEndorsementWithName> StaffEndorsements { get; set; } = new List<StaffEndorsementWithName>(0);
         public IList<Donation> Donations { get; set; } = new List<Donation>(0);
+        public IList<Education> Education { get; set; } = new List<Education>(0);
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public Donor Donor { get; set; }

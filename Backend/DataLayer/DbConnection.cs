@@ -32,6 +32,7 @@ namespace Backend.DataLayer
         IQueryable<Endorsement> Endorsements { get; }
         IQueryable<StaffEndorsement> StaffEndorsements { get; }
         IQueryable<RequiredEndorsement> RequiredEndorsements { get; }
+        IQueryable<Education> Education { get; }
         IQueryable<LeaveRequest> LeaveRequests { get; }
         IQueryable<TrainingRequirement> TrainingRequirements { get; }
         IQueryable<Staff> Staff { get; }
@@ -115,6 +116,7 @@ namespace Backend.DataLayer
         public IQueryable<Endorsement> Endorsements => GetTable<Endorsement>();
         public IQueryable<StaffEndorsement> StaffEndorsements => GetTable<StaffEndorsement>();
         public IQueryable<RequiredEndorsement> RequiredEndorsements => GetTable<RequiredEndorsement>();
+        public IQueryable<Education> Education => GetTable<Education>();
         public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
         public IQueryable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
         public IQueryable<Staff> Staff => GetTable<Staff>();

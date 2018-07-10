@@ -1,0 +1,52 @@
+<app-accordion-list
+  title="Education"
+  itemTitle="Education"
+  [(items)]="education"
+  (itemsChange)="educationChange.emit($event)"
+  [createNewItem]="createNewEducation"
+  [save]="save"
+  [delete]="delete">
+  <ng-container *appAccordionListHeader="let ed;">
+    <mat-panel-title>{{ed.degree}}</mat-panel-title>
+    <mat-panel-description>{{ed.completedDate | date}}</mat-panel-description>
+  </ng-container>
+  <ng-container *appAccordionListContent="let ed;">
+    <form class="two-colum-grid" appAccordionListForm>
+      <mat-form-field>
+        <mat-select [(ngModel)]="ed.degree" name="degree" placeholder="Degree">
+          <mat-option *ngFor="let degree of degreeList" [value]="degree">{{degree}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput required [(ngModel)]="ed.field" name="field" placeholder="Field">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="ed.institution" name="institution" placeholder="Institution">
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput
+               #countriesControl="ngModel"
+               (focus)="focusedCountries(countriesControl)"
+               [(ngModel)]="ed.country"
+               name="country"
+               [matAutocomplete]="countryAuto"
+               placeholder="Country">
+        <mat-autocomplete #countryAuto="matAutocomplete" autoActiveFirstOption>
+          <mat-option *ngFor="let country of filteredCountries | async" [value]="country">
+            {{ country }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+
+      <mat-form-field>
+        <input name="completedDate" matInput [(ngModel)]="ed.completedDate"
+               [matDatepicker]="completedDatePicker"
+               placeholder="Completed Date">
+        <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #completedDatePicker></mat-datepicker>
+      </mat-form-field>
+    </form>
+  </ng-container>
+</app-accordion-list>

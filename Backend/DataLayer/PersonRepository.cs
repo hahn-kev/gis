@@ -280,6 +280,14 @@ namespace Backend.DataLayer
                     .ToList();
             }
 
+            if (person.StaffId.HasValue)
+            {
+                person.Education = _dbConnection.Education
+                    .Where(education => education.PersonId == person.Id)
+                    .OrderBy(education => education.CompletedDate)
+                    .ToList();
+            }
+
             person.Roles = GetPersonRolesWithJob(id).ToList();
             person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
                 .OrderBy(contact => contact.ContactPreferedName).ToList();
