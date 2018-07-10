@@ -678,6 +678,8 @@
     <app-education
       *ngIf="person.staffId && (person.education.length > 0 || !isSelf)"
       [(education)]="person.education"
+      [minDate]="person.birthdate"
+      [startDate]="person.birthdate | dateAdd: '18 years'"
       [personId]="person.id"></app-education>
   </div>
 

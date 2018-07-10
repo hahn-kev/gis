@@ -15,6 +15,8 @@ export class EducationComponent implements OnInit {
   degreeList = Object.keys(Degree);
   public filteredCountries: Observable<string[]>;
   @Input() personId: string;
+  @Input() startDate: Date;
+  @Input() minDate: Date;
 
   @Input() education: Education[];
 

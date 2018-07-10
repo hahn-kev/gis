@@ -7,13 +7,16 @@
   [save]="save"
   [delete]="delete">
   <ng-container *appAccordionListHeader="let ed;">
-    <mat-panel-title>{{ed.degree}}</mat-panel-title>
-    <mat-panel-description>{{ed.completedDate | date}}</mat-panel-description>
+    <mat-panel-title>{{ed.degree}}: {{ed.field}}</mat-panel-title>
+    <mat-panel-description>{{ed.institution}}
+      <ng-container *ngIf="ed.institution && ed.completedDate">:</ng-container>
+      {{ed.completedDate | date}}
+    </mat-panel-description>
   </ng-container>
   <ng-container *appAccordionListContent="let ed;">
     <form class="two-colum-grid" appAccordionListForm>
       <mat-form-field>
-        <mat-select [(ngModel)]="ed.degree" name="degree" placeholder="Degree">
+        <mat-select [(ngModel)]="ed.degree" required name="degree" placeholder="Degree">
           <mat-option *ngFor="let degree of degreeList" [value]="degree">{{degree}}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -41,11 +44,17 @@
 
 
       <mat-form-field>
-        <input name="completedDate" matInput [(ngModel)]="ed.completedDate"
+        <input name="completedDate"
+               required matInput
+               [(ngModel)]="ed.completedDate"
+               [min]="minDate"
                [matDatepicker]="completedDatePicker"
                placeholder="Completed Date">
         <mat-datepicker-toggle matSuffix [for]="completedDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #completedDatePicker></mat-datepicker>
+        <mat-datepicker #completedDatePicker
+                        [startAt]="startDate"
+                        startView="year"></mat-datepicker>
+        <mat-hint>if day is unknown use the 1st</mat-hint>
       </mat-form-field>
     </form>
   </ng-container>

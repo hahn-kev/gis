@@ -124,6 +124,7 @@ import { PolicyGuard } from './services/auth/policy.guard';
 import { DonationComponent } from './people/person/donor/donation.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { EducationComponent } from './people/person/education/education.component';
+import { DateAddPipe } from './services/date-add.pipe';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -194,6 +195,8 @@ if (environment.production) {
     CalendarComponent
     ,
     EducationComponent
+    ,
+    DateAddPipe
   ],
   entryComponents: [
     ConfirmDialogComponent,
