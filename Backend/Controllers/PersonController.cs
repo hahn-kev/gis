@@ -97,28 +97,33 @@ namespace Backend.Controllers
         [Authorize(Policy = "staff")]
         public IList<StaffWithName> Staff()
         {
-            return _personService.StaffWithNames.ForEach(s => s.RemoveSalary());
+            return _personService.StaffWithNames.RemoveSalary();
         }
 
         [HttpGet("staff/all")]
         [Authorize(Policy = "staff")]
         public IList<PersonWithStaff> StaffAll()
         {
-            return _personService.StaffAll.ForEach(p => p?.Staff.RemoveSalary());
+            return _personService.StaffAll.RemoveSalaryStaff();
         }
 
         [HttpGet("staff/summaries")]
         [Authorize(Policy = "staff")]
         public IList<PersonWithStaffSummaries> StaffSummaries()
         {
-            return _personService.StaffSummaries.ForEach(p => p?.Staff.RemoveSalary());
+            return _personService.StaffSummaries.RemoveSalaryStaff();
         }
 
         [HttpGet("staff/roles")]
         [Authorize(Policy = "staff")]
         public IList<StaffWithRoles> StaffWithRoles()
         {
-            return _personService.StaffWithRoles.ForEach(p => p?.StaffWithName.RemoveSalary());
+            var staff = _personService.StaffWithRoles;
+            foreach (var s in staff)
+            {
+                s.StaffWithName?.RemoveSalary();
+            }
+            return staff;
         }
 
         [HttpGet("{personId}/emergency")]

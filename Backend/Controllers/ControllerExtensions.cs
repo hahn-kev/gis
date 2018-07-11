@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Backend.Entities;
@@ -78,6 +79,26 @@ namespace Backend.Controllers
         public static bool IsJsonRequest(this HttpContext context)
         {
             return context.Request.GetTypedHeaders().Accept?.Any(value => value.IsSubsetOf(JsonMediaType)) == true;
+        }
+        
+        public static IList<T> RemoveSalary<T>(this IList<T> list) where T : Staff
+        {
+            foreach (var ent in list)
+            {
+                ent.RemoveSalary();
+            }
+
+            return list;
+        }
+
+        public static IList<T> RemoveSalaryStaff<T>(this IList<T> list) where T : PersonWithStaff
+        {
+            foreach (var ent in list)
+            {
+                ent.Staff?.RemoveSalary();
+            }
+
+            return list;
         }
     }
 }
