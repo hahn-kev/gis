@@ -38,12 +38,9 @@ namespace Backend.DataLayer
             get
             {
                 return from person in PeopleGeneric<PersonWithStaffSummaries>()
-                    from r in (
-                        from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
-                        from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
-                        select new {role, job}
-                    )
-                    group r by new {person}
+                    from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
+                    from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                    group new {role, job} by new {person}
                     into g
                     select new PersonWithStaffSummaries
                     {
@@ -84,7 +81,7 @@ namespace Backend.DataLayer
                         DaysOfService = g.Sum(r =>
                             r.job.Status == JobStatus.SchoolAid
                                 ? 0
-                                : r.role.StartDate.DayDiff(r.role.EndDate ?? DateTime.Now)),
+                                : r.role.StartDate.DayDiff(r.role.EndDate ?? Sql.CurrentTimestamp)),
                         IsActive = g.Sum(r => r.role.Active ? 1 : 0) > 0,
                         StartDate = g.Min(r => (DateTime?) r.role.StartDate)
                     };

@@ -139,5 +139,16 @@ namespace UnitTestProject
             var actualConnectionString = Settings.FormatConnectionString(expectedString);
             actualConnectionString.ShouldBe(expectedString);
         }
+
+        [Fact]
+        public void StaffSummariesIncludeStaffWithoutRole()
+        {
+            var pWithRole = _servicesFixture.InsertPerson();
+            var job = _servicesFixture.InsertStaffJob();
+            _servicesFixture.InsertRole(job.Id, pWithRole.Id);
+            var pWithoutRole = _servicesFixture.InsertPerson();
+            _personRepository.Staff.Count().ShouldBe(2);
+            _personRepository.PeopleWithStaffSummaries.Count().ShouldBe(2);
+        }
     }
 }
