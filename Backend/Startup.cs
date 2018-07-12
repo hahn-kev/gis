@@ -83,13 +83,11 @@ namespace Backend
             services.AddMvc(options =>
                 {
                     options.InputFormatters.Add(new TextPlainInputFormatter());
-#if DEBUG
-                    options.Filters.Add(typeof(AllowAnonymousFilter));
-#else
+
 //require auth on every controller by default
                     options.Filters.Add(
                         new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
-#endif
+
                     options.Filters.Add(typeof(GlobalExceptionHandler));
                 })
                 .AddJsonOptions(options =>
