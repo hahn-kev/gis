@@ -5,9 +5,14 @@ export class EmergencyContact extends BaseEntity {
   public contactId: string;
   public order: number;
   public relationship: string;
+
+  //these are only used when contactId is null
+  public name: string;
+  public phone: string;
+  public email: string;
 }
 
 export class EmergencyContactExtended extends EmergencyContact {
-  public contactPreferedName: string;
+  public contactPreferredName: string;
   public contactLastName: string;
 }

@@ -248,17 +248,21 @@ namespace Backend.DataLayer
 
         public IQueryable<EmergencyContactExtended> EmergencyContactsExtended =>
             from emergencyContact in _dbConnection.EmergencyContacts
-            join person in PeopleExtended on emergencyContact.ContactId equals person.Id
-            where !person.Deleted
+            from person in PeopleExtended.LeftJoin(person => emergencyContact.ContactId == person.Id)
+            where person == null || !person.Deleted
+            orderby emergencyContact.Name ?? person.PreferredName ?? person.LastName, person.LastName
             select new EmergencyContactExtended
             {
                 Id = emergencyContact.Id,
                 ContactId = emergencyContact.ContactId,
                 Order = emergencyContact.Order,
                 PersonId = emergencyContact.PersonId,
-                ContactPreferedName = person.PreferredName,
+                ContactPreferredName = person.PreferredName ?? person.FirstName,
                 ContactLastName = person.LastName,
-                Relationship = emergencyContact.Relationship
+                Relationship = emergencyContact.Relationship,
+                Name = emergencyContact.Name,
+                Email = emergencyContact.Email,
+                Phone = emergencyContact.Phone
             };
 
         public PersonWithOthers GetById(Guid id)
@@ -287,8 +291,7 @@ namespace Backend.DataLayer
             }
 
             person.Roles = GetPersonRolesWithJob(id).ToList();
-            person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id)
-                .OrderBy(contact => contact.ContactPreferedName).ToList();
+            person.EmergencyContacts = EmergencyContactsExtended.Where(contact => contact.PersonId == id).ToList();
 
             return person;
         }

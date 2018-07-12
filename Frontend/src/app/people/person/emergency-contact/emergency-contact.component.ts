@@ -10,10 +10,12 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./emergency-contact.component.scss']
 })
 export class EmergencyContactComponent implements OnInit {
+  @Input() customContactOnly: boolean;
   @Input() emergencyContact: EmergencyContactExtended;
   @Input() formId: string;
   @ViewChild('form') form: NgForm;
   public people: Person[];
+  public isCustomContact;
 
   constructor(private route: ActivatedRoute) {
   }
@@ -24,11 +26,16 @@ export class EmergencyContactComponent implements OnInit {
     }) => {
       this.people = value.people.filter(person => person.id != this.emergencyContact.personId);
     });
+    this.isCustomContact = !this.emergencyContact.contactId;
+  }
+
+  personAdded(person: Person) {
+    this.people = [...this.people, person];
   }
 
   updateContactName(contactId: string) {
     let person = this.people.find(p => p.id == contactId);
-    this.emergencyContact.contactPreferedName = person ? person.preferredName || person.firstName : '';
+    this.emergencyContact.contactPreferredName = person ? person.preferredName || person.firstName : '';
     this.emergencyContact.contactLastName = person ? person.lastName : '';
   }
 }

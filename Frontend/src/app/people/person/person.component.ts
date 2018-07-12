@@ -259,7 +259,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
     let result = await ConfirmDialogComponent.OpenWait(
       this.dialog,
-      `Delete Emergency Contact ${emergencyContact.contactPreferedName}?`,
+      `Delete Emergency Contact ${emergencyContact.contactPreferredName}?`,
       'Delete',
       'Cancel');
     if (!result) return;

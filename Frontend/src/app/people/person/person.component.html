@@ -35,7 +35,7 @@
           </mat-form-field>
 
           <mat-form-field>
-            <input matInput name="preferedName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
+            <input matInput name="preferredName" [(ngModel)]="person.preferredName" placeholder="Preferred Name">
           </mat-form-field>
           <mat-form-field>
             <mat-select [(ngModel)]="person.spouseId"
@@ -229,100 +229,104 @@
     <app-donation *ngIf="person.donorId" [readonly]="isSelf" [person]="person"></app-donation>
 
     <!--emergency contacts-->
-    <ng-container
-      *ngIf="!isSelf || !person.spouseId || !person.staff?.missionOrgId || person.emergencyContacts.length != 0">
-      <span class="mat-caption">
+    <span class="mat-caption">
         Emergency Contacts
-      </span>
-      <mat-accordion class="emergency-contact">
-        <mat-expansion-panel #newEmergencyContactPanel
-                             *ngIf="!isSelf"
-                             [disabled]="isNew"
-                             [matTooltipDisabled]="!isNew"
-                             matTooltip="To add an emergency contract first save the person">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Add new Emergency Contact</mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-emergency-contact
-              #newEmergencyContactEl
-              formId="newEcForm"
-              [emergencyContact]="newEmergencyContact"
-              (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.close();">
-            </app-emergency-contact>
-            <mat-action-row>
-              <button type="submit" form="newEcForm" [disabled]="newEmergencyContactEl.form.invalid"
-                      mat-button>Add
-              </button>
-            </mat-action-row>
-          </ng-template>
-        </mat-expansion-panel>
-        <mat-expansion-panel *ngIf="peopleMap[person.spouseId] as spouse" disabled expanded="false" hideToggle="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="foreground-text" style="align-items: center">
-              {{spouse.preferredName}} {{spouse.lastName}}
-            </mat-panel-title>
-            <mat-panel-description class="secondary-text">{{spouse.email || 'Email unknown'}}
-              <a mat-icon-button [routerLink]="'/people/edit/' + person.spouseId">
-                <mat-icon class="foreground-text"
-                          [matTooltip]="'View Spouse'"
-                          matTooltipPosition="before">
-                  person
-                </mat-icon>
-              </a>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-        </mat-expansion-panel>
+    </span>
+    <mat-accordion class="emergency-contact">
+      <mat-expansion-panel #newEmergencyContactPanel
+                           [disabled]="isNew"
+                           [matTooltipDisabled]="!isNew"
+                           matTooltip="To add an emergency contract first save the person">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Add new Emergency Contact</mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <app-emergency-contact
+            #newEmergencyContactEl
+            formId="newEcForm"
+            [customContactOnly]="isSelf"
+            [emergencyContact]="newEmergencyContact"
+            (submit)="saveEmergencyContact(newEmergencyContact, true); newEmergencyContactPanel.close();">
+          </app-emergency-contact>
+          <mat-action-row>
+            <button type="submit" form="newEcForm" [disabled]="newEmergencyContactEl.form.invalid"
+                    mat-button>Add
+            </button>
+          </mat-action-row>
+        </ng-template>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngIf="peopleMap[person.spouseId] as spouse" disabled expanded="false" hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="foreground-text" style="align-items: center">
+            {{spouse.preferredName}} {{spouse.lastName}}
+          </mat-panel-title>
+          <mat-panel-description class="secondary-text">{{spouse.email || 'Email unknown'}}
+            <a mat-icon-button [routerLink]="'/people/edit/' + person.spouseId">
+              <mat-icon class="foreground-text"
+                        [matTooltip]="'View Spouse'"
+                        matTooltipPosition="before">
+                person
+              </mat-icon>
+            </a>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
 
-        <mat-expansion-panel *ngIf="person.staff && person.staff.missionOrgId" disabled expanded="false"
-                             hideToggle="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="foreground-text" style="align-items: center">
-              {{person.staff.missionOrgName}}
-            </mat-panel-title>
-            <mat-panel-description class="secondary-text">{{person.staff.missionOrgEmail || 'Email unknown'}}
-              <a mat-icon-button [routerLink]="'/mission-org/edit/' + person.staff.missionOrgId">
-                <mat-icon class="foreground-text"
-                          [matTooltip]="'View Sending Org'"
-                          matTooltipPosition="before">
-                  account_balance
-                </mat-icon>
-              </a>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-        </mat-expansion-panel>
+      <mat-expansion-panel *ngIf="person.staff && person.staff.missionOrgId" disabled expanded="false"
+                           hideToggle="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="foreground-text" style="align-items: center">
+            {{person.staff.missionOrgName}}
+          </mat-panel-title>
+          <mat-panel-description class="secondary-text">{{person.staff.missionOrgEmail || 'Email unknown'}}
+            <a mat-icon-button [routerLink]="'/mission-org/edit/' + person.staff.missionOrgId">
+              <mat-icon class="foreground-text"
+                        [matTooltip]="'View Sending Org'"
+                        matTooltipPosition="before">
+                account_balance
+              </mat-icon>
+            </a>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
 
-        <mat-expansion-panel #ecPanel *ngFor="let contact of person.emergencyContacts">
-          <mat-expansion-panel-header>
-            <mat-panel-title>{{contact.contactPreferedName}} {{contact.contactLastName}}</mat-panel-title>
+      <mat-expansion-panel #ecPanel *ngFor="let contact of person.emergencyContacts">
+        <mat-expansion-panel-header>
+          <ng-container *ngIf="contact.contactId; else customContact">
+            <mat-panel-title>{{contact.contactPreferredName}} {{contact.contactLastName}}</mat-panel-title>
             <mat-panel-description>{{peopleMap[contact.contactId]?.email || 'Email unknown'}}</mat-panel-description>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-emergency-contact #contactForm [emergencyContact]="contact"
-                                   [formId]="'contactForm_' + contact.id"
-                                   (submit)="saveEmergencyContact(contact); ecPanel.close();">
-            </app-emergency-contact>
-            <mat-action-row>
-              <a [routerLink]="'/people/edit/' + contact.contactId"
-                 *ngIf="!isSelf"
-                 [matTooltip]="'View ' + contact.contactPreferedName + ' ' + contact.contactLastName"
-                 matTooltipPosition="after"
-                 mat-icon-button>
-                <mat-icon>person</mat-icon>
-              </a>
-              <span class="spacer"></span>
-              <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
-              <button type="submit"
-                      [attr.form]="'contactForm_' + contact.id"
-                      [disabled]="contactForm.form.invalid"
-                      mat-button>Save
-              </button>
-            </mat-action-row>
+          </ng-container>
+          <ng-template #customContact>
+            <mat-panel-title>{{contact.name}}</mat-panel-title>
+            <mat-panel-description>{{contact.email || 'Email unknown'}}</mat-panel-description>
           </ng-template>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <app-emergency-contact #contactForm [emergencyContact]="contact"
+                                 [customContactOnly]="isSelf"
+                                 [formId]="'contactForm_' + contact.id"
+                                 (submit)="saveEmergencyContact(contact); ecPanel.close();">
+          </app-emergency-contact>
+          <mat-action-row>
+            <a [routerLink]="'/people/edit/' + contact.contactId"
+               *ngIf="!isSelf"
+               [matTooltip]="'View ' + contact.contactPreferedName + ' ' + contact.contactLastName"
+               matTooltipPosition="after"
+               mat-icon-button>
+              <mat-icon>person</mat-icon>
+            </a>
+            <span class="spacer"></span>
+            <button mat-button (click)="deleteEmergencyContact(contact)" color="warn">Delete</button>
+            <button type="submit"
+                    [attr.form]="'contactForm_' + contact.id"
+                    [disabled]="contactForm.form.invalid"
+                    mat-button>Save
+            </button>
+          </mat-action-row>
+        </ng-template>
 
-        </mat-expansion-panel>
-      </mat-accordion>
-    </ng-container>
+      </mat-expansion-panel>
+    </mat-accordion>
 
     <!--leave summary-->
     <mat-card *ngIf="person.staffId">
@@ -357,16 +361,16 @@
         <ng-template matExpansionPanelContent>
 
           <ng-container *ngIf="person.isThai && ('viewSalary' | isUserPolicy)">
-              <mat-form-field>
-                <mat-icon matPrefix>฿</mat-icon>
-                <input matInput
-                       name="annualSalary"
-                       type="number"
-                       [(ngModel)]="person.staff.annualSalary"
-                       min="0"
-                       placeholder="Annual Salary">
-              </mat-form-field>
-              <span></span>
+            <mat-form-field>
+              <mat-icon matPrefix>฿</mat-icon>
+              <input matInput
+                     name="annualSalary"
+                     type="number"
+                     [(ngModel)]="person.staff.annualSalary"
+                     min="0"
+                     placeholder="Annual Salary">
+            </mat-form-field>
+            <span></span>
           </ng-container>
           <mat-form-field>
             <input matInput [(ngModel)]="person.staff.email"

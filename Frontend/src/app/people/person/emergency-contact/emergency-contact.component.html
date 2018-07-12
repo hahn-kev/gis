@@ -1,10 +1,13 @@
 <form #form="ngForm" [id]="formId" class="two-colum-grid">
-  <div class="form-field-button">
+  <mat-slide-toggle [disabled]="customContactOnly" [(ngModel)]="isCustomContact" name="customContact">Custom Contact
+  </mat-slide-toggle>
+  <div class="form-field-button" *ngIf="!isCustomContact; else elseTemplate">
     <mat-form-field>
       <mat-select [(ngModel)]="emergencyContact.contactId"
                   (ngModelChange)="updateContactName($event)"
+                  required="true"
+                  [disabled]="customContactOnly"
                   name="contact"
-                  required
                   placeholder="Contact">
         <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
           {{eachPerson.lastName}}
@@ -13,11 +16,31 @@
     </mat-form-field>
     <app-quick-add-button
       title="Contact"
+      *ngIf="'peopleEdit' | isUserPolicy"
       [(personId)]="emergencyContact.contactId"
       (personIdChange)="updateContactName($event)"
-      (updateList)="people.push($event)">
+      (updateList)="personAdded($event)">
     </app-quick-add-button>
   </div>
+  <ng-template #elseTemplate>
+    <mat-form-field>
+      <input matInput name="name" required [(ngModel)]="emergencyContact.name" placeholder="Name">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="emergencyContact.email"
+             type="email"
+             name="email"
+             placeholder="Email">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="emergencyContact.phone"
+             type="tel"
+             name="phone"
+             placeholder="Phone Number">
+    </mat-form-field>
+
+  </ng-template>
+
   <mat-form-field>
     <input matInput name="order" type="number" min="1" [(ngModel)]="emergencyContact.order" placeholder="Order">
   </mat-form-field>
