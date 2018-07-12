@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./accordion-list.component.scss']
 })
 export class AccordionListComponent<T extends BaseEntity> implements OnInit {
-  @Input() title: string = null;
+  @Input() caption: string = null;
   @Input() createNewItem: () => T;
   newItem: T;
   @Input() itemTitle = 'Item';

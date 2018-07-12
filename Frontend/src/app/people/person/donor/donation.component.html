@@ -5,7 +5,7 @@
                     [showActions]="!readonly"
                     [addNew]="!readonly"
                     itemTitle="Donation"
-                    title="Donations">
+                    caption="Donations">
   <ng-container *appAccordionListHeader="let donation">
     <mat-panel-title>{{donation.date | date}}</mat-panel-title>
     <mat-panel-description>{{donation.money | currency: 'THB'}}</mat-panel-description>

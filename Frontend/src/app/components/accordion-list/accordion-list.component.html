@@ -1,4 +1,4 @@
-<span class="mat-caption" *ngIf="title">{{title}}</span>
+<span class="mat-caption" *ngIf="caption">{{caption}}</span>
 <mat-accordion>
   <mat-expansion-panel *ngIf="addNew" #newItemPanel (opened)="newItem = newItem ? newItem : createNewItem()">
     <mat-expansion-panel-header>

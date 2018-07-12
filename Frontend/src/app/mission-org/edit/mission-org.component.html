@@ -38,7 +38,7 @@
         </mat-form-field>
         <app-quick-add-button
           [(personId)]="missionOrg.repId"
-          title="Rep"
+          caption="Rep"
           (updateList)="people.push($event)">
         </app-quick-add-button>
       </div>
@@ -95,7 +95,7 @@
                       [save]="saveYear"
                       [delete]="deleteYear"
                       [(items)]="missionOrg.yearSummaries"
-                      title="Year Summaries"
+                      caption="Year Summaries"
                       itemTitle="Year">
     <ng-container *appAccordionListHeader="let item;">
       <mat-panel-title>{{item.year}}</mat-panel-title>

@@ -7,7 +7,7 @@ import { PersonWithStaff } from '../../person';
   styleUrls: ['./quick-add-button.component.scss']
 })
 export class QuickAddButtonComponent implements OnInit {
-  @Input() title = 'Person';
+  @Input() caption = 'Person';
   @Input() personId: string;
   @Output() personIdChange = new EventEmitter<string>();
   @Output() updateList = new EventEmitter<PersonWithStaff>();

@@ -15,7 +15,7 @@
       </mat-select>
     </mat-form-field>
     <app-quick-add-button
-      title="Contact"
+      caption="Contact"
       *ngIf="'peopleEdit' | isUserPolicy"
       [(personId)]="emergencyContact.contactId"
       (personIdChange)="updateContactName($event)"
