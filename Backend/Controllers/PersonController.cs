@@ -134,7 +134,6 @@ namespace Backend.Controllers
         }
 
         [HttpPost("emergency")]
-        [Authorize(Policy = "contact")]
         public EmergencyContactExtended UpdateEmergencyContact([FromBody] EmergencyContactExtended emergencyContact)
         {
             _personService.Save(emergencyContact);
@@ -142,7 +141,6 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("emergency/{id}")]
-        [Authorize(Policy = "contact")]
         public void DeleteEmergencyContact(Guid id)
         {
             _personService.DeleteEmergencyContact(id);
