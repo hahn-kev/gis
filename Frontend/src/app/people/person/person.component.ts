@@ -254,6 +254,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
     } else {
       this.snackBar.open(`Emergency Contact Saved`, null, {duration: 2000});
     }
+    this.person.emergencyContacts.sort((a, b) => a.order - b.order);
   }
 
   async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {

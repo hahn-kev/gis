@@ -250,7 +250,7 @@ namespace Backend.DataLayer
             from emergencyContact in _dbConnection.EmergencyContacts
             from person in PeopleExtended.LeftJoin(person => emergencyContact.ContactId == person.Id)
             where person == null || !person.Deleted
-            orderby emergencyContact.Name ?? person.PreferredName ?? person.LastName, person.LastName
+            orderby emergencyContact.Order
             select new EmergencyContactExtended
             {
                 Id = emergencyContact.Id,
