@@ -294,11 +294,13 @@
         <mat-expansion-panel-header>
           <ng-container *ngIf="contact.contactId; else customContact">
             <mat-panel-title>{{contact.contactPreferredName}} {{contact.contactLastName}}</mat-panel-title>
-            <mat-panel-description>{{peopleMap[contact.contactId]?.email || 'Email unknown'}}</mat-panel-description>
+            <mat-panel-description>{{ peopleMap[contact.contactId]?.phoneNumber || peopleMap[contact.contactId]?.email
+              || ''}}
+            </mat-panel-description>
           </ng-container>
           <ng-template #customContact>
             <mat-panel-title>{{contact.name}}</mat-panel-title>
-            <mat-panel-description>{{contact.email || 'Email unknown'}}</mat-panel-description>
+            <mat-panel-description>{{contact.phone || contact.email || ''}}</mat-panel-description>
           </ng-template>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>

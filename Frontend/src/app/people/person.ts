@@ -17,6 +17,7 @@ export class Person extends BaseEntity {
   public firstName: string;
   public lastName: string;
   public email: string;
+  public phoneNumber: string;
   public staffId?: string;
   public donorId?: string;
 
@@ -32,7 +33,6 @@ export class PersonExtended extends Person {
   public thaiFirstName: string;
   public thaiLastName: string;
   public speaksEnglish: boolean;
-  public phoneNumber: string;
   public spouseId: string;
   public spouseChanged: boolean;
 

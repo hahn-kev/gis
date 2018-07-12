@@ -13,6 +13,7 @@ namespace Backend.Entities
         public string LastName { get; set; }
         public Guid? StaffId { get; set; }
         public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public bool Deleted { get; set; }
         public Guid? DonorId { get; set; }
 
@@ -42,7 +43,6 @@ namespace Backend.Entities
         public string ThaiFirstName { get; set; }
         public string ThaiLastName { get; set; }
         public bool SpeaksEnglish { get; set; }
-        public string PhoneNumber { get; set; }
         public Guid? SpouseId { get; set; }
 
 
