@@ -188,6 +188,7 @@ namespace Backend.DataLayer
             from person in _dbConnection.PeopleExtended.InnerJoin(person => person.StaffId == staff.Id)
             from missionOrg in _dbConnection.MissionOrgs.LeftJoin(org => staff.MissionOrgId == org.Id).DefaultIfEmpty()
             where !person.Deleted
+            orderby person.PreferredName ?? person.FirstName, person.LastName
             select new StaffWithName
             {
                 Id = staff.Id,
@@ -195,7 +196,7 @@ namespace Backend.DataLayer
                 OrgGroupId = staff.OrgGroupId,
                 MissionOrgId = staff.MissionOrgId,
                 PersonId = person.Id,
-                PreferredName = person.PreferredName,
+                PreferredName = person.PreferredName ?? person.FirstName,
                 LastName = person.LastName,
                 AnnualSalary = staff.AnnualSalary,
                 RenwebId = staff.RenwebId,
