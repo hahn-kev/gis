@@ -3,6 +3,8 @@
   itemTitle="Education"
   [(items)]="education"
   (itemsChange)="educationChange.emit($event)"
+  [addNew]="!readonly"
+  [showActions]="!readonly"
   [createNewItem]="createNewEducation"
   [save]="save"
   [delete]="delete">

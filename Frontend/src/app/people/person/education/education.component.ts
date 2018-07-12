@@ -17,6 +17,7 @@ export class EducationComponent implements OnInit {
   @Input() personId: string;
   @Input() startDate: Date;
   @Input() minDate: Date;
+  @Input() readonly: boolean;
 
   @Input() education: Education[];
 

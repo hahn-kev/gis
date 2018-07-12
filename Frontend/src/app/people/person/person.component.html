@@ -641,6 +641,8 @@
       [createNewItem]="createNewStaffEndorsement"
       [save]="saveStaffEndorsement"
       [delete]="deleteStaffEndorsement"
+      [showActions]="!isSelf"
+      [addNew]="!isSelf"
       title="Certifications"
       itemTitle="Certification">
       <ng-container *appAccordionListHeader="let item">
@@ -681,6 +683,7 @@
 
     <app-education
       *ngIf="person.staffId && (person.education.length > 0 || !isSelf)"
+      [readonly]="isSelf"
       [(education)]="person.education"
       [minDate]="person.birthdate"
       [startDate]="person.birthdate | dateAdd: '18 years'"
