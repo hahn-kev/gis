@@ -9,7 +9,7 @@
   [save]="save"
   [delete]="delete">
   <ng-container *appAccordionListHeader="let ed;">
-    <mat-panel-title>{{ed.degree}}: {{ed.field}}</mat-panel-title>
+    <mat-panel-title>{{formatDegree(ed.degree)}}: {{ed.field}}</mat-panel-title>
     <mat-panel-description>{{ed.institution}}
       <ng-container *ngIf="ed.institution && ed.completedDate">:</ng-container>
       {{ed.completedDate | date}}
@@ -19,7 +19,7 @@
     <form class="two-colum-grid" appAccordionListForm>
       <mat-form-field>
         <mat-select [(ngModel)]="ed.degree" required name="degree" placeholder="Degree">
-          <mat-option *ngFor="let degree of degreeList" [value]="degree">{{degree}}</mat-option>
+          <mat-option *ngFor="let degree of degreeList" [value]="degree">{{formatDegree(degree)}}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field>

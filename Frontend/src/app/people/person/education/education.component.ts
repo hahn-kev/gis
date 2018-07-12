@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Degree, Education } from './education';
+import { Degree, Education, formatDegree } from './education';
 import { EducationService } from './education.service';
 import { countries } from '../../countries';
 import { map } from 'rxjs/operators';
@@ -13,6 +13,7 @@ import { NgModel } from '@angular/forms';
 })
 export class EducationComponent implements OnInit {
   degreeList = Object.keys(Degree);
+  formatDegree = formatDegree;
   public filteredCountries: Observable<string[]>;
   @Input() personId: string;
   @Input() startDate: Date;
