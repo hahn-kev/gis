@@ -1,68 +1,104 @@
-<form #form="ngForm" [id]="formId" class="two-colum-grid">
-  <mat-slide-toggle [disabled]="customContactOnly" [(ngModel)]="isCustomContact" name="customContact">Custom Contact
-  </mat-slide-toggle>
-  <div class="form-field-button" *ngIf="!isCustomContact; else elseTemplate">
-    <mat-form-field>
-      <mat-select [(ngModel)]="emergencyContact.contactId"
-                  (ngModelChange)="updateContactName($event)"
-                  required="true"
-                  [disabled]="customContactOnly"
-                  name="contact"
-                  placeholder="Contact">
-        <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
-          {{eachPerson.lastName}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <app-quick-add-button
-      caption="Contact"
-      *ngIf="'peopleEdit' | isUserPolicy"
-      [(personId)]="emergencyContact.contactId"
-      (personIdChange)="updateContactName($event)"
-      (updateList)="personAdded($event)">
-    </app-quick-add-button>
-  </div>
-  <ng-template #elseTemplate>
-    <mat-form-field>
-      <input matInput name="name" required [(ngModel)]="emergencyContact.name" placeholder="Name">
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput [(ngModel)]="emergencyContact.email"
-             type="email"
-             name="email"
-             placeholder="Email">
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput [(ngModel)]="emergencyContact.phone"
-             type="tel"
-             name="phone"
-             placeholder="Phone Number">
-    </mat-form-field>
+<app-accordion-list caption="Emergency Contacts"
+                    itemTitle="Emergency Contact"
+                    [(items)]="emergencyContacts"
+                    (itemsChange)="emergencyContactsChange.emit($event)"
+                    [createNewItem]="createNewContact"
+                    [save]="saveEmergencyContact"
+                    [delete]="deleteEmergencyContact">
+  <ng-container *appAccordionListHeader="let contact;">
+    <ng-container *ngIf="contact.contactId; else customContact">
+      <mat-panel-title>{{contact.contactPreferredName}} {{contact.contactLastName}}</mat-panel-title>
+      <mat-panel-description>
+        {{ contact.contactPhone || contact.contactEmail || ''}}
+      </mat-panel-description>
+    </ng-container>
+    <ng-template #customContact>
+      <mat-panel-title>{{contact.name}}</mat-panel-title>
+      <mat-panel-description>{{contact.phone || contact.email || ''}}</mat-panel-description>
+    </ng-template>
+  </ng-container>
+  <ng-container *appAccordionListContent="let emergencyContact;">
+    <form appAccordionListForm class="two-colum-grid">
+      <mat-slide-toggle #customContactSwitch
+                        [checked]="!emergencyContact.contactId"
+                        (change)="$event.checked ? (emergencyContact.contactId = null) : void"
+                        [disabled]="customContactOnly"
+                        name="customContact">Custom Contact
+      </mat-slide-toggle>
+      <div class="form-field-button" *ngIf="!customContactSwitch.checked; else elseTemplate">
+        <mat-form-field>
+          <mat-select [(ngModel)]="emergencyContact.contactId"
+                      required="true"
+                      [disabled]="customContactOnly"
+                      name="contact"
+                      placeholder="Contact">
+            <mat-option *ngFor="let eachPerson of filterAvaliblePeople(emergencyContact, people, emergencyContacts)"
+                        [value]="eachPerson.id"
+                        (onSelectionChange)="$event.source.selected ? (updateContactName(emergencyContact, eachPerson)) : void">
+              {{eachPerson.preferredName}}
+              {{eachPerson.lastName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <app-quick-add-button
+          caption="Contact"
+          *ngIf="'peopleEdit' | isUserPolicy"
+          [(personId)]="emergencyContact.contactId"
+          (personIdChange)="updateContactName($event)"
+          (updateList)="personAdded($event)">
+        </app-quick-add-button>
+      </div>
+      <ng-template #elseTemplate>
+        <mat-form-field>
+          <input matInput name="name" required [(ngModel)]="emergencyContact.name" placeholder="Name">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput [(ngModel)]="emergencyContact.email"
+                 type="email"
+                 name="email"
+                 placeholder="Email">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput [(ngModel)]="emergencyContact.phone"
+                 type="tel"
+                 name="phone"
+                 placeholder="Phone Number">
+        </mat-form-field>
 
-  </ng-template>
+      </ng-template>
+      <mat-form-field>
+        <input matInput name="order" type="number" min="1" [(ngModel)]="emergencyContact.order" placeholder="Order">
+      </mat-form-field>
 
-  <mat-form-field>
-    <input matInput name="order" type="number" min="1" [(ngModel)]="emergencyContact.order" placeholder="Order">
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-select [(ngModel)]="emergencyContact.relationship"
-                name="relationship"
-                placeholder="Relationship">
-      <mat-option [value]="null">None</mat-option>
-      <mat-option value="Spouse">Spouse</mat-option>
-      <mat-option value="Father">Father</mat-option>
-      <mat-option value="Mother">Mother</mat-option>
-      <mat-option value="Brother">Brother</mat-option>
-      <mat-option value="BrotherInLaw">Brother in law</mat-option>
-      <mat-option value="Sister">Sister</mat-option>
-      <mat-option value="SisterInLaw">Sister in law</mat-option>
-      <mat-option value="Son">Son</mat-option>
-      <mat-option value="Daughter">Daughter</mat-option>
-      <mat-option value="Friend">Friend</mat-option>
-      <mat-option value="Pastor">Pastor</mat-option>
-      <mat-option value="SendingOrg">Sending Organization/Church</mat-option>
-      <mat-option value="Other">Other</mat-option>
-    </mat-select>
-  </mat-form-field>
-</form>
+      <mat-form-field>
+        <mat-select [(ngModel)]="emergencyContact.relationship"
+                    name="relationship"
+                    placeholder="Relationship">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option value="Spouse">Spouse</mat-option>
+          <mat-option value="Father">Father</mat-option>
+          <mat-option value="Mother">Mother</mat-option>
+          <mat-option value="Brother">Brother</mat-option>
+          <mat-option value="BrotherInLaw">Brother in law</mat-option>
+          <mat-option value="Sister">Sister</mat-option>
+          <mat-option value="SisterInLaw">Sister in law</mat-option>
+          <mat-option value="Son">Son</mat-option>
+          <mat-option value="Daughter">Daughter</mat-option>
+          <mat-option value="Friend">Friend</mat-option>
+          <mat-option value="Pastor">Pastor</mat-option>
+          <mat-option value="SendingOrg">Sending Organization/Church</mat-option>
+          <mat-option value="Other">Other</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </ng-container>
+  <ng-container *appAccordionListCustomAction="let contact;">
+    <a [routerLink]="'/people/edit/' + contact.contactId"
+       *ngIf="('peopleEdit' | isUserPolicy) && contact.contactId"
+       [matTooltip]="'View ' + contact.contactPreferredName + ' ' + contact.contactLastName"
+       matTooltipPosition="after"
+       mat-icon-button>
+      <mat-icon>person</mat-icon>
+    </a>
+  </ng-container>
+</app-accordion-list>

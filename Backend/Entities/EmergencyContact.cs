@@ -20,5 +20,7 @@ namespace Backend.Entities
     {
         public string ContactPreferredName { get; set; }
         public string ContactLastName { get; set; }
+        public string ContactPhone { get; set; }
+        public string ContactEmail { get; set; }
     }
 }

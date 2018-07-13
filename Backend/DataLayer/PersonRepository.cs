@@ -259,6 +259,8 @@ namespace Backend.DataLayer
                 PersonId = emergencyContact.PersonId,
                 ContactPreferredName = person.PreferredName ?? person.FirstName,
                 ContactLastName = person.LastName,
+                ContactEmail = person.Email,
+                ContactPhone = person.PhoneNumber,
                 Relationship = emergencyContact.Relationship,
                 Name = emergencyContact.Name,
                 Email = emergencyContact.Email,

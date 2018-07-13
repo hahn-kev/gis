@@ -242,33 +242,6 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   }
 
-  async saveEmergencyContact(emergencyContact: EmergencyContactExtended, isNew = false) {
-    emergencyContact = await this.personService.updateEmergencyContact(emergencyContact);
-    if (isNew) {
-      this.person.emergencyContacts = [...this.person.emergencyContacts, emergencyContact];
-      this.newEmergencyContact = new EmergencyContactExtended();
-      this.newEmergencyContact.personId = this.person.id;
-      this.newEmergencyContact.order = this.person.emergencyContacts.length + 1;
-      this.newEmergencyContactEl.form.resetForm();
-      this.snackBar.open(`Emergency Contact Added`, null, {duration: 2000});
-    } else {
-      this.snackBar.open(`Emergency Contact Saved`, null, {duration: 2000});
-    }
-    this.person.emergencyContacts.sort((a, b) => a.order - b.order);
-  }
-
-  async deleteEmergencyContact(emergencyContact: EmergencyContactExtended) {
-    let result = await ConfirmDialogComponent.OpenWait(
-      this.dialog,
-      `Delete Emergency Contact ${emergencyContact.name || (emergencyContact.contactPreferredName + ' ' + emergencyContact.contactLastName)}?`,
-      'Delete',
-      'Cancel');
-    if (!result) return;
-    await this.personService.deleteEmergencyContact(emergencyContact.id);
-    this.person.emergencyContacts = this.person.emergencyContacts.filter(value => value.id != emergencyContact.id);
-    this.snackBar.open(`Emergency Contact Deleted`, null, {duration: 2000});
-  }
-
   async saveEvaluation(evaluation: EvaluationWithNames,
                        panel: MatExpansionPanel,
                        evalComponent: EvaluationComponent,

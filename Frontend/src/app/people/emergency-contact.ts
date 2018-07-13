@@ -15,4 +15,6 @@ export class EmergencyContact extends BaseEntity {
 export class EmergencyContactExtended extends EmergencyContact {
   public contactPreferredName: string;
   public contactLastName: string;
+  public contactPhone: string;
+  public contactEmail: string;
 }
