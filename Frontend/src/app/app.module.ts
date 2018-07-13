@@ -125,6 +125,7 @@ import { DonationComponent } from './people/person/donor/donation.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { EducationComponent } from './people/person/education/education.component';
 import { DateAddPipe } from './services/date-add.pipe';
+import { AccordionListCustomActionDirective } from './components/accordion-list/accordion-list-custom-action.directive';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -197,6 +198,8 @@ if (environment.production) {
     EducationComponent
     ,
     DateAddPipe
+    ,
+    AccordionListCustomActionDirective
   ],
   entryComponents: [
     ConfirmDialogComponent,

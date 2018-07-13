@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dial
 import { BaseEntity } from '../../classes/base-entity';
 import { AccordionListHeaderDirective } from './accordion-list-header.directive';
 import { Observable } from 'rxjs';
+import { AccordionListCustomActionDirective } from './accordion-list-custom-action.directive';
 
 @Component({
   selector: 'app-accordion-list',
@@ -30,6 +31,7 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   forms: AccordionListFormDirective<T>[] = [];
   public header: AccordionListHeaderDirective<T>;
   public content: AccordionListContentDirective<T>;
+  public customAction: AccordionListCustomActionDirective<T>;
 
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
   }

@@ -28,6 +28,10 @@
       </ng-template>
     </ng-container>
     <mat-action-row *ngIf="showActions">
+      <ng-container *ngIf="customAction">
+        <ng-container *ngTemplateOutlet="customAction; context: {$implicit: item,  index: index}"></ng-container>
+        <span class="spacer"></span>
+      </ng-container>
       <button type="button" mat-button (click)="onDelete(item)" color="warn">Delete</button>
       <button type="button"
               (click)="forms[index].ngForm.ngSubmit.emit()"
