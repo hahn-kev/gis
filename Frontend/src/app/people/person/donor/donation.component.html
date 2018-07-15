@@ -36,7 +36,7 @@
 
       <mat-form-field>
         <mat-select name="missionOrg"
-                    [disabled]="isSelf"
+                    [disabled]="readonly"
                     [(ngModel)]="donation.missionOrgId"
                     placeholder="Sending Org">
           <mat-option [value]="null">None</mat-option>
