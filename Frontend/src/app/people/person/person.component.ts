@@ -75,7 +75,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
               private location: Location,
               private lazyLoadService: LazyLoadService) {
     loginService.safeUserToken().pipe(first()).subscribe(value => this.isAdmin = value.hasRole('admin'));
-    this.isSelf = this.router.url.indexOf('self') != -1;
+    this.isSelf = false;//this.router.url.indexOf('self') != -1;
     this.groups = this.lazyLoadService.share('orgGroups', () => this.groupService.getAll());
     this.missionOrgs = this.lazyLoadService.share('missionOrgs', () => missionOrgService.list());
     this.endorsements = this.lazyLoadService.share('endorsements', () => this.endorsementService.list());
@@ -183,7 +183,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   async save(): Promise<void> {
     let extras: NavigationExtras = {};
-    let savedPerson = await this.personService.updatePerson(this.person, this.isSelf);
+    let savedPerson = await this.personService.updatePerson(this.person, this.router.url.indexOf('self') != -1);
     this.snackBar.open(`${savedPerson.preferredName} Saved`, null, {duration: 2000});
     let commands: Array<any> = ['/people/list'];
     if (this.isNew) {

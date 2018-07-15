@@ -447,7 +447,7 @@
       <span class="mat-caption">Roles</span>
       <mat-accordion class="roles">
         <!--new role-->
-        <ng-container *ngIf="'addRoles' | isUserPolicy">
+        <ng-container>
           <mat-expansion-panel #newRolePanel
                                *ngIf="!isSelf"
                                [disabled]="isNew"
@@ -516,7 +516,7 @@
       <span class="mat-caption">Evaluations</span>
       <mat-accordion class="evaluations">
         <!--new evaluation-->
-        <ng-container *ngIf="'addEvaluations' | isUserPolicy">
+        <ng-container>
           <mat-expansion-panel #newEvalPanel
                                *ngIf="!isSelf"
                                [disabled]="isNew"
