@@ -18,6 +18,8 @@
     </mat-action-row>
   </mat-expansion-panel>
 
+  <ng-content select="before"></ng-content>
+
   <mat-expansion-panel #itemPanel *ngFor="let item of items; index as index">
     <mat-expansion-panel-header *ngIf="header">
       <ng-container *ngTemplateOutlet="header; context: {$implicit: item, index: index}"></ng-container>
@@ -40,4 +42,7 @@
       </button>
     </mat-action-row>
   </mat-expansion-panel>
+
+
+  <ng-content select="after"></ng-content>
 </mat-accordion>

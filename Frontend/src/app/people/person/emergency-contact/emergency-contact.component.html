@@ -17,6 +17,8 @@
       <mat-panel-description>{{contact.phone || contact.email || ''}}</mat-panel-description>
     </ng-template>
   </ng-container>
+  <ng-content ngProjectAs="before">
+  </ng-content>
   <ng-container *appAccordionListContent="let emergencyContact;">
     <form appAccordionListForm class="two-colum-grid">
       <mat-slide-toggle #customContactSwitch
