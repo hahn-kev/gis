@@ -42,6 +42,11 @@ namespace Backend.Controllers
                 : (Guid?) null;
         }
 
+        public static bool IsStaff(this ClaimsPrincipal user)
+        {
+            return user.PersonId() != null;
+        }
+
         public static bool IsInAnyRole(this ClaimsPrincipal user, params string[] roles)
         {
             return roles.Any(user.IsInRole);
