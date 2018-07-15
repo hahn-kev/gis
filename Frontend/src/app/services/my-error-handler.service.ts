@@ -26,11 +26,6 @@ export class MyErrorHandlerService implements ErrorHandler {
   }
 
   handleError(error: any): void {
-    if (!this.snackBarService) {
-      //this error handeler gets created very early, so we must inject services here
-      this.snackBarService = this.injector.get(MatSnackBar);
-    }
-
     let message: string;
     if (error.rejection) {
       if (error.rejection instanceof HttpErrorResponse) {
@@ -45,6 +40,27 @@ export class MyErrorHandlerService implements ErrorHandler {
     } else {
       message = error.toString();
     }
+    if (this.snackBarService != null) {
+      this.showSnackbar(message);
+    }
+    if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse) && environment.production) {
+      //don't report http errors, the server will report those
+      Raven.captureException(error);
+    }
+    this.original.handleError(error);
+  }
+
+  showSnackbar(message: string) {
+    try {
+      if (!this.snackBarService) {
+        //this error handler gets created very early, so we must inject services here
+        this.snackBarService = this.injector.get(MatSnackBar);
+      }
+    } catch (e) {
+      this.original.handleError(e);
+      console.error('Unable to inject snackbar service');
+    }
+
     if (NgZone.isInAngularZone()) {
       this.snackBarService.open(message, 'Dismiss');
     } else if (this.timeSinceLast() > 100) {
@@ -52,11 +68,6 @@ export class MyErrorHandlerService implements ErrorHandler {
         this.snackBarService.open(message, 'Dismiss');
       });
     }
-    if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse) && environment.production) {
-      //don't report http errors, the server will report those
-      Raven.captureException(error);
-    }
-    this.original.handleError(error);
   }
 
   static getHttpError(rejection: HttpErrorResponse): string {
