@@ -171,16 +171,16 @@ namespace Backend
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("role",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("evaluations",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("staff",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("contact",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("isSupervisor",
                     builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
                 options.AddPolicy("leaveRequest",
@@ -188,13 +188,13 @@ namespace Backend
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("training",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("orgGroup",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("endorsement",
                     builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor() || context.User.IsStaff()));
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("people",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsInAnyRole("admin", "hr", "registrar") ||

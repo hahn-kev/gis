@@ -44,6 +44,7 @@
         </mat-form-field>
         <app-quick-add-button
           caption="Contact"
+          *ngIf="'peopleEdit' | isUserPolicy"
           [(personId)]="emergencyContact.contactId"
           (personIdChange)="updateContactName($event)"
           (updateList)="personAdded($event)">
@@ -95,7 +96,7 @@
   </ng-container>
   <ng-container *appAccordionListCustomAction="let contact;">
     <a [routerLink]="'/people/edit/' + contact.contactId"
-       *ngIf="contact.contactId"
+       *ngIf="('peopleEdit' | isUserPolicy) && contact.contactId"
        [matTooltip]="'View ' + contact.contactPreferredName + ' ' + contact.contactLastName"
        matTooltipPosition="after"
        mat-icon-button>
