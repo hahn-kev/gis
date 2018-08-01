@@ -122,8 +122,9 @@ namespace UnitTestProject
                 DbConnection.InsertId(
                     new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
             }
-            
-            DbConnection.MappingSchema.SetConvertExpression<string, string[]>(s => s.Split(',', StringSplitOptions.RemoveEmptyEntries), true);
+
+            DbConnection.MappingSchema.SetConvertExpression<string, string[]>(
+                s => s.Split(',', StringSplitOptions.RemoveEmptyEntries), true);
             DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
         }
 
@@ -266,6 +267,11 @@ namespace UnitTestProject
             return person;
         }
 
+        public PersonWithStaff InsertStaff(Guid orgGroupId)
+        {
+            return InsertPerson(staff => staff.Staff.OrgGroupId = orgGroupId);
+        }
+
         public PersonRole InsertRole(Guid jobId, Guid personId = default(Guid), int years = 2, bool active = true)
         {
             return InsertRole(role =>
@@ -341,6 +347,17 @@ namespace UnitTestProject
             tr.CompletedDate = completedDate;
             _dbConnection.Insert(tr);
             return tr;
+        }
+
+        public OrgGroup InsertOrgGroup(Guid? parentId = null, Guid? supervisorId = null,
+            Action<OrgGroup> action = null)
+        {
+            var orgGroup = AutoFaker.Generate<OrgGroup>();
+            orgGroup.ParentId = parentId;
+            orgGroup.Supervisor = supervisorId;
+            action?.Invoke(orgGroup);
+            _dbConnection.Insert(orgGroup);
+            return orgGroup;
         }
 
         public void SetupData()

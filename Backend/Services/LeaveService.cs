@@ -84,7 +84,8 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
-            var leaveUsage = GetLeaveUseage(leaveRequest.Type, result.personOnLeave.Id, leaveRequest.StartDate.SchoolYear());
+            var leaveUsage = GetLeaveUseage(leaveRequest.Type, result.personOnLeave.Id,
+                leaveRequest.StartDate.SchoolYear());
             var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
             try
@@ -344,15 +345,40 @@ namespace Backend.Services
             return 20;
         }
 
-        public IList<PersonAndLeaveDetails> PeopleWithCurrentLeave(Guid? personId)
+        public PersonAndLeaveDetails PersonWithCurrentLeave(Guid personId)
         {
-            return PeopleWithLeave(personId, DateTime.Now.SchoolYear());
+            return PersonWithLeave(personId, DateTime.Now.SchoolYear());
         }
 
-        public IList<PersonAndLeaveDetails> PeopleWithLeave(Guid? personId, int schoolYear)
+        public PersonAndLeaveDetails PersonWithLeave(Guid personId, int schoolYear)
         {
             var peopleQueryable = _personRepository.PeopleWithStaff.Where(person =>
-                person.StaffId != null && (personId == null || person.Id == personId));
+                person.StaffId != null && person.Id == personId);
+            return PeopleWithLeave(peopleQueryable, schoolYear).FirstOrDefault();
+        }
+
+        public IList<PersonAndLeaveDetails> PeopleInGroupWithCurrentLeave(Guid orgGroupId)
+        {
+            var peopleWithStaff = from person in _personRepository.PeopleWithStaff
+                from org in _orgGroupRepository.GetByIdWithChildren(orgGroupId)
+                    .InnerJoin(orgGroup => orgGroup.Id == person.Staff.OrgGroupId)
+                select person;
+            return PeopleWithLeave(peopleWithStaff, DateTime.Now.SchoolYear());
+        }
+
+        public IList<PersonAndLeaveDetails> PeopleWithCurrentLeave()
+        {
+            return PeopleWithLeave(DateTime.Now.SchoolYear());
+        }
+
+        public IList<PersonAndLeaveDetails> PeopleWithLeave(int schoolYear)
+        {
+            return PeopleWithLeave(_personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null), schoolYear);
+        }
+
+        private IList<PersonAndLeaveDetails> PeopleWithLeave(IQueryable<PersonWithStaff> peopleQueryable,
+            int schoolYear)
+        {
             var leaveRequests = (
                     from request in _personRepository.LeaveRequestsInYear(schoolYear)
                     from p in peopleQueryable.InnerJoin(person => person.Id == request.PersonId)
@@ -363,7 +389,7 @@ namespace Backend.Services
                     from person in peopleQueryable.InnerJoin(person => person.Id == role.PersonId)
                     select role)
                 .ToLookup(role => role.PersonId);
-            
+
             return peopleQueryable.Select(person => new PersonAndLeaveDetails
             {
                 Person = person,

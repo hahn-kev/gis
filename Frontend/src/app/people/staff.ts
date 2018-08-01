@@ -20,6 +20,7 @@ export class Staff extends BaseEntity {
   public endorsements: string;
   public endorsementAgency: string;
   public yearsOfServiceAdjustment = 0;
+  public leaveDelegateGroupId: string;
 
   constructor(id?: string) {
     super();

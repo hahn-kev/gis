@@ -205,7 +205,7 @@ namespace UnitTestProject
         [Fact]
         public void ListAllLeaveWorks()
         {
-            var personAndLeaveDetailses = _leaveService.PeopleWithCurrentLeave(null);
+            var personAndLeaveDetailses = _leaveService.PeopleWithCurrentLeave();
             Assert.NotEmpty(personAndLeaveDetailses);
         }
     }

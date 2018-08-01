@@ -17,7 +17,6 @@
                     [(ngModel)]="leaveRequest.personId"
                     (ngModelChange)="personSelectedChanged($event)"
                     required
-                    [disabled]="!isHr"
                     placeholder="Person Leaving">
           <mat-option>None</mat-option>
           <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.person.id">

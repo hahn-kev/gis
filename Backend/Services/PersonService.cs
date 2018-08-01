@@ -43,6 +43,11 @@ namespace Backend.Services
 
         public IList<Person> SchoolAids() => _personRepository.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
 
+        public PersonWithStaff GetStaffById(Guid personId)
+        {
+            return _personRepository.PeopleWithStaff.FirstOrDefault(person => person.Id == personId);
+        }
+        
         public PersonWithOthers GetById(Guid id)
         {
             var personWithOthers = _personRepository.GetById(id);

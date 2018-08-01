@@ -18,10 +18,12 @@ namespace Backend.Controllers
     public class LeaveRequestController : MyController
     {
         private readonly LeaveService _leaveService;
+        private readonly IAuthorizationService _authorizationService;
 
-        public LeaveRequestController(LeaveService leaveService)
+        public LeaveRequestController(LeaveService leaveService, IAuthorizationService authorizationService)
         {
             _leaveService = leaveService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -106,15 +108,32 @@ namespace Backend.Controllers
 
 
         [HttpGet("people")]
-        public IList<PersonAndLeaveDetails> PeopleWithLeave(bool listAll = false)
+        public async ValueTask<IList<PersonAndLeaveDetails>> PeopleWithLeave()
         {
-            //todo allow users with the 'leaveRequest' policy to access this too
-            if (listAll && !User.IsAdminOrHr())
-                throw new UnauthorizedAccessException("Only admin and hr users are allowed to see all leave");
-            return _leaveService.PeopleWithCurrentLeave(listAll
-                ? (Guid?) null
-                : (User.PersonId() ??
-                   throw new AuthenticationException("If user isn't admin or hr they must have a personId")));
+            if ((await _authorizationService.AuthorizeAsync(User, "leaveRequest")).Succeeded)
+            {
+                return _leaveService.PeopleWithCurrentLeave();
+            }
+
+            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
+            if (groupId.HasValue)
+            {
+                var personId = User.PersonId();
+                var people = _leaveService.PeopleInGroupWithCurrentLeave(groupId.Value);
+                if (personId != null && people.All(details => details.Person.Id != personId))
+                {
+                    people.Insert(0, _leaveService.PersonWithCurrentLeave(personId.Value));
+                }
+
+                return people;
+            }
+
+            return new List<PersonAndLeaveDetails>
+            {
+                _leaveService.PersonWithCurrentLeave(User.PersonId() ??
+                                                     throw new AuthenticationException(
+                                                         "User must be a person to request leave"))
+            };
         }
     }
 }

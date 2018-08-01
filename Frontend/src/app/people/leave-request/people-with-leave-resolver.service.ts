@@ -10,12 +10,10 @@ import { first, switchMap } from 'rxjs/operators';
 export class PeopleWithLeaveResolverService implements Resolve<PersonAndLeaveDetails[]> {
   resolve(route: ActivatedRouteSnapshot,
           state: RouterStateSnapshot): Observable<PersonAndLeaveDetails[]> | Promise<PersonAndLeaveDetails[]> | PersonAndLeaveDetails[] {
-    return this.loginService.hasAnyRole(['admin', 'hr'])
-      .pipe(first(),
-        switchMap(isHrAdmin => this.leaveRequestService.listPeopleWithLeave(isHrAdmin)));
+    return this.leaveRequestService.listPeopleWithLeave();
   }
 
-  constructor(private leaveRequestService: LeaveRequestService, private loginService: LoginService) {
+  constructor(private leaveRequestService: LeaveRequestService) {
   }
 
 }

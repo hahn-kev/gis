@@ -37,9 +37,7 @@ namespace Backend.Controllers
 
         public static Guid? PersonId(this ClaimsPrincipal user)
         {
-            return Guid.TryParse(user.FindFirstValue(AuthenticateController.ClaimPersonId), out var guid)
-                ? guid
-                : (Guid?) null;
+            return user.ClaimValueAsGuid(AuthenticateController.ClaimPersonId);
         }
 
         public static bool IsStaff(this ClaimsPrincipal user)
@@ -79,13 +77,28 @@ namespace Backend.Controllers
             return user.HasClaim(claim => claim.Type == AuthenticateController.ClaimSupervisor);
         }
 
+        public static Guid? SupervisorGroupId(this ClaimsPrincipal user)
+        {
+            return user.ClaimValueAsGuid(AuthenticateController.ClaimSupervisor);
+        }
+
+        public static Guid? LeaveDelegateGroupId(this ClaimsPrincipal user)
+        {
+            return user.ClaimValueAsGuid(AuthenticateController.ClaimLeaveDelegate);
+        }
+
+        private static Guid? ClaimValueAsGuid(this ClaimsPrincipal user, string claimType)
+        {
+            return Guid.TryParse(user.FindFirstValue(claimType), out var guid) ? guid : (Guid?) null;
+        }
+
         static readonly MediaTypeHeaderValue JsonMediaType = MediaTypeHeaderValue.Parse("application/json");
 
         public static bool IsJsonRequest(this HttpContext context)
         {
             return context.Request.GetTypedHeaders().Accept?.Any(value => value.IsSubsetOf(JsonMediaType)) == true;
         }
-        
+
         public static IList<T> RemoveSalary<T>(this IList<T> list) where T : Staff
         {
             foreach (var ent in list)

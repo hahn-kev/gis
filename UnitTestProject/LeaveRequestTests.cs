@@ -42,7 +42,8 @@ namespace UnitTestProject
             Assert.NotNull(jacob);
             var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
             Assert.NotNull(expectedSupervisor);
-            var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
+            var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest
+                {PersonId = jacob.Id, StartDate = DateTime.Now});
             Assert.NotNull(actualSupervisor);
             Assert.Equal(expectedSupervisor.FirstName, actualSupervisor.FirstName);
         }
@@ -613,6 +614,39 @@ namespace UnitTestProject
             _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId);
         }
 
+        [Fact]
+        public void LeaveListByOrgGroupShouldIncludeChildGroupStaff()
+        {
+            PersonWithStaff rootStaff = null;
+
+            PersonWithStaff aStaff = null;
+            PersonWithStaff bStaff = null;
+            PersonWithStaff a1Staff = null;
+            var rootGroup = _servicesFixture.InsertOrgGroup(action: rootGroupA =>
+            {
+                rootStaff = _servicesFixture.InsertStaff(rootGroupA.Id);
+                _servicesFixture.InsertOrgGroup(rootGroupA.Id,
+                    action: aGroupA =>
+                    {
+                        aStaff = _servicesFixture.InsertStaff(aGroupA.Id);
+                        _servicesFixture.InsertOrgGroup(aGroupA.Id,
+                            action: a1GroupA => { a1Staff = _servicesFixture.InsertStaff(a1GroupA.Id); });
+                    });
+
+                _servicesFixture.InsertOrgGroup(rootGroupA.Id,
+                    action: bGroup => bStaff = _servicesFixture.InsertStaff(bGroup.Id));
+            });
+            rootStaff.ShouldNotBeNull();
+            aStaff.ShouldNotBeNull();
+            bStaff.ShouldNotBeNull();
+            a1Staff.ShouldNotBeNull();
+            aStaff.Staff.OrgGroupId.ShouldNotBeNull();
+            var actualStaff = _leaveService.PeopleInGroupWithCurrentLeave(aStaff.Staff.OrgGroupId.Value);
+            actualStaff.Select(details => details.Person.Id).ShouldBe(new[] {aStaff.Id, a1Staff.Id}, true);
+            actualStaff.Select(details => details.Person.Id).ShouldNotContain(rootStaff.Id);
+            actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
+        }
+
         LeaveUsage VacationLeave(IEnumerable<LeaveUsage> enumerable)
         {
             return enumerable.Single(usage => usage.LeaveType == LeaveType.Vacation);
@@ -623,9 +657,9 @@ namespace UnitTestProject
             return new[]
             {
                 VacationLeave(_leaveService.GetLeaveDetails(personId, year).LeaveUsages),
-                VacationLeave(_leaveService.PeopleWithLeave(null, year)
+                VacationLeave(_leaveService.PeopleWithLeave(year)
                     .Single(details => details.Person.Id == personId).LeaveUsages),
-                VacationLeave(_leaveService.PeopleWithLeave(personId, year).Single().LeaveUsages),
+                VacationLeave(_leaveService.PersonWithLeave(personId, year).LeaveUsages),
                 _leaveService.GetLeaveUseage(LeaveType.Vacation, personId, year),
             };
         }
@@ -768,7 +802,7 @@ namespace UnitTestProject
                         //first week day of July 2017
                         LR(Date(2017, 7, 3), Date(2017, 7, 3))
                     }, used: 1);
-                
+
                 yield return (P(),
                     new[]
                     {

@@ -28,15 +28,17 @@ namespace Backend.Controllers
         private readonly UserService _userService;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly SecurityTokenHandler _securityTokenHandler;
+        private readonly PersonService _personService;
         private readonly Settings _settings;
 
         public AuthenticateController(IOptions<JWTSettings> jwtOptions,
             SignInManager<IdentityUser> signInManager,
             IOptions<Settings> options,
-            UserService userService)
+            UserService userService, PersonService personService)
         {
             _signInManager = signInManager;
             _userService = userService;
+            _personService = personService;
             _securityTokenHandler = new JwtSecurityTokenHandler();
             _jwtOptions = jwtOptions.Value;
             _settings = options.Value;
@@ -94,6 +96,7 @@ namespace Backend.Controllers
         public const string ClaimPersonId = "personId";
         public const string ClaimSupervisor = "supervisesGroupId";
         public const string ClaimSupervisorType = "supervisesGroupType";
+        public const string ClaimLeaveDelegate = "leaveDelegateGroupId";
         public const string GoogleOAuthTokenName = "access_token";
 
         public const string GisEmailSufix = "@gisthailand.org";
@@ -235,6 +238,11 @@ namespace Backend.Controllers
                     claims.Add(new Claim(ClaimSupervisor, group.Id.ToString()));
                     claims.Add(new Claim(ClaimSupervisorType, group.Type.ToString()));
                 }
+                var personWithStaff = _personService.GetStaffById(identityUser.PersonId.Value);
+
+                if (personWithStaff.Staff.LeaveDelegateGroupId.HasValue)
+                    claims.Add(new Claim(ClaimLeaveDelegate,
+                        personWithStaff.Staff.LeaveDelegateGroupId.Value.ToString()));
             }
 
             return claims;

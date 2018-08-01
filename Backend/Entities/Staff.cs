@@ -25,6 +25,7 @@ namespace Backend.Entities
         public string Endorsements { get; set; }
         public string EndorsementAgency { get; set; }
         public decimal YearsOfServiceAdjustment { get; set; }
+        public Guid? LeaveDelegateGroupId { get; set; }
 
         public void RemoveSalary()
         {
