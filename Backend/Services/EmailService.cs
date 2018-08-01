@@ -157,8 +157,7 @@ namespace Backend.Services
             }
 
             if (!tos.Any()) return Task.CompletedTask;
-            if (fromEmail == null)
-                throw new ArgumentNullException(nameof(fromEmail), $"{fromName} does not have an email assigned");
+            fromEmail = string.IsNullOrEmpty(fromEmail) ? "dont-reply@gisthailand.org" : fromEmail;
             var msg = new SendGridMessage
             {
                 Personalizations = new List<Personalization>
