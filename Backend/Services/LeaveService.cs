@@ -8,6 +8,7 @@ using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Utils;
 using LinqToDB;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -22,19 +23,21 @@ namespace Backend.Services
         private readonly IEmailService _emailService;
         private readonly Settings _settings;
         private readonly IEntityService _entityService;
+        private readonly IAuthorizationService _authorizationService;
 
         public LeaveService(OrgGroupRepository orgGroupRepository,
             PersonRepository personRepository,
             IEmailService emailService,
             IOptions<Settings> options,
             LeaveRequestRepository leaveRequestRepository,
-            IEntityService entityService)
+            IEntityService entityService, IAuthorizationService authorizationService)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
             _emailService = emailService;
             _leaveRequestRepository = leaveRequestRepository;
             _entityService = entityService;
+            _authorizationService = authorizationService;
             _settings = options.Value;
         }
 
@@ -222,10 +225,14 @@ namespace Backend.Services
                 supervisor);
         }
 
-        public bool CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
+        public async ValueTask<bool> CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
         {
-            return leaveRequest.PersonId == user.PersonId() ||
-                   user.IsAdminOrHr();
+            if (leaveRequest.PersonId == user.PersonId()) return true;
+            if ((await _authorizationService.AuthorizeAsync(user, "leaveRequest")).Succeeded) return true;
+            var groupId = user.LeaveDelegateGroupId() ?? user.SupervisorGroupId();
+            if (groupId != null)
+                return PeopleWithStaffUnderGroup(groupId.Value).Any(person => person.Id == leaveRequest.PersonId);
+            return false;
         }
 
         public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
@@ -359,10 +366,7 @@ namespace Backend.Services
 
         public IList<PersonAndLeaveDetails> PeopleInGroupWithCurrentLeave(Guid orgGroupId)
         {
-            var peopleWithStaff = from person in _personRepository.PeopleWithStaff
-                from org in _orgGroupRepository.GetByIdWithChildren(orgGroupId)
-                    .InnerJoin(orgGroup => orgGroup.Id == person.Staff.OrgGroupId)
-                select person;
+            var peopleWithStaff = PeopleWithStaffUnderGroup(orgGroupId);
             return PeopleWithLeave(peopleWithStaff, DateTime.Now.SchoolYear());
         }
 
@@ -404,6 +408,14 @@ namespace Backend.Services
                 oldRequest = _leaveRequestRepository.LeaveRequests.SingleOrDefault(request =>
                     request.Id == updatedLeaveRequest.Id);
             ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest, personMakingChanges);
+        }
+
+        private IQueryable<PersonWithStaff> PeopleWithStaffUnderGroup(Guid orgGroupId)
+        {
+            return from person in _personRepository.PeopleWithStaff
+                from org in _orgGroupRepository.GetByIdWithChildren(orgGroupId)
+                    .InnerJoin(orgGroup => orgGroup.Id == person.Staff.OrgGroupId)
+                select person;
         }
 
         public void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
