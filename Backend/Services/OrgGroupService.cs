@@ -47,7 +47,9 @@ namespace Backend.Services
 
         public OrgTreeData OrgTreeData(Guid? groupId = null)
         {
-            var orgGroups = _orgGroupRepository.GetByIdWithChildren(groupId);
+            var orgGroups = groupId.HasValue
+                ? _orgGroupRepository.GetByIdWithChildren(groupId.Value)
+                : _orgGroupRepository.OrgGroups;
 
             var jobs = from job in _jobRepository.Job
                 from orgGroup in orgGroups.InnerJoin(g => g.Id == job.OrgGroupId)
