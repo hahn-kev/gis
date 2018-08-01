@@ -212,7 +212,8 @@ namespace Backend.DataLayer
                 EndorsementAgency = staff.EndorsementAgency,
                 Endorsements = staff.Endorsements,
                 YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
-                PhoneExt = staff.PhoneExt
+                PhoneExt = staff.PhoneExt,
+                LeaveDelegateGroupId = staff.LeaveDelegateGroupId
             };
 
         public IQueryable<StaffWithOrgName> StaffWithOrgNames =>
@@ -242,6 +243,7 @@ namespace Backend.DataLayer
                 Endorsements = staff.Endorsements,
                 YearsOfServiceAdjustment = staff.YearsOfServiceAdjustment,
                 PhoneExt = staff.PhoneExt,
+                LeaveDelegateGroupId = staff.LeaveDelegateGroupId,
                 OrgGroupName = orgGroup.GroupName,
                 OrgGroupSupervisor = orgGroup.Supervisor
             };
