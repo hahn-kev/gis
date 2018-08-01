@@ -42,6 +42,11 @@ export class UserToken {
     return !!this.token['supervisesGroupId'];
   }
 
+  get isLeaveDelegate(): boolean {
+    if (!this.token) return false;
+    return !!this.token['leaveDelegateGroupId'];
+  }
+
   get orgGroupId(): string {
     if (!this.isSupervisor) return null;
     return this.token['supervisesGroupId'];

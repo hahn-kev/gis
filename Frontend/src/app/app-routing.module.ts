@@ -272,6 +272,13 @@ const routes: Routes = [
             }
           },
           {
+            path: 'report',
+            component: LeaveReportComponent,
+            resolve: {
+              people: PeopleWithLeaveResolverService
+            }
+          },
+          {
             path: '',
             canActivate: [PolicyGuard],
             data: {
@@ -290,13 +297,6 @@ const routes: Routes = [
                 component: LeaveListComponent,
                 resolve: {
                   leave: LeaveListResolverService
-                }
-              },
-              {
-                path: 'report',
-                component: LeaveReportComponent,
-                resolve: {
-                  people: PeopleWithLeaveResolverService
                 }
               }
             ]

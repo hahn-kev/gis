@@ -68,6 +68,13 @@
               <mat-icon mat-list-icon>location_city</mat-icon>
               <span mat-line>My People</span>
             </a>
+            <a *ngIf="user.isSupervisor || user.isLeaveDelegate"
+               mat-list-item
+               routerLink="/leave-request/report"
+               routerLinkActive="active-link">
+              <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
+              <span mat-line>My People's Leave</span>
+            </a>
           </ng-container>
 
           <ng-container *ngIf="'hrEdit' | isUserPolicy">
