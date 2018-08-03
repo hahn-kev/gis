@@ -240,7 +240,7 @@ namespace Backend.Controllers
                 }
                 var personWithStaff = _personService.GetStaffById(identityUser.PersonId.Value);
 
-                if (personWithStaff.Staff.LeaveDelegateGroupId.HasValue)
+                if (personWithStaff.Staff?.LeaveDelegateGroupId != null)
                     claims.Add(new Claim(ClaimLeaveDelegate,
                         personWithStaff.Staff.LeaveDelegateGroupId.Value.ToString()));
             }
