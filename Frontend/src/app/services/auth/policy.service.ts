@@ -11,7 +11,7 @@ export class PolicyService {
   constructor() {
     this.policies = {
       viewSalary: (user: UserToken) => user.hasAnyRole(['admin', 'hradmin']),
-      orgGroupManager: (user: UserToken) => user.hasAnyRole(['admin', 'hradmin']) || user.isHigherup,
+      orgGroupManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
       orgChart: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isSupervisor,
       leaveManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
       endorsementManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
@@ -27,7 +27,7 @@ export class PolicyService {
     };
   }
 
-  getPolicy(policy: string) {
+  getPolicy(policy: string): (user: UserToken) => boolean {
     return this.policies[policy];
   }
 }
