@@ -4,7 +4,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0 --disable-host-check",
     "start:hmr": "ng serve --hmr -e=hmr",
     "build": "ng build --prod",
     "test": "ng test",
