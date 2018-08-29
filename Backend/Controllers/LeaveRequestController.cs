@@ -36,7 +36,7 @@ namespace Backend.Controllers
         [HttpGet("person/{personId}")]
         public IList<LeaveRequestWithNames> ListByPerson(Guid personId)
         {
-            if (!User.IsAdminOrHr() && User.PersonId() != personId)
+            if ((!User.IsAdminOrHr() && !User.IsHighLevelSupervisor()) && User.PersonId() != personId)
                 throw new UnauthorizedAccessException(
                     "You're only allowed to list your leave requests unless you're hr");
             return _leaveService.ListByPersonId(personId);
