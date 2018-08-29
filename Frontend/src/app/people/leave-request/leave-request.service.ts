@@ -43,12 +43,12 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/supervisor/' + supervisorId);
   }
 
-  listPeopleWithLeave(): Observable<PersonAndLeaveDetails[]> {
-    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people');
+  listPeopleWithLeave(year: number): Observable<PersonAndLeaveDetails[]> {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people', {params: {year: year.toString()}});
   }
 
-  listMyPeopleWithLeave() {
-    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/mine');
+  listMyPeopleWithLeave(year: number) {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/mine', {params: {year: year.toString()}});
   }
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {

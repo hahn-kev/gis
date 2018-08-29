@@ -275,15 +275,34 @@ const routes: Routes = [
                 }
               },
               {
+                path: 'mine/:year',
+                component: LeaveReportComponent,
+                resolve: {
+                  people: PeopleWithLeaveResolverService
+                }
+              },
+              {
                 path: '',
                 canActivate: [PolicyGuard],
                 data: {
                   requirePolicy: 'leaveManager'
                 },
-                component: LeaveReportComponent,
-                resolve: {
-                  people: PeopleWithLeaveResolverService
-                }
+                children: [
+                  {
+                    path: ':year',
+                    component: LeaveReportComponent,
+                    resolve: {
+                      people: PeopleWithLeaveResolverService
+                    }
+                  },
+                  {
+                    path: '',
+                    component: LeaveReportComponent,
+                    resolve: {
+                      people: PeopleWithLeaveResolverService
+                    }
+                  }
+                ]
               }
             ],
           },

@@ -6,22 +6,35 @@
   <mat-form-field floatLabel="never">
     <input autofocus matInput [(ngModel)]="urlBinding.values.search" placeholder="Search">
   </mat-form-field>
-  <mat-form-field>
-    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
-      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+  <mat-form-field style="padding-left: 8px; width: 100px">
+    <mat-select [(ngModel)]="urlBinding.values.year"
+                placeholder="School Year">
+      <mat-option *ngFor="let year of years" [value]="year.value">{{year.name}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field>
-    <mat-select placeholder="Filter Sending Org" [(ngModel)]="urlBinding.values.sendingOrg" multiple>
-      <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <button mat-icon-button (click)="filterDialog.show()" class="print-hide" matTooltip="Filters">
+    <mat-icon>filter_list</mat-icon>
+  </button>
   <a mat-button [routerLink]="['/leave-request', 'list', isMine ? 'supervisor':'']">
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
-    Show all Leave Requests
+    Show Leave Requests
   </a>
   <app-export-button [values]="dataSource" fileName="leaveSummaryData"></app-export-button>
 </ng-container>
+<ng-template #filterDialog="dialog" appDialog="Filter">
+  <div class="two-colum-grid">
+    <mat-form-field>
+      <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+        <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Filter Sending Org" [(ngModel)]="urlBinding.values.sendingOrg" multiple>
+        <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>
 <mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="staff">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Staff</mat-header-cell>

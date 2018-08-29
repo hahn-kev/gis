@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {UrlBindingService} from '../../../services/url-binding.service';
 import {PersonLeaveModel} from './person-leave-model';
 import {MatSort} from '@angular/material';
+import {Year} from "../../training-requirement/year";
 
 @Component({
   selector: 'app-leave-report',
@@ -13,6 +14,7 @@ import {MatSort} from '@angular/material';
   providers: [UrlBindingService]
 })
 export class LeaveReportComponent implements OnInit {
+  public years = Year.years();
   public dataSource = new AppDataSource<PersonLeaveModel>();
   public allOrgGroups: string[] = [];
   public allMissionOrgs: string[] = [];
@@ -20,9 +22,10 @@ export class LeaveReportComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ search: string, group: string[], sendingOrg: string[] }>) {
+              public urlBinding: UrlBindingService<{ search: string, group: string[], sendingOrg: string[], year: number }>) {
     this.urlBinding.addParam('group', []);
     this.urlBinding.addParam('sendingOrg', []);
+    this.urlBinding.addParam('year', Year.CurrentSchoolYear(), true);
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.trim().toUpperCase());
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     this.dataSource.filterPredicate = ((data, filter) =>

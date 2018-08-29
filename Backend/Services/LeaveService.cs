@@ -372,10 +372,10 @@ namespace Backend.Services
             return PeopleWithLeave(peopleQueryable, schoolYear).FirstOrDefault();
         }
 
-        public IList<PersonAndLeaveDetails> PeopleInGroupWithCurrentLeave(Guid orgGroupId)
+        public IList<PersonAndLeaveDetails> PeopleInGroupWithLeave(Guid orgGroupId, int schoolYear)
         {
             var peopleWithStaff = PeopleWithStaffUnderGroup(orgGroupId);
-            return PeopleWithLeave(peopleWithStaff, DateTime.Now.SchoolYear());
+            return PeopleWithLeave(peopleWithStaff, schoolYear);
         }
 
         public IList<PersonAndLeaveDetails> PeopleWithCurrentLeave()

@@ -118,22 +118,22 @@ namespace Backend.Controllers
 
         [HttpGet("people")]
         [Authorize(Policy = "leaveRequest")]
-        public IList<PersonAndLeaveDetails> PeopleWithLeave()
+        public IList<PersonAndLeaveDetails> PeopleWithLeave(int year)
         {
-            return _leaveService.PeopleWithCurrentLeave();
+            return _leaveService.PeopleWithLeave(year);
         }
 
         [HttpGet("people/mine")]
-        public IList<PersonAndLeaveDetails> MyPeopleWithLeave()
+        public IList<PersonAndLeaveDetails> MyPeopleWithLeave(int year)
         {
             var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
             if (groupId.HasValue)
             {
                 var personId = User.PersonId();
-                var people = _leaveService.PeopleInGroupWithCurrentLeave(groupId.Value);
+                var people = _leaveService.PeopleInGroupWithLeave(groupId.Value, year);
                 if (personId != null && people.All(details => details.Person.Id != personId))
                 {
-                    people.Insert(0, _leaveService.PersonWithCurrentLeave(personId.Value));
+                    people.Insert(0, _leaveService.PersonWithLeave(personId.Value, year));
                 }
 
                 return people;
@@ -141,9 +141,9 @@ namespace Backend.Controllers
 
             return new List<PersonAndLeaveDetails>
             {
-                _leaveService.PersonWithCurrentLeave(User.PersonId() ??
+                _leaveService.PersonWithLeave(User.PersonId() ??
                                                      throw new AuthenticationException(
-                                                         "User must be a person to request leave"))
+                                                         "User must be a person to request leave"), year)
             };
         }
     }
