@@ -21,6 +21,7 @@ namespace Backend.DataLayer
             from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
             from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById).DefaultIfEmpty()
             where !person.Deleted
+            orderby l.StartDate descending 
             select new LeaveRequestWithNames
             {
                 Approved = l.Approved,

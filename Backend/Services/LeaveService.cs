@@ -48,7 +48,6 @@ namespace Backend.Services
         {
             return _leaveRequestRepository.LeaveRequestWithNames
                 .Where(request => request.PersonId == personId)
-                .OrderBy(leaveRequest => leaveRequest.StartDate)
                 .ToList();
         }
 
