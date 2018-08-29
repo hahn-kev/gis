@@ -641,7 +641,7 @@ namespace UnitTestProject
             bStaff.ShouldNotBeNull();
             a1Staff.ShouldNotBeNull();
             aStaff.Staff.OrgGroupId.ShouldNotBeNull();
-            var actualStaff = _leaveService.PeopleInGroupWithCurrentLeave(aStaff.Staff.OrgGroupId.Value);
+            var actualStaff = _leaveService.PeopleInGroupWithLeave(aStaff.Staff.OrgGroupId.Value, DateTime.Now.SchoolYear());
             actualStaff.Select(details => details.Person.Id).ShouldBe(new[] {aStaff.Id, a1Staff.Id}, true);
             actualStaff.Select(details => details.Person.Id).ShouldNotContain(rootStaff.Id);
             actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
