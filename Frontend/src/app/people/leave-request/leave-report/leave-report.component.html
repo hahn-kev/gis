@@ -16,7 +16,7 @@
       <mat-option *ngFor="let orgName of allMissionOrgs" [value]="orgName">{{orgName}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <a mat-button routerLink="/leave-request/list">
+  <a mat-button [routerLink]="['/leave-request', 'list', isMine ? 'supervisor':'']">
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
     Show all Leave Requests
   </a>

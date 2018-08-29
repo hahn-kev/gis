@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Backend.Entities;
 using LinqToDB;
 
@@ -20,18 +21,32 @@ namespace Backend.DataLayer
 
         public IQueryable<OrgGroup> GetByIdWithChildren(Guid id)
         {
+            return GetWithChildrenWhere(orgGroup => orgGroup.Id == id);
+        }
+
+        public IQueryable<OrgGroup> GetBySupervisorIdWithChildren(Guid supervisorId)
+        {
+            return GetWithChildrenWhere(orgGroup => orgGroup.Supervisor == supervisorId,
+                childGroup => !childGroup.ApproverIsSupervisor);
+        }
+
+        public IQueryable<OrgGroup> GetWithChildrenWhere(Expression<Func<OrgGroup, bool>> rootPredicate,
+            Expression<Func<OrgGroup, bool>> childPredicate = null)
+        {
             return _connection.GetCte<OrgGroup>(parents =>
             {
-                return (
-                        from orgGroup in OrgGroups
-                        where orgGroup.Id == id
-                        select orgGroup
-                    )
-                    .Union(
-                        from orgGroup in OrgGroups
-                        from parent in parents.InnerJoin(parent => parent.Id == orgGroup.ParentId)
-                        select orgGroup
-                    );
+                var rootQuery = (
+                    from orgGroup in OrgGroups
+                    select orgGroup
+                ).Where(rootPredicate);
+                var childQuery = (
+                    from orgGroup in OrgGroups
+                    from parent in parents.InnerJoin(parent => parent.Id == orgGroup.ParentId)
+                    select orgGroup
+                );
+                if (childPredicate != null)
+                    childQuery = childQuery.Where(childPredicate);
+                return rootQuery.Union(childQuery);
             });
         }
 

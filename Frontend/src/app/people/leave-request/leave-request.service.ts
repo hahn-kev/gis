@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
-import { Person } from '../person';
-import { Observable, of } from 'rxjs';
-import { PersonAndLeaveDetails } from './person-and-leave-details';
-import { LeaveUsage } from '../self/self';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {LeaveRequest, LeaveRequestWithNames} from './leave-request';
+import {Person} from '../person';
+import {Observable, of} from 'rxjs';
+import {PersonAndLeaveDetails} from './person-and-leave-details';
+import {LeaveUsage} from '../self/self';
 import * as moment from 'moment';
 import * as buisness from 'moment-business';
 
@@ -39,8 +39,16 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
+  listForSupervisor(supervisorId: string) {
+    return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/supervisor/' + supervisorId);
+  }
+
   listPeopleWithLeave(): Observable<PersonAndLeaveDetails[]> {
     return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people');
+  }
+
+  listMyPeopleWithLeave() {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/mine');
   }
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {

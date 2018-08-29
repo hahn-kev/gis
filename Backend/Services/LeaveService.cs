@@ -51,6 +51,15 @@ namespace Backend.Services
                 .ToList();
         }
 
+        public IList<LeaveRequestWithNames> ListForSupervisor(Guid supervisorId)
+        {
+            return (from request in _leaveRequestRepository.LeaveRequestWithNames
+                from person in _personRepository.PeopleExtended.InnerJoin(person => person.Id == request.PersonId)
+                from staff in _personRepository.Staff.InnerJoin(staff => staff.Id == person.StaffId)
+                from orgGroup in _orgGroupRepository.GetBySupervisorIdWithChildren(supervisorId).InnerJoin(orgGroup => orgGroup.Id == staff.OrgGroupId)
+                select request).ToList();
+        }
+
         public LeaveRequestWithNames GetById(Guid id)
         {
             return _leaveRequestRepository.LeaveRequestWithNames.Single(request => request.Id == id);

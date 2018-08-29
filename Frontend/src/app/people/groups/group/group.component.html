@@ -4,6 +4,9 @@
      matTooltip="View Org Tree At {{group.groupName}}">
     <mat-icon>location_city</mat-icon>
   </a>
+  <a mat-icon-button *ngIf="group.supervisor" [routerLink]="['/leave-request', 'list', 'supervisor', group.supervisor]">
+    <mat-icon>transfer_within_a_station</mat-icon>
+  </a>
 </ng-container>
 <form class="main-card" id="form" #groupForm="ngForm" (ngSubmit)="save()">
   <mat-card class="two-colum-grid">

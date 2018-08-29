@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
-import { LeaveRequestService } from '../leave-request.service';
-import { LeaveRequestWithNames } from '../leave-request';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
-import { LoginService } from '../../../services/auth/login.service';
-import { first, switchMap } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {LeaveRequestService} from '../leave-request.service';
+import {LeaveRequestWithNames} from '../leave-request';
+import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import {Observable} from 'rxjs';
+import {LoginService} from '../../../services/auth/login.service';
 
 @Injectable()
 export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]> {
@@ -12,10 +11,15 @@ export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]
           state: RouterStateSnapshot): Observable<LeaveRequestWithNames[]> | Promise<LeaveRequestWithNames[]> | LeaveRequestWithNames[] {
     const personId = route.params['personId'];
     if (personId === 'mine' || state.url.endsWith('mine')) {
-      return this.loginService.currentUserToken()
-        .pipe(first(),
-          switchMap(userToken => this.leaveService.listByPersonId(userToken.personId)));
+      return this.leaveService.listByPersonId(this.loginService.userToken.personId);
     }
+    if (personId === 'supervisor' || state.url.endsWith('supervisor')) {
+      return this.leaveService.listForSupervisor(this.loginService.userToken.personId);
+    }
+
+    const supervisorId = route.params['supervisorId'];
+    if (supervisorId)
+      return this.leaveService.listForSupervisor(supervisorId);
     if (personId) {
       return this.leaveService.listByPersonId(personId);
     }

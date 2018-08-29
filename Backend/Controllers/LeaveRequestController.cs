@@ -42,6 +42,15 @@ namespace Backend.Controllers
             return _leaveService.ListByPersonId(personId);
         }
 
+        [HttpGet("supervisor/{supervisorId}")]
+        public IList<LeaveRequestWithNames> ListBySupervisor(Guid supervisorId)
+        {
+            if ((!User.IsAdminOrHr() && !User.IsHighLevelSupervisor()) && User.PersonId() != supervisorId)
+                throw new UnauthorizedAccessException(
+                    "You can't view leave of another supervisor");
+            return _leaveService.ListForSupervisor(supervisorId);
+        }
+
         [HttpGet("{id}")]
         public LeaveRequestWithNames Get(Guid id)
         {
@@ -108,13 +117,15 @@ namespace Backend.Controllers
 
 
         [HttpGet("people")]
-        public async ValueTask<IList<PersonAndLeaveDetails>> PeopleWithLeave()
+        [Authorize(Policy = "leaveRequest")]
+        public IList<PersonAndLeaveDetails> PeopleWithLeave()
         {
-            if ((await _authorizationService.AuthorizeAsync(User, "leaveRequest")).Succeeded)
-            {
-                return _leaveService.PeopleWithCurrentLeave();
-            }
+            return _leaveService.PeopleWithCurrentLeave();
+        }
 
+        [HttpGet("people/mine")]
+        public IList<PersonAndLeaveDetails> MyPeopleWithLeave()
+        {
             var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
             if (groupId.HasValue)
             {
