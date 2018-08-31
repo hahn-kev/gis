@@ -24,31 +24,31 @@
   <ng-container matColumnDef="staffId">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Staff</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.staffId"></mat-checkbox>
+      <mat-checkbox readonly [checked]="row.staffId"></mat-checkbox>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="isSchoolAid">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is School Aide</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.isSchoolAid"></mat-checkbox>
+      <mat-checkbox readonly [checked]="row.isSchoolAid"></mat-checkbox>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="donorId">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Donor</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.donorId"></mat-checkbox>
+      <mat-checkbox readonly [checked]="row.donorId"></mat-checkbox>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="isParent">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Parent</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.isParent"></mat-checkbox>
+      <mat-checkbox readonly [checked]="row.isParent"></mat-checkbox>
     </mat-cell>
   </ng-container>
   <ng-container matColumnDef="isAlumni">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Alumni</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.isAlumni"></mat-checkbox>
+      <mat-checkbox readonly [checked]="row.isAlumni"></mat-checkbox>
     </mat-cell>
   </ng-container>
 
