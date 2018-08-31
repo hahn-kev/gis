@@ -1,8 +1,8 @@
-import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
-import { HttpErrorResponse } from '@angular/common/http';
+import {ErrorHandler, Injectable, Injector, NgZone} from '@angular/core';
+import {MatSnackBar} from '@angular/material';
+import {HttpErrorResponse} from '@angular/common/http';
 import * as Raven from 'raven-js';
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class MyErrorHandlerService implements ErrorHandler {
@@ -40,9 +40,8 @@ export class MyErrorHandlerService implements ErrorHandler {
     } else {
       message = error.toString();
     }
-    if (this.snackBarService != null) {
-      this.showSnackbar(message);
-    }
+    this.showSnackbar(message);
+
     if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse) && environment.production) {
       //don't report http errors, the server will report those
       Raven.captureException(error);
@@ -59,6 +58,7 @@ export class MyErrorHandlerService implements ErrorHandler {
     } catch (e) {
       this.original.handleError(e);
       console.error('Unable to inject snackbar service');
+      return;
     }
 
     if (NgZone.isInAngularZone()) {
