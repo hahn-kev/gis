@@ -11,7 +11,7 @@ export class PeopleWithLeaveResolverService implements Resolve<PersonAndLeaveDet
           state: RouterStateSnapshot): Observable<PersonAndLeaveDetails[]> | Promise<PersonAndLeaveDetails[]> | PersonAndLeaveDetails[] {
     let year = route.params['year'];
     if (!year) year = Year.CurrentSchoolYear();
-    if (route.url.some(segment => segment.path == 'mine')) {
+    if (route.data.mine || route.url.some(segment => segment.path == 'mine')) {
       return this.leaveRequestService.listMyPeopleWithLeave(year);
     }
     return this.leaveRequestService.listPeopleWithLeave(year);

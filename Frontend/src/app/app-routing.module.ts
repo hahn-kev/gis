@@ -262,6 +262,9 @@ const routes: Routes = [
             resolve: {
               leaveRequest: LeaveRequestResolverService,
               people: PeopleWithLeaveResolverService
+            },
+            data: {
+              mine: true
             }
           },
           {
