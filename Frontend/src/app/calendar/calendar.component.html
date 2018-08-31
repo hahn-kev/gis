@@ -22,7 +22,40 @@
   <div *ngFor="let model of models" class="date-cell">
     <ng-container *ngIf="model.dayOfMonth == 1">{{model.monthName}}</ng-container>
     {{model.dayOfMonth}}
-    <a class="mat-link" [routerLink]="'/leave-request/edit/' + req.id" style="display: block"
-       *ngFor="let req of model.items">{{req.requesterName}} | Type: {{req.type}}</a>
+    <button (click)="leaveSheet.show(req)" mat-button
+            style="display: block"
+            *ngFor="let req of model.items">
+      [{{leaveTypeName(req.type)}}] {{req.requesterName}}
+
+    </button>
   </div>
 </div>
+
+<ng-template appBottomSheet let-leave #leaveSheet="bottomSheet">
+  <a mat-button [routerLink]="['/leave-request', 'edit', leave.id]">
+    <mat-icon>transfer_within_a_station</mat-icon>
+    View Request
+  </a>
+  <div class="two-colum-grid leave-summary">
+    <mat-form-field>
+      <input matInput readonly [value]="leave.requesterName" placeholder="Name">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput readonly [value]="leaveTypeName(leave.type)" placeholder="Type">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput readonly [value]="leave.startDate | date" placeholder="Start Date">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput readonly [value]="leave.endDate | date" placeholder="End Date">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput readonly [value]="leave.days == 0.5 ? '1/2' : leave.days" placeholder="Length (days)">
+    </mat-form-field>
+    <mat-checkbox readonly [checked]="leave.approved">Approved</mat-checkbox>
+
+    <mat-form-field class="span-2-columns" *ngIf="leave.reason">
+      <input matInput readonly [value]="leave.reason" placeholder="Reason">
+    </mat-form-field>
+  </div>
+</ng-template>

@@ -230,3 +230,7 @@ html, body {
   @include print-hide;
 }
 
+.mat-checkbox[readonly], .mat-slide-toggle[readonly] {
+  pointer-events: none;
+  cursor: default;
+}

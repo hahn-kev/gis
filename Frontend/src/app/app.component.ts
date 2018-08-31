@@ -1,17 +1,17 @@
-﻿import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { MatSidenav } from '@angular/material';
-import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie';
-import { LoginService } from './services/auth/login.service';
-import { ActivityIndicatorService } from './services/activity-indicator.service';
-import { SettingsService } from './services/settings.service';
-import { UserToken } from './login/user-token';
-import { AttachmentService } from './components/attachments/attachment.service';
-import { Meta, Title } from '@angular/platform-browser';
-import { environment } from '../environments/environment';
-import { JobStatus, NonSchoolAidJobStatus } from './job/job';
-import { delay, map } from 'rxjs/operators';
+﻿import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Observable} from 'rxjs';
+import {MatBottomSheet, MatDialog, MatSidenav} from '@angular/material';
+import {Router} from '@angular/router';
+import {CookieService} from 'ngx-cookie';
+import {LoginService} from './services/auth/login.service';
+import {ActivityIndicatorService} from './services/activity-indicator.service';
+import {SettingsService} from './services/settings.service';
+import {UserToken} from './login/user-token';
+import {AttachmentService} from './components/attachments/attachment.service';
+import {Meta, Title} from '@angular/platform-browser';
+import {environment} from '../environments/environment';
+import {JobStatus, NonSchoolAidJobStatus} from './job/job';
+import {delay, map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -41,6 +41,8 @@ export class AppComponent implements OnInit {
               activityIndicatorService: ActivityIndicatorService,
               settings: SettingsService,
               private titleService: Title,
+              private bottomSheet: MatBottomSheet,
+              private dialog: MatDialog,
               meta: Meta) {
     this.currentUser = loginService.currentUserToken();
     this.indicatorStatus = activityIndicatorService.observeIndicator().pipe(delay(1));
@@ -52,6 +54,8 @@ export class AppComponent implements OnInit {
     this.router.events.subscribe(() => {
       this.sidenav.close();
       if (this.rightDrawer) this.rightDrawer.close();
+      this.bottomSheet.dismiss();
+      this.dialog.closeAll();
     });
     this.hasAttachments = this.attachmentService.extractId().pipe(map(value => value.hasAttachments));
   }

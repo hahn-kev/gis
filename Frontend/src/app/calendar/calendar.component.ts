@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { LeaveRequestService } from '../people/leave-request/leave-request.service';
-import { LeaveRequestWithNames } from '../people/leave-request/leave-request';
+import {Component, OnInit} from '@angular/core';
+import {LeaveRequestService} from '../people/leave-request/leave-request.service';
+import {LeaveRequestWithNames} from '../people/leave-request/leave-request';
 import * as moment from 'moment';
-import { Moment } from 'moment';
-import { DateModel } from './date-model';
-import { UrlBindingService } from '../services/url-binding.service';
+import {Moment} from 'moment';
+import {DateModel} from './date-model';
+import {UrlBindingService} from '../services/url-binding.service';
+import {LeaveTypeName} from "../people/self/self";
 
 @Component({
   selector: 'app-calendar',
@@ -13,6 +14,7 @@ import { UrlBindingService } from '../services/url-binding.service';
   providers: [UrlBindingService]
 })
 export class CalendarComponent implements OnInit {
+  leaveTypeName = LeaveTypeName;
   readonly FORMAT = 'M-D-YYYY';
   readonly URL_FORMAT = 'M-YYYY';
   // noinspection TypeScriptUnresolvedVariable
