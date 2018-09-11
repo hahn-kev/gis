@@ -124,8 +124,10 @@ namespace Backend.Controllers
         }
 
         [HttpGet("people/mine")]
-        public IList<PersonAndLeaveDetails> MyPeopleWithLeave(int year)
+        public async Task<IList<PersonAndLeaveDetails>> MyPeopleWithLeave(int year)
         {
+            if ((await _authorizationService.AuthorizeAsync(User, "leaveRequest")).Succeeded)
+                return _leaveService.PeopleWithLeave(year);
             var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
             if (groupId.HasValue)
             {
