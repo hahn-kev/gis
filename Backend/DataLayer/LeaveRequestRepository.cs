@@ -19,6 +19,8 @@ namespace Backend.DataLayer
         public IQueryable<LeaveRequestWithNames> LeaveRequestWithNames =>
             from l in _connection.LeaveRequests
             from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
+            from staff in _connection.Staff.LeftJoin(s => s.Id == person.StaffId).DefaultIfEmpty()
+            from orgGroup in _connection.OrgGroups.LeftJoin(org => org.Id == staff.OrgGroupId).DefaultIfEmpty()
             from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById).DefaultIfEmpty()
             where !person.Deleted
             orderby l.StartDate descending 
@@ -32,6 +34,8 @@ namespace Backend.DataLayer
                 Id = l.Id,
                 PersonId = l.PersonId,
                 RequesterName = (person.PreferredName ?? person.FirstName) + " " + person.LastName,
+                OrgGroupName = orgGroup.GroupName,
+                OrgGroupId = orgGroup.Id,
                 StartDate = l.StartDate,
                 Type = l.Type,
                 Reason = l.Reason,

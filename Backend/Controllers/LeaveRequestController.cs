@@ -33,6 +33,21 @@ namespace Backend.Controllers
             return _leaveService.LeaveRequestsWithNames;
         }
 
+        [HttpGet("mine")]
+        public IList<LeaveRequestWithNames> ListMyLeave()
+        {
+            
+            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
+            if (groupId.HasValue)
+            {
+                return _leaveService.ListUnderOrgGroup(groupId.Value, User.PersonId());
+            }
+
+            return _leaveService.ListByPersonId(User.PersonId() ?? 
+                                                throw new UnauthorizedAccessException(
+                                                    "Logged in user must be connected to a person, talk to HR about this issue"));
+        }
+
         [HttpGet("person/{personId}")]
         public IList<LeaveRequestWithNames> ListByPerson(Guid personId)
         {

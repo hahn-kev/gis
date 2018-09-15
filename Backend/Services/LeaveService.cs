@@ -44,6 +44,13 @@ namespace Backend.Services
         public IList<LeaveRequestWithNames> LeaveRequestsWithNames =>
             _leaveRequestRepository.LeaveRequestWithNames.ToList();
 
+        private IList<LeaveRequestWithNames> ListForPeople(IQueryable<Guid> people)
+        {
+            return (from request in _leaveRequestRepository.LeaveRequestWithNames
+                from personId in people.InnerJoin(personId => personId == request.PersonId)
+                select request).ToList();
+        }
+
         public IList<LeaveRequestWithNames> ListByPersonId(Guid personId)
         {
             return _leaveRequestRepository.LeaveRequestWithNames
@@ -51,12 +58,22 @@ namespace Backend.Services
                 .ToList();
         }
 
+        public IList<LeaveRequestWithNames> ListUnderOrgGroup(Guid orgGroupId, Guid? includePersonId = null)
+        {
+            return ListForPeople(
+                    PeopleWithStaffUnderGroup(orgGroupId)
+//                        .Union(_personRepository.PeopleWithStaff.Where(p => p.Id == includePersonId))
+                        .Select(person => person.Id)
+                );
+        }
+
         public IList<LeaveRequestWithNames> ListForSupervisor(Guid supervisorId)
         {
             return (from request in _leaveRequestRepository.LeaveRequestWithNames
                 from person in _personRepository.PeopleExtended.InnerJoin(person => person.Id == request.PersonId)
                 from staff in _personRepository.Staff.InnerJoin(staff => staff.Id == person.StaffId)
-                from orgGroup in _orgGroupRepository.GetBySupervisorIdWithChildren(supervisorId).InnerJoin(orgGroup => orgGroup.Id == staff.OrgGroupId)
+                from orgGroup in _orgGroupRepository.GetBySupervisorIdWithChildren(supervisorId)
+                    .InnerJoin(orgGroup => orgGroup.Id == staff.OrgGroupId)
                 select request).ToList();
         }
 

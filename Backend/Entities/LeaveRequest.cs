@@ -27,6 +27,7 @@ namespace Backend.Entities
         public decimal Days { get; set; }
         public bool OverrideDays { get; set; }
         public string Reason { get; set; }
+
         /// <summary>
         /// Null means pending, true is approved, false is rejected
         /// </summary>
@@ -67,6 +68,12 @@ namespace Backend.Entities
 
         [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
         public string ApprovedByName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public string OrgGroupName { get; set; }
+
+        [Column(SkipOnInsert = true, SkipOnUpdate = true, IsColumn = false)]
+        public Guid? OrgGroupId { get; set; }
     }
 
 
@@ -87,13 +94,13 @@ namespace Backend.Entities
 
         [MapValue("Paternity")]
         Paternity,
-        
+
         [MapValue("Emergency")]
         Emergency,
 
         [MapValue("SchoolRelated")]
         SchoolRelated,
-        
+
         [MapValue(nameof(MissionRelated))]
         MissionRelated,
 

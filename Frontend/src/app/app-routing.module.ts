@@ -64,7 +64,6 @@ import {EndorsementComponent} from './endorsement/edit/endorsement.component';
 import {EndorsementResolverService} from './endorsement/endorsement-resolver.service';
 import {PolicyGuard} from './services/auth/policy.guard';
 import {CalendarComponent} from './calendar/calendar.component';
-import {LeaveRequestSupervisorResolverService} from "./people/leave-request/leave-request-supervisor-resolver.service";
 
 const routes: Routes = [
   {
@@ -550,8 +549,7 @@ const routes: Routes = [
     EvaluationSummaryResolveService,
     OrgTreeDataResolverService,
     EndorsementListResolverService,
-    EndorsementResolverService,
-    LeaveRequestSupervisorResolverService
+    EndorsementResolverService
   ]
 })
 export class AppRoutingModule {

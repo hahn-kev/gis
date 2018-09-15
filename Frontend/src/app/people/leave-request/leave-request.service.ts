@@ -39,6 +39,10 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/person/' + personId);
   }
 
+  listMyLeave() {
+    return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/mine');
+  }
+
   listForSupervisor(supervisorId: string) {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/supervisor/' + supervisorId);
   }
