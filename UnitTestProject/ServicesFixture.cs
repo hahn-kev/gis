@@ -366,7 +366,11 @@ namespace UnitTestProject
             var personFaker = PersonFaker();
             var leaveRequester = personFaker.Generate();
             _dbConnection.Insert(leaveRequester);
+            var leaveRequesterOrgGroup = AutoFaker.Generate<OrgGroup>();
+            leaveRequesterOrgGroup.Id = leaveRequester.Staff.OrgGroupId ?? (Guid)(leaveRequester.Staff.OrgGroupId = Guid.NewGuid()) ;
+            _dbConnection.Insert(leaveRequesterOrgGroup);
             _dbConnection.Insert(leaveRequester.Staff);
+            
             var leaveApprover = personFaker.Generate();
             _dbConnection.Insert(leaveApprover);
             _dbConnection.Insert(leaveApprover.Staff);
