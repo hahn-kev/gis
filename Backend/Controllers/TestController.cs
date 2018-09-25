@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Backend.Controllers
 {
-    #if DEBUG
+//    #if DEBUG
     [Route("api/[controller]")]
     [AllowAnonymous]
     public class TestController : MyController
@@ -41,5 +41,5 @@ namespace Backend.Controllers
             return value;
         }
     }
-    #endif
+//    #endif
 }

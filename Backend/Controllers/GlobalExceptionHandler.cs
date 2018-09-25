@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Backend.Entities;
 using LinqToDB.Common;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +17,7 @@ using Sentinel.Sdk.Middleware;
 
 namespace Backend.Controllers
 {
-    public class GlobalExceptionHandler : IExceptionFilter
+    public class GlobalExceptionHandler : IExceptionFilter, IAsyncExceptionFilter
     {
         private readonly ISentinelClientFactory _sentinelClientFactory;
         private readonly SentinelSettings _sentinelSettings;
@@ -87,6 +88,12 @@ namespace Backend.Controllers
             }
 
             return sentryEvent;
+        }
+
+        public Task OnExceptionAsync(ExceptionContext context)
+        {
+            OnException(context);
+            return Task.CompletedTask;
         }
     }
 
