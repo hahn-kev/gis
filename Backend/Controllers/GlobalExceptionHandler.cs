@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -80,6 +81,7 @@ namespace Backend.Controllers
                 User = new UserSentryContext(httpContext),
                 Request = new HttpSentryContext(httpContext) {Cookies = null}
             };
+            sentryEvent.Logger = ".NET";
             sentryEvent.Tags.Add("logger", ".NET");
             sentryEvent.Request.Headers.Remove("Cookie");
             if (sentryEvent.User.UserName.IsNullOrEmpty())
@@ -101,6 +103,7 @@ namespace Backend.Controllers
     {
         public MySentryEvent(Exception exception, SeverityLevel level = SeverityLevel.Error) : base(exception, level)
         {
+            Tags = new Dictionary<string, string>();
         }
 
         public MySentryEvent(string message, SeverityLevel level = SeverityLevel.Info) : base(message, level)
