@@ -145,6 +145,7 @@ namespace Backend
                     options.ClientSecret = google["client_secret"];
                     options.Scope.Add("https://www.googleapis.com/auth/drive");
                     options.SaveTokens = true;
+                    options.AccessType = "offline";
                     options.Events.OnTicketReceived = async context =>
                     {
                         context.HandleResponse();
