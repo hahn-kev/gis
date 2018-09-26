@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {JwtHelperService} from './jwt-helper.service';
-import {filter, map} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { JwtHelperService } from './jwt-helper.service';
+import { filter, map } from 'rxjs/operators';
 import * as Raven from 'raven-js';
-import {CookieService} from 'ngx-cookie';
-import {UserToken} from '../../login/user-token';
+import { CookieService } from 'ngx-cookie';
+import { UserToken } from '../../login/user-token';
 
 @Injectable()
 export class LoginService implements CanActivate {
@@ -21,6 +21,10 @@ export class LoginService implements CanActivate {
     this.currentUserToken().subscribe(user => {
       if (user) {
         Raven.setUserContext({username: user.userName});
+        let email = user.email;
+        if (email) {
+          this.cookieService.put('.Sub', email);
+        }
       } else {
         Raven.setUserContext();
       }

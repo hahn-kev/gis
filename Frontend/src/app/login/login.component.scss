@@ -1,11 +1,27 @@
-.main-card {
-  grid-template-columns: 360px;
+.login {
+  position              : absolute;
+  top                   : 0;
+  left                  : 0;
+  right                 : 0;
+  bottom                : 0;
+  display               : grid;
+  justify-content       : center;
+  align-content         : center;
+  grid-template-columns : 360px;
+  h1 {
+    text-align : center;
+  }
 }
 
 .mat-form-field {
-  width: 100%;
+  width : 100%;
+}
+
+.google-login {
+  margin-bottom : 16px;
+  justify-self  : center;
 }
 
 .mat-card-footer {
-  padding: 8px;
+  padding : 8px;
 }

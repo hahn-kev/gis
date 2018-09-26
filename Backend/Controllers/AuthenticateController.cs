@@ -34,7 +34,8 @@ namespace Backend.Controllers
         public AuthenticateController(IOptions<JWTSettings> jwtOptions,
             SignInManager<IdentityUser> signInManager,
             IOptions<Settings> options,
-            UserService userService, PersonService personService)
+            UserService userService,
+            PersonService personService)
         {
             _signInManager = signInManager;
             _userService = userService;
@@ -82,11 +83,16 @@ namespace Backend.Controllers
         [AllowAnonymous]
         public IActionResult Google(string redirectTo = null)
         {
-            return Challenge(new AuthenticationProperties
-                {
-                    RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
-                },
-                "Google");
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = string.IsNullOrEmpty(redirectTo) ? "/home" : redirectTo
+            };
+            if (Request.Cookies.TryGetValue(".Sub", out var subject) && !string.IsNullOrWhiteSpace(subject))
+            {
+                properties.SetParameter("login_hint", subject);
+            }
+
+            return Challenge(properties, "Google");
         }
 
         public const string ClaimTypeId = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
@@ -238,6 +244,7 @@ namespace Backend.Controllers
                     claims.Add(new Claim(ClaimSupervisor, group.Id.ToString()));
                     claims.Add(new Claim(ClaimSupervisorType, group.Type.ToString()));
                 }
+
                 var personWithStaff = _personService.GetStaffById(identityUser.PersonId.Value);
 
                 if (personWithStaff.Staff?.LeaveDelegateGroupId != null)
