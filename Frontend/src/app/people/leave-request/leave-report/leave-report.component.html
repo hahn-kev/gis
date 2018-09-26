@@ -15,7 +15,7 @@
   <button mat-icon-button (click)="filterDialog.show()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
-  <a mat-button [routerLink]="['/leave-request', 'list', isSupervisor ? 'supervisor':'']">
+  <a mat-button [routerLink]="['/leave-request', 'list', isSupervisor ? 'supervisor':'all']">
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
     Show Leave Requests
   </a>

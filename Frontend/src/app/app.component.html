@@ -75,6 +75,13 @@
               <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
               <span mat-line>My People's Leave</span>
             </a>
+            <a *ngIf="'leaveSupervisor' | isUserPolicy"
+               mat-list-item
+               routerLink="/calendar/supervisor"
+               routerLinkActive="active-link">
+              <mat-icon mat-list-icon>date_rangeff</mat-icon>
+              <span mat-line>Leave Calendar</span>
+            </a>
           </ng-container>
 
           <ng-container *ngIf="'hrEdit' | isUserPolicy">
@@ -82,7 +89,7 @@
             <h3 mat-subheader>HR</h3>
             <ng-container appRenderTemplate="sidenav:hr"></ng-container>
             <ng-container *appTemplateContent="'sidenav:hr'">
-              <a mat-list-item routerLink="/calendar" routerLinkActive="active-link">
+              <a mat-list-item routerLink="/calendar/all" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>date_range</mat-icon>
                 <span mat-line>Calendar</span>
               </a>
@@ -102,7 +109,7 @@
                 <mat-icon mat-list-icon>assignment_ind</mat-icon>
                 <span mat-line>Evaluations</span>
               </a>
-              <a mat-list-item routerLink="/leave-request/report" routerLinkActive="active-link">
+              <a mat-list-item routerLink="/leave-request/report/all" routerLinkActive="active-link">
                 <mat-icon mat-list-icon>transfer_within_a_station</mat-icon>
                 <span mat-line>Leave</span>
               </a>
@@ -119,7 +126,8 @@
                 <mat-icon mat-list-icon>work</mat-icon>
                 <span mat-line>Jobs</span>
               </a>
-              <a mat-list-item *ngIf="'orgChart' | isUserPolicy" routerLink="/org-tree" routerLinkActive="active-link">
+              <a mat-list-item *ngIf="'orgChart' | isUserPolicy" routerLink="/org-tree/all"
+                 routerLinkActive="active-link">
                 <mat-icon mat-list-icon>location_city</mat-icon>
                 <span mat-line>Organization</span>
               </a>

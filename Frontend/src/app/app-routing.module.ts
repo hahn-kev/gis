@@ -299,14 +299,14 @@ const routes: Routes = [
                 },
                 children: [
                   {
-                    path: ':year',
+                    path: 'all/:year',
                     component: LeaveReportComponent,
                     resolve: {
                       people: PeopleWithLeaveResolverService
                     }
                   },
                   {
-                    path: '',
+                    path: 'all',
                     component: LeaveReportComponent,
                     resolve: {
                       people: PeopleWithLeaveResolverService
@@ -342,13 +342,6 @@ const routes: Routes = [
                 },
                 children: [
                   {
-                    path: ':personId',
-                    component: LeaveListComponent,
-                    resolve: {
-                      leave: LeaveListResolverService
-                    }
-                  },
-                  {
                     path: 'supervisor/:supervisorId',
                     component: LeaveListComponent,
                     resolve: {
@@ -356,7 +349,14 @@ const routes: Routes = [
                     }
                   },
                   {
-                    path: '',
+                    path: 'all',
+                    component: LeaveListComponent,
+                    resolve: {
+                      leave: LeaveListResolverService
+                    }
+                  },
+                  {
+                    path: ':personId',
                     component: LeaveListComponent,
                     resolve: {
                       leave: LeaveListResolverService
@@ -441,7 +441,7 @@ const routes: Routes = [
         },
         children: [
           {
-            path: '',
+            path: 'all',
             component: OrgTreeComponent,
             resolve: {
               treeData: OrgTreeDataResolverService
@@ -481,7 +481,30 @@ const routes: Routes = [
       },
       {
         path: 'calendar',
-        component: CalendarComponent
+        children: [
+          {
+            path: 'all',
+            component: CalendarComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            },
+            canActivate: [PolicyGuard],
+            data: {
+              requirePolicy: 'leaveManager'
+            },
+          },
+          {
+            path: 'supervisor',
+            component: CalendarComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            },
+            canActivate: [PolicyGuard],
+            data: {
+              requirePolicy: 'leaveSupervisor'
+            }
+          }
+        ]
       },
       {
         path: 'self',

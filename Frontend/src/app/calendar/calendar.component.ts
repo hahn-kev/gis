@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {LeaveRequestService} from '../people/leave-request/leave-request.service';
-import {LeaveRequestWithNames} from '../people/leave-request/leave-request';
+import { Component, OnInit } from '@angular/core';
+import { LeaveRequestWithNames } from '../people/leave-request/leave-request';
 import * as moment from 'moment';
-import {Moment} from 'moment';
-import {DateModel} from './date-model';
-import {UrlBindingService} from '../services/url-binding.service';
-import {LeaveTypeName} from "../people/self/self";
+import { Moment } from 'moment';
+import { DateModel } from './date-model';
+import { UrlBindingService } from '../services/url-binding.service';
+import { LeaveTypeName } from '../people/self/self';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-calendar',
@@ -17,23 +17,21 @@ export class CalendarComponent implements OnInit {
   leaveTypeName = LeaveTypeName;
   readonly FORMAT = 'M-D-YYYY';
   readonly URL_FORMAT = 'M-YYYY';
-  // noinspection TypeScriptUnresolvedVariable
   leaveRequests: Map<string, LeaveRequestWithNames[]>;
   models: DateModel<LeaveRequestWithNames>[];
   month: Moment;
 
-  constructor(private leaveService: LeaveRequestService, private urlBinding: UrlBindingService<{ date: string }>) {
+  constructor(private route: ActivatedRoute, private urlBinding: UrlBindingService<{ date: string }>) {
     this.urlBinding.addParam('date', moment().format(this.URL_FORMAT))
       .subscribe(value => this.month = moment(value, this.URL_FORMAT));
     this.urlBinding.loadFromParams();
-    this.leaveService.list().subscribe(value => {
-      this.groupLeaveRequestsByDate(value);
+    this.route.data.subscribe((value: { leave: LeaveRequestWithNames[] }) => {
+      this.groupLeaveRequestsByDate(value.leave);
       this.generateModel();
     });
   }
 
   groupLeaveRequestsByDate(leaveRequests: LeaveRequestWithNames[]) {
-    // noinspection TypeScriptUnresolvedVariable
     this.leaveRequests = new Map<string, LeaveRequestWithNames[]>();
     for (let req of leaveRequests) {
       let startDate = moment(req.startDate);
