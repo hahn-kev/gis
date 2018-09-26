@@ -111,10 +111,13 @@ namespace Backend.Services
 
         public OrgGroup FindGroupIdIfSupervisor(Guid personId)
         {
-            return (from person in _personRepository.People
+            var orgGroups = (from person in _personRepository.People
                 from orgGroup in _orgGroupRepository.OrgGroups.LeftJoin(g => g.Supervisor == person.Id).DefaultIfEmpty()
                 where person.Id == personId
-                select orgGroup).SingleOrDefault();
+                select orgGroup).ToList();
+            if (orgGroups.Count < 2) return orgGroups.SingleOrDefault();
+            //todo handle this case
+            return orgGroups.First();
         }
     }
 }

@@ -44,6 +44,15 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
   }
 
   supervisorChanged() {
+    let orgs = this.findOrgsSupervisorIsOver(this.group.supervisor);
+    if (orgs.length > 0) {
+      this.snackBar.open(`This Supervisor is already over department${orgs.length > 1 ? 's' : ''}: [${orgs.map(
+        value => value.groupName)
+          .join(', ')}], they will not be able to view details for other departments, all their departments should be grouped under one`,
+        'Dismiss');
+      this.refreshOrgChain();
+      return;
+    }
     let supervisor = this.people.find(p => p.id == this.group.supervisor);
     if (supervisor != null && supervisor.staff.email == null) {
       let editSuperSnackbar = this.snackBar.open(`Supervisor won't get leave requests, they don't have a staff email`,
@@ -54,6 +63,11 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
       });
     }
     this.refreshOrgChain();
+  }
+
+  findOrgsSupervisorIsOver(personId: string): OrgGroup[] {
+    if (!personId) return [];
+    return this.groups.filter(value => value.supervisor == personId);
   }
 
   refreshOrgChain(): void {
@@ -78,6 +92,5 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
     await this.groupService.deleteGroup(this.group.id);
     this.snackBar.open(`${this.group.type} ${this.group.groupName} deleted`, null, {duration: 2000});
     this.router.navigate(['/groups/list']);
-
   }
 }
