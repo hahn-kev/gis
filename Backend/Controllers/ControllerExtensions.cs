@@ -87,6 +87,11 @@ namespace Backend.Controllers
             return user.ClaimValueAsGuid(AuthenticateController.ClaimLeaveDelegate);
         }
 
+        public static bool IsLeaveDelegate(this ClaimsPrincipal user)
+        {
+            return user.HasClaim(claim => claim.Type == AuthenticateController.ClaimLeaveDelegate);
+        }
+
         private static Guid? ClaimValueAsGuid(this ClaimsPrincipal user, string claimType)
         {
             return Guid.TryParse(user.FindFirstValue(claimType), out var guid) ? guid : (Guid?) null;

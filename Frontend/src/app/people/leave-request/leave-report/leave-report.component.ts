@@ -1,11 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {AppDataSource} from '../../../classes/app-data-source';
-import {PersonAndLeaveDetails} from '../person-and-leave-details';
-import {ActivatedRoute} from '@angular/router';
-import {UrlBindingService} from '../../../services/url-binding.service';
-import {PersonLeaveModel} from './person-leave-model';
-import {MatSort} from '@angular/material';
-import {Year} from "../../training-requirement/year";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AppDataSource } from '../../../classes/app-data-source';
+import { PersonAndLeaveDetails } from '../person-and-leave-details';
+import { ActivatedRoute } from '@angular/router';
+import { UrlBindingService } from '../../../services/url-binding.service';
+import { PersonLeaveModel } from './person-leave-model';
+import { MatSort } from '@angular/material';
+import { Year } from '../../training-requirement/year';
 
 @Component({
   selector: 'app-leave-report',
@@ -18,7 +18,7 @@ export class LeaveReportComponent implements OnInit {
   public dataSource = new AppDataSource<PersonLeaveModel>();
   public allOrgGroups: string[] = [];
   public allMissionOrgs: string[] = [];
-  public isMine = false;
+  public isSupervisor = false;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
@@ -46,7 +46,7 @@ export class LeaveReportComponent implements OnInit {
       });
       if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
       this.route.url.subscribe(url => {
-        this.isMine = url.some(segment => segment.path == 'mine');
+        this.isSupervisor = url.some(segment => segment.path == 'supervisor');
       });
 
       //filter list to distinct

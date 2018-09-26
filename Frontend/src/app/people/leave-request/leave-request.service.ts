@@ -1,10 +1,10 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {LeaveRequest, LeaveRequestWithNames} from './leave-request';
-import {Person} from '../person';
-import {Observable, of} from 'rxjs';
-import {PersonAndLeaveDetails} from './person-and-leave-details';
-import {LeaveUsage} from '../self/self';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
+import { Person } from '../person';
+import { Observable, of } from 'rxjs';
+import { PersonAndLeaveDetails } from './person-and-leave-details';
+import { LeaveUsage } from '../self/self';
 import * as moment from 'moment';
 import * as buisness from 'moment-business';
 
@@ -43,7 +43,10 @@ export class LeaveRequestService {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/mine');
   }
 
-  listForSupervisor(supervisorId: string) {
+  listForSupervisor(supervisorId?: string) {
+    if (!supervisorId) {
+      return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/supervisor');
+    }
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest/supervisor/' + supervisorId);
   }
 
@@ -52,7 +55,8 @@ export class LeaveRequestService {
   }
 
   listMyPeopleWithLeave(year: number) {
-    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/mine', {params: {year: year.toString()}});
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/supervisor',
+      {params: {year: year.toString()}});
   }
 
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {

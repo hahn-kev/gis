@@ -36,16 +36,20 @@ namespace Backend.Controllers
         [HttpGet("mine")]
         public IList<LeaveRequestWithNames> ListMyLeave()
         {
-            
-            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
-            if (groupId.HasValue)
-            {
-                return _leaveService.ListUnderOrgGroup(groupId.Value, User.PersonId());
-            }
-
-            return _leaveService.ListByPersonId(User.PersonId() ?? 
+            return _leaveService.ListByPersonId(User.PersonId() ??
                                                 throw new UnauthorizedAccessException(
                                                     "Logged in user must be connected to a person, talk to HR about this issue"));
+        }
+
+        [HttpGet("supervisor")]
+        [Authorize("leaveSupervisor")]
+        public IList<LeaveRequestWithNames> Supervisor()
+        {
+            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId() ??
+                          throw new UnauthorizedAccessException(
+                              "Logged in user must be a supervisor or leave delegate");
+
+            return _leaveService.ListUnderOrgGroup(groupId, User.PersonId());
         }
 
         [HttpGet("person/{personId}")]
@@ -138,30 +142,16 @@ namespace Backend.Controllers
             return _leaveService.PeopleWithLeave(year);
         }
 
-        [HttpGet("people/mine")]
-        public async Task<IList<PersonAndLeaveDetails>> MyPeopleWithLeave(int year)
+        [HttpGet("people/supervisor")]
+        [Authorize("leaveSupervisor")]
+        public IList<PersonAndLeaveDetails> MyPeopleWithLeave(int year)
         {
-            if ((await _authorizationService.AuthorizeAsync(User, "leaveRequest")).Succeeded)
-                return _leaveService.PeopleWithLeave(year);
-            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId();
-            if (groupId.HasValue)
-            {
-                var personId = User.PersonId();
-                var people = _leaveService.PeopleInGroupWithLeave(groupId.Value, year);
-                if (personId != null && people.All(details => details.Person.Id != personId))
-                {
-                    people.Insert(0, _leaveService.PersonWithLeave(personId.Value, year));
-                }
+            var groupId = User.LeaveDelegateGroupId() ?? User.SupervisorGroupId() ??
+                          throw new UnauthorizedAccessException(
+                              "Logged in user must be a supervisor or leave delegate");
+            var people = _leaveService.PeopleInGroupWithLeave(groupId, year);
 
-                return people;
-            }
-
-            return new List<PersonAndLeaveDetails>
-            {
-                _leaveService.PersonWithLeave(User.PersonId() ??
-                                                     throw new AuthenticationException(
-                                                         "User must be a person to request leave"), year)
-            };
+            return people;
         }
     }
 }

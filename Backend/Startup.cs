@@ -187,6 +187,10 @@ namespace Backend
                 options.AddPolicy("leaveRequest",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
+                options.AddPolicy("leaveSupervisor",
+                    builder => builder.RequireAssertion(context =>
+                        context.User.IsSupervisor() || context.User.IsLeaveDelegate()));
+                
                 options.AddPolicy("training",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
