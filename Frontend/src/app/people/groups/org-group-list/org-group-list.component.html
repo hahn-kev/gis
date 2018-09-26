@@ -7,18 +7,24 @@
     <input autofocus matInput placeholder="Search" [(ngModel)]="urlBinding.values.search">
   </mat-form-field>
 </ng-container>
-<mat-table [dataSource]="dataSource">
+<mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="groupName">
-    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.groupName}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="supervisor">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Supervisor</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{(row.supervisorPerson?.preferredName || row.supervisorPerson?.firstName || '') +
+      ' ' + (row.supervisorPerson?.lastName || '')}}
+    </mat-cell>
+  </ng-container>
   <ng-container matColumnDef="type">
-    <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.type}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['groupName', 'type']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['groupName', 'type']"
+  <mat-header-row *matHeaderRowDef="['groupName', 'supervisor', 'type']"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['groupName', 'supervisor', 'type']"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 
