@@ -4,10 +4,11 @@
   left                  : 0;
   right                 : 0;
   bottom                : 0;
+  padding               : 8px;
   display               : grid;
   justify-content       : center;
   align-content         : center;
-  grid-template-columns : 360px;
+  grid-template-columns : minmax(220px, 360px);
   h1 {
     text-align : center;
   }
