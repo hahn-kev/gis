@@ -1,4 +1,9 @@
 <ng-container *appTemplateContent="'title'">Login</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button matTooltip="Manual Login" (click)="loginSheet.show()">
+    <mat-icon>input</mat-icon>
+  </button>
+</ng-container>
 <div class="login">
   <h1 i18n="login page welcome@@welcomeLogin">Welcome to GIS Office</h1>
   <a mat-stroked-button color="accent" class="google-login"
@@ -18,71 +23,87 @@
     </svg>
     Login with Google
   </a>
-
-  <mat-card>
-    <form #loginForm="ngForm" id="form" (ngSubmit)="login()">
-      <h4>Manual Login</h4>
-      <mat-form-field>
-        <input #usernameElement="ngModel" name="username" matInput required [(ngModel)]="username"
-               placeholder="Username" i18n-placeholder="input hint for username at login@@usernameLoginInput">
-        <mat-error *ngIf="usernameElement.valid || usernameElement.pristine"
-                   i18n="message telling user that the username is required@@usernameRequiredError">
-          Username required
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field>
-        <input #passwordElement="ngModel" type="password" name="password" matInput required [(ngModel)]="password"
-               placeholder="Password" i18n-placeholder="input hint for password at login@@passwordLoginInput">
-        <mat-error *ngIf="passwordElement.valid || passwordElement.pristine"
-                   i18n="message telling user that the password is required@@passRequiredError">
-          Password required
-        </mat-error>
-      </mat-form-field>
-      <ng-container *ngIf="passwordReset">
-        <mat-form-field>
-          <input matInput
-                 required
-                 #newPasswordElement="ngModel"
-                 name="newPassword"
-                 minlength="8"
-                 autocomplete="off"
-                 [(ngModel)]="newPassword"
-                 type="password"
-                 placeholder="New Password"
-                 i18n-placeholder="user password@@NewPassword">
-          <mat-error *ngIf="newPasswordElement.invalid && (newPasswordElement.dirty || newPasswordElement.touched)"
-                     i18n="password error@@passwordLengthWrong">
-            Password must be at least 8 characters long
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput
-                 required
-                 #newPasswordElement2="ngModel"
-                 name="newPassword2"
-                 minlength="8"
-                 autocomplete="off"
-                 ngModel
-                 [pattern]="newPasswordElement.value"
-                 type="password"
-                 placeholder="Confirm new Password"
-                 i18n-placeholder="user password confirm@@newPasswordConfirm">
-          <mat-error
-            *ngIf="newPasswordElement2.invalid && (newPasswordElement2.dirty || newPasswordElement2.touched || newPasswordElement.touched)"
-            i18n="password matching error@@passwordsMustMatch">
-            Passwords must match
-          </mat-error>
-        </mat-form-field>
-      </ng-container>
-
-      <mat-error *ngIf="errorMessage">
-        {{errorMessage}}
-      </mat-error>
-    </form>
-    <mat-card-actions>
-      <button mat-button type="submit" form="form" [disabled]="!loginForm.form.valid" i18n="login button@@loginButton">
-        Login
-      </button>
-    </mat-card-actions>
-  </mat-card>
 </div>
+
+<ng-template #loginSheet="bottomSheet" appBottomSheet>
+  <form #loginForm="ngForm" id="form" (ngSubmit)="login()">
+    <h4>Manual Login</h4>
+    <mat-form-field>
+      <input #usernameElement="ngModel"
+             name="username"
+             autofocus
+             matInput
+             required
+             [(ngModel)]="username"
+             placeholder="Username"
+             i18n-placeholder="input hint for username at login@@usernameLoginInput">
+      <mat-error *ngIf="usernameElement.valid || usernameElement.pristine"
+                 i18n="message telling user that the username is required@@usernameRequiredError">
+        Username required
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input #passwordElement="ngModel"
+             type="password"
+             name="password"
+             matInput
+             required
+             [(ngModel)]="password"
+             [placeholder]="passwordReset ? 'Current Password' : 'Password'"
+             i18n-placeholder="input hint for password at login@@passwordLoginInput">
+      <mat-hint>Enter to Login</mat-hint>
+      <mat-error *ngIf="passwordElement.valid || passwordElement.pristine"
+                 i18n="message telling user that the password is required@@passRequiredError">
+        Password required
+      </mat-error>
+    </mat-form-field>
+    <ng-container *ngIf="passwordReset">
+      <mat-form-field>
+        <input matInput
+               required
+               #newPasswordElement="ngModel"
+               name="newPassword"
+               minlength="8"
+               autocomplete="off"
+               [(ngModel)]="newPassword"
+               type="password"
+               placeholder="New Password"
+               i18n-placeholder="user password@@NewPassword">
+        <mat-error *ngIf="newPasswordElement.invalid && (newPasswordElement.dirty || newPasswordElement.touched)"
+                   i18n="password error@@passwordLengthWrong">
+          Password must be at least 8 characters long
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+               required
+               #newPasswordElement2="ngModel"
+               name="newPassword2"
+               minlength="8"
+               autocomplete="off"
+               ngModel
+               [pattern]="newPasswordElement.value"
+               type="password"
+               placeholder="Confirm new Password"
+               i18n-placeholder="user password confirm@@newPasswordConfirm">
+        <mat-error
+          *ngIf="newPasswordElement2.invalid && (newPasswordElement2.dirty || newPasswordElement2.touched || newPasswordElement.touched)"
+          i18n="password matching error@@passwordsMustMatch">
+          Passwords must match
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <mat-error *ngIf="errorMessage">
+      {{errorMessage}}
+    </mat-error>
+    <button mat-button
+            hidden
+            type="submit"
+            form="form"
+            [disabled]="!loginForm.form.valid"
+            i18n="login button@@loginButton">
+      Login
+    </button>
+  </form>
+</ng-template>
