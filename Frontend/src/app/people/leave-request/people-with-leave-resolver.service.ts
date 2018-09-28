@@ -12,10 +12,17 @@ export class PeopleWithLeaveResolverService implements Resolve<PersonAndLeaveDet
           state: RouterStateSnapshot): Observable<PersonAndLeaveDetails[]> | Promise<PersonAndLeaveDetails[]> | PersonAndLeaveDetails[] {
     let year = route.params['year'];
     if (!year) year = Year.CurrentSchoolYear();
-    if (route.data.all || this.policyService.testPolicy('leaveManager')) {
+    if (route.data.all) {
       return this.leaveRequestService.listPeopleWithLeave(year);
     }
-    if (route.data.supervisor || this.policyService.testPolicy('leaveSupervisor')) {
+    if (route.data.supervisor) {
+      //this should come before the policy tests
+      return this.leaveRequestService.listMyPeopleWithLeave(year);
+    }
+    if (this.policyService.testPolicy('leaveManager')) {
+      return this.leaveRequestService.listPeopleWithLeave(year);
+    }
+    if (this.policyService.testPolicy('leaveSupervisor')) {
       return this.leaveRequestService.listMyPeopleWithLeave(year);
     }
     return this.leaveRequestService.listMyLeaveDetails(year);

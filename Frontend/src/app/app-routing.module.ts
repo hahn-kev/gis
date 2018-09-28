@@ -500,17 +500,6 @@ const routes: Routes = [
         path: 'calendar',
         children: [
           {
-            path: 'all',
-            component: CalendarComponent,
-            resolve: {
-              leave: LeaveListResolverService
-            },
-            canActivate: [PolicyGuard],
-            data: {
-              requirePolicy: 'leaveManager'
-            },
-          },
-          {
             path: 'supervisor',
             component: CalendarComponent,
             resolve: {
@@ -518,8 +507,52 @@ const routes: Routes = [
             },
             canActivate: [PolicyGuard],
             data: {
-              requirePolicy: 'leaveSupervisor'
+              requirePolicy: 'leaveSupervisor',
+              supervisor: true
             }
+          },
+          {
+            path: 'mine',
+            component: CalendarComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            },
+            data: {
+              mine: true
+            }
+          },
+          {
+            path: '',
+            canActivate: [PolicyGuard],
+            data: {
+              requirePolicy: 'leaveManager'
+            },
+            children: [
+              {
+                path: 'supervisor/:supervisorId',
+                component: CalendarComponent,
+                resolve: {
+                  leave: LeaveListResolverService
+                }
+              },
+              {
+                path: 'all',
+                component: CalendarComponent,
+                resolve: {
+                  leave: LeaveListResolverService
+                },
+                data: {
+                  all: true
+                }
+              },
+              {
+                path: ':personId',
+                component: CalendarComponent,
+                resolve: {
+                  leave: LeaveListResolverService
+                }
+              }
+            ]
           }
         ]
       },
