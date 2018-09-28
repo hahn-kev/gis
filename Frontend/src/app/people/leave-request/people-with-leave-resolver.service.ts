@@ -4,6 +4,7 @@ import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { Observable } from 'rxjs';
 import { LeaveRequestService } from './leave-request.service';
 import { Year } from '../training-requirement/year';
+import { PolicyService } from '../../services/auth/policy.service';
 
 @Injectable()
 export class PeopleWithLeaveResolverService implements Resolve<PersonAndLeaveDetails[]> {
@@ -11,13 +12,16 @@ export class PeopleWithLeaveResolverService implements Resolve<PersonAndLeaveDet
           state: RouterStateSnapshot): Observable<PersonAndLeaveDetails[]> | Promise<PersonAndLeaveDetails[]> | PersonAndLeaveDetails[] {
     let year = route.params['year'];
     if (!year) year = Year.CurrentSchoolYear();
-    if (route.data.mine || route.url.some(segment => segment.path == 'supervisor')) {
+    if (route.data.all || this.policyService.testPolicy('leaveManager')) {
+      return this.leaveRequestService.listPeopleWithLeave(year);
+    }
+    if (route.data.supervisor || this.policyService.testPolicy('leaveSupervisor')) {
       return this.leaveRequestService.listMyPeopleWithLeave(year);
     }
-    return this.leaveRequestService.listPeopleWithLeave(year);
+    return this.leaveRequestService.listMyLeaveDetails(year);
   }
 
-  constructor(private leaveRequestService: LeaveRequestService) {
+  constructor(private leaveRequestService: LeaveRequestService, private policyService: PolicyService) {
   }
 
 }

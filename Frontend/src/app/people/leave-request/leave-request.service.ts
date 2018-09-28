@@ -59,6 +59,11 @@ export class LeaveRequestService {
       {params: {year: year.toString()}});
   }
 
+  listMyLeaveDetails(year: number) {
+    return this.http.get<PersonAndLeaveDetails[]>('/api/leaveRequest/people/mine',
+      {params: {year: year.toString()}});
+  }
+
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {
     const leaveUsage = leaveUsages.find(value => value.leaveType == leaveRequest.type);
     if (leaveUsage == null) return true;

@@ -27,7 +27,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "leaveRequest")]
+        [Authorize("leaveRequest")]
         public IList<LeaveRequestWithNames> List()
         {
             return _leaveService.LeaveRequestsWithNames;
@@ -53,20 +53,16 @@ namespace Backend.Controllers
         }
 
         [HttpGet("person/{personId}")]
+        [Authorize("leaveRequest")]
         public IList<LeaveRequestWithNames> ListByPerson(Guid personId)
         {
-            if ((!User.IsAdminOrHr() && !User.IsHighLevelSupervisor()) && User.PersonId() != personId)
-                throw new UnauthorizedAccessException(
-                    "You're only allowed to list your leave requests unless you're hr");
             return _leaveService.ListByPersonId(personId);
         }
 
         [HttpGet("supervisor/{supervisorId}")]
+        [Authorize("leaveRequest")]
         public IList<LeaveRequestWithNames> ListBySupervisor(Guid supervisorId)
         {
-            if ((!User.IsAdminOrHr() && !User.IsHighLevelSupervisor()) && User.PersonId() != supervisorId)
-                throw new UnauthorizedAccessException(
-                    "You can't view leave of another supervisor");
             return _leaveService.ListForSupervisor(supervisorId);
         }
 
@@ -136,7 +132,7 @@ namespace Backend.Controllers
 
 
         [HttpGet("people")]
-        [Authorize(Policy = "leaveRequest")]
+        [Authorize("leaveRequest")]
         public IList<PersonAndLeaveDetails> PeopleWithLeave(int year)
         {
             return _leaveService.PeopleWithLeave(year);
@@ -150,6 +146,24 @@ namespace Backend.Controllers
                           throw new UnauthorizedAccessException(
                               "Logged in user must be a supervisor or leave delegate");
             var people = _leaveService.PeopleInGroupWithLeave(groupId, year);
+            var personId = User.PersonId();
+            if (personId != null && people.All(details => details.Person.Id != personId))
+            {
+                people.Insert(0, _leaveService.PersonWithLeave(personId.Value, year));
+            }
+
+            return people;
+        }
+
+        [HttpGet("people/mine")]
+        public IList<PersonAndLeaveDetails> MyLeaveDetails(int year)
+        {
+            var personId = User.PersonId() ??
+                           throw new AuthenticationException("User must be a person to request leave");
+            var people = new List<PersonAndLeaveDetails>
+            {
+                _leaveService.PersonWithLeave(personId, year)
+            };
 
             return people;
         }

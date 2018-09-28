@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserToken } from '../../login/user-token';
+import { LoginService } from './login.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ export class PolicyService {
 
   private readonly policies: { [key: string]: ((user: UserToken) => boolean) };
 
-  constructor() {
+  constructor(private loginService: LoginService) {
     this.policies = {
       viewSalary: (user: UserToken) => user.hasAnyRole(['admin', 'hradmin']),
       orgGroupManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
@@ -30,5 +31,10 @@ export class PolicyService {
 
   getPolicy(policy: string): (user: UserToken) => boolean {
     return this.policies[policy];
+  }
+
+  testPolicy(policy: string) {
+    let policyFunction = this.getPolicy(policy);
+    return policyFunction && policyFunction(this.loginService.userToken);
   }
 }

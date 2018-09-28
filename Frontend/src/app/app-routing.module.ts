@@ -270,22 +270,24 @@ const routes: Routes = [
             path: 'report',
             children: [
               {
+                path: 'supervisor',
                 canActivate: [PolicyGuard],
                 data: {
-                  requirePolicy: 'leaveSupervisor'
+                  requirePolicy: 'leaveSupervisor',
+                  supervisor: true
                 },
-                path: 'supervisor',
                 component: LeaveReportComponent,
                 resolve: {
                   people: PeopleWithLeaveResolverService
                 }
               },
               {
+                path: 'supervisor/:year',
                 canActivate: [PolicyGuard],
                 data: {
-                  requirePolicy: 'leaveSupervisor'
+                  requirePolicy: 'leaveSupervisor',
+                  supervisor: true
                 },
-                path: 'supervisor/:year',
                 component: LeaveReportComponent,
                 resolve: {
                   people: PeopleWithLeaveResolverService
@@ -302,14 +304,20 @@ const routes: Routes = [
                     path: 'all/:year',
                     component: LeaveReportComponent,
                     resolve: {
-                      people: PeopleWithLeaveResolverService
+                      people: PeopleWithLeaveResolverService,
+                    },
+                    data: {
+                      all: true
                     }
                   },
                   {
                     path: 'all',
                     component: LeaveReportComponent,
                     resolve: {
-                      people: PeopleWithLeaveResolverService
+                      people: PeopleWithLeaveResolverService,
+                    },
+                    data: {
+                      all: true
                     }
                   }
                 ]
@@ -325,6 +333,9 @@ const routes: Routes = [
                 component: LeaveListComponent,
                 resolve: {
                   leave: LeaveListResolverService
+                },
+                data: {
+                  mine: true
                 }
               },
               {
@@ -332,6 +343,9 @@ const routes: Routes = [
                 component: LeaveListComponent,
                 resolve: {
                   leave: LeaveListResolverService
+                },
+                data: {
+                  supervisor: true
                 }
               },
               {
@@ -353,6 +367,9 @@ const routes: Routes = [
                     component: LeaveListComponent,
                     resolve: {
                       leave: LeaveListResolverService
+                    },
+                    data: {
+                      all: true
                     }
                   },
                   {
