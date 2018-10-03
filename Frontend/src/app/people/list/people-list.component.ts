@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { Person } from '../person';
 import { ActivatedRoute } from '@angular/router';
 import { AppDataSource } from '../../classes/app-data-source';
@@ -9,7 +9,8 @@ import { UrlBindingService } from '../../services/url-binding.service';
   selector: 'app-people-list',
   templateUrl: './people-list.component.html',
   styleUrls: ['./people-list.component.scss'],
-  providers: [UrlBindingService]
+  providers: [UrlBindingService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PeopleListComponent implements OnInit {
   public dataSource: AppDataSource<Person>;
