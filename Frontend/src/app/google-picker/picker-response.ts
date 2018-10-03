@@ -1,6 +1,4 @@
-﻿// noinspection ES6UnusedImports
-import {} from 'google.picker';
-
+﻿
 export type PickerDocument = typeof google.picker.Document;
 
 export class PickerResponse {

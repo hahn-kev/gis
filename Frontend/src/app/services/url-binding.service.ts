@@ -66,7 +66,7 @@ export class UrlBindingService<T_VALUES> {
   }
 
 
-  addParam<K extends keyof T_VALUES>(name: K, defaultValue: T_VALUES[K], pathParam = false) {
+  addParam<K extends Extract<keyof T_VALUES, string>>(name: K, defaultValue: T_VALUES[K], pathParam = false) {
     this.params.push(name);
     this.pathParams.push(pathParam);
     this.defaultValues.push(defaultValue);
