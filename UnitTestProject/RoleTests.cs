@@ -4,8 +4,6 @@ using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
 namespace UnitTestProject
@@ -18,8 +16,7 @@ namespace UnitTestProject
 
         public RoleTests()
         {
-            _servicesFixture = new ServicesFixture(collection =>
-                collection.Replace(ServiceDescriptor.Singleton<IEntityService, EntityService>()));
+            _servicesFixture = new ServicesFixture();
             _db = _servicesFixture.DbConnection;
             _personService = _servicesFixture.Get<PersonService>();
         }

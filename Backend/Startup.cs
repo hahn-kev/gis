@@ -9,6 +9,7 @@ using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
+using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
@@ -39,6 +40,8 @@ namespace Backend
 {
     public class Startup
     {
+        private IApplicationBuilder _applicationBuilder;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -48,7 +51,7 @@ namespace Backend
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
             services.Configure<Settings>(Configuration);
@@ -66,7 +69,7 @@ namespace Backend
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequiredLength = 8;
                     })
-                .AddLinqToDBStores<int>(new DefaultConnectionFactory())
+                .AddLinqToDBStores<int>(new AppConnectionFactory(() => _applicationBuilder.ApplicationServices))
                 .AddDefaultTokenProviders();
 
             services.AddSentinel(new SentinelSettings
@@ -212,7 +215,7 @@ namespace Backend
                     builder => builder.RequireAssertion(context =>
                         context.User.IsSupervisor() || context.User.IsAdminOrHr()));
             });
-            foreach (var type in GetType().Assembly.GetTypes()
+            foreach (var type in typeof(Startup).Assembly.GetTypes()
                 .Where(type =>
                     (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
             {
@@ -258,8 +261,9 @@ namespace Backend
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            _applicationBuilder = app;
             loggerFactory.AddFile("Logs/log-{Date}.txt", LogLevel.Warning);
             if (env.IsDevelopment())
             {
@@ -304,8 +308,14 @@ namespace Backend
             app.UseAuthentication();
             app.UseSentinel();
             app.UseMvc();
-
-            ConfigureDatabase(app.ApplicationServices, loggerFactory.CreateLogger("database"));
+            
+            var databaseLogger = loggerFactory.CreateLogger("database");
+            DataConnection.TurnTraceSwitchOn();
+            DataConnection.WriteTraceLine = (message, category) => databaseLogger.LogDebug(message);
+            LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
+            DbConnection.SetupMappingBuilder(MappingSchema.Default);
+            
+            ConfigureDatabase(app.ApplicationServices);
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
@@ -333,14 +343,10 @@ namespace Backend
 #endif
         }
 
-        public void ConfigureDatabase(IServiceProvider provider, ILogger logger)
+        public virtual void ConfigureDatabase(IServiceProvider provider)
         {
             var settings = provider.GetService<IOptions<Settings>>().Value;
             DataConnection.DefaultSettings = settings;
-            DataConnection.TurnTraceSwitchOn();
-            DataConnection.WriteTraceLine = (message, category) => logger.LogDebug(message);
-            LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
-            DbConnection.SetupMappingBuilder(MappingSchema.Default);
         }
     }
 }

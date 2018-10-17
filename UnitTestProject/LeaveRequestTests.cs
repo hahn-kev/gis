@@ -641,7 +641,8 @@ namespace UnitTestProject
             bStaff.ShouldNotBeNull();
             a1Staff.ShouldNotBeNull();
             aStaff.Staff.OrgGroupId.ShouldNotBeNull();
-            var actualStaff = _leaveService.PeopleInGroupWithLeave(aStaff.Staff.OrgGroupId.Value, DateTime.Now.SchoolYear());
+            var actualStaff =
+                _leaveService.PeopleInGroupWithLeave(aStaff.Staff.OrgGroupId.Value, DateTime.Now.SchoolYear());
             actualStaff.Select(details => details.Person.Id).ShouldBe(new[] {aStaff.Id, a1Staff.Id}, true);
             actualStaff.Select(details => details.Person.Id).ShouldNotContain(rootStaff.Id);
             actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
@@ -728,7 +729,7 @@ namespace UnitTestProject
 
                     var leaveUsages = WaysToGetVacationLeaveCalculation(person.Id, 2017);
                     leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
-                        $"Window at {requests.First().StartDate.ToShortDateString()} Size: {j}, Requests: [{string.Join(", ", requests)}]");
+                        () => $"Window at {requests.First().StartDate.ToShortDateString()} Size: {j}, Requests: [{string.Join(", ", requests)}]");
                 } while (requestDate < rangeEnd);
             }
         }

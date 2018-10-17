@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Entities;
@@ -8,6 +9,7 @@ using LinqToDB.DataProvider;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
 
@@ -54,7 +56,8 @@ namespace Backend.DataLayer
     }
 
     public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
-        IDbConnection
+        IDbConnection,
+        IDisposable
     {
         public DbConnection()
         {
@@ -125,6 +128,33 @@ namespace Backend.DataLayer
         public BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list)
         {
             return DataConnectionExtensions.BulkCopy(this, list);
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose();
+        }
+    }
+
+    public class AppConnectionFactory : IConnectionFactory
+    {
+        private readonly Func<IServiceProvider> _serviceProvider;
+
+        public AppConnectionFactory(Func<IServiceProvider> serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public IDataContext GetContext()
+        {
+            return GetConnection();
+        }
+
+        public DataConnection GetConnection()
+        {
+            var dbConnection = _serviceProvider().GetService<IDbConnection>();
+//            dbConnection.Connection.Open();
+            return new DataConnection(dbConnection.DataProvider, dbConnection.Connection);
         }
     }
 }

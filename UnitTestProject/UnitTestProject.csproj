@@ -16,11 +16,10 @@
     <PackageReference Include="AutoBogus" Version="2.1.1"/>
     <PackageReference Include="Bogus" Version="22.0.9"/>
     <PackageReference Include="linq2db.SQLite" Version="2.1.0"/>
-    <PackageReference Include="Microsoft.CodeCoverage" Version="1.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.1.3"/>
+    <PackageReference Include="Microsoft.CodeCoverage" Version="15.8.0"/>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.0"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0"/>
     <PackageReference Include="Moq" Version="4.8.2"/>
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="xunit" Version="2.3.1" />

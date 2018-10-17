@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoBogus;
 using Backend;
@@ -15,6 +16,8 @@ using LinqToDB.Identity;
 using LinqToDB.Linq;
 using LinqToDB.Reflection;
 using LinqToDB.SqlQuery;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -35,108 +38,40 @@ namespace UnitTestProject
 {
     public class ServicesFixture
     {
-        public ServiceProvider ServiceProvider { get; }
-        public IServiceCollection ServiceCollection { get; }
+        public IServiceProvider ServiceProvider => Server.Host.Services;
         public T Get<T>() => ServiceProvider.GetService<T>();
-        private IDbConnection _dbConnection;
-        public IDbConnection DbConnection => _dbConnection ?? (_dbConnection = Get<IDbConnection>());
+        public TestServer Server { get; }
+        public IDbConnection DbConnection { get; }
         public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService) Get<IEmailService>());
         public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService) Get<IEntityService>());
+        private readonly Lazy<HttpClient> _lazyClient;
+        public HttpClient Client => _lazyClient.Value;
 
-        public ServicesFixture(Action<IServiceCollection> configure = null)
+        public ServicesFixture()
         {
-            ServiceCollection = new ServiceCollection();
-            IConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.AddInMemoryCollection(new[]
+            var hostBuilder = new WebHostBuilder()
+                .ConfigureAppConfiguration(builder =>
                 {
-                    new KeyValuePair<string, string>("Environment", "UnitTest"),
-                    new KeyValuePair<string, string>("JWTSettings:SecretKey", "helloWorld"),
-                    new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
-                    new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
-                    new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
-                }
-            );
-            var startup = new Startup(builder.Build());
-            ServiceCollection.AddLogging(loggingBuilder => loggingBuilder.AddConsole().AddDebug());
-            startup.ConfigureServices(ServiceCollection);
-            ServiceCollection.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
-            {
-                var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>(),
-                    provider.GetService<IOptions<TemplateSettings>>(),
-                    provider.GetService<ILogger<EmailService>>());
-                esm.CallBase = true;
-                esm.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>())).Returns(Task.CompletedTask);
-                return esm.Object;
-            }));
-            ServiceCollection.Replace(ServiceDescriptor.Singleton<IEntityService>(provider =>
-            {
-                var esm = new Mock<EntityService>(provider.GetService<IDbConnection>());
-//                esm.CallBase = true;
-                return esm.Object;
-            }));
-
-            configure?.Invoke(ServiceCollection);
-            DataConnection.AddDataProvider(nameof(MyDataProvider), new MyDataProvider());
-            ServiceProvider = ServiceCollection.BuildServiceProvider();
-            startup.ConfigureDatabase(ServiceProvider, new ConsoleLogger("db", (s, level) => true, false));
-            DataConnection.DefaultSettings = new MockDbSettings();
-            DataConnection.WriteTraceLine = (message, category) => Debug.WriteLine(message, category);
-            SetupSchema();
+                    builder.AddInMemoryCollection(new[]
+                        {
+                            new KeyValuePair<string, string>("Environment", "UnitTest"),
+                            new KeyValuePair<string, string>("JWTSettings:SecretKey", "helloWorld"),
+                            new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
+                            new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
+                            new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
+                            new KeyValuePair<string, string>("web:client_id", "helloClient"),
+                            new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
+                        }
+                    );
+                }).ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); })
+                .UseStartup<TestServerStartup>();
+            Server = new TestServer(hostBuilder);
+            DbConnection = Get<IDbConnection>();
+            _lazyClient = new Lazy<HttpClient>(() => Server.CreateClient());
         }
 
-
-        private void SetupSchema()
+        public void AuthenticateAs(string userName)
         {
-            TryCreateTable<IdentityUser>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserClaim<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserLogin<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserToken<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityUserRole<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityRole<int>>();
-            TryCreateTable<LinqToDB.Identity.IdentityRoleClaim<int>>();
-            TryCreateTable<PersonExtended>();
-            TryCreateTable<PersonRole>();
-            TryCreateTable<Job>();
-            TryCreateTable<Grade>();
-            TryCreateTable<Endorsement>();
-            TryCreateTable<StaffEndorsement>();
-            TryCreateTable<RequiredEndorsement>();
-            TryCreateTable<Education>();
-            TryCreateTable<OrgGroup>();
-            TryCreateTable<LeaveRequest>();
-            TryCreateTable<TrainingRequirement>();
-            TryCreateTable<Staff>();
-            TryCreateTable<StaffTraining>();
-            TryCreateTable<EmergencyContact>();
-            TryCreateTable<Donor>();
-            TryCreateTable<Donation>();
-            TryCreateTable<Evaluation>();
-            TryCreateTable<Attachment>();
-            TryCreateTable<MissionOrg>();
-            TryCreateTable<MissionOrgYearSummary>();
-
-            var roles = new[] {"admin", "hr", "hradmin"};
-            var existingRoles = DbConnection.Roles.Select(role => role.Name).ToArray();
-            foreach (var role in roles.Except(existingRoles))
-            {
-                DbConnection.InsertId(
-                    new IdentityRole<int>(role) {NormalizedName = role.ToUpper()});
-            }
-
-            DbConnection.MappingSchema.SetConvertExpression<string, string[]>(
-                s => s.Split(',', StringSplitOptions.RemoveEmptyEntries), true);
-            DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
-        }
-
-        private void TryCreateTable<T>()
-        {
-            try
-            {
-                DbConnection.CreateTable<T>();
-            }
-            catch (PostgresException e) when (e.SqlState == "42P07") //already exists code I think
-            {
-            }
         }
 
         public void SetupPeople()
@@ -153,30 +88,30 @@ namespace UnitTestProject
             var jacobDonor = AutoFaker.Generate<Donor>();
             jacob.DonorId = jacobDonor.Id;
 
-            Assert.Empty(_dbConnection.People);
-            _dbConnection.Insert(jacob);
-            _dbConnection.Insert(jacobWife);
-            _dbConnection.Insert(bob);
-            _dbConnection.BulkCopy(faker.Generate(5));
-            _dbConnection.Insert(jacob.Staff);
-            _dbConnection.Insert(bob.Staff);
-            _dbConnection.Insert(jacobDonor);
+            Assert.Empty(DbConnection.People);
+            DbConnection.Insert(jacob);
+            DbConnection.Insert(jacobWife);
+            DbConnection.Insert(bob);
+            DbConnection.BulkCopy(faker.Generate(5));
+            DbConnection.Insert(jacob.Staff);
+            DbConnection.Insert(bob.Staff);
+            DbConnection.Insert(jacobDonor);
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
             jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
             jacobGroup.Supervisor = bob.Id;
             jacobGroup.ApproverIsSupervisor = true;
-            _dbConnection.Insert(jacobGroup);
+            DbConnection.Insert(jacobGroup);
             var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
             jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
-            _dbConnection.Insert(jacobMissionOrg);
+            DbConnection.Insert(jacobMissionOrg);
             var jacobMissionOrgYear = AutoFaker.Generate<MissionOrgYearSummary>();
             jacobMissionOrgYear.MissionOrgId = jacobMissionOrg.Id;
-            _dbConnection.Insert(jacobMissionOrgYear);
+            DbConnection.Insert(jacobMissionOrgYear);
 
             var jacobDonation = AutoFaker.Generate<Donation>();
             jacobDonation.PersonId = jacob.Id;
             jacobDonation.MissionOrgId = jacobMissionOrg.Id;
-            _dbConnection.Insert(jacobDonation);
+            DbConnection.Insert(jacobDonation);
             var jacobJob = InsertJob();
             InsertRole(role =>
             {
@@ -186,19 +121,39 @@ namespace UnitTestProject
 
             //endorsments
             var endorsement = AutoFaker.Generate<Endorsement>();
-            _dbConnection.Insert(endorsement);
+            DbConnection.Insert(endorsement);
             var jacobEndorsement = AutoFaker.Generate<StaffEndorsement>();
             jacobEndorsement.EndorsementId = endorsement.Id;
             jacobEndorsement.PersonId = jacob.Id;
-            _dbConnection.Insert(jacobEndorsement);
+            DbConnection.Insert(jacobEndorsement);
             var requiredEndorsement = AutoFaker.Generate<RequiredEndorsement>();
             requiredEndorsement.EndorsementId = endorsement.Id;
             requiredEndorsement.JobId = jacobJob.Id;
-            _dbConnection.Insert(requiredEndorsement);
+            DbConnection.Insert(requiredEndorsement);
 
             var education = AutoFaker.Generate<Education>();
             education.PersonId = jacob.Id;
-            _dbConnection.Insert(education);
+            DbConnection.Insert(education);
+        }
+
+        public void InsertUser(string userName,
+            Guid? personId = null,
+            string[] roles = null,
+            bool sendHrLeaveEmails = false)
+        {
+            var userService = Get<UserService>();
+            var identityUser = new IdentityUser
+            {
+                UserName = userName,
+                ResetPassword = true,
+                PersonId = personId,
+                SendHrLeaveEmails = sendHrLeaveEmails
+            };
+            userService.CreateAsync(identityUser, "password").Wait();
+            if (roles != null)
+            {
+                Task.WaitAll(roles.Select(role => userService.AddToRoleAsync(identityUser, role)).ToArray());
+            }
         }
 
         public Faker<PersonWithStaff> PersonFaker() =>
@@ -246,8 +201,9 @@ namespace UnitTestProject
         {
             var job = JobFaker().Generate();
             action?.Invoke(job);
-            _dbConnection.Insert<Job>(job);
-            _dbConnection.Insert(job.OrgGroup);
+            IDbConnection dbConnection = Get<IDbConnection>();
+            dbConnection.Insert<Job>(job);
+            dbConnection.Insert(job.OrgGroup);
             return job;
         }
 
@@ -260,9 +216,10 @@ namespace UnitTestProject
         {
             var person = PersonFaker().Generate(includeStaff ? "default" : "default,notStaff");
             action?.Invoke(person);
-            _dbConnection.Insert(person);
+            IDbConnection dbConnection = Get<IDbConnection>();
+            dbConnection.Insert(person);
             if (includeStaff)
-                _dbConnection.Insert<Staff>(person.Staff);
+                dbConnection.Insert<Staff>(person.Staff);
 
             return person;
         }
@@ -287,7 +244,7 @@ namespace UnitTestProject
         {
             var role = AutoFaker.Generate<PersonRole>();
             action?.Invoke(role);
-            _dbConnection.Insert(role);
+            Get<IDbConnection>().Insert(role);
             return role;
         }
 
@@ -301,7 +258,7 @@ namespace UnitTestProject
             leaveRequest.OverrideDays = true;
             leaveRequest.StartDate = DateTime.Now;
             leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4);
-            _dbConnection.Insert(leaveRequest);
+            Get<IDbConnection>().Insert(leaveRequest);
             return leaveRequest;
         }
 
@@ -312,18 +269,19 @@ namespace UnitTestProject
                 .RuleFor(identityUser => identityUser.Id, 0)
                 .Generate();
             modify?.Invoke(user);
-            user.Id = _dbConnection.InsertId(user);
+            IDbConnection dbConnection = Get<IDbConnection>();
+            user.Id = dbConnection.InsertId(user);
             Assert.True(user.Id > 0, $"{user.Id} > 0");
             if (roles.Any())
             {
                 roles = roles.Select(s => s.ToUpper()).ToArray();
-                var roleIds = _dbConnection.Roles
+                var roleIds = dbConnection.Roles
                     .Where(role => roles.Contains(role.NormalizedName))
                     .Select(role => role.Id)
                     .ToList();
                 foreach (var roleId in roleIds)
                 {
-                    _dbConnection.InsertId(new IdentityUserRole<int> {RoleId = roleId, UserId = user.Id});
+                    dbConnection.InsertId(new IdentityUserRole<int> {RoleId = roleId, UserId = user.Id});
                 }
             }
 
@@ -336,7 +294,7 @@ namespace UnitTestProject
             tr.FirstYear = firstYear;
             tr.LastYear = lastYear;
             tr.RenewMonthsCount = months;
-            _dbConnection.Insert(tr);
+            Get<IDbConnection>().Insert(tr);
             return tr;
         }
 
@@ -345,18 +303,19 @@ namespace UnitTestProject
             var tr = AutoFaker.Generate<StaffTraining>();
             tr.TrainingRequirementId = trId;
             tr.CompletedDate = completedDate;
-            _dbConnection.Insert(tr);
+            Get<IDbConnection>().Insert(tr);
             return tr;
         }
 
-        public OrgGroup InsertOrgGroup(Guid? parentId = null, Guid? supervisorId = null,
+        public OrgGroup InsertOrgGroup(Guid? parentId = null,
+            Guid? supervisorId = null,
             Action<OrgGroup> action = null)
         {
             var orgGroup = AutoFaker.Generate<OrgGroup>();
             orgGroup.ParentId = parentId;
             orgGroup.Supervisor = supervisorId;
             action?.Invoke(orgGroup);
-            _dbConnection.Insert(orgGroup);
+            Get<IDbConnection>().Insert(orgGroup);
             return orgGroup;
         }
 
@@ -365,29 +324,31 @@ namespace UnitTestProject
             SetupPeople();
             var personFaker = PersonFaker();
             var leaveRequester = personFaker.Generate();
-            _dbConnection.Insert(leaveRequester);
+            IDbConnection dbConnection = Get<IDbConnection>();
+            dbConnection.Insert(leaveRequester);
             var leaveRequesterOrgGroup = AutoFaker.Generate<OrgGroup>();
-            leaveRequesterOrgGroup.Id = leaveRequester.Staff.OrgGroupId ?? (Guid)(leaveRequester.Staff.OrgGroupId = Guid.NewGuid()) ;
-            _dbConnection.Insert(leaveRequesterOrgGroup);
-            _dbConnection.Insert(leaveRequester.Staff);
-            
+            leaveRequesterOrgGroup.Id = leaveRequester.Staff.OrgGroupId ??
+                                        (Guid) (leaveRequester.Staff.OrgGroupId = Guid.NewGuid());
+            dbConnection.Insert(leaveRequesterOrgGroup);
+            dbConnection.Insert(leaveRequester.Staff);
+
             var leaveApprover = personFaker.Generate();
-            _dbConnection.Insert(leaveApprover);
-            _dbConnection.Insert(leaveApprover.Staff);
+            dbConnection.Insert(leaveApprover);
+            dbConnection.Insert(leaveApprover.Staff);
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
             leaveRequest.PersonId = leaveRequester.Id;
             leaveRequest.ApprovedById = leaveApprover.Id;
-            _dbConnection.Insert(leaveRequest);
+            dbConnection.Insert(leaveRequest);
 
             var personWithRole = personFaker.Generate();
-            _dbConnection.Insert(personWithRole);
-            _dbConnection.Insert(personWithRole.Staff);
+            dbConnection.Insert(personWithRole);
+            dbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
             personRoles[0].Active = true; //always have at least one active
-            _dbConnection.BulkCopy(personRoles);
+            dbConnection.BulkCopy(personRoles);
             var grade = AutoFaker.Generate<Grade>();
-            _dbConnection.Insert(grade);
+            dbConnection.Insert(grade);
             var jobs = personRoles.Select(role => JobFaker()
                 .RuleFor(job => job.Id, role.JobId)
                 .RuleFor(job => job.GradeId, grade.Id)
@@ -396,24 +357,24 @@ namespace UnitTestProject
             evaluation.PersonId = personWithRole.Id;
             evaluation.Evaluator = leaveApprover.Id;
             evaluation.RoleId = personRoles[0].Id;
-            _dbConnection.Insert(evaluation);
+            dbConnection.Insert(evaluation);
 
-            _dbConnection.BulkCopy<Job>(jobs);
-            _dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
+            dbConnection.BulkCopy<Job>(jobs);
+            dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();
             InsertUser();
 
             var personWithEmergencyContact = personFaker.Generate("default,notStaff");
-            _dbConnection.Insert(personWithEmergencyContact);
+            dbConnection.Insert(personWithEmergencyContact);
             var contactPerson = personFaker.Generate("default,notStaff");
 
-            _dbConnection.Insert(contactPerson);
+            dbConnection.Insert(contactPerson);
             var emergencyContact = AutoFaker.Generate<EmergencyContact>();
             emergencyContact.ContactId = contactPerson.Id;
             emergencyContact.PersonId = personWithEmergencyContact.Id;
-            _dbConnection.Insert(emergencyContact);
+            dbConnection.Insert(emergencyContact);
 
-            _dbConnection.Insert(new Attachment()
+            dbConnection.Insert(new Attachment
             {
                 AttachedToId = Guid.NewGuid(),
                 DownloadUrl = "someurl.com",
@@ -423,13 +384,13 @@ namespace UnitTestProject
                 Name = "hello attachments"
             });
 
-            _dbConnection.Insert(AutoFaker.Generate<Grade>());
-            _dbConnection.Insert(AutoFaker.Generate<MissionOrg>());
-            _dbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
-            _dbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
-            _dbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
-            _dbConnection.Insert(AutoFaker.Generate<IdentityUserRole<int>>());
-            _dbConnection.Insert(AutoFaker.Generate<IdentityUserToken<int>>());
+            dbConnection.Insert(AutoFaker.Generate<Grade>());
+            dbConnection.Insert(AutoFaker.Generate<MissionOrg>());
+            dbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
+            dbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
+            dbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
+            dbConnection.Insert(AutoFaker.Generate<IdentityUserRole<int>>());
+            dbConnection.Insert(AutoFaker.Generate<IdentityUserToken<int>>());
         }
 
         public void SetupTraining()
@@ -444,17 +405,18 @@ namespace UnitTestProject
 
             var orgGroup = AutoFaker.Generate<OrgGroup>();
             orgGroup.Id = personWithTraining.Staff.OrgGroupId ?? Guid.Empty;
-            _dbConnection.Insert(orgGroup);
+            IDbConnection dbConnection = Get<IDbConnection>();
+            dbConnection.Insert(orgGroup);
 
-            _dbConnection.Insert(personWithTraining);
-            _dbConnection.Insert(personWithTraining.Staff);
-            _dbConnection.Insert(trainingRequirement);
+            dbConnection.Insert(personWithTraining);
+            dbConnection.Insert(personWithTraining.Staff);
+            dbConnection.Insert(trainingRequirement);
 
             var staffTraining = AutoFaker.Generate<StaffTraining>();
             staffTraining.StaffId =
                 personWithTraining.StaffId ?? throw new NullReferenceException("person staff id is null");
             staffTraining.TrainingRequirementId = trainingRequirement.Id;
-            _dbConnection.Insert(staffTraining);
+            dbConnection.Insert(staffTraining);
         }
     }
 
