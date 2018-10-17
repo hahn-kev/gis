@@ -138,11 +138,10 @@ namespace Backend.DataLayer
 
     public class AppConnectionFactory : IConnectionFactory
     {
-        private readonly Func<IServiceProvider> _serviceProvider;
-
-        public AppConnectionFactory(Func<IServiceProvider> serviceProvider)
+        private readonly IDbConnection _dbConnection;
+        public AppConnectionFactory(IDbConnection dbConnection)
         {
-            _serviceProvider = serviceProvider;
+            _dbConnection = dbConnection;
         }
 
         public IDataContext GetContext()
@@ -152,9 +151,10 @@ namespace Backend.DataLayer
 
         public DataConnection GetConnection()
         {
-            var dbConnection = _serviceProvider().GetService<IDbConnection>();
-//            dbConnection.Connection.Open();
-            return new DataConnection(dbConnection.DataProvider, dbConnection.Connection);
+            //we're creating a new dataConnection here because the Identity stores dispose
+            //the connection they get from here, and by injecting in this way the connection won't get disposed
+            //which would break unit tests
+            return new DataConnection(_dbConnection.DataProvider, _dbConnection.Connection);
         }
     }
 }

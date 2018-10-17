@@ -69,8 +69,10 @@ namespace Backend
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequiredLength = 8;
                     })
-                .AddLinqToDBStores<int>(new AppConnectionFactory(() => _applicationBuilder.ApplicationServices))
+                .AddLinqToDBStores<int>(new AppConnectionFactory(null))//passing an invalid factory here
                 .AddDefaultTokenProviders();
+            //replace the singleton factory above with a scoped version
+            services.Replace(ServiceDescriptor.Scoped<IConnectionFactory, AppConnectionFactory>());
 
             services.AddSentinel(new SentinelSettings
             {
