@@ -27,20 +27,21 @@ namespace Backend.Controllers
         private readonly JWTSettings _jwtOptions;
         private readonly UserService _userService;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly SecurityTokenHandler _securityTokenHandler;
         private readonly PersonService _personService;
         private readonly Settings _settings;
+        private readonly JwtService _jwtService;
 
         public AuthenticateController(IOptions<JWTSettings> jwtOptions,
             SignInManager<IdentityUser> signInManager,
             IOptions<Settings> options,
             UserService userService,
-            PersonService personService)
+            PersonService personService,
+            JwtService jwtService)
         {
             _signInManager = signInManager;
             _userService = userService;
             _personService = personService;
-            _securityTokenHandler = new JwtSecurityTokenHandler();
+            _jwtService = jwtService;
             _jwtOptions = jwtOptions.Value;
             _settings = options.Value;
         }
@@ -143,7 +144,7 @@ namespace Backend.Controllers
                 GoogleOAuthTokenName,
                 authProperties.GetTokenValue(GoogleOAuthTokenName));
             if (!authTokenResult.Succeeded) throw authTokenResult.Errors();
-            Response.Cookies.Append(JwtCookieName, _securityTokenHandler.WriteToken(await GetJwtSecurityToken(user)));
+            Response.Cookies.Append(JwtCookieName, await _jwtService.GetJwtSecurityTokenAsString(user));
         }
 
         [HttpPost("signin")]
@@ -200,59 +201,12 @@ namespace Backend.Controllers
                 });
             }
 
-            var token = await GetJwtSecurityToken(user);
-            var accessTokenString = _securityTokenHandler.WriteToken(token);
+            var accessTokenString = await _jwtService.GetJwtSecurityTokenAsString(user);
             Response.Cookies.Append(JwtCookieName, accessTokenString);
             return Json(new Dictionary<string, object>
             {
                 {"access_token", accessTokenString}
             });
-        }
-
-        private async Task<JwtSecurityToken> GetJwtSecurityToken(IdentityUser identityUser)
-        {
-            var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identityUser);
-            var oauthToken =
-                await _signInManager.UserManager.GetAuthenticationTokenAsync(identityUser,
-                    "Google",
-                    GoogleOAuthTokenName);
-            return new JwtSecurityToken(
-                issuer: _jwtOptions.Issuer,
-                audience: _jwtOptions.Audience,
-                claims: GetTokenClaims(identityUser, oauthToken).Union(claimsPrincipal.Claims),
-                expires: DateTime.UtcNow.AddDays(7),
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
-                    SecurityAlgorithms.HmacSha256)
-            );
-        }
-
-        private IEnumerable<Claim> GetTokenClaims(IdentityUser identityUser, string googleOauthToken)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Jti, identityUser.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, identityUser.Email ?? string.Empty),
-                new Claim("oauth", googleOauthToken ?? string.Empty)
-            };
-            if (identityUser.PersonId.HasValue)
-            {
-                claims.Add(new Claim(ClaimPersonId, identityUser.PersonId.ToString()));
-                var group = _userService.FindGroupIdIfSupervisor(identityUser.PersonId.Value);
-                if (group != null)
-                {
-                    claims.Add(new Claim(ClaimSupervisor, group.Id.ToString()));
-                    claims.Add(new Claim(ClaimSupervisorType, group.Type.ToString()));
-                }
-
-                var personWithStaff = _personService.GetStaffById(identityUser.PersonId.Value);
-
-                if (personWithStaff.Staff?.LeaveDelegateGroupId != null)
-                    claims.Add(new Claim(ClaimLeaveDelegate,
-                        personWithStaff.Staff.LeaveDelegateGroupId.Value.ToString()));
-            }
-
-            return claims;
         }
 
         private Exception ThrowLoginFailed()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoBogus;
 using Backend;
@@ -55,7 +56,9 @@ namespace UnitTestProject
                     builder.AddInMemoryCollection(new[]
                         {
                             new KeyValuePair<string, string>("Environment", "UnitTest"),
-                            new KeyValuePair<string, string>("JWTSettings:SecretKey", "helloWorld"),
+                            new KeyValuePair<string, string>("JWTSettings:SecretKey","3C384CBA-393F-4192-A18D-8EF6543E5D01"),
+                            new KeyValuePair<string, string>("JWTSettings:Issuer","dotnet_gis"),
+                            new KeyValuePair<string, string>("JWTSettings:Audience","GisAPI"),
                             new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
                             new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
                             new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
@@ -70,8 +73,13 @@ namespace UnitTestProject
             _lazyClient = new Lazy<HttpClient>(() => Server.CreateClient());
         }
 
-        public void AuthenticateAs(string userName)
+        public IdentityUser AuthenticateAs(string userName)
         {
+            var userService = Get<UserService>();
+            var identityUser = userService.FindByNameAsync(userName).Result;
+            var task = Get<JwtService>().GetJwtSecurityTokenAsString(identityUser);
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", task.Result);
+            return identityUser;
         }
 
         public void SetupPeople()
@@ -96,6 +104,7 @@ namespace UnitTestProject
             DbConnection.Insert(jacob.Staff);
             DbConnection.Insert(bob.Staff);
             DbConnection.Insert(jacobDonor);
+            InsertUser("jacob", jacob.Id, new[] {"admin"});
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
             jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
             jacobGroup.Supervisor = bob.Id;

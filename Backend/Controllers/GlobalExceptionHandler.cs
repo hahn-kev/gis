@@ -58,7 +58,7 @@ namespace Backend.Controllers
 
         private void ReportToSentry(ExceptionContext context)
         {
-            if (_sentinelSettings.Environment == "dev") return;
+            if (!_sentinelSettings.Environment.Equals("production", StringComparison.InvariantCultureIgnoreCase)) return;
             var sentryClient = _sentinelClientFactory.CreateClient(_sentinelSettings, context.HttpContext);
             //we're using user and http the right way, not via contexts
             sentryClient.Contexts.Remove("user");
