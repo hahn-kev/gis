@@ -40,6 +40,7 @@ export class UserService {
 
   private userToPostBody(user: User, password: string) {
     return {
+      id: user.id,
       password: password,
       userName: user.userName,
       phoneNumber: user.phoneNumber,
