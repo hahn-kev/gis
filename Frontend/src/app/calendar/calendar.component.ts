@@ -49,6 +49,8 @@ export class CalendarComponent implements OnInit {
   }
 
   generateModel() {
+    //todo split into weeks and make each week it's own css grid
+    //guide https://snook.ca/archives/html_and_css/calendar-css-grid
     let rows = 5;
     let columns = 7;
     let monthStartWeekday = this.month.weekday();

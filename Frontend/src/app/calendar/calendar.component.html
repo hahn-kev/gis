@@ -22,8 +22,10 @@
   <div *ngFor="let model of models" class="date-cell">
     <ng-container *ngIf="model.dayOfMonth == 1">{{model.monthName}}</ng-container>
     {{model.dayOfMonth}}
-    <button (click)="leaveSheet.show(req)" mat-button
-            style="display: block"
+    <button (click)="leaveSheet.show(req)"
+            mat-button
+            class="request-line"
+            [style.grid-column]="'span ' + req.days"
             *ngFor="let req of model.items">
       [{{leaveTypeName(req.type)}}] {{req.requesterName}}
 
