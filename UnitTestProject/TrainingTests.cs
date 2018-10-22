@@ -4,22 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using Backend.DataLayer;
 using LinqToDB;
+using LinqToDB.Data;
 using Shouldly;
 using Xunit;
 using DataExtensions = Backend.DataLayer.DataExtensions;
 
 namespace UnitTestProject
 {
-    public class TrainingTests
+    public class TrainingTests:IClassFixture<ServicesFixture>, IDisposable
     {
         private readonly ServicesFixture _sf;
         private TrainingRepository _repo;
+        private DataConnectionTransaction _transaction;
         private const int StartMonth = DataExtensions.SchoolStartMonth;
         private const int EndMonth = DataExtensions.SchoolEndMonth;
 
-        public TrainingTests()
+        public TrainingTests(ServicesFixture sf)
         {
-            _sf = new ServicesFixture();
+            _sf = sf;
+            _transaction = _sf.DbConnection.BeginTransaction();
             _repo = _sf.Get<TrainingRepository>();
         }
 
@@ -208,6 +211,11 @@ namespace UnitTestProject
                 new DateTime(2018, 3, 1),
                 new DateTime(2025, 3, 1)
             });
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
         }
     }
 }

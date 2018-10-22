@@ -236,7 +236,7 @@ namespace Backend
             }
 
             services.AddScoped<AuthenticateController>();
-            services.AddScoped<IDbConnection, DbConnection>();
+            AddDatabase(services);
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
                     (NpgsqlConnection) provider.GetRequiredService<IDbConnection>().Connection));
@@ -317,7 +317,6 @@ namespace Backend
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
             DbConnection.SetupMappingBuilder(MappingSchema.Default);
             
-            ConfigureDatabase(app.ApplicationServices);
 #if DEBUG
             using (var scope = app.ApplicationServices.CreateScope())
             {
@@ -345,10 +344,10 @@ namespace Backend
 #endif
         }
 
-        public virtual void ConfigureDatabase(IServiceProvider provider)
+        public virtual void AddDatabase(IServiceCollection services)
         {
-            var settings = provider.GetService<IOptions<Settings>>().Value;
-            DataConnection.DefaultSettings = settings;
+            services.AddScoped<IDbConnection, DbConnection>();
+            DataConnection.DefaultSettings = Configuration.Get<Settings>();
         }
     }
 }

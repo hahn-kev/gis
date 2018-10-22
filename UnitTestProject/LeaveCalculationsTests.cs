@@ -5,19 +5,22 @@ using System.Runtime.InteropServices.ComTypes;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
+using LinqToDB.Data;
 using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
 {
-    public class LeaveCalculationsTests
+    public class LeaveCalculationsTests:IClassFixture<ServicesFixture>, IDisposable
     {
         private LeaveService _leaveService;
         private ServicesFixture _servicesFixture;
+        private DataConnectionTransaction _transaction;
 
-        public LeaveCalculationsTests()
+        public LeaveCalculationsTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = new ServicesFixture();
+            _servicesFixture = servicesFixture;
+            _transaction = _servicesFixture.DbConnection.BeginTransaction();
             _servicesFixture.SetupData();
             _leaveService = _servicesFixture.Get<LeaveService>();
         }
@@ -207,6 +210,11 @@ namespace UnitTestProject
         {
             var personAndLeaveDetailses = _leaveService.PeopleWithCurrentLeave();
             Assert.NotEmpty(personAndLeaveDetailses);
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
         }
     }
 }

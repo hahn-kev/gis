@@ -10,6 +10,7 @@ using Backend.Services;
 using Backend.Utils;
 using Bogus.DataSets;
 using LinqToDB;
+using LinqToDB.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -19,19 +20,21 @@ using Xunit;
 
 namespace UnitTestProject
 {
-    public class LeaveRequestTests
+    public class LeaveRequestTests:IClassFixture<ServicesFixture>, IDisposable
     {
         private LeaveService _leaveService;
         private OrgGroupRepository _orgGroupRepository;
         private IDbConnection _dbConnection;
         private ServicesFixture _servicesFixture;
+        private DataConnectionTransaction _transaction;
 
-        public LeaveRequestTests()
+        public LeaveRequestTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = new ServicesFixture();
+            _servicesFixture = servicesFixture;
             _leaveService = _servicesFixture.Get<LeaveService>();
             _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
             _dbConnection = _servicesFixture.Get<IDbConnection>();
+            _transaction = _dbConnection.BeginTransaction();
             _servicesFixture.SetupPeople();
         }
 
@@ -845,6 +848,11 @@ namespace UnitTestProject
             _dbConnection.BulkCopy(leaveRequests);
 
             WaysToGetVacationLeaveCalculation(person.Id, 2017).ShouldAllBe(usage => usage.Used == used);
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
         }
     }
 }

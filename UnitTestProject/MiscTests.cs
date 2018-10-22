@@ -7,6 +7,7 @@ using Backend;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
+using LinqToDB.Data;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shouldly;
@@ -14,15 +15,17 @@ using Xunit;
 
 namespace UnitTestProject
 {
-    public class MiscTests
+    public class MiscTests:IClassFixture<ServicesFixture>, IDisposable
     {
-        private ServicesFixture _servicesFixture;
-        private PersonRepository _personRepository;
+        private readonly ServicesFixture _servicesFixture;
+        private readonly PersonRepository _personRepository;
+        private DataConnectionTransaction _transaction;
 
-        public MiscTests()
+        public MiscTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = new ServicesFixture();
+            _servicesFixture = servicesFixture;
             _personRepository = _servicesFixture.Get<PersonRepository>();
+            _transaction = _servicesFixture.DbConnection.BeginTransaction();
         }
 
         [Fact]
@@ -149,6 +152,11 @@ namespace UnitTestProject
             var pWithoutRole = _servicesFixture.InsertPerson();
             _personRepository.Staff.Count().ShouldBe(2);
             _personRepository.PeopleWithStaffSummaries.Count().ShouldBe(2);
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
         }
     }
 }

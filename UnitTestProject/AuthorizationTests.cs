@@ -22,9 +22,10 @@ namespace UnitTestProject
         [Fact]
         public async void UserCanEditSelf()
         {
+            var client = _servicesFixture.CreateClient();
             var expectedPhone = Guid.NewGuid().ToString("N");
-            var identityUser = _servicesFixture.AuthenticateAs("jacob");
-            var responseMessage = await _servicesFixture.Client.PutAsync("api/user/self",
+            var identityUser = _servicesFixture.AuthenticateAs(client, "jacob");
+            var responseMessage = await client.PutAsync("api/user/self",
                 new RegisterUser
                 {
                     Id = identityUser.Id,

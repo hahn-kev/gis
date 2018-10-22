@@ -1,19 +1,28 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Backend.Services;
+using LinqToDB.Data;
 using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
 {
-    public class JobTests
+    public class JobTests: IClassFixture<ServicesFixture>, IDisposable
     {
-        private ServicesFixture _sf;
-        private JobService _js;
+        private readonly ServicesFixture _sf;
+        private readonly JobService _js;
+        private readonly DataConnectionTransaction _transaction;
 
-        public JobTests()
+        public JobTests(ServicesFixture servicesFixture)
         {
-            _sf = new ServicesFixture();
+            _sf = servicesFixture;
             _js = _sf.Get<JobService>();
+            _transaction = _sf.DbConnection.BeginTransaction();
+        }
+
+        public void Dispose()
+        {
+            _transaction.Rollback();
         }
 
         [Fact]

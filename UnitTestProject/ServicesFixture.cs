@@ -18,6 +18,7 @@ using LinqToDB.Linq;
 using LinqToDB.Reflection;
 using LinqToDB.SqlQuery;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,48 +38,62 @@ using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
 {
-    public class ServicesFixture
+    public class ServicesFixture : WebApplicationFactory<TestServerStartup>
     {
-        public IServiceProvider ServiceProvider => Server.Host.Services;
+        public IWebHost WebHost { get; }
+        public IServiceProvider ServiceProvider => WebHost.Services;
         public T Get<T>() => ServiceProvider.GetService<T>();
-        public TestServer Server { get; }
         public IDbConnection DbConnection { get; }
         public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService) Get<IEmailService>());
         public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService) Get<IEntityService>());
-        private readonly Lazy<HttpClient> _lazyClient;
-        public HttpClient Client => _lazyClient.Value;
 
         public ServicesFixture()
         {
-            var hostBuilder = new WebHostBuilder()
-                .ConfigureAppConfiguration(builder =>
-                {
-                    builder.AddInMemoryCollection(new[]
-                        {
-                            new KeyValuePair<string, string>("Environment", "UnitTest"),
-                            new KeyValuePair<string, string>("JWTSettings:SecretKey","3C384CBA-393F-4192-A18D-8EF6543E5D01"),
-                            new KeyValuePair<string, string>("JWTSettings:Issuer","dotnet_gis"),
-                            new KeyValuePair<string, string>("JWTSettings:Audience","GisAPI"),
-                            new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
-                            new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
-                            new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
-                            new KeyValuePair<string, string>("web:client_id", "helloClient"),
-                            new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
-                        }
-                    );
-                }).ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); })
-                .UseStartup<TestServerStartup>();
-            Server = new TestServer(hostBuilder);
+            var webHostBuilder = CreateWebHostBuilder();
+            //todo config on startup not called, figure out work around
+            ConfigureWebHost(webHostBuilder);
+            WebHost = webHostBuilder.Build();
             DbConnection = Get<IDbConnection>();
-            _lazyClient = new Lazy<HttpClient>(() => Server.CreateClient());
         }
 
-        public IdentityUser AuthenticateAs(string userName)
+        protected override IWebHostBuilder CreateWebHostBuilder()
+        {
+            return new WebHostBuilder().UseStartup<TestServerStartup>().UseEnvironment("UnitTest");
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureAppConfiguration(configBuilder =>
+            {
+                configBuilder.AddInMemoryCollection(new[]
+                    {
+                        new KeyValuePair<string, string>("Environment", "UnitTest"),
+                        new KeyValuePair<string, string>("JWTSettings:SecretKey",
+                            "3C384CBA-393F-4192-A18D-8EF6543E5D01"),
+                        new KeyValuePair<string, string>("JWTSettings:Issuer", "dotnet_gis"),
+                        new KeyValuePair<string, string>("JWTSettings:Audience", "GisAPI"),
+                        new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
+                        new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
+                        new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
+                        new KeyValuePair<string, string>("web:client_id", "helloClient"),
+                        new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
+                    }
+                );
+            }).ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); });
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            DbConnection.Dispose();
+            base.Dispose(disposing);
+        }
+
+        public IdentityUser AuthenticateAs(HttpClient client, string userName)
         {
             var userService = Get<UserService>();
             var identityUser = userService.FindByNameAsync(userName).Result;
             var task = Get<JwtService>().GetJwtSecurityTokenAsString(identityUser);
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", task.Result);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", task.Result);
             return identityUser;
         }
 
