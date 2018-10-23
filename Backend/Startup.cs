@@ -311,14 +311,26 @@ namespace Backend
             app.UseSentinel();
             app.UseMvc();
             
+            SetupDatabase(loggerFactory, app.ApplicationServices);
+
+        }
+
+        public virtual void AddDatabase(IServiceCollection services)
+        {
+            services.AddScoped<IDbConnection, DbConnection>();
+            DataConnection.DefaultSettings = Configuration.Get<Settings>();
+        }
+
+        public static void SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        {
             var databaseLogger = loggerFactory.CreateLogger("database");
             DataConnection.TurnTraceSwitchOn();
             DataConnection.WriteTraceLine = (message, category) => databaseLogger.LogDebug(message);
             LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
             DbConnection.SetupMappingBuilder(MappingSchema.Default);
-            
+
 #if DEBUG
-            using (var scope = app.ApplicationServices.CreateScope())
+            using (var scope = serviceProvider.CreateScope())
             {
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
                 var roleManager = scope.ServiceProvider.GetService<RoleManager<LinqToDB.Identity.IdentityRole<int>>>();
@@ -328,6 +340,7 @@ namespace Backend
                 {
                     roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();
                 }
+
                 //to configure db look at ServiceFixture.SetupSchema
                 if (!dbConnection.Users.Any())
                 {
@@ -342,12 +355,6 @@ namespace Backend
                 }
             }
 #endif
-        }
-
-        public virtual void AddDatabase(IServiceCollection services)
-        {
-            services.AddScoped<IDbConnection, DbConnection>();
-            DataConnection.DefaultSettings = Configuration.Get<Settings>();
         }
     }
 }

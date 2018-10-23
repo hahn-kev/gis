@@ -18,8 +18,9 @@ using LinqToDB.Linq;
 using LinqToDB.Reflection;
 using LinqToDB.SqlQuery;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
+//using Microsoft.AspNetCore.Mvc.Testing;
+//using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -38,10 +39,11 @@ using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
 {
-    public class ServicesFixture : WebApplicationFactory<TestServerStartup>
+    public class ServicesFixture 
+//        : WebApplicationFactory<TestServerStartup>
     {
         public IWebHost WebHost { get; }
-        public IServiceProvider ServiceProvider => WebHost.Services;
+        public IServiceProvider ServiceProvider { get; }
         public T Get<T>() => ServiceProvider.GetService<T>();
         public IDbConnection DbConnection { get; }
         public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService) Get<IEmailService>());
@@ -49,44 +51,103 @@ namespace UnitTestProject
 
         public ServicesFixture()
         {
-            var webHostBuilder = CreateWebHostBuilder();
-            //todo config on startup not called, figure out work around
-            ConfigureWebHost(webHostBuilder);
-            WebHost = webHostBuilder.Build();
+//            var webHostBuilder = CreateWebHostBuilder();
+//            todo config on startup not called, figure out work around
+//            ConfigureWebHost(webHostBuilder);
+//            WebHost = webHostBuilder.Build();
+//            ServiceProvider = WebHost.Services;
+            var configBuilder = new ConfigurationBuilder();
+            SetupConfig(configBuilder);
+            var sc = new ServiceCollection();
+            var startup = new TestServerStartup(configBuilder.Build());
+
+            startup.ConfigureServices(sc);
+            ServiceProvider = sc.BuildServiceProvider();
             DbConnection = Get<IDbConnection>();
+            Setup();
         }
 
-        protected override IWebHostBuilder CreateWebHostBuilder()
+        private void Setup()
         {
-            return new WebHostBuilder().UseStartup<TestServerStartup>().UseEnvironment("UnitTest");
+            TryCreateTable<IdentityUser>(DbConnection);
+            TryCreateTable<IdentityUserClaim<int>>(DbConnection);
+            TryCreateTable<IdentityUserLogin<int>>(DbConnection);
+            TryCreateTable<IdentityUserToken<int>>(DbConnection);
+            TryCreateTable<IdentityUserRole<int>>(DbConnection);
+            TryCreateTable<IdentityRole<int>>(DbConnection);
+            TryCreateTable<IdentityRoleClaim<int>>(DbConnection);
+            TryCreateTable<PersonExtended>(DbConnection);
+            TryCreateTable<PersonRole>(DbConnection);
+            TryCreateTable<Job>(DbConnection);
+            TryCreateTable<Grade>(DbConnection);
+            TryCreateTable<Endorsement>(DbConnection);
+            TryCreateTable<StaffEndorsement>(DbConnection);
+            TryCreateTable<RequiredEndorsement>(DbConnection);
+            TryCreateTable<Education>(DbConnection);
+            TryCreateTable<OrgGroup>(DbConnection);
+            TryCreateTable<LeaveRequest>(DbConnection);
+            TryCreateTable<TrainingRequirement>(DbConnection);
+            TryCreateTable<Staff>(DbConnection);
+            TryCreateTable<StaffTraining>(DbConnection);
+            TryCreateTable<EmergencyContact>(DbConnection);
+            TryCreateTable<Donor>(DbConnection);
+            TryCreateTable<Donation>(DbConnection);
+            TryCreateTable<Evaluation>(DbConnection);
+            TryCreateTable<Attachment>(DbConnection);
+            TryCreateTable<MissionOrg>(DbConnection);
+            TryCreateTable<MissionOrgYearSummary>(DbConnection);
+
+            DbConnection.MappingSchema.SetConvertExpression<string, string[]>(
+                s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
+                true);
+            DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
+            Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
         }
 
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        private void TryCreateTable<T>(IDbConnection dbConnection)
         {
-            builder.ConfigureAppConfiguration(configBuilder =>
+            try
             {
-                configBuilder.AddInMemoryCollection(new[]
-                    {
-                        new KeyValuePair<string, string>("Environment", "UnitTest"),
-                        new KeyValuePair<string, string>("JWTSettings:SecretKey",
-                            "3C384CBA-393F-4192-A18D-8EF6543E5D01"),
-                        new KeyValuePair<string, string>("JWTSettings:Issuer", "dotnet_gis"),
-                        new KeyValuePair<string, string>("JWTSettings:Audience", "GisAPI"),
-                        new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
-                        new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
-                        new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
-                        new KeyValuePair<string, string>("web:client_id", "helloClient"),
-                        new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
-                    }
-                );
-            }).ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); });
+                dbConnection.CreateTable<T>();
+            }
+            catch (SqliteException e) when (e.SqliteErrorCode == 1) //already exists code I think
+            {
+            }
         }
 
-        protected override void Dispose(bool disposing)
+//        protected override IWebHostBuilder CreateWebHostBuilder()
+//        {
+//            return new WebHostBuilder().UseStartup<TestServerStartup>().UseEnvironment("UnitTest");
+//        }
+
+//        protected override void ConfigureWebHost(IWebHostBuilder builder)
+//        {
+//            builder.ConfigureAppConfiguration(SetupConfig)
+//                .ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); });
+//        }
+
+        private void SetupConfig(IConfigurationBuilder configBuilder)
         {
-            DbConnection.Dispose();
-            base.Dispose(disposing);
+            configBuilder.AddInMemoryCollection(new[]
+            {
+                new KeyValuePair<string, string>("Environment", "UnitTest"),
+                new KeyValuePair<string, string>("JWTSettings:SecretKey",
+                    "3C384CBA-393F-4192-A18D-8EF6543E5D01"),
+                new KeyValuePair<string, string>("JWTSettings:Issuer", "dotnet_gis"),
+                new KeyValuePair<string, string>("JWTSettings:Audience", "GisAPI"),
+                new KeyValuePair<string, string>("TemplateSettings:NotifyLeaveRequest", "abc"),
+                new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
+                new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
+                new KeyValuePair<string, string>("web:client_id", "helloClient"),
+                new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
+            });
         }
+
+//        protected override void Dispose(bool disposing)
+//        {
+//            DbConnection.Dispose();
+//            base.Dispose(disposing);
+//        }
 
         public IdentityUser AuthenticateAs(HttpClient client, string userName)
         {

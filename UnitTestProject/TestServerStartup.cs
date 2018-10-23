@@ -51,54 +51,11 @@ namespace UnitTestProject
             }));
         }
 
-        public override void ConfigureDatabase(IServiceProvider provider)
+        public override void AddDatabase(IServiceCollection services)
         {
+            services.AddSingleton<IDbConnection, DbConnection>();
             DataConnection.AddDataProvider(nameof(MyDataProvider), new MyDataProvider());
             DataConnection.DefaultSettings = new MockDbSettings();
-            var dbConnection = provider.GetService<IDbConnection>();
-            TryCreateTable<IdentityUser>(dbConnection);
-            TryCreateTable<IdentityUserClaim<int>>(dbConnection);
-            TryCreateTable<IdentityUserLogin<int>>(dbConnection);
-            TryCreateTable<IdentityUserToken<int>>(dbConnection);
-            TryCreateTable<IdentityUserRole<int>>(dbConnection);
-            TryCreateTable<IdentityRole<int>>(dbConnection);
-            TryCreateTable<IdentityRoleClaim<int>>(dbConnection);
-            TryCreateTable<PersonExtended>(dbConnection);
-            TryCreateTable<PersonRole>(dbConnection);
-            TryCreateTable<Job>(dbConnection);
-            TryCreateTable<Grade>(dbConnection);
-            TryCreateTable<Endorsement>(dbConnection);
-            TryCreateTable<StaffEndorsement>(dbConnection);
-            TryCreateTable<RequiredEndorsement>(dbConnection);
-            TryCreateTable<Education>(dbConnection);
-            TryCreateTable<OrgGroup>(dbConnection);
-            TryCreateTable<LeaveRequest>(dbConnection);
-            TryCreateTable<TrainingRequirement>(dbConnection);
-            TryCreateTable<Staff>(dbConnection);
-            TryCreateTable<StaffTraining>(dbConnection);
-            TryCreateTable<EmergencyContact>(dbConnection);
-            TryCreateTable<Donor>(dbConnection);
-            TryCreateTable<Donation>(dbConnection);
-            TryCreateTable<Evaluation>(dbConnection);
-            TryCreateTable<Attachment>(dbConnection);
-            TryCreateTable<MissionOrg>(dbConnection);
-            TryCreateTable<MissionOrgYearSummary>(dbConnection);
-
-            dbConnection.MappingSchema.SetConvertExpression<string, string[]>(
-                s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
-                true);
-            dbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
-        }
-
-        private void TryCreateTable<T>(IDbConnection dbConnection)
-        {
-            try
-            {
-                dbConnection.CreateTable<T>();
-            }
-            catch (SqliteException e) when (e.SqliteErrorCode == 1) //already exists code I think
-            {
-            }
         }
     }
 }
