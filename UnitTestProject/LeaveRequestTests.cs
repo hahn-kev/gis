@@ -121,7 +121,6 @@ namespace UnitTestProject
             sf.EntityServiceMock.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
         }
 
-
         [Fact]
         public void OrgGroupChainResolvesAsExpected()
         {
@@ -414,6 +413,29 @@ namespace UnitTestProject
                     person2Id,
                     true,
                     1);
+
+                yield return ("supervisor is in list twice",
+                        new LeaveRequest {PersonId = person1Id},
+                        Person(person1Id),
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
+                        person2Id,
+                        true,
+                        0
+                    );
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
@@ -422,7 +444,7 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(GetExpectedEmailValues))]
-        public async Task SendsExpectedEmails(string reason,
+        public static async Task SendsExpectedEmails(string reason,
             LeaveRequest request,
             PersonWithStaff requestedBy,
             OrgGroupWithSupervisor department,
@@ -432,10 +454,14 @@ namespace UnitTestProject
             bool expectApprovalEmailSent,
             int expectedNotifyEmailCount)
         {
+            var sf = new ServicesFixture();
+            sf.CreateWebHost();
+            var leaveService = sf.Get<LeaveService>();
+            
             bool actualApprovalEmailSent = false;
             int actualNotifyEmailCount = 0;
 
-            var emailMock = _sf.EmailServiceMock.As<IEmailService>();
+            var emailMock = sf.EmailServiceMock.As<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
                     It.IsAny<EmailTemplate>(),
@@ -451,7 +477,7 @@ namespace UnitTestProject
                     });
 
 
-            var actualApprover = await _leaveService.ResolveLeaveRequestChain(request,
+            var actualApprover = await leaveService.ResolveLeaveRequestChain(request,
                 requestedBy,
                 department,
                 devision,
