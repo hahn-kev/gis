@@ -8,13 +8,13 @@ using Xunit;
 
 namespace UnitTestProject
 {
-    public class UserTests
+    public class UserTests:IClassFixture<ServicesFixture>
     {
-        private ServicesFixture _servicesFixture;
+        private readonly ServicesFixture _servicesFixture;
 
-        public UserTests()
+        public UserTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = new ServicesFixture();
+            _servicesFixture = servicesFixture;
         }
 
         [Fact]

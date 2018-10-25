@@ -18,6 +18,8 @@ using LinqToDB.Linq;
 using LinqToDB.Reflection;
 using LinqToDB.SqlQuery;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 //using Microsoft.AspNetCore.Mvc.Testing;
 //using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
@@ -39,36 +41,37 @@ using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
 {
-    public class ServicesFixture 
-//        : WebApplicationFactory<TestServerStartup>
+    public class ServicesFixture :
+        WebApplicationFactory<TestServerStartup>,
+        IAsyncLifetime
     {
-        public IWebHost WebHost { get; }
-        public IServiceProvider ServiceProvider { get; }
+        public IWebHost WebHost { get; private set; }
+        public IServiceProvider ServiceProvider { get; private set; }
         public T Get<T>() => ServiceProvider.GetService<T>();
-        public IDbConnection DbConnection { get; }
+        private readonly Lazy<IDbConnection> _lazyConnection;
+        public IDbConnection DbConnection => _lazyConnection.Value;
         public Mock<EmailService> EmailServiceMock => Mock.Get((EmailService) Get<IEmailService>());
         public Mock<EntityService> EntityServiceMock => Mock.Get((EntityService) Get<IEntityService>());
 
         public ServicesFixture()
         {
-//            var webHostBuilder = CreateWebHostBuilder();
-//            todo config on startup not called, figure out work around
-//            ConfigureWebHost(webHostBuilder);
-//            WebHost = webHostBuilder.Build();
-//            ServiceProvider = WebHost.Services;
-            var configBuilder = new ConfigurationBuilder();
-            SetupConfig(configBuilder);
-            var sc = new ServiceCollection();
-            var startup = new TestServerStartup(configBuilder.Build());
-
-            startup.ConfigureServices(sc);
-            ServiceProvider = sc.BuildServiceProvider();
-            DbConnection = Get<IDbConnection>();
-            Setup();
+            _lazyConnection = new Lazy<IDbConnection>(Get<IDbConnection>);
         }
 
-        private void Setup()
+        public void CreateWebHost(Action<IWebHostBuilder> action = null)
         {
+            var webHostBuilder = CreateWebHostBuilder();
+//            todo config on startup not called, figure out work around
+            ConfigureWebHost(webHostBuilder);
+            action?.Invoke(webHostBuilder);
+            WebHost = webHostBuilder.Build();
+            ServiceProvider = WebHost.Services;
+        }
+
+        private Task Setup()
+        {
+            CreateWebHost();
+
             TryCreateTable<IdentityUser>(DbConnection);
             TryCreateTable<IdentityUserClaim<int>>(DbConnection);
             TryCreateTable<IdentityUserLogin<int>>(DbConnection);
@@ -101,7 +104,7 @@ namespace UnitTestProject
                 s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
                 true);
             DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
-            Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
+            return Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
         }
 
         private void TryCreateTable<T>(IDbConnection dbConnection)
@@ -115,16 +118,15 @@ namespace UnitTestProject
             }
         }
 
-//        protected override IWebHostBuilder CreateWebHostBuilder()
-//        {
-//            return new WebHostBuilder().UseStartup<TestServerStartup>().UseEnvironment("UnitTest");
-//        }
+        protected override IWebHostBuilder CreateWebHostBuilder()
+        {
+            return new WebHostBuilder().UseStartup<TestServerStartup>().UseEnvironment("UnitTest");
+        }
 
-//        protected override void ConfigureWebHost(IWebHostBuilder builder)
-//        {
-//            builder.ConfigureAppConfiguration(SetupConfig)
-//                .ConfigureTestServices(collection => { collection.AddSingleton<IDbConnection, DbConnection>(); });
-//        }
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureAppConfiguration(SetupConfig);
+        }
 
         private void SetupConfig(IConfigurationBuilder configBuilder)
         {
@@ -143,11 +145,11 @@ namespace UnitTestProject
             });
         }
 
-//        protected override void Dispose(bool disposing)
-//        {
-//            DbConnection.Dispose();
-//            base.Dispose(disposing);
-//        }
+        protected override void Dispose(bool disposing)
+        {
+            if (_lazyConnection.IsValueCreated) DbConnection.Dispose();
+            base.Dispose(disposing);
+        }
 
         public IdentityUser AuthenticateAs(HttpClient client, string userName)
         {
@@ -241,7 +243,7 @@ namespace UnitTestProject
             }
         }
 
-        public Faker<PersonWithStaff> PersonFaker() =>
+        public static Faker<PersonWithStaff> PersonFaker() =>
             new AutoFaker<PersonWithStaff>()
                 .RuleFor(p => p.Deleted, false)
                 .RuleFor(extended => extended.StaffId, () => Guid.NewGuid())
@@ -286,9 +288,8 @@ namespace UnitTestProject
         {
             var job = JobFaker().Generate();
             action?.Invoke(job);
-            IDbConnection dbConnection = Get<IDbConnection>();
-            dbConnection.Insert<Job>(job);
-            dbConnection.Insert(job.OrgGroup);
+            DbConnection.Insert<Job>(job);
+            DbConnection.Insert(job.OrgGroup);
             return job;
         }
 
@@ -301,10 +302,9 @@ namespace UnitTestProject
         {
             var person = PersonFaker().Generate(includeStaff ? "default" : "default,notStaff");
             action?.Invoke(person);
-            IDbConnection dbConnection = Get<IDbConnection>();
-            dbConnection.Insert(person);
+            DbConnection.Insert(person);
             if (includeStaff)
-                dbConnection.Insert<Staff>(person.Staff);
+                DbConnection.Insert<Staff>(person.Staff);
 
             return person;
         }
@@ -329,7 +329,7 @@ namespace UnitTestProject
         {
             var role = AutoFaker.Generate<PersonRole>();
             action?.Invoke(role);
-            Get<IDbConnection>().Insert(role);
+            DbConnection.Insert(role);
             return role;
         }
 
@@ -343,7 +343,7 @@ namespace UnitTestProject
             leaveRequest.OverrideDays = true;
             leaveRequest.StartDate = DateTime.Now;
             leaveRequest.EndDate = DateTime.Now + TimeSpan.FromDays(4);
-            Get<IDbConnection>().Insert(leaveRequest);
+            DbConnection.Insert(leaveRequest);
             return leaveRequest;
         }
 
@@ -354,19 +354,18 @@ namespace UnitTestProject
                 .RuleFor(identityUser => identityUser.Id, 0)
                 .Generate();
             modify?.Invoke(user);
-            IDbConnection dbConnection = Get<IDbConnection>();
-            user.Id = dbConnection.InsertId(user);
+            user.Id = DbConnection.InsertId(user);
             Assert.True(user.Id > 0, $"{user.Id} > 0");
             if (roles.Any())
             {
                 roles = roles.Select(s => s.ToUpper()).ToArray();
-                var roleIds = dbConnection.Roles
+                var roleIds = DbConnection.Roles
                     .Where(role => roles.Contains(role.NormalizedName))
                     .Select(role => role.Id)
                     .ToList();
                 foreach (var roleId in roleIds)
                 {
-                    dbConnection.InsertId(new IdentityUserRole<int> {RoleId = roleId, UserId = user.Id});
+                    DbConnection.InsertId(new IdentityUserRole<int> {RoleId = roleId, UserId = user.Id});
                 }
             }
 
@@ -379,7 +378,7 @@ namespace UnitTestProject
             tr.FirstYear = firstYear;
             tr.LastYear = lastYear;
             tr.RenewMonthsCount = months;
-            Get<IDbConnection>().Insert(tr);
+            DbConnection.Insert(tr);
             return tr;
         }
 
@@ -388,7 +387,7 @@ namespace UnitTestProject
             var tr = AutoFaker.Generate<StaffTraining>();
             tr.TrainingRequirementId = trId;
             tr.CompletedDate = completedDate;
-            Get<IDbConnection>().Insert(tr);
+            DbConnection.Insert(tr);
             return tr;
         }
 
@@ -400,7 +399,7 @@ namespace UnitTestProject
             orgGroup.ParentId = parentId;
             orgGroup.Supervisor = supervisorId;
             action?.Invoke(orgGroup);
-            Get<IDbConnection>().Insert(orgGroup);
+            DbConnection.Insert(orgGroup);
             return orgGroup;
         }
 
@@ -409,31 +408,30 @@ namespace UnitTestProject
             SetupPeople();
             var personFaker = PersonFaker();
             var leaveRequester = personFaker.Generate();
-            IDbConnection dbConnection = Get<IDbConnection>();
-            dbConnection.Insert(leaveRequester);
+            DbConnection.Insert(leaveRequester);
             var leaveRequesterOrgGroup = AutoFaker.Generate<OrgGroup>();
             leaveRequesterOrgGroup.Id = leaveRequester.Staff.OrgGroupId ??
                                         (Guid) (leaveRequester.Staff.OrgGroupId = Guid.NewGuid());
-            dbConnection.Insert(leaveRequesterOrgGroup);
-            dbConnection.Insert(leaveRequester.Staff);
+            DbConnection.Insert(leaveRequesterOrgGroup);
+            DbConnection.Insert(leaveRequester.Staff);
 
             var leaveApprover = personFaker.Generate();
-            dbConnection.Insert(leaveApprover);
-            dbConnection.Insert(leaveApprover.Staff);
+            DbConnection.Insert(leaveApprover);
+            DbConnection.Insert(leaveApprover.Staff);
             var leaveRequest = AutoFaker.Generate<LeaveRequest>();
             leaveRequest.PersonId = leaveRequester.Id;
             leaveRequest.ApprovedById = leaveApprover.Id;
-            dbConnection.Insert(leaveRequest);
+            DbConnection.Insert(leaveRequest);
 
             var personWithRole = personFaker.Generate();
-            dbConnection.Insert(personWithRole);
-            dbConnection.Insert(personWithRole.Staff);
+            DbConnection.Insert(personWithRole);
+            DbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
             personRoles[0].Active = true; //always have at least one active
-            dbConnection.BulkCopy(personRoles);
+            DbConnection.BulkCopy(personRoles);
             var grade = AutoFaker.Generate<Grade>();
-            dbConnection.Insert(grade);
+            DbConnection.Insert(grade);
             var jobs = personRoles.Select(role => JobFaker()
                 .RuleFor(job => job.Id, role.JobId)
                 .RuleFor(job => job.GradeId, grade.Id)
@@ -442,24 +440,24 @@ namespace UnitTestProject
             evaluation.PersonId = personWithRole.Id;
             evaluation.Evaluator = leaveApprover.Id;
             evaluation.RoleId = personRoles[0].Id;
-            dbConnection.Insert(evaluation);
+            DbConnection.Insert(evaluation);
 
-            dbConnection.BulkCopy<Job>(jobs);
-            dbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
+            DbConnection.BulkCopy<Job>(jobs);
+            DbConnection.BulkCopy(jobs.Select(job => job.OrgGroup));
             SetupTraining();
             InsertUser();
 
             var personWithEmergencyContact = personFaker.Generate("default,notStaff");
-            dbConnection.Insert(personWithEmergencyContact);
+            DbConnection.Insert(personWithEmergencyContact);
             var contactPerson = personFaker.Generate("default,notStaff");
 
-            dbConnection.Insert(contactPerson);
+            DbConnection.Insert(contactPerson);
             var emergencyContact = AutoFaker.Generate<EmergencyContact>();
             emergencyContact.ContactId = contactPerson.Id;
             emergencyContact.PersonId = personWithEmergencyContact.Id;
-            dbConnection.Insert(emergencyContact);
+            DbConnection.Insert(emergencyContact);
 
-            dbConnection.Insert(new Attachment
+            DbConnection.Insert(new Attachment
             {
                 AttachedToId = Guid.NewGuid(),
                 DownloadUrl = "someurl.com",
@@ -469,13 +467,13 @@ namespace UnitTestProject
                 Name = "hello attachments"
             });
 
-            dbConnection.Insert(AutoFaker.Generate<Grade>());
-            dbConnection.Insert(AutoFaker.Generate<MissionOrg>());
-            dbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
-            dbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
-            dbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
-            dbConnection.Insert(AutoFaker.Generate<IdentityUserRole<int>>());
-            dbConnection.Insert(AutoFaker.Generate<IdentityUserToken<int>>());
+            DbConnection.Insert(AutoFaker.Generate<Grade>());
+            DbConnection.Insert(AutoFaker.Generate<MissionOrg>());
+            DbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
+            DbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
+            DbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
+            DbConnection.Insert(AutoFaker.Generate<IdentityUserRole<int>>());
+            DbConnection.Insert(AutoFaker.Generate<IdentityUserToken<int>>());
         }
 
         public void SetupTraining()
@@ -490,23 +488,27 @@ namespace UnitTestProject
 
             var orgGroup = AutoFaker.Generate<OrgGroup>();
             orgGroup.Id = personWithTraining.Staff.OrgGroupId ?? Guid.Empty;
-            IDbConnection dbConnection = Get<IDbConnection>();
-            dbConnection.Insert(orgGroup);
+            DbConnection.Insert(orgGroup);
 
-            dbConnection.Insert(personWithTraining);
-            dbConnection.Insert(personWithTraining.Staff);
-            dbConnection.Insert(trainingRequirement);
+            DbConnection.Insert(personWithTraining);
+            DbConnection.Insert(personWithTraining.Staff);
+            DbConnection.Insert(trainingRequirement);
 
             var staffTraining = AutoFaker.Generate<StaffTraining>();
             staffTraining.StaffId =
                 personWithTraining.StaffId ?? throw new NullReferenceException("person staff id is null");
             staffTraining.TrainingRequirementId = trainingRequirement.Id;
-            dbConnection.Insert(staffTraining);
+            DbConnection.Insert(staffTraining);
         }
-    }
 
-    [CollectionDefinition("ServicesCollection")]
-    public class ServicesCollection : ICollectionFixture<ServicesFixture>
-    {
+        public Task InitializeAsync()
+        {
+            return Setup();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

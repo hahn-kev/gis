@@ -8,15 +8,15 @@ using Xunit;
 
 namespace UnitTestProject
 {
-    public class RoleTests
+    public class RoleTests:IClassFixture<ServicesFixture>
     {
-        private ServicesFixture _servicesFixture;
-        private IDbConnection _db;
-        private PersonService _personService;
+        private readonly ServicesFixture _servicesFixture;
+        private readonly IDbConnection _db;
+        private readonly PersonService _personService;
 
-        public RoleTests()
+        public RoleTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = new ServicesFixture();
+            _servicesFixture = servicesFixture;
             _db = _servicesFixture.DbConnection;
             _personService = _servicesFixture.Get<PersonService>();
         }

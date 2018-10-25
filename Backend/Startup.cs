@@ -311,7 +311,7 @@ namespace Backend
             app.UseSentinel();
             app.UseMvc();
             
-            SetupDatabase(loggerFactory, app.ApplicationServices);
+            SetupDatabase(loggerFactory, app.ApplicationServices).Wait();
 
         }
 
@@ -321,7 +321,7 @@ namespace Backend
             DataConnection.DefaultSettings = Configuration.Get<Settings>();
         }
 
-        public static void SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        public static async Task SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             var databaseLogger = loggerFactory.CreateLogger("database");
             DataConnection.TurnTraceSwitchOn();
@@ -338,7 +338,7 @@ namespace Backend
                     new[] {"admin", "hr", "hradmin", "registrar"}.Except(roleManager.Roles.Select(role => role.Name));
                 foreach (var missingRole in missingRoles)
                 {
-                    roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole)).Wait();
+                    await roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole));
                 }
 
                 //to configure db look at ServiceFixture.SetupSchema
@@ -350,8 +350,8 @@ namespace Backend
                         UserName = "khahn",
                         ResetPassword = true
                     };
-                    userService.CreateAsync(identityUser, "password").Wait();
-                    userService.AddToRoleAsync(identityUser, "admin").Wait();
+                    await userService.CreateAsync(identityUser, "password");
+                    await userService.AddToRoleAsync(identityUser, "admin");
                 }
             }
 #endif

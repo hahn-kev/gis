@@ -11,6 +11,7 @@ using Backend.Utils;
 using Bogus.DataSets;
 using LinqToDB;
 using LinqToDB.Data;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -20,30 +21,28 @@ using Xunit;
 
 namespace UnitTestProject
 {
-    public class LeaveRequestTests:IClassFixture<ServicesFixture>, IDisposable
+    public class LeaveRequestTests : IClassFixture<ServicesFixture>, IDisposable
     {
         private LeaveService _leaveService;
         private OrgGroupRepository _orgGroupRepository;
-        private IDbConnection _dbConnection;
-        private ServicesFixture _servicesFixture;
+        private ServicesFixture _sf;
         private DataConnectionTransaction _transaction;
 
-        public LeaveRequestTests(ServicesFixture servicesFixture)
+        public LeaveRequestTests(ServicesFixture sf)
         {
-            _servicesFixture = servicesFixture;
-            _leaveService = _servicesFixture.Get<LeaveService>();
-            _orgGroupRepository = _servicesFixture.Get<OrgGroupRepository>();
-            _dbConnection = _servicesFixture.Get<IDbConnection>();
-            _transaction = _dbConnection.BeginTransaction();
-            _servicesFixture.SetupPeople();
+            _sf = sf;
+            _leaveService = _sf.Get<LeaveService>();
+            _orgGroupRepository = _sf.Get<OrgGroupRepository>();
+            _transaction = _sf.DbConnection.BeginTransaction();
+            _sf.SetupPeople();
         }
 
         [Fact]
         public async Task FindsSupervisor()
         {
-            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            var jacob = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            var expectedSupervisor = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
+            var expectedSupervisor = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
             Assert.NotNull(expectedSupervisor);
             var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest
                 {PersonId = jacob.Id, StartDate = DateTime.Now});
@@ -52,17 +51,23 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public async Task SendsEmail()
+        public static async Task SendsEmail()
         {
-            var emailMock = _servicesFixture.EmailServiceMock;
+            var sf = new ServicesFixture();
+            await sf.InitializeAsync();
+            sf.SetupPeople();
+            var leaveService = sf.Get<LeaveService>();
+
+            var emailMock = sf.EmailServiceMock;
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
                 It.IsAny<EmailTemplate>(),
                 It.IsAny<PersonWithStaff>(),
                 It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
-            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
-            await _leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
+
+            await leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
 
             emailMock.Verify(service =>
                     service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
@@ -85,35 +90,42 @@ namespace UnitTestProject
         [Fact]
         public async Task SavesLeaveRequest()
         {
-            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            var jacob = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
+            _sf.EntityServiceMock.ResetCalls();
             await _leaveService.RequestLeave(expectedLeaveRequest);
-            _servicesFixture.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
+            _sf.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
         }
 
         [Fact]
-        public async Task EmailThrowingAnErrorWillCauseALeaveRequestToBeDeleted()
+        public static async Task EmailThrowingAnErrorWillCauseALeaveRequestToBeDeleted()
         {
+            var sf = new ServicesFixture();
+            await sf.InitializeAsync();
+            sf.SetupPeople();
+
+            var leaveService = sf.Get<LeaveService>();
+
             var expectedException = new Exception("email test exception");
-            _servicesFixture.EmailServiceMock
+            sf.EmailServiceMock
                 .Setup(email => email.SendEmail(It.IsAny<SendGridMessage>()))
                 .Throws(expectedException);
-            var jacob = _dbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
             var actualException =
-                await Assert.ThrowsAsync<Exception>(() => _leaveService.RequestLeave(expectedLeaveRequest));
+                await Assert.ThrowsAsync<Exception>(() => leaveService.RequestLeave(expectedLeaveRequest));
             Assert.Same(expectedException, actualException);
-            _servicesFixture.EntityServiceMock.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
-            _servicesFixture.EntityServiceMock.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
+            sf.EntityServiceMock.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
+            sf.EntityServiceMock.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
         }
 
 
         [Fact]
         public void OrgGroupChainResolvesAsExpected()
         {
-            var personFaker = _servicesFixture.PersonFaker();
+            var personFaker = ServicesFixture.PersonFaker();
             var expectedPersonOnLeave = personFaker.Generate();
             var expectedDepartment = AutoFaker.Generate<OrgGroup>();
             var expectedDevision = AutoFaker.Generate<OrgGroup>();
@@ -127,12 +139,12 @@ namespace UnitTestProject
             expectedDevision.Supervisor = expectedDevisionSupervisor.Id;
             expectedDevision.ParentId = null;
 
-            _dbConnection.Insert(expectedPersonOnLeave);
-            _dbConnection.Insert(expectedPersonOnLeave.Staff);
-            _dbConnection.Insert(expectedDepartment);
-            _dbConnection.Insert(expectedDevision);
-            _dbConnection.Insert(expectedDevisionSupervisor);
-            _dbConnection.Insert(expectedDevisionSupervisor.Staff);
+            _sf.DbConnection.Insert(expectedPersonOnLeave);
+            _sf.DbConnection.Insert(expectedPersonOnLeave.Staff);
+            _sf.DbConnection.Insert(expectedDepartment);
+            _sf.DbConnection.Insert(expectedDevision);
+            _sf.DbConnection.Insert(expectedDevisionSupervisor);
+            _sf.DbConnection.Insert(expectedDevisionSupervisor.Staff);
 
             //test method
             (var actualPersonOnLeave, var actualDepartment, var actualDevision, var actualSupervisorGroup) =
@@ -201,18 +213,18 @@ namespace UnitTestProject
             int totalYears,
             bool expectedEmailed)
         {
-            var job = _servicesFixture.InsertJob(j =>
+            var job = _sf.InsertJob(j =>
             {
                 //force job to provide time off
                 j.Status = JobStatus.FullTime;
                 j.OrgGroup.Type = GroupType.Department;
             });
-            _dbConnection.Insert(personWithStaff);
-            _dbConnection.Insert(personWithStaff.Staff);
+            _sf.DbConnection.Insert(personWithStaff);
+            _sf.DbConnection.Insert(personWithStaff.Staff);
             //create roles for # of years
-            _servicesFixture.InsertRole(job.Id, personWithStaff.Id, totalYears);
+            _sf.InsertRole(job.Id, personWithStaff.Id, totalYears);
             //insert used leave
-            _servicesFixture.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
+            _sf.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
             var actualEmailed = _leaveService.ShouldNotifyHr(request,
                 _leaveService.GetCurrentLeaveUseage(request.Type, personWithStaff.Id));
             Assert.Equal(expectedEmailed, actualEmailed);
@@ -423,7 +435,7 @@ namespace UnitTestProject
             bool actualApprovalEmailSent = false;
             int actualNotifyEmailCount = 0;
 
-            var emailMock = _servicesFixture.EmailServiceMock.As<IEmailService>();
+            var emailMock = _sf.EmailServiceMock.As<IEmailService>();
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
                     It.IsAny<EmailTemplate>(),
@@ -625,19 +637,19 @@ namespace UnitTestProject
             PersonWithStaff aStaff = null;
             PersonWithStaff bStaff = null;
             PersonWithStaff a1Staff = null;
-            var rootGroup = _servicesFixture.InsertOrgGroup(action: rootGroupA =>
+            var rootGroup = _sf.InsertOrgGroup(action: rootGroupA =>
             {
-                rootStaff = _servicesFixture.InsertStaff(rootGroupA.Id);
-                _servicesFixture.InsertOrgGroup(rootGroupA.Id,
+                rootStaff = _sf.InsertStaff(rootGroupA.Id);
+                _sf.InsertOrgGroup(rootGroupA.Id,
                     action: aGroupA =>
                     {
-                        aStaff = _servicesFixture.InsertStaff(aGroupA.Id);
-                        _servicesFixture.InsertOrgGroup(aGroupA.Id,
-                            action: a1GroupA => { a1Staff = _servicesFixture.InsertStaff(a1GroupA.Id); });
+                        aStaff = _sf.InsertStaff(aGroupA.Id);
+                        _sf.InsertOrgGroup(aGroupA.Id,
+                            action: a1GroupA => { a1Staff = _sf.InsertStaff(a1GroupA.Id); });
                     });
 
-                _servicesFixture.InsertOrgGroup(rootGroupA.Id,
-                    action: bGroup => bStaff = _servicesFixture.InsertStaff(bGroup.Id));
+                _sf.InsertOrgGroup(rootGroupA.Id,
+                    action: bGroup => bStaff = _sf.InsertStaff(bGroup.Id));
             });
             rootStaff.ShouldNotBeNull();
             aStaff.ShouldNotBeNull();
@@ -651,27 +663,27 @@ namespace UnitTestProject
             actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
         }
 
-        LeaveUsage VacationLeave(IEnumerable<LeaveUsage> enumerable)
+        static LeaveUsage VacationLeave(IEnumerable<LeaveUsage> enumerable)
         {
             return enumerable.Single(usage => usage.LeaveType == LeaveType.Vacation);
         }
 
-        LeaveUsage[] WaysToGetVacationLeaveCalculation(Guid personId, int year)
+        static LeaveUsage[] WaysToGetVacationLeaveCalculation(Guid personId, int year, LeaveService leaveService)
         {
             return new[]
             {
-                VacationLeave(_leaveService.GetLeaveDetails(personId, year).LeaveUsages),
-                VacationLeave(_leaveService.PeopleWithLeave(year)
+                VacationLeave(leaveService.GetLeaveDetails(personId, year).LeaveUsages),
+                VacationLeave(leaveService.PeopleWithLeave(year)
                     .Single(details => details.Person.Id == personId).LeaveUsages),
-                VacationLeave(_leaveService.PersonWithLeave(personId, year).LeaveUsages),
-                _leaveService.GetLeaveUseage(LeaveType.Vacation, personId, year),
+                VacationLeave(leaveService.PersonWithLeave(personId, year).LeaveUsages),
+                leaveService.GetLeaveUseage(LeaveType.Vacation, personId, year),
             };
         }
 
         [Fact]
         public void EnsureDifferentWaysOfCalculatingLeaveMatchExpected()
         {
-            var person = _servicesFixture.InsertPerson(staff => staff.IsThai = false);
+            var person = _sf.InsertPerson(staff => staff.IsThai = false);
 
             void InsertLeaveRequest(DateTime start, DateTime? end = null, bool? approved = true)
             {
@@ -685,7 +697,7 @@ namespace UnitTestProject
                     Approved = approved
                 };
                 leaveRequest.Days = leaveRequest.CalculateLength();
-                _servicesFixture.DbConnection.Insert(leaveRequest);
+                _sf.DbConnection.Insert(leaveRequest);
             }
 
             InsertLeaveRequest(new DateTime(2018, 4, 30));
@@ -693,11 +705,10 @@ namespace UnitTestProject
             InsertLeaveRequest(new DateTime(2018, 4, 30), new DateTime(2018, 4, 30), null);
             InsertLeaveRequest(new DateTime(2018, 6, 25), new DateTime(2018, 6, 29));
 
-            WaysToGetVacationLeaveCalculation(person.Id, 2017).ShouldAllBe(usage => usage.Used == 7);
+            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == 7);
         }
 
-        [Fact]
-        public void EnsureAllLeaveCalculatesUseTheSameDateRanges()
+        public static IEnumerable<object[]> GetEnsureAllLeaveUseTheSameDateRanges()
         {
             for (int j = 1; j < 4; j++)
             {
@@ -705,11 +716,11 @@ namespace UnitTestProject
                 var rangeEnd = new DateTime(2018, 8, 5);
 
                 var requestDate = rangeStart;
-                var requests = new List<LeaveRequest>(3);
                 do
                 {
-                    requests.Clear();
-                    var person = _servicesFixture.InsertPerson(staff => staff.IsThai = false);
+                    var requests = new List<LeaveRequest>(3);
+                    var person = ServicesFixture.PersonFaker().Generate();
+                    person.IsThai = false;
                     //insert 3 leave requests and test those 3 at a time
                     for (int i = 0; i < j; i++)
                     {
@@ -727,14 +738,28 @@ namespace UnitTestProject
                         requestDate += TimeSpan.FromDays(1);
                     }
 
-                    _servicesFixture.DbConnection.BulkCopy(requests);
-
-
-                    var leaveUsages = WaysToGetVacationLeaveCalculation(person.Id, 2017);
-                    leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
-                        () => $"Window at {requests.First().StartDate.ToShortDateString()} Size: {j}, Requests: [{string.Join(", ", requests)}]");
+                    yield return new object[] {person, requests, j};
                 } while (requestDate < rangeEnd);
             }
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEnsureAllLeaveUseTheSameDateRanges))]
+        public static async Task EnsureAllLeaveCalculatesUseTheSameDateRanges(PersonWithStaff person,
+            List<LeaveRequest> requests,
+            int size)
+        {
+            var servicesFixture = new ServicesFixture();
+            await servicesFixture.InitializeAsync();
+            servicesFixture.DbConnection.Insert(person);
+            servicesFixture.DbConnection.Insert<Staff>(person.Staff);
+            servicesFixture.DbConnection.BulkCopy(requests);
+            
+            var leaveUsages =
+                WaysToGetVacationLeaveCalculation(person.Id, 2017, servicesFixture.Get<LeaveService>());
+            leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
+                () =>
+                    $"Window at {requests.First().StartDate.ToShortDateString()} Size: {size}, Requests: [{string.Join(", ", requests)}]");
         }
 
         public static IEnumerable<object[]> GetExpectedLeaveValues()
@@ -843,11 +868,11 @@ namespace UnitTestProject
         [MemberData(nameof(GetExpectedLeaveValues))]
         public void LeaveUsedIsCalculatedAsExpected(PersonWithStaff person, LeaveRequest[] leaveRequests, int used)
         {
-            _dbConnection.Insert(person);
-            _dbConnection.Insert(person.Staff);
-            _dbConnection.BulkCopy(leaveRequests);
+            _sf.DbConnection.Insert(person);
+            _sf.DbConnection.Insert(person.Staff);
+            _sf.DbConnection.BulkCopy(leaveRequests);
 
-            WaysToGetVacationLeaveCalculation(person.Id, 2017).ShouldAllBe(usage => usage.Used == used);
+            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == used);
         }
 
         public void Dispose()
