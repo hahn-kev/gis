@@ -736,16 +736,16 @@ namespace UnitTestProject
 
         public static IEnumerable<object[]> GetEnsureAllLeaveUseTheSameDateRanges()
         {
+            var personFaker = ServicesFixture.PersonFaker();
+            var rangeStart = new DateTime(2018, 5, 25);
+            var rangeEnd = new DateTime(2018, 8, 5);
             for (int j = 1; j < 4; j++)
             {
-                var rangeStart = new DateTime(2018, 5, 25);
-                var rangeEnd = new DateTime(2018, 8, 5);
-
                 var requestDate = rangeStart;
                 do
                 {
-                    var requests = new List<LeaveRequest>(3);
-                    var person = ServicesFixture.PersonFaker().Generate();
+                    var requests = new LeaveRequest[j];
+                    var person = personFaker.Generate();
                     person.IsThai = false;
                     //insert 3 leave requests and test those 3 at a time
                     for (int i = 0; i < j; i++)
@@ -760,7 +760,7 @@ namespace UnitTestProject
                             Type = LeaveType.Vacation
                         };
                         leaveRequest.Days = leaveRequest.CalculateLength();
-                        requests.Add(leaveRequest);
+                        requests[i] = leaveRequest;
                         requestDate += TimeSpan.FromDays(1);
                     }
 
@@ -771,18 +771,16 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(GetEnsureAllLeaveUseTheSameDateRanges))]
-        public static async Task EnsureAllLeaveCalculatesUseTheSameDateRanges(PersonWithStaff person,
-            List<LeaveRequest> requests,
+        public void EnsureAllLeaveCalculatesUseTheSameDateRanges(PersonWithStaff person,
+            ICollection<LeaveRequest> requests,
             int size)
         {
-            var servicesFixture = new ServicesFixture();
-            await servicesFixture.InitializeAsync();
-            servicesFixture.DbConnection.Insert(person);
-            servicesFixture.DbConnection.Insert<Staff>(person.Staff);
-            servicesFixture.DbConnection.BulkCopy(requests);
+            _sf.DbConnection.Insert(person);
+            _sf.DbConnection.Insert<Staff>(person.Staff);
+            _sf.DbConnection.BulkCopy(requests);
             
             var leaveUsages =
-                WaysToGetVacationLeaveCalculation(person.Id, 2017, servicesFixture.Get<LeaveService>());
+                WaysToGetVacationLeaveCalculation(person.Id, 2017, _sf.Get<LeaveService>());
             leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
                 () =>
                     $"Window at {requests.First().StartDate.ToShortDateString()} Size: {size}, Requests: [{string.Join(", ", requests)}]");

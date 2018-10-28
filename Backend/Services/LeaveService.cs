@@ -30,7 +30,8 @@ namespace Backend.Services
             IEmailService emailService,
             IOptions<Settings> options,
             LeaveRequestRepository leaveRequestRepository,
-            IEntityService entityService, IAuthorizationService authorizationService)
+            IEntityService entityService,
+            IAuthorizationService authorizationService)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
@@ -61,10 +62,10 @@ namespace Backend.Services
         public IList<LeaveRequestWithNames> ListUnderOrgGroup(Guid orgGroupId, Guid? includePersonId = null)
         {
             return ListForPeople(
-                    PeopleWithStaffUnderGroup(orgGroupId)
+                PeopleWithStaffUnderGroup(orgGroupId)
 //                        .Union(_personRepository.PeopleWithStaff.Where(p => p.Id == includePersonId))
-                        .Select(person => person.Id)
-                );
+                    .Select(person => person.Id)
+            );
         }
 
         public IList<LeaveRequestWithNames> ListForSupervisor(Guid supervisorId)
@@ -112,7 +113,8 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
-            var leaveUsage = GetLeaveUseage(leaveRequest.Type, result.personOnLeave.Id,
+            var leaveUsage = GetLeaveUseage(leaveRequest.Type,
+                result.personOnLeave.Id,
                 leaveRequest.StartDate.SchoolYear());
             var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
