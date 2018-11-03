@@ -67,5 +67,46 @@ namespace Backend.Services
 
             return data;
         }
+        
+        public enum SortedBy
+        {
+            ParentFirst,
+            ChildFirst,
+            Either
+        }
+
+        public static bool IsOrgGroupSortedByHierarchy(ICollection<OrgGroup> orgGroups, SortedBy sortedBy = SortedBy.Either)
+        {
+            if (!orgGroups.Any()) return true;
+            bool ParentInList(OrgGroup group)
+            {
+                return orgGroups.Any(orgGroup => orgGroup.Id == @group.ParentId);
+            }
+
+            var groupWithoutParent = orgGroups.FirstOrDefault(group => !ParentInList(@group));
+            var startsWithChild = orgGroups.First() != groupWithoutParent;
+            switch (sortedBy)
+            {
+                    case SortedBy.ChildFirst:
+                        if (!startsWithChild) return false;
+                        break;
+                    case SortedBy.ParentFirst:
+                        if (startsWithChild) return false;
+                        break;
+            }
+            OrgGroup previous = null;
+            foreach (var orgGroup in startsWithChild ? orgGroups.Reverse() : orgGroups)
+            {
+                if (previous == null)
+                {
+                    if (groupWithoutParent != orgGroup) return false;
+                }
+                else if (orgGroup.ParentId != previous.Id) return false;
+
+                previous = orgGroup;
+            }
+
+            return true;
+        }
     }
 }

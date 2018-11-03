@@ -50,6 +50,23 @@ namespace Backend.DataLayer
             });
         }
 
+        public IQueryable<OrgGroup> GetWithParentsWhere(Expression<Func<OrgGroup, bool>> rootPredicate, Func<IQueryable<OrgGroup>, IQueryable<OrgGroup>> visit = null)
+        {
+            return _connection.GetCte<OrgGroup>(children =>
+            {
+                var rootQuery = (
+                    from orgGroup in OrgGroups
+                    select orgGroup
+                ).Where(rootPredicate);
+                var childQuery = from orgGroup in OrgGroups
+                    from parent in children.InnerJoin(child => child.ParentId== orgGroup.Id)
+                    select orgGroup;
+                if (visit != null)
+                    childQuery = visit(childQuery);
+                return rootQuery.Union(childQuery);
+            });
+        }
+
         public IQueryable<OrgGroupWithSupervisor> OrgGroupsWithSupervisor =>
             from orgGroup in OrgGroups
             from person in _personRepository.PeopleWithStaff
