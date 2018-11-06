@@ -414,28 +414,28 @@ namespace UnitTestProject
                     true,
                     1);
 
-                yield return ("supervisor is in list twice",
-                        new LeaveRequest {PersonId = person1Id},
-                        Person(person1Id),
-                        new OrgGroupWithSupervisor
-                        {
-                            Id = departmentId,
-                            ApproverIsSupervisor = false,
-                            Supervisor = person2Id,
-                            SupervisorPerson = Person(person2Id)
-                        },
-                        new OrgGroupWithSupervisor
-                        {
-                            Id = devisionId,
-                            ApproverIsSupervisor = true,
-                            Supervisor = person2Id,
-                            SupervisorPerson = Person(person2Id)
-                        },
-                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
-                        person2Id,
-                        true,
-                        0
-                    );
+//                yield return ("supervisor is in list twice",
+//                        new LeaveRequest {PersonId = person1Id},
+//                        Person(person1Id),
+//                        new OrgGroupWithSupervisor
+//                        {
+//                            Id = departmentId,
+//                            ApproverIsSupervisor = false,
+//                            Supervisor = person2Id,
+//                            SupervisorPerson = Person(person2Id)
+//                        },
+//                        new OrgGroupWithSupervisor
+//                        {
+//                            Id = devisionId,
+//                            ApproverIsSupervisor = true,
+//                            Supervisor = person2Id,
+//                            SupervisorPerson = Person(person2Id)
+//                        },
+//                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
+//                        person2Id,
+//                        true,
+//                        0
+//                    );
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());

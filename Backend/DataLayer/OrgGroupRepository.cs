@@ -89,23 +89,18 @@ namespace Backend.DataLayer
             OrgGroupWithSupervisor devision,
             OrgGroupWithSupervisor supervisorGroup) PersonWithOrgGroupChain(Guid personId)
         {
-            var result =
-                (from personOnLeave in _personRepository.PeopleWithStaff.Where(person => person.Id == personId)
-                    from department in OrgGroupsWithSupervisor.LeftJoin(@group =>
-                            @group.Id == personOnLeave.Staff.OrgGroupId || @group.Supervisor == personOnLeave.Id)
-                        .DefaultIfEmpty()
-                    from devision in OrgGroupsWithSupervisor.LeftJoin(@group => @group.Id == department.ParentId)
-                        .DefaultIfEmpty()
-                    from supervisorGroup in OrgGroupsWithSupervisor.LeftJoin(@group => @group.Id == devision.ParentId)
-                        .DefaultIfEmpty()
-                    select new
-                    {
-                        personOnLeave,
-                        department,
-                        devision,
-                        supervisorGroup
-                    }).FirstOrDefault();
-            return (result?.personOnLeave, result?.department, result?.devision, result?.supervisorGroup);
+            var personOnLeave = _personRepository.PeopleWithStaff.SingleOrDefault(person => person.Id == personId);
+            if (personOnLeave == null) throw new ArgumentException("Unable to find person " + personId);
+            var orgGroupWithSupervisors = StaffParentOrgGroups(personOnLeave.Staff).Take(3).AsEnumerable().Concat(new OrgGroupWithSupervisor[3]).ToList();
+            
+            return (personOnLeave, orgGroupWithSupervisors[0], orgGroupWithSupervisors[1], orgGroupWithSupervisors[2]);
+        }
+
+        private IQueryable<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
+        {
+            return from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id)
+                from orgGroupWithSupervisor in OrgGroupsWithSupervisor.InnerJoin(g => g.Id == orgGroup.Id)
+                select orgGroupWithSupervisor;
         }
     }
 }
