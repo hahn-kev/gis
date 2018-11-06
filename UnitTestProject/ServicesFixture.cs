@@ -68,7 +68,17 @@ namespace UnitTestProject
             ServiceProvider = WebHost.Services;
         }
 
-        private Task Setup()
+        public Task InitializeAsync()
+        {
+            return Setup();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        private async Task Setup()
         {
             CreateWebHost();
 
@@ -104,7 +114,10 @@ namespace UnitTestProject
                 s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
                 true);
             DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
-            return Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
+            await Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
+#if !DEBUG
+            await Startup.SetupDevDatabase(ServiceProvider);
+#endif
         }
 
         private void TryCreateTable<T>(IDbConnection dbConnection)
@@ -499,16 +512,6 @@ namespace UnitTestProject
                 personWithTraining.StaffId ?? throw new NullReferenceException("person staff id is null");
             staffTraining.TrainingRequirementId = trainingRequirement.Id;
             DbConnection.Insert(staffTraining);
-        }
-
-        public Task InitializeAsync()
-        {
-            return Setup();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
         }
     }
 }

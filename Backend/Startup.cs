@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
@@ -69,7 +70,7 @@ namespace Backend
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequiredLength = 8;
                     })
-                .AddLinqToDBStores<int>(new AppConnectionFactory(null))//passing an invalid factory here
+                .AddLinqToDBStores<int>(new AppConnectionFactory(null)) //passing an invalid factory here
                 .AddDefaultTokenProviders();
             //replace the singleton factory above with a scoped version
             services.Replace(ServiceDescriptor.Scoped<IConnectionFactory, AppConnectionFactory>());
@@ -195,7 +196,7 @@ namespace Backend
                 options.AddPolicy("leaveSupervisor",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsSupervisor() || context.User.IsLeaveDelegate()));
-                
+
                 options.AddPolicy("training",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
@@ -310,9 +311,9 @@ namespace Backend
             app.UseAuthentication();
             app.UseSentinel();
             app.UseMvc();
-            
-            SetupDatabase(loggerFactory, app.ApplicationServices).Wait();
 
+            var databaseSetupTask = SetupDatabase(loggerFactory, app.ApplicationServices);
+            if (!databaseSetupTask.IsCompleted) databaseSetupTask.AsTask().Wait();
         }
 
         public virtual void AddDatabase(IServiceCollection services)
@@ -321,7 +322,7 @@ namespace Backend
             DataConnection.DefaultSettings = Configuration.Get<Settings>();
         }
 
-        public static async Task SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        public static async ValueTask SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             var databaseLogger = loggerFactory.CreateLogger("database");
             DataConnection.TurnTraceSwitchOn();
@@ -330,6 +331,12 @@ namespace Backend
             DbConnection.SetupMappingBuilder(MappingSchema.Default);
 
 #if DEBUG
+            await SetupDevDatabase(serviceProvider);
+#endif
+        }
+
+        public static async Task SetupDevDatabase(IServiceProvider serviceProvider)
+        {
             using (var scope = serviceProvider.CreateScope())
             {
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
@@ -354,7 +361,6 @@ namespace Backend
                     await userService.AddToRoleAsync(identityUser, "admin");
                 }
             }
-#endif
         }
     }
 }
