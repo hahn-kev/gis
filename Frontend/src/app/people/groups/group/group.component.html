@@ -17,7 +17,7 @@
       <mat-select required name="type" [(ngModel)]="group.type" placeholder="Type">
         <mat-option value="Division">Division</mat-option>
         <mat-option value="Department">Department</mat-option>
-        <mat-option value="Supervisor">Supervisor</mat-option>
+        <mat-option value="Supervisor">{{'Supervisor' | groupTypeName}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field>

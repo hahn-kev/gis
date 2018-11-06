@@ -1,5 +1,5 @@
-import { BaseEntity } from '../../classes/base-entity';
-import { PersonWithStaff } from '../person';
+import {BaseEntity} from '../../classes/base-entity';
+import {PersonWithStaff} from '../person';
 
 export class OrgGroup extends BaseEntity {
   public groupName: string;
@@ -17,4 +17,13 @@ export enum GroupType {
   Division = 'Division',
   Department = 'Department',
   Supervisor = 'Supervisor'
+}
+
+export function GroupTypeName(groupType: GroupType): string {
+  switch (groupType) {
+    case GroupType.Supervisor:
+      return 'Office';
+    default:
+      return groupType;
+  }
 }

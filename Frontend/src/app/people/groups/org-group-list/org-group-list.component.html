@@ -20,7 +20,7 @@
   </ng-container>
   <ng-container matColumnDef="type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.type}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.type | groupTypeName}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="['groupName', 'supervisor', 'type']"></mat-header-row>
