@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
-import { Person } from '../person';
-import { ActivatedRoute } from '@angular/router';
-import { AppDataSource } from '../../classes/app-data-source';
-import { MatSort } from '@angular/material';
-import { UrlBindingService } from '../../services/url-binding.service';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
+import {Person} from '../person';
+import {ActivatedRoute} from '@angular/router';
+import {AppDataSource} from '../../classes/app-data-source';
+import {MatSort} from '@angular/material';
+import {UrlBindingService} from '../../services/url-binding.service';
 
 @Component({
   selector: 'app-people-list',
@@ -14,6 +14,7 @@ import { UrlBindingService } from '../../services/url-binding.service';
 })
 export class PeopleListComponent implements OnInit {
   public dataSource: AppDataSource<Person>;
+  public columns = ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni'];
   @ViewChild(MatSort) sort: MatSort;
 
   get title() {

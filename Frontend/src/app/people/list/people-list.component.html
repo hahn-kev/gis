@@ -11,55 +11,54 @@
   </mat-form-field>
   <app-export-button [values]="dataSource" fileName="peopleData"></app-export-button>
 </ng-container>
-<mat-table [dataSource]="dataSource" matSort>
+<table mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="preferredName">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.preferredName}}</mat-cell>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</th>
+    <td mat-cell *matCellDef="let row"> {{row.preferredName}}</td>
   </ng-container>
   <ng-container matColumnDef="lastName">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{row.lastName}}</mat-cell>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Name</th>
+    <td mat-cell *matCellDef="let row"> {{row.lastName}}</td>
   </ng-container>
 
   <ng-container matColumnDef="staffId">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Staff</mat-header-cell>
-    <mat-cell *matCellDef="let row">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Staff</th>
+    <td mat-cell *matCellDef="let row">
       <mat-checkbox readonly [checked]="row.staffId"></mat-checkbox>
-    </mat-cell>
+    </td>
   </ng-container>
   <ng-container matColumnDef="isSchoolAid">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Is School Aide</mat-header-cell>
-    <mat-cell *matCellDef="let row">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Is School Aide</th>
+    <td mat-cell *matCellDef="let row">
       <mat-checkbox readonly [checked]="row.isSchoolAid"></mat-checkbox>
-    </mat-cell>
+    </td>
   </ng-container>
   <ng-container matColumnDef="donorId">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Donor</mat-header-cell>
-    <mat-cell *matCellDef="let row">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Donor</th>
+    <td mat-cell *matCellDef="let row">
       <mat-checkbox readonly [checked]="row.donorId"></mat-checkbox>
-    </mat-cell>
+    </td>
   </ng-container>
   <ng-container matColumnDef="isParent">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Parent</mat-header-cell>
-    <mat-cell *matCellDef="let row">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Parent</th>
+    <td mat-cell *matCellDef="let row">
       <mat-checkbox readonly [checked]="row.isParent"></mat-checkbox>
-    </mat-cell>
+    </td>
   </ng-container>
   <ng-container matColumnDef="isAlumni">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Is Alumni</mat-header-cell>
-    <mat-cell *matCellDef="let row">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Alumni</th>
+    <td mat-cell *matCellDef="let row">
       <mat-checkbox readonly [checked]="row.isAlumni"></mat-checkbox>
-    </mat-cell>
+    </td>
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <mat-header-row
-    *matHeaderRowDef="['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni']"></mat-header-row>
-  <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni']"
-           [routerLink]="'/people/edit/' + row.id"></mat-row>
-</mat-table>
-
+  <tr mat-header-row
+      *matHeaderRowDef="columns; sticky: true"></tr>
+  <tr mat-row class="hover-overlay"
+      *matRowDef="let row; columns: columns"
+      [routerLink]="'/people/edit/' + row.id"></tr>
+</table>
 <a routerLink="/people/edit/new" class="add-button" mat-fab matTooltip="Add new Person" matTooltipPosition="left">
   <mat-icon>add</mat-icon>
 </a>

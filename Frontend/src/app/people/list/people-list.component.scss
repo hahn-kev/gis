@@ -1,3 +1,7 @@
 .mat-column-staffId, .mat-column-isSchoolAid, .mat-column-donorId, .mat-column-isParent, .mat-column-isAlumni {
   flex-grow : 0.5;
 }
+
+.mat-table {
+  width : 100%;
+}
