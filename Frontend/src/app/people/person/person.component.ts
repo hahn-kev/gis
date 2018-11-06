@@ -1,37 +1,37 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Person, PersonWithOthers } from '../person';
-import { PersonService } from '../person.service';
-import { RoleWithJob } from '../role';
-import { OrgGroup } from '../groups/org-group';
-import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
-import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { NgForm, NgModel } from '@angular/forms';
-import { EmergencyContactExtended } from '../emergency-contact';
-import { EmergencyContactComponent } from './emergency-contact/emergency-contact.component';
-import { RoleComponent } from './role.component';
-import { countries } from '../countries';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Job } from '../../job/job';
-import { MissionOrg } from '../../mission-org/mission-org';
-import { GroupService } from '../groups/group.service';
-import { OrgChain, OrgChainLink } from '../groups/org-chain';
-import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
-import { StaffWithOrgName } from '../staff';
-import { LazyLoadService } from '../../services/lazy-load.service';
-import { MissionOrgService } from '../../mission-org/mission-org.service';
-import { LeaveType, LeaveTypeName } from '../self/self';
-import { Location } from '@angular/common';
-import { EvaluationWithNames } from './evaluation/evaluation';
-import { EvaluationService } from './evaluation/evaluation.service';
-import { EvaluationComponent } from './evaluation/evaluation.component';
-import { LoginService } from '../../services/auth/login.service';
-import { first } from 'rxjs/internal/operators';
-import { Donor } from '../donor';
-import { EndorsementService } from '../../endorsement/endorsement.service';
-import { Endorsement, StaffEndorsementWithName } from '../../endorsement/endorsement';
-import { NavigationExtras } from '@angular/router/src/router';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Person, PersonWithOthers} from '../person';
+import {PersonService} from '../person.service';
+import {RoleWithJob} from '../role';
+import {OrgGroup} from '../groups/org-group';
+import {MatDialog, MatExpansionPanel, MatSnackBar} from '@angular/material';
+import {ConfirmDialogComponent} from '../../dialog/confirm-dialog/confirm-dialog.component';
+import {NgForm, NgModel} from '@angular/forms';
+import {EmergencyContactExtended} from '../emergency-contact';
+import {EmergencyContactComponent} from './emergency-contact/emergency-contact.component';
+import {RoleComponent} from './role.component';
+import {countries} from '../countries';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {Job} from '../../job/job';
+import {MissionOrg} from '../../mission-org/mission-org';
+import {GroupService} from '../groups/group.service';
+import {OrgChain, OrgChainLink} from '../groups/org-chain';
+import {CanComponentDeactivate} from '../../services/can-deactivate.guard';
+import {StaffWithOrgName} from '../staff';
+import {LazyLoadService} from '../../services/lazy-load.service';
+import {MissionOrgService} from '../../mission-org/mission-org.service';
+import {LeaveType, LeaveTypeName} from '../self/self';
+import {Location} from '@angular/common';
+import {EvaluationWithNames} from './evaluation/evaluation';
+import {EvaluationService} from './evaluation/evaluation.service';
+import {EvaluationComponent} from './evaluation/evaluation.component';
+import {LoginService} from '../../services/auth/login.service';
+import {first} from 'rxjs/internal/operators';
+import {Donor} from '../donor';
+import {EndorsementService} from '../../endorsement/endorsement.service';
+import {Endorsement, StaffEndorsementWithName} from '../../endorsement/endorsement';
+import {NavigationExtras} from '@angular/router/src/router';
 
 @Component({
   selector: 'app-person',
@@ -132,7 +132,8 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   async isStaffChanged(isStaff: boolean, isStaffElement: NgModel): Promise<void> {
     if (isStaff) {
-      this.person.staff = new StaffWithOrgName();
+      //just a guard in case this gets called incorrectly
+      this.person.staff = this.person.staff || new StaffWithOrgName();
       return;
     }
     //deleting?
@@ -149,7 +150,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       }
       if (!result) {
         //roll back switch
-        isStaffElement.control.setValue(true, {emitEvent: false});
+        isStaffElement.control.setValue(true, {emitViewToModelChange: false});
         return;
       }
     }
@@ -158,7 +159,8 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   async isDonorChanged(isDonor: boolean, isDonorElement: NgModel) {
     if (isDonor) {
-      this.person.donor = new Donor();
+      //just a guard in case this gets called incorrectly
+      this.person.donor = this.person.donor || new Donor();
       return;
     }
     if (!this.isNew && this.person.donor.id) {
@@ -174,7 +176,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       }
       if (!result) {
         //roll back switch
-        isDonorElement.control.setValue(true, {emitEvent: false});
+        isDonorElement.control.setValue(true, {emitViewToModelChange: false});
         return;
       }
     }
