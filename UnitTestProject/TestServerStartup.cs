@@ -29,10 +29,13 @@ namespace UnitTestProject
 
         public override void ConfigureServices(IServiceCollection services)
         {
+#if DEBUG
             services.AddLogging(loggingBuilder =>
                 loggingBuilder.SetMinimumLevel(LogLevel.Trace)
                     .AddConsole(options => options.IncludeScopes = true)
                     .AddDebug());
+#endif
+
             base.ConfigureServices(services);
             services.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
             {
