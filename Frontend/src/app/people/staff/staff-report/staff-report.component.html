@@ -1,11 +1,11 @@
 <ng-container *appTemplateContent="'title'">Staff ({{dataSource.filteredData.length}})</ng-container>
 <ng-container *appToolbarContent>
-  <button mat-icon-button class="print-hide">
-    <mat-icon>search</mat-icon>
-  </button>
-  <mat-form-field floatLabel="never" class="print-hide">
+  <mat-form-field floatLabel="never" appearance="fill" class="print-hide">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Search</mat-label>
     <input autofocus matInput [value]="urlBinding.values.search"
-           (keyup)="urlBinding.values.search = $event.target.value" placeholder="Search">
+           (keyup)="urlBinding.values.search = $event.target.value">
+    <mat-icon matSuffix matTooltip="Matches on name or email">help</mat-icon>
   </mat-form-field>
 
   <mat-slide-toggle [(ngModel)]="urlBinding.values.showInactive">
@@ -14,10 +14,10 @@
   <button mat-icon-button (click)="filterDialog.show()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
-  <mat-form-field style="padding-left: 8px" class="print-hide">
+  <mat-form-field style="padding-left: 8px" appearance="fill" class="print-hide">
+    <mat-label>Columns</mat-label>
     <mat-select [(ngModel)]="urlBinding.values.selectedColumns"
-                multiple
-                placeholder="Columns">
+                multiple>
       <mat-option *ngFor="let column of avalibleColumns" [value]="column">{{column | titleCase}}</mat-option>
     </mat-select>
   </mat-form-field>
