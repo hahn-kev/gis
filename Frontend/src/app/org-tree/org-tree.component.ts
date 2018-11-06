@@ -134,6 +134,7 @@ export class OrgTreeComponent implements OnInit {
 
 
   nodeToggled(node: OrgNode) {
+    if (!node.hasChildren) return;
     let expanded = this.urlBinding.values.expanded.filter(value => value != node.id);
     if (this.treeControl.isExpanded(node)) {
       expanded.push(node.id);

@@ -62,6 +62,12 @@
                 <mat-icon>edit</mat-icon>
                 Edit {{node.value.groupName}}
               </a>
+              <a *ngIf="node.value.supervisorPerson as person"
+                 [routerLink]="['/person', 'edit', node.value.supervisor]"
+                 mat-menu-item>
+                <mat-icon>person</mat-icon>
+                Edit {{person.preferredName}} {{person.lastName}}
+              </a>
               <a routerLink="/job/list" [queryParams]="{group: node.allDecendantsGroups}" mat-menu-item>
                 <mat-icon>work</mat-icon>
                 View Jobs
@@ -73,6 +79,18 @@
               <a routerLink="/staff/report" [queryParams]="{group: node.allDecendantsGroups}" mat-menu-item>
                 <mat-icon>business</mat-icon>
                 View Staff
+              </a>
+              <a *ngIf="node.value.supervisor"
+                 [routerLink]="['/leave-request', 'list', 'supervisor', node.value.supervisor]"
+                 mat-menu-item>
+                <mat-icon>transfer_within_a_station</mat-icon>
+                View Leave
+              </a>
+              <a *ngIf="node.value.supervisor"
+                 [routerLink]="['/calendar', 'supervisor', node.value.supervisor]"
+                 mat-menu-item>
+                <mat-icon>date_range</mat-icon>
+                View Calendar
               </a>
             </mat-menu>
           </div>
