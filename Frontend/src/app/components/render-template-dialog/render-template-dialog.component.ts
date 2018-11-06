@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, TemplateRef } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs/Rx';
-import { AppTemplateService } from '../../toolbar/app-template.service';
+import {Component, Inject, OnInit, TemplateRef} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
+import {Observable} from 'rxjs';
+import {AppTemplateService} from '../../toolbar/app-template.service';
 
 interface RenderDialogContext {
   $implicit: MatDialogRef<RenderTemplateDialogComponent>;

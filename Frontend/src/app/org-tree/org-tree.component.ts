@@ -1,6 +1,6 @@
+import {combineLatest, of as observableOf} from 'rxjs';
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {combineLatest, Observable} from 'rxjs';
 import {Job, JobStatus} from '../job/job';
 import {RoleExtended} from '../people/role';
 import {OrgGroupWithSupervisor} from '../people/groups/org-group';
@@ -74,7 +74,7 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildRoleNode(role: RoleExtended, data: OrgTreeData) {
-    return new RoleOrgNode(role.personId, role, 'role', [], Observable.of(() => true));
+    return new RoleOrgNode(role.personId, role, 'role', [], observableOf(() => true));
   }
 
   buildOrgNode(org: OrgGroupWithSupervisor, data: OrgTreeData) {
