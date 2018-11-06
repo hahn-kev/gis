@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest, Observable } from 'rxjs';
-import { Job, JobStatus } from '../job/job';
-import { RoleExtended } from '../people/role';
-import { OrgGroupWithSupervisor } from '../people/groups/org-group';
-import { GroupOrgNode, JobOrgNode, OrgNode, RoleOrgNode } from './org-node';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { UrlBindingService } from '../services/url-binding.service';
-import { map } from 'rxjs/operators';
-import { OrgTreeData } from './org-tree-data';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {combineLatest, Observable} from 'rxjs';
+import {Job, JobStatus} from '../job/job';
+import {RoleExtended} from '../people/role';
+import {OrgGroupWithSupervisor} from '../people/groups/org-group';
+import {GroupOrgNode, JobOrgNode, OrgNode, RoleOrgNode} from './org-node';
+import {NestedTreeControl} from '@angular/cdk/tree';
+import {UrlBindingService} from '../services/url-binding.service';
+import {map} from 'rxjs/operators';
+import {OrgTreeData} from './org-tree-data';
 
 
 @Component({
@@ -24,10 +24,11 @@ export class OrgTreeComponent implements OnInit {
   rootId: string;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean, show: string[] }>) {
+              public urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean, show: string[], expanded: string[] }>) {
     this.urlBinding.addParam('allRoles', false);
     this.urlBinding.addParam('allJobs', false);
     this.urlBinding.addParam('show', ['staff']);
+    this.urlBinding.addParam('expanded', []);
     this.treeControl = new NestedTreeControl<OrgNode>(dataNode => dataNode.observableChildren);
     this.treeControl.getLevel = dataNode => dataNode.level;
     combineLatest(this.route.params, this.route.data).subscribe(([params, data]: [
@@ -46,8 +47,17 @@ export class OrgTreeComponent implements OnInit {
   buildList() {
     this.nodes = this.data.groups.filter(org => org.parentId == null || org.id == this.rootId)
       .map(org => this.buildOrgNode(org, this.data));
-    for (let node of this.nodes) {
-      this.treeControl.expand(node);
+    let expanded = this.urlBinding.values.expanded;
+    if (expanded.length == 0) {
+      for (let node of this.nodes) {
+        this.treeControl.expand(node);
+        this.nodeToggled(node);
+      }
+    } else {
+      for (let nodeIdToExpand of expanded) {
+        let node = this.findNode(this.nodes, nodeIdToExpand);
+        if (node) this.treeControl.expand(node);
+      }
     }
   }
 
@@ -66,7 +76,6 @@ export class OrgTreeComponent implements OnInit {
   buildRoleNode(role: RoleExtended, data: OrgTreeData) {
     return new RoleOrgNode(role.personId, role, 'role', [], Observable.of(() => true));
   }
-
 
   buildOrgNode(org: OrgGroupWithSupervisor, data: OrgTreeData) {
     return new GroupOrgNode(org.id, org, 'org', [
@@ -103,7 +112,7 @@ export class OrgTreeComponent implements OnInit {
     return node.type == 'role';
   };
 
-  trackBy(i: number, node: OrgNode) {
+  trackNodesBy(i: number, node: OrgNode) {
     return node.id;
   }
 
@@ -146,6 +155,14 @@ export class OrgTreeComponent implements OnInit {
       }
     }
     return this.isLast(node);
+  }
+
+  nodeToggled(node: OrgNode) {
+    let expanded = this.urlBinding.values.expanded.filter(value => value != node.id);
+    if (this.treeControl.isExpanded(node)) {
+      expanded.push(node.id);
+    }
+    this.urlBinding.values.expanded = expanded;
   }
 
 }

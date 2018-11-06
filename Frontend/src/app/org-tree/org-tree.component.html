@@ -21,11 +21,12 @@
 </ng-container>
 <div class="main-card">
   <mat-card>
-    <mat-tree [dataSource]="nodes" [treeControl]="treeControl" [trackBy]="trackBy">
+    <mat-tree [dataSource]="nodes" [treeControl]="treeControl" [trackBy]="trackNodesBy">
       <ng-container *matTreeNodeDef="let node; when: isOrgNode">
         <mat-nested-tree-node role="group">
           <div class="mat-tree-node" matTreeNodePadding>
-            <button mat-icon-button matTreeNodeToggle
+            <button mat-icon-button
+                    (click)="nodeToggled(node)" matTreeNodeToggle
                     [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
                     [attr.aria-label]="'toggle ' + node.value.groupName">
               <mat-icon class="mat-icon-rtl-mirror">
@@ -86,7 +87,9 @@
       <ng-container *matTreeNodeDef="let node; when: isJobNode">
         <mat-nested-tree-node role="group">
           <div class="mat-tree-node" matTreeNodePadding>
-            <button mat-icon-button matTreeNodeToggle [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
+            <button mat-icon-button matTreeNodeToggle
+                    (click)="nodeToggled(node)"
+                    [style.visibility]="node.hasChildren ? 'visible' : 'hidden'"
                     [attr.aria-label]="'toggle ' + node.value.title">
               <mat-icon class="mat-icon-rtl-mirror">
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
