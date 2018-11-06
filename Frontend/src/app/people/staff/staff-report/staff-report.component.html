@@ -11,7 +11,7 @@
   <mat-slide-toggle [(ngModel)]="urlBinding.values.showInactive">
     Show Inactive
   </mat-slide-toggle>
-  <button mat-icon-button (click)="openFilterDialog()" class="print-hide" matTooltip="Filters">
+  <button mat-icon-button (click)="filterDialog.show()" class="print-hide" matTooltip="Filters">
     <mat-icon>filter_list</mat-icon>
   </button>
   <mat-form-field style="padding-left: 8px" class="print-hide">
@@ -31,7 +31,7 @@
   </a>
   <app-export-button fileName="staff" [values]="dataSource"></app-export-button>
 </ng-container>
-<ng-container *appTemplateContent="'dialog:filter'">
+<ng-template #filterDialog="dialog" appDialog="Filters">
   <div class="two-colum-grid">
     <mat-checkbox [(ngModel)]="urlBinding.values.showThai">
       Show Thai Staff
@@ -68,7 +68,10 @@
         <mat-button-toggle value=">"> ></mat-button-toggle>
       </mat-button-toggle-group>
       <mat-form-field>
-        <input matInput type="number" [(ngModel)]="urlBinding.values.serviceLength" placeholder="Service Length">
+        <input matInput
+               type="number"
+               [(ngModel)]="urlBinding.values.serviceLength"
+               placeholder="Service Length (years)">
       </mat-form-field>
     </div>
     <mat-form-field>
@@ -82,7 +85,7 @@
       </mat-select>
     </mat-form-field>
   </div>
-</ng-container>
+</ng-template>
 <mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="preferredName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Name</mat-header-cell>

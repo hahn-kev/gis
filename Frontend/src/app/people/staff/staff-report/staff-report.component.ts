@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSort } from '@angular/material';
 import * as moment from 'moment';
 import { MomentInput } from 'moment';
-import { RenderTemplateDialogComponent } from '../../../components/render-template-dialog/render-template-dialog.component';
 import { UrlBindingService } from '../../../services/url-binding.service';
 
 @Component({
@@ -125,10 +124,6 @@ export class StaffReportComponent implements OnInit {
     this.urlBinding.addParam('serviceLengthType', null);
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
-  }
-
-  async openFilterDialog() {
-    await RenderTemplateDialogComponent.OpenWait(this.dialog, 'Filters', 'filter');
   }
 
   ngOnInit(): void {
