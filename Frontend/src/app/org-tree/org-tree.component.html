@@ -76,7 +76,9 @@
               </a>
             </mat-menu>
           </div>
-          <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+          <mat-divider *ngIf="!(node|isLastVisible:treeControl.isExpanded(node):nodes)"
+                       [inset]="true"
+                       [style.margin-left]="dividerMargin(node)"
                        [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
           <ng-container *ngIf="treeControl.isExpanded(node)">
             <ng-container matTreeNodeOutlet></ng-container>
@@ -121,7 +123,9 @@
               </a>
             </mat-menu>
           </div>
-          <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+          <mat-divider *ngIf="!(node|isLastVisible:treeControl.isExpanded(node):nodes)"
+                       [inset]="true"
+                       [style.margin-left]="dividerMargin(node)"
                        [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
           <ng-container *ngIf="treeControl.isExpanded(node)">
             <ng-container matTreeNodeOutlet></ng-container>
@@ -154,7 +158,9 @@
             </a>
           </mat-menu>
         </mat-tree-node>
-        <mat-divider *ngIf="!isLastVisible(node)" [inset]="true" [style.margin-left]="dividerMargin(node)"
+        <mat-divider *ngIf="!(node|isLastVisible:treeControl.isExpanded(node):nodes)"
+                     [inset]="true"
+                     [style.margin-left]="dividerMargin(node)"
                      [style.width]="'calc(100% - ' + dividerMargin(node) + ')'"></mat-divider>
       </ng-container>
     </mat-tree>

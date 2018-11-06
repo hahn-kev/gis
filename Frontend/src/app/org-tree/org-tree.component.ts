@@ -132,30 +132,6 @@ export class OrgTreeComponent implements OnInit {
     return 48 + node.level * 40 + 'px';
   }
 
-  isLast(node: OrgNode) {
-    if (node.parent) {
-      return node.parent.filteredChildren.findIndex(
-        value => value.id == node.id) + 1 == node.parent.filteredChildren.length;
-    }
-    return this.nodes.findIndex(value => value.id == node.id) + 1 == this.nodes.length;
-  }
-
-  isLastVisible(node: OrgNode) {
-    let visitedNodes = [node];
-    if (node.hasChildren && this.treeControl.isExpanded(node)) return false;
-    if (node.parent) {
-      while (node.parent) {
-        if (this.isLast(node)) {
-          node = node.parent;
-          if (visitedNodes.indexOf(node) != -1) throw new Error('Error loop in tree found');
-          visitedNodes.push(node);
-        } else {
-          return false;
-        }
-      }
-    }
-    return this.isLast(node);
-  }
 
   nodeToggled(node: OrgNode) {
     let expanded = this.urlBinding.values.expanded.filter(value => value != node.id);

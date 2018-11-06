@@ -128,6 +128,9 @@ import {DateAddPipe} from './services/date-add.pipe';
 import {AccordionListCustomActionDirective} from './components/accordion-list/accordion-list-custom-action.directive';
 import {BottomSheetDirective} from './components/render-template-bottom-sheet/bottom-sheet.directive';
 import {GroupTypeNamePipe} from './people/groups/group-type-name.pipe';
+import {IsLastVisiblePipe} from './org-tree/is-last-visible.pipe'
+
+  ;
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -202,6 +205,8 @@ if (environment.production) {
     BottomSheetDirective
     ,
     GroupTypeNamePipe
+    ,
+    IsLastVisiblePipe
   ],
   entryComponents: [
     ConfirmDialogComponent,
