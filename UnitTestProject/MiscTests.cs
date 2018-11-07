@@ -25,6 +25,7 @@ namespace UnitTestProject
         {
             _servicesFixture = servicesFixture;
             _personRepository = _servicesFixture.Get<PersonRepository>();
+            _servicesFixture.DoOnce(fixture => fixture.SetupData());
             _transaction = _servicesFixture.DbConnection.BeginTransaction();
         }
 
@@ -54,19 +55,8 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public void CanMockQuery()
-        {
-            var person1 = AutoFaker.Generate<PersonExtended>();
-            _servicesFixture.DbConnection.Insert(person1);
-            _servicesFixture.DbConnection.Insert(AutoFaker.Generate<PersonExtended>());
-            var actualPerson = _personRepository.People.Single(person => person.Id == person1.Id);
-            Assert.Equal(person1.FirstName, actualPerson.FirstName);
-        }
-
-        [Fact]
         public void GetStaffDoesntCrash()
         {
-            _servicesFixture.SetupData();
             var list = _personRepository.StaffWithNames.Where(name => name.Id != Guid.Empty).ToList();
             Assert.NotNull(list);
             Assert.NotEmpty(list);
@@ -87,7 +77,6 @@ namespace UnitTestProject
         [MemberData(nameof(GetRepoTypes))]
         public void ShouldEachPropertyResultInAPopulatedObject(Type repoType, PropertyInfo info)
         {
-            _servicesFixture.SetupData();
             var repo = _servicesFixture.ServiceProvider.GetService(repoType);
             var list = (IQueryable) info.GetValue(repo);
 
@@ -122,7 +111,7 @@ namespace UnitTestProject
         public void SqlDatesGetExecutedProperly()
         {
             var tr = _servicesFixture.InsertRequirement(months: 12);
-            var actualDate = _servicesFixture.DbConnection.TrainingRequirements.Select(requirement =>
+            var actualDate = _servicesFixture.DbConnection.TrainingRequirements.Where(r => r.Id == tr.Id).Select(requirement =>
                 Sql.AsSql(new DateTime(2018, 3, 1).AddMonths(requirement.RenewMonthsCount / -2))
             ).First();
             actualDate.ShouldBe(new DateTime(2018, 3, 1).AddMonths(tr.RenewMonthsCount / -2));
@@ -143,16 +132,6 @@ namespace UnitTestProject
             actualConnectionString.ShouldBe(expectedString);
         }
 
-        [Fact]
-        public void StaffSummariesIncludeStaffWithoutRole()
-        {
-            var pWithRole = _servicesFixture.InsertPerson();
-            var job = _servicesFixture.InsertStaffJob();
-            _servicesFixture.InsertRole(job.Id, pWithRole.Id);
-            var pWithoutRole = _servicesFixture.InsertPerson();
-            _personRepository.Staff.Count().ShouldBe(2);
-            _personRepository.PeopleWithStaffSummaries.Count().ShouldBe(2);
-        }
 
         public void Dispose()
         {

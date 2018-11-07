@@ -33,8 +33,8 @@ namespace UnitTestProject
             _sf = sf;
             _leaveService = _sf.Get<LeaveService>();
             _orgGroupRepository = _sf.Get<OrgGroupRepository>();
+            _sf.DoOnce(fixture => fixture.SetupPeople());
             _transaction = _sf.DbConnection.BeginTransaction();
-            _sf.SetupPeople();
         }
 
         [Fact]
@@ -88,14 +88,18 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public async Task SavesLeaveRequest()
+        public static async Task SavesLeaveRequest()
         {
-            var jacob = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
+            var sf = new ServicesFixture();
+            await sf.InitializeAsync();
+            sf.SetupPeople();
+            var leaveService = sf.Get<LeaveService>();
+            
+            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
-            _sf.EntityServiceMock.ResetCalls();
-            await _leaveService.RequestLeave(expectedLeaveRequest);
-            _sf.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
+            await leaveService.RequestLeave(expectedLeaveRequest);
+            sf.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
         }
 
         [Fact]
@@ -146,11 +150,15 @@ namespace UnitTestProject
             _sf.DbConnection.Insert(expectedDevisionSupervisor.Staff);
 
             //test method
-            (var actualPersonOnLeave, var actualDepartment, var actualDevision, var actualSupervisorGroup) =
-                _orgGroupRepository.PersonWithOrgGroupChain(expectedPersonOnLeave.Id);
+            var orgGroupWithSupervisors = _orgGroupRepository.StaffParentOrgGroups(expectedPersonOnLeave.Staff)
+                .Take(3)
+                .AsEnumerable()
+                .Concat(new OrgGroupWithSupervisor[3]).ToList();
 
-            Assert.NotNull(actualPersonOnLeave);
-            Assert.Equal(expectedPersonOnLeave.Id, actualPersonOnLeave.Id);
+            OrgGroupWithSupervisor actualDepartment = orgGroupWithSupervisors[0];
+            OrgGroupWithSupervisor actualDevision = orgGroupWithSupervisors[1];
+            OrgGroupWithSupervisor actualSupervisorGroup = orgGroupWithSupervisors[2];
+
             Assert.NotNull(actualDepartment);
             Assert.Equal(expectedDepartment.Id, actualDepartment.Id);
             Assert.Null(actualDepartment.SupervisorPerson);
@@ -259,8 +267,8 @@ namespace UnitTestProject
             {
                 yield return ("Person with a single supervisor", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId},
-                    new OrgGroupWithSupervisor {Id = devisionId},
+                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
@@ -274,10 +282,11 @@ namespace UnitTestProject
 
                 yield return ("Person with a supervisor to notify", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId},
+                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
+                        ParentId = supervisorGroupId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
                         SupervisorPerson = Person(person3Id)
@@ -298,6 +307,7 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
+                        ParentId = devisionId,
                         ApproverIsSupervisor = false,
                         Supervisor = person4Id,
                         SupervisorPerson = Person(person4Id)
@@ -305,6 +315,7 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
+                        ParentId = supervisorGroupId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
                         SupervisorPerson = Person(person3Id)
@@ -325,11 +336,12 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
+                        ParentId = devisionId,
                         ApproverIsSupervisor = false,
                         Supervisor = person4Id,
                         SupervisorPerson = Person(person4Id)
                     },
-                    new OrgGroupWithSupervisor {Id = devisionId},
+                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
@@ -349,11 +361,12 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
+                        ParentId = devisionId,
                         ApproverIsSupervisor = true,
                         Supervisor = person4Id,
                         SupervisorPerson = Person(person4Id)
                     },
-                    new OrgGroupWithSupervisor {Id = devisionId},
+                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
@@ -370,11 +383,12 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
+                        ParentId = devisionId,
                         ApproverIsSupervisor = true,
                         Supervisor = person1Id,
                         SupervisorPerson = Person(person1Id)
                     },
-                    new OrgGroupWithSupervisor {Id = devisionId},
+                    new OrgGroupWithSupervisor {Id = devisionId,ParentId = supervisorGroupId},
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
@@ -392,6 +406,7 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = departmentId,
+                        ParentId = devisionId,
                         ApproverIsSupervisor = true,
                         Supervisor = person1Id,
                         SupervisorPerson = Person(person1Id)
@@ -399,6 +414,7 @@ namespace UnitTestProject
                     new OrgGroupWithSupervisor
                     {
                         Id = devisionId,
+                        ParentId = supervisorGroupId,
                         ApproverIsSupervisor = false,
                         Supervisor = person3Id,
                         SupervisorPerson = Person(person3Id)
@@ -457,7 +473,7 @@ namespace UnitTestProject
             var sf = new ServicesFixture();
             sf.CreateWebHost();
             var leaveService = sf.Get<LeaveService>();
-            
+
             bool actualApprovalEmailSent = false;
             int actualNotifyEmailCount = 0;
 
@@ -469,7 +485,7 @@ namespace UnitTestProject
                     It.IsAny<PersonWithStaff>()))
                 .Returns(Task.CompletedTask)
                 .Callback<Dictionary<string, string>, string, EmailTemplate, PersonWithStaff, PersonWithStaff>(
-                    (dictionary, subject, template, to, from) =>
+                    (dictionary, subject, template, from, to) =>
                     {
                         if (template == EmailTemplate.RequestLeaveApproval) actualApprovalEmailSent = true;
                         else if (template == EmailTemplate.NotifyLeaveRequest)
@@ -477,11 +493,14 @@ namespace UnitTestProject
                     });
 
 
-            var actualApprover = await leaveService.ResolveLeaveRequestChain(request,
+            var actualApprover = await leaveService.ResolveLeaveRequestEmails(request,
                 requestedBy,
-                department,
-                devision,
-                supervisorGroup,
+                new List<OrgGroupWithSupervisor>
+                {
+                    department,
+                    devision,
+                    supervisorGroup
+                }.FindAll(g => g != null),
                 new LeaveUsage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
@@ -490,413 +509,175 @@ namespace UnitTestProject
             Assert.Equal(expectedNotifyEmailCount, actualNotifyEmailCount);
         }
 
-        private LeaveRequest GenerateRequest(LeaveType? leaveType = null, bool? approved = null)
+        public static IEnumerable<object[]> ValidateEmailValues()
         {
-            var leaveRequest = AutoFaker.Generate<LeaveRequest>();
-            leaveRequest.Approved = approved;
-            if (leaveRequest.StartDate > leaveRequest.EndDate)
+            PersonWithStaff MakeStaff(OrgGroup orgGroup)
             {
-                var tmp = leaveRequest.StartDate;
-                leaveRequest.StartDate = leaveRequest.EndDate;
-                leaveRequest.EndDate = tmp;
-            }
-
-            if (leaveType.HasValue) leaveRequest.Type = leaveType.Value;
-
-            leaveRequest.OverrideDays = false;
-            leaveRequest.Days = leaveRequest.CalculateLength();
-            return leaveRequest;
-        }
-
-        [Fact]
-        public void ThrowsErrorWhenPersonIsInvalid()
-        {
-            var personId = Guid.NewGuid();
-            LeaveRequest oldRequest = GenerateRequest();
-            LeaveRequest newRequest = oldRequest.Copy();
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
-            Assert.Contains("modify this leave request", ex.Message);
-
-            personId = oldRequest.PersonId;
-            newRequest.PersonId = Guid.NewGuid();
-            ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
-            Assert.Contains("modify this leave request", ex.Message);
-        }
-
-        [Fact]
-        public void ThrowsWhenChangingTheDays()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            LeaveRequest newRequest = oldRequest.Copy();
-
-            newRequest.Days--;
-
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-
-            Assert.Contains("must match calculated", ex.Message);
-
-            newRequest.Days = newRequest.CalculateLength();
-            newRequest.EndDate += TimeSpan.FromDays(4);
-            ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-
-            Assert.Contains("must match calculated", ex.Message);
-        }
-
-        [Fact]
-        public void ThrowsWhenChangingDaysWhenOverriden()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.OverrideDays = true;
-            LeaveRequest newRequest = oldRequest.Copy();
-            newRequest.Days++;
-
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-
-            Assert.Contains("modify the length", ex.Message);
-        }
-
-        [Fact]
-        public void ThrowsWhenChangingStartAndEndForOverridenDays()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.OverrideDays = true;
-            LeaveRequest newRequest = oldRequest.Copy();
-            newRequest.EndDate += TimeSpan.FromDays(4);
-
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-
-            Assert.Contains("modify the start or end", ex.Message);
-        }
-
-        [Fact]
-        public void ThrowsIfChangingApproved()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            LeaveRequest newRequest = oldRequest.Copy();
-            oldRequest.Approved = false;
-            newRequest.Approved = true;
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-            Assert.Contains("approve", ex.Message);
-        }
-
-        [Fact]
-        public void AcceptMissmatchedCalculationForHalfDays()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            //16th is a friday
-            oldRequest.StartDate = new DateTime(2018, 3, 16);
-            oldRequest.EndDate = new DateTime(2018, 3, 16);
-            oldRequest.Days = oldRequest.CalculateLength();
-            LeaveRequest newRequest = oldRequest.Copy();
-            newRequest.Days = 0.5m;
-            //does not throw
-            _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId);
-        }
-
-
-        [Fact]
-        public void DontMissmatchedCalculationForHalfDaysOnWeeken()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            //17th is a saturday
-            oldRequest.StartDate = new DateTime(2018, 3, 17);
-            oldRequest.EndDate = new DateTime(2018, 3, 17);
-            oldRequest.Days = oldRequest.CalculateLength();
-            LeaveRequest newRequest = oldRequest.Copy();
-            newRequest.Days = 0.5m;
-            //does not throw
-            Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
-        }
-
-        [Fact]
-        public void ThrowsForNewRequestsWhenOverridingDays()
-        {
-            LeaveRequest request = GenerateRequest();
-            request.OverrideDays = true;
-            Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
-        }
-
-        [Fact]
-        public void ThrowIfCalculationIsOff()
-        {
-            LeaveRequest request = GenerateRequest();
-
-            //16th is a friday
-            request.StartDate = new DateTime(2018, 3, 14);
-            request.EndDate = new DateTime(2018, 3, 16);
-            //should be 3 days
-            request.Days = 2;
-            Assert.Throws<ArgumentException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
-            request.Days.ShouldBe(2);
-        }
-
-        [Fact]
-        public void ThrowsWhenModifyingApprovedLeave()
-        {
-            LeaveRequest oldRequest = GenerateRequest();
-            oldRequest.Approved = true;
-            Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
-            oldRequest.Approved = false;
-            Assert.Throws<UnauthorizedAccessException>(() =>
-                _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
-            oldRequest.Approved = null;
-            //doesn't throw
-            _leaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId);
-        }
-
-        [Fact]
-        public void LeaveListByOrgGroupShouldIncludeChildGroupStaff()
-        {
-            PersonWithStaff rootStaff = null;
-
-            PersonWithStaff aStaff = null;
-            PersonWithStaff bStaff = null;
-            PersonWithStaff a1Staff = null;
-            var rootGroup = _sf.InsertOrgGroup(action: rootGroupA =>
-            {
-                rootStaff = _sf.InsertStaff(rootGroupA.Id);
-                _sf.InsertOrgGroup(rootGroupA.Id,
-                    action: aGroupA =>
-                    {
-                        aStaff = _sf.InsertStaff(aGroupA.Id);
-                        _sf.InsertOrgGroup(aGroupA.Id,
-                            action: a1GroupA => { a1Staff = _sf.InsertStaff(a1GroupA.Id); });
-                    });
-
-                _sf.InsertOrgGroup(rootGroupA.Id,
-                    action: bGroup => bStaff = _sf.InsertStaff(bGroup.Id));
-            });
-            rootStaff.ShouldNotBeNull();
-            aStaff.ShouldNotBeNull();
-            bStaff.ShouldNotBeNull();
-            a1Staff.ShouldNotBeNull();
-            aStaff.Staff.OrgGroupId.ShouldNotBeNull();
-            var actualStaff =
-                _leaveService.PeopleInGroupWithLeave(aStaff.Staff.OrgGroupId.Value, DateTime.Now.SchoolYear());
-            actualStaff.Select(details => details.Person.Id).ShouldBe(new[] {aStaff.Id, a1Staff.Id}, true);
-            actualStaff.Select(details => details.Person.Id).ShouldNotContain(rootStaff.Id);
-            actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
-        }
-
-        static LeaveUsage VacationLeave(IEnumerable<LeaveUsage> enumerable)
-        {
-            return enumerable.Single(usage => usage.LeaveType == LeaveType.Vacation);
-        }
-
-        static LeaveUsage[] WaysToGetVacationLeaveCalculation(Guid personId, int year, LeaveService leaveService)
-        {
-            return new[]
-            {
-                VacationLeave(leaveService.GetLeaveDetails(personId, year).LeaveUsages),
-                VacationLeave(leaveService.PeopleWithLeave(year)
-                    .Single(details => details.Person.Id == personId).LeaveUsages),
-                VacationLeave(leaveService.PersonWithLeave(personId, year).LeaveUsages),
-                leaveService.GetLeaveUseage(LeaveType.Vacation, personId, year),
-            };
-        }
-
-        [Fact]
-        public void EnsureDifferentWaysOfCalculatingLeaveMatchExpected()
-        {
-            var person = _sf.InsertPerson(staff => staff.IsThai = false);
-
-            void InsertLeaveRequest(DateTime start, DateTime? end = null, bool? approved = true)
-            {
-                var leaveRequest = new LeaveRequest
-                {
-                    Id = Guid.NewGuid(),
-                    PersonId = person.Id,
-                    Type = LeaveType.Vacation,
-                    StartDate = start,
-                    EndDate = end ?? start,
-                    Approved = approved
-                };
-                leaveRequest.Days = leaveRequest.CalculateLength();
-                _sf.DbConnection.Insert(leaveRequest);
-            }
-
-            InsertLeaveRequest(new DateTime(2018, 4, 30));
-            InsertLeaveRequest(new DateTime(2018, 4, 30), new DateTime(2018, 4, 30), false);
-            InsertLeaveRequest(new DateTime(2018, 4, 30), new DateTime(2018, 4, 30), null);
-            InsertLeaveRequest(new DateTime(2018, 6, 25), new DateTime(2018, 6, 29));
-
-            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == 7);
-        }
-
-        public static IEnumerable<object[]> GetEnsureAllLeaveUseTheSameDateRanges()
-        {
-            var personFaker = ServicesFixture.PersonFaker();
-            var rangeStart = new DateTime(2018, 5, 25);
-            var rangeEnd = new DateTime(2018, 8, 5);
-            for (int j = 1; j < 4; j++)
-            {
-                var requestDate = rangeStart;
-                do
-                {
-                    var requests = new LeaveRequest[j];
-                    var person = personFaker.Generate();
-                    person.IsThai = false;
-                    //insert 3 leave requests and test those 3 at a time
-                    for (int i = 0; i < j; i++)
-                    {
-                        var leaveRequest = new LeaveRequest
-                        {
-                            Id = Guid.NewGuid(),
-                            Approved = true,
-                            StartDate = requestDate,
-                            EndDate = requestDate,
-                            PersonId = person.Id,
-                            Type = LeaveType.Vacation
-                        };
-                        leaveRequest.Days = leaveRequest.CalculateLength();
-                        requests[i] = leaveRequest;
-                        requestDate += TimeSpan.FromDays(1);
-                    }
-
-                    yield return new object[] {person, requests, j};
-                } while (requestDate < rangeEnd);
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(GetEnsureAllLeaveUseTheSameDateRanges))]
-        public void EnsureAllLeaveCalculatesUseTheSameDateRanges(PersonWithStaff person,
-            ICollection<LeaveRequest> requests,
-            int size)
-        {
-            _sf.DbConnection.Insert(person);
-            _sf.DbConnection.Insert<Staff>(person.Staff);
-            _sf.DbConnection.BulkCopy(requests);
-            
-            var leaveUsages =
-                WaysToGetVacationLeaveCalculation(person.Id, 2017, _sf.Get<LeaveService>());
-            leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
-                () =>
-                    $"Window at {requests.First().StartDate.ToShortDateString()} Size: {size}, Requests: [{string.Join(", ", requests)}]");
-        }
-
-        public static IEnumerable<object[]> GetExpectedLeaveValues()
-        {
-            Guid personId = Guid.Empty;
-
-            PersonWithStaff P()
-            {
-                Guid staffId = Guid.NewGuid();
-                personId = Guid.NewGuid();
+                var staffId = Guid.NewGuid();
+                var personId = Guid.NewGuid();
                 return new PersonWithStaff
                 {
-                    IsThai = true,
                     Id = personId,
                     StaffId = staffId,
-                    Staff = new StaffWithOrgName {Id = staffId}
+                    FirstName = orgGroup.GroupName + " staff",
+                    Staff = new StaffWithOrgName
+                    {
+                        Id = staffId,
+                        OrgGroupId = orgGroup.Id
+                    }
                 };
             }
 
-            DateTime Date(int year, int month, int day)
+            (OrgGroupWithSupervisor root, PersonWithStaff rootStaff,
+            OrgGroupWithSupervisor a, PersonWithStaff aStaff,
+            OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
+            OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
+            OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
+            PersonWithStaff[] people, OrgGroup[] groups) Extract(
+                OrgGroupWithSupervisor root,
+                PersonWithStaff rootStaff,
+                OrgGroupWithSupervisor a,
+                PersonWithStaff aStaff,
+                OrgGroupWithSupervisor aa,
+                PersonWithStaff aaStaff,
+                OrgGroupWithSupervisor ab,
+                PersonWithStaff abStaff,
+                OrgGroupWithSupervisor aaa,
+                PersonWithStaff aaaStaff)
             {
-                return new DateTime(year, month, day);
+                return (
+                    root, rootStaff,
+                    a, aStaff,
+                    aa, aaStaff,
+                    ab, abStaff,
+                    aaa, aaaStaff,
+                    new[]
+                    {
+                        rootStaff, aStaff, aaStaff, abStaff, aaaStaff, root.SupervisorPerson, a.SupervisorPerson,
+                        aa.SupervisorPerson, ab.SupervisorPerson, aaa.SupervisorPerson
+                    },
+                    new[]
+                    {
+                        root, a, aa, ab, aaa
+                    });
             }
 
-            LeaveRequest LR(DateTime start, DateTime end)
+            (OrgGroupWithSupervisor root, PersonWithStaff rootStaff,
+            OrgGroupWithSupervisor a, PersonWithStaff aStaff,
+            OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
+            OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
+            OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
+            PersonWithStaff[] people, OrgGroup[] groups) MakeTree()
             {
-                return new LeaveRequest(start, end)
-                {
-                    Approved = true,
-                    Id = Guid.NewGuid(),
-                    PersonId = personId,
-                    Type = LeaveType.Vacation
-                };
+                var (root, a, aa, ab, aaa) = ServicesFixture.MakeGroupTree();
+                return Extract(root,
+                    MakeStaff(root),
+                    a,
+                    MakeStaff(a),
+                    aa,
+                    MakeStaff(aa),
+                    ab,
+                    MakeStaff(ab),
+                    aaa,
+                    MakeStaff(aaa));
             }
 
-            IEnumerable<(PersonWithStaff, LeaveRequest[], int used)> MakeValues()
+            IEnumerable<(Guid requestForId,
+                PersonWithStaff[] people,
+                OrgGroup[] groups,
+                string approver, string[] notified)> MakeValues()
             {
-                //NOTE dates are based on 2018, which is the 2017 school year,
-                //any dates after school is out should be the 2018 school year
-                yield return (P(),
-                    new[]
-                    {
-                        LR(Date(2018, 4, 5), Date(2018, 4, 6))
-                    }, used: 2);
+                var (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = true;
+                yield return (aaaStaff.Id, people, groups, aaa.SupervisorPerson.FirstName, new string[0]);
 
-                yield return (P(),
-                    new[]
-                    {
-                        LR(Date(2018, 4, 5), Date(2018, 4, 6)),
-                        LR(Date(2018, 5, 30), Date(2018, 6, 1))
-                    }, used: 5);
+                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = false;
+                aa.ApproverIsSupervisor = true;
+                yield return (aaaStaff.Id, people, groups, aa.SupervisorPerson.FirstName,
+                    new[] {aaa.SupervisorPerson.FirstName});
 
-                yield return (P(),
-                    new[]
-                    {
-                        LR(Date(2018, 6, 15), Date(2018, 6, 15)),
-                        LR(Date(2017, 6, 15), Date(2017, 6, 15))
-                    }, used: 1);
+                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = false;
+                aa.ApproverIsSupervisor = false;
+                a.ApproverIsSupervisor = true;
+                yield return (aaaStaff.Id, people, groups, a.SupervisorPerson.FirstName,
+                    new[] {aaa.SupervisorPerson.FirstName, aa.SupervisorPerson.FirstName});
 
-                yield return (P(),
-                    new[]
-                    {
-                        LR(Date(2017, 7, 19), Date(2017, 7, 19))
-                    }, used: 1);
+                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = false;
+                aa.ApproverIsSupervisor = true;
+                yield return (aaa.SupervisorPerson.Id, people, groups, aa.SupervisorPerson.FirstName, new string[0]);
 
-                yield return (P(),
-                    new[]
-                    {
-                        //first week day of July 2017
-                        LR(Date(2017, 7, 3), Date(2017, 7, 3))
-                    }, used: 1);
+                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = true;
+                aa.ApproverIsSupervisor = true;
+                yield return (aaa.SupervisorPerson.Id, people, groups, aa.SupervisorPerson.FirstName, new string[0]);
 
-                yield return (P(),
-                    new[]
-                    {
-                        //last week day of June 2017
-                        LR(Date(2017, 6, 30), Date(2017, 6, 30))
-                    }, used: 0);
-
-                yield return (P(),
-                    new[]
-                    {
-                        LR(Date(2017, 8, 8), Date(2017, 8, 8))
-                    }, used: 1);
-
-
-//                var rangeStart = new DateTime(2018, 5, 25);
-//                var rangeEnd = new DateTime(2018, 8, 5);
-//                var requestDate = rangeStart;
-//                do
-//                {
-//                    var person = P();
-//                    var lr18 = LR(requestDate, requestDate);
-//                    var lr17 = LR(requestDate.AddYears(-1), requestDate.AddYears(-1));
-//                    //exclude when they're on weekends
-//                    if (lr18.Days == 1 && lr17.Days == 1)
-//                        yield return (person, new[] {lr18, lr17}, used: 1);
-//                    requestDate += TimeSpan.FromDays(1);
-//                } while (requestDate < rangeEnd);
+                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                aaa.ApproverIsSupervisor = true;
+                aa.ApproverIsSupervisor = false;
+                a.ApproverIsSupervisor = true;
+                yield return (aaa.SupervisorPerson.Id, people, groups, a.SupervisorPerson.FirstName, new []{aa.SupervisorPerson.FirstName});
             }
 
-            return MakeValues().Select(tuple => tuple.ToArray());
+            return MakeValues().Select(t => t.ToArray());
         }
 
         [Theory]
-        [MemberData(nameof(GetExpectedLeaveValues))]
-        public void LeaveUsedIsCalculatedAsExpected(PersonWithStaff person, LeaveRequest[] leaveRequests, int used)
+        [MemberData(nameof(ValidateEmailValues))]
+        public async Task ValidateSupervisorEmails(Guid requestForId,
+            PersonWithStaff[] people,
+            OrgGroup[] groups,
+            string approver,
+            string[] notified)
         {
-            _sf.DbConnection.Insert(person);
-            _sf.DbConnection.Insert(person.Staff);
-            _sf.DbConnection.BulkCopy(leaveRequests);
+            _sf.DbConnection.BulkCopy(people);
+            _sf.DbConnection.BulkCopy(people.Select(p => p.Staff));
+            _sf.DbConnection.BulkCopy(groups);
+            var emailMock = _sf.EmailServiceMock;
+            var approvalEmails = new List<string>();
+            var notifyEmails = new List<string>();
 
-            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == used);
+            emailMock.Invocations.Clear();
+            emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<string>(),
+                    It.IsAny<EmailTemplate>(),
+                    It.IsAny<PersonWithStaff>(),
+                    It.IsAny<PersonWithStaff>()))
+                .Returns(Task.CompletedTask)
+                .Callback<Dictionary<string, string>, string, EmailTemplate, PersonWithStaff, PersonWithStaff>(
+                    (dictionary, subject, template, from, to) =>
+                    {
+                        if (template == EmailTemplate.RequestLeaveApproval) approvalEmails.Add(to.FirstName);
+                        else if (template == EmailTemplate.NotifyLeaveRequest) notifyEmails.Add(to.FirstName);
+                    });
+
+            await _leaveService.RequestLeave(new LeaveRequest
+            {
+                PersonId = requestForId,
+                StartDate = new DateTime(2018, 10, 19),
+                EndDate = new DateTime(2018, 10, 19),
+                Days = 1
+            });
+
+            emailMock.Verify(e => e.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<string>(),
+                    It.IsAny<EmailTemplate>(),
+                    It.IsAny<PersonWithStaff>(),
+                    It.IsAny<PersonWithStaff>()),
+                Times.AtLeastOnce());
+
+            if (!string.IsNullOrEmpty(approver))
+            {
+                approvalEmails.ShouldHaveSingleItem().ShouldBe(approver);
+            }
+            else
+            {
+                approvalEmails.ShouldBeEmpty();
+            }
+
+            notifyEmails.ShouldBe(notified);
         }
 
         public void Dispose()

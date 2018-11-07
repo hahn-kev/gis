@@ -53,7 +53,7 @@ namespace Backend.Services
                     GoodEvaluations = e.Sum(evaluation => evaluation.Result == EvaluationResult.Good ? 1 : 0),
                     PoorEvaluations = e.Sum(evaluation => evaluation.Result == EvaluationResult.Poor ? 1 : 0),
                     AveragePercentage = e.Average(evaluation => evaluation.Score / evaluation.Total * 100)
-                }).ToList();
+                }).OrderBy(_ => _.Person.PreferredName ?? _.Person.FirstName).ThenBy(_ => _.Person.LastName).ToList();
         }
     }
 }

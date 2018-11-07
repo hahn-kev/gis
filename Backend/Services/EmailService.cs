@@ -31,20 +31,6 @@ namespace Backend.Services
             PersonWithStaff from,
             IEnumerable<PersonWithStaff> tos);
 
-        Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string subject,
-            EmailTemplate emailTemplate,
-            PersonExtended from,
-            PersonExtended to);
-
-        Task SendTemplateEmail(Dictionary<string, string> substituions,
-            string subject,
-            EmailTemplate emailTemplate,
-            string fromEmail,
-            string fromName,
-            string toEmail,
-            string toName);
-
         Task SendEmail(SendGridMessage message);
     }
 

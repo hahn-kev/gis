@@ -50,7 +50,8 @@ namespace Backend.DataLayer
             });
         }
 
-        public IQueryable<OrgGroup> GetWithParentsWhere(Expression<Func<OrgGroup, bool>> rootPredicate, Func<IQueryable<OrgGroup>, IQueryable<OrgGroup>> visit = null)
+        public IQueryable<OrgGroup> GetWithParentsWhere(Expression<Func<OrgGroup, bool>> rootPredicate,
+            Func<IQueryable<OrgGroup>, IQueryable<OrgGroup>> visit = null)
         {
             return _connection.GetCte<OrgGroup>(children =>
             {
@@ -59,7 +60,7 @@ namespace Backend.DataLayer
                     select orgGroup
                 ).Where(rootPredicate);
                 var childQuery = from orgGroup in OrgGroups
-                    from parent in children.InnerJoin(child => child.ParentId== orgGroup.Id)
+                    from parent in children.InnerJoin(child => child.ParentId == orgGroup.Id)
                     select orgGroup;
                 if (visit != null)
                     childQuery = visit(childQuery);
@@ -84,19 +85,7 @@ namespace Backend.DataLayer
                 SupervisorPerson = person
             };
 
-        public (PersonWithStaff personOnLeave,
-            OrgGroupWithSupervisor department,
-            OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup) PersonWithOrgGroupChain(Guid personId)
-        {
-            var personOnLeave = _personRepository.PeopleWithStaff.SingleOrDefault(person => person.Id == personId);
-            if (personOnLeave == null) throw new ArgumentException("Unable to find person " + personId);
-            var orgGroupWithSupervisors = StaffParentOrgGroups(personOnLeave.Staff).Take(3).AsEnumerable().Concat(new OrgGroupWithSupervisor[3]).ToList();
-            
-            return (personOnLeave, orgGroupWithSupervisors[0], orgGroupWithSupervisors[1], orgGroupWithSupervisors[2]);
-        }
-
-        private IQueryable<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
+        public IQueryable<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
         {
             return from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id)
                 from orgGroupWithSupervisor in OrgGroupsWithSupervisor.InnerJoin(g => g.Id == orgGroup.Id)

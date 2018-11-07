@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
@@ -30,12 +31,14 @@ namespace UnitTestProject
             _groupService = _sf.Get<OrgGroupService>();
             _groupRepository = _sf.Get<OrgGroupRepository>();
             _transaction = _sf.DbConnection.BeginTransaction();
-            orgRoot = _sf.InsertOrgGroup();
+            var orgRootId = Guid.NewGuid();
 
             org1Super = _sf.InsertPerson();
-            org1 = _sf.InsertOrgGroup(orgRoot.Id, org1Super.Id);
+            org1 = _sf.InsertOrgGroup(orgRootId, org1Super.Id);
             org1aSuper = _sf.InsertPerson();
             org1a = _sf.InsertOrgGroup(org1.Id, org1aSuper.Id);
+
+            orgRoot = _sf.InsertOrgGroup(action: group => group.Id = orgRootId);
 
             org1Staff = _sf.InsertStaff(org1.Id);
             org1aStaff = _sf.InsertStaff(org1a.Id);
@@ -61,6 +64,8 @@ namespace UnitTestProject
             {
                 yield return new object[] {new List<OrgGroup> {g2, g3, g1}, sortedBy, false};
                 yield return new object[] {new List<OrgGroup> {g1, g3, g2}, sortedBy, false};
+                yield return new object[] {new List<OrgGroup>(), sortedBy, true};
+                yield return new object[] {new List<OrgGroup> {g1}, sortedBy, true};
             }
 
             yield return new object[] {new List<OrgGroup> {g1, g2, g3}, OrgGroupService.SortedBy.Either, true};
@@ -77,12 +82,27 @@ namespace UnitTestProject
             OrgGroupService.IsOrgGroupSortedByHierarchy(groups, sortedBy).ShouldBe(expected);
         }
 
+        private void ShouldMatchOrder<T>(IEnumerable<T> actual, IEnumerable<T> expected)
+        {
+            var actualList = actual.ToList();
+            actualList.ShouldSatisfyAllConditions(expected.Select<T, Action>((obj, i) =>
+            {
+                return () => actualList[i].ShouldBe(obj);
+            }).ToArray());
+        }
+
         [Fact]
         public void ShouldGetParentsOrdered()
         {
             var orgGroups = _groupRepository.GetWithParentsWhere(group => @group.Id == org1a.Id)
                 .Select(group => group.Id).ToList();
-            orgGroups.ShouldBe(new[] {org1a.Id, org1.Id, orgRoot.Id});
+            ShouldMatchOrder(orgGroups,
+                new[]
+                {
+                    org1a.Id,
+                    org1.Id,
+                    orgRoot.Id,
+                });
         }
 
         [Fact]

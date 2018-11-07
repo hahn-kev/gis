@@ -108,24 +108,21 @@ namespace Backend.Services
 
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
-            var result = _orgGroupRepository.PersonWithOrgGroupChain(leaveRequest.PersonId);
-            if (result.personOnLeave?.StaffId == null)
+            var personOnLeave = _personRepository.PeopleWithStaff.SingleOrDefault(p => p.Id == leaveRequest.PersonId);
+            if (personOnLeave?.StaffId == null)
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
+            var result = _orgGroupRepository.StaffParentOrgGroups(personOnLeave.Staff).ToList();
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
-            var leaveUsage = GetLeaveUseage(leaveRequest.Type,
-                result.personOnLeave.Id,
-                leaveRequest.StartDate.SchoolYear());
+            var leaveUsage = GetLeaveUseage(leaveRequest.Type, personOnLeave.Id, leaveRequest.StartDate.SchoolYear());
             var isNew = leaveRequest.IsNew();
             _entityService.Save(leaveRequest);
             try
             {
-                await NotifyHr(leaveRequest, result.personOnLeave, leaveUsage);
-                return await ResolveLeaveRequestChain(leaveRequest,
-                    result.personOnLeave,
-                    result.department,
-                    result.devision,
-                    result.supervisorGroup,
+                await NotifyHr(leaveRequest, personOnLeave, leaveUsage);
+                return await ResolveLeaveRequestEmails(leaveRequest,
+                    personOnLeave,
+                    result,
                     leaveUsage);
             }
             catch
@@ -136,16 +133,19 @@ namespace Backend.Services
             }
         }
 
-        public async Task<PersonExtended> ResolveLeaveRequestChain(LeaveRequest leaveRequest,
+        public async Task<PersonExtended> ResolveLeaveRequestEmails(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor department,
-            OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup,
+            List<OrgGroupWithSupervisor> orgGroups,
             LeaveUsage leaveUsage)
         {
-            return await DoNotifyWork(leaveRequest, requestedBy, department, leaveUsage) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, devision, leaveUsage) ??
-                   await DoNotifyWork(leaveRequest, requestedBy, supervisorGroup, leaveUsage);
+            if (!OrgGroupService.IsOrgGroupSortedByHierarchy(orgGroups, OrgGroupService.SortedBy.ChildFirst)) throw new ArgumentException("org groups not sorted properly");
+            foreach (var orgGroup in orgGroups)
+            {
+                var result = await DoNotifyWork(leaveRequest, requestedBy, orgGroup, leaveUsage);
+                if (result != null) return result;
+            }
+
+            return null;
         }
 
         private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
@@ -404,7 +404,8 @@ namespace Backend.Services
 
         public IList<PersonAndLeaveDetails> PeopleWithLeave(int schoolYear)
         {
-            return PeopleWithLeave(_personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null), schoolYear);
+            return PeopleWithLeave(_personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null)
+                .OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName), schoolYear);
         }
 
         private IList<PersonAndLeaveDetails> PeopleWithLeave(IQueryable<PersonWithStaff> peopleQueryable,
@@ -439,13 +440,13 @@ namespace Backend.Services
 
         private IQueryable<PersonWithStaff> PeopleWithStaffUnderGroup(Guid orgGroupId)
         {
-            return from person in _personRepository.PeopleWithStaff
+            return (from person in _personRepository.PeopleWithStaff
                 from org in _orgGroupRepository.GetByIdWithChildren(orgGroupId)
                     .InnerJoin(orgGroup => orgGroup.Id == person.Staff.OrgGroupId)
-                select person;
+                select person).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
         }
 
-        public void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
+        public static void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
             LeaveRequest newRequest,
             Guid? personMakingChanges)
         {

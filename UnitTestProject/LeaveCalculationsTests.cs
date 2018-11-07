@@ -2,27 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
+using LinqToDB;
 using LinqToDB.Data;
 using Shouldly;
 using Xunit;
 
 namespace UnitTestProject
 {
-    public class LeaveCalculationsTests:IClassFixture<ServicesFixture>, IDisposable
+    public class LeaveCalculationsTests : IClassFixture<ServicesFixture>, IDisposable
     {
         private LeaveService _leaveService;
-        private ServicesFixture _servicesFixture;
+        private ServicesFixture _sf;
         private DataConnectionTransaction _transaction;
 
         public LeaveCalculationsTests(ServicesFixture servicesFixture)
         {
-            _servicesFixture = servicesFixture;
-            _transaction = _servicesFixture.DbConnection.BeginTransaction();
-            _servicesFixture.SetupData();
-            _leaveService = _servicesFixture.Get<LeaveService>();
+            _sf = servicesFixture;
+            _sf.DoOnce(f => f.SetupData());
+            _transaction = _sf.DbConnection.BeginTransaction();
+            _leaveService = _sf.Get<LeaveService>();
         }
 
 
@@ -108,10 +110,10 @@ namespace UnitTestProject
         [Fact]
         public void LeaveDetailsShouldIncludeOtherLeaveTypes()
         {
-            var personWithStaff = _servicesFixture.InsertPerson(person => person.IsThai = true);
-            var job = _servicesFixture.InsertJob();
+            var personWithStaff = _sf.InsertPerson(person => person.IsThai = true);
+            var job = _sf.InsertJob();
             var expectedDays = 5;
-            var leaveRequest = _servicesFixture.InsertLeaveRequest(LeaveType.Other, personWithStaff.Id, expectedDays);
+            var leaveRequest = _sf.InsertLeaveRequest(LeaveType.Other, personWithStaff.Id, expectedDays);
 
             var currentLeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithStaff.Id);
             var leaveUseage =
@@ -158,7 +160,9 @@ namespace UnitTestProject
                     {
                         Role(startDate: twoYearsAgo),
                         //director position doesn't count to the 20 days because it's not active
-                        Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1),
+                        Role(false,
+                            new DateTime(2000, 1, 1),
+                            new DateTime(2002, 1, 1),
                             supervisorId: personId)
                     });
                 yield return (20, new List<PersonRoleWithJob>
@@ -211,6 +215,252 @@ namespace UnitTestProject
             var personAndLeaveDetailses = _leaveService.PeopleWithCurrentLeave();
             Assert.NotEmpty(personAndLeaveDetailses);
         }
+
+
+        [Fact]
+        public void LeaveListByOrgGroupShouldIncludeChildGroupStaff()
+        {
+            PersonWithStaff rootStaff = null;
+
+            PersonWithStaff aStaff = null;
+            PersonWithStaff bStaff = null;
+            PersonWithStaff a1Staff = null;
+            var rootGroup = _sf.InsertOrgGroup(action: rootGroupA =>
+            {
+                rootStaff = _sf.InsertStaff(rootGroupA.Id);
+                _sf.InsertOrgGroup(rootGroupA.Id,
+                    action: aGroupA =>
+                    {
+                        aStaff = _sf.InsertStaff(aGroupA.Id);
+                        _sf.InsertOrgGroup(aGroupA.Id,
+                            action: a1GroupA => { a1Staff = _sf.InsertStaff(a1GroupA.Id); });
+                    });
+
+                _sf.InsertOrgGroup(rootGroupA.Id,
+                    action: bGroup => bStaff = _sf.InsertStaff(bGroup.Id));
+            });
+            rootStaff.ShouldNotBeNull();
+            aStaff.ShouldNotBeNull();
+            bStaff.ShouldNotBeNull();
+            a1Staff.ShouldNotBeNull();
+            aStaff.Staff.OrgGroupId.ShouldNotBeNull();
+            var actualStaff =
+                _leaveService.PeopleInGroupWithLeave(aStaff.Staff.OrgGroupId.Value, DateTime.Now.SchoolYear());
+            actualStaff.Select(details => details.Person.Id).ShouldBe(new[] {aStaff.Id, a1Staff.Id}, true);
+            actualStaff.Select(details => details.Person.Id).ShouldNotContain(rootStaff.Id);
+            actualStaff.Select(details => details.Person.Id).ShouldNotContain(bStaff.Id);
+        }
+
+        static LeaveUsage VacationLeave(IEnumerable<LeaveUsage> enumerable)
+        {
+            return enumerable.Single(usage => usage.LeaveType == LeaveType.Vacation);
+        }
+
+        static LeaveUsage[] WaysToGetVacationLeaveCalculation(Guid personId, int year, LeaveService leaveService)
+        {
+            return new[]
+            {
+                VacationLeave(leaveService.GetLeaveDetails(personId, year).LeaveUsages),
+                VacationLeave(leaveService.PeopleWithLeave(year)
+                    .Single(details => details.Person.Id == personId).LeaveUsages),
+                VacationLeave(leaveService.PersonWithLeave(personId, year).LeaveUsages),
+                leaveService.GetLeaveUseage(LeaveType.Vacation, personId, year),
+            };
+        }
+
+        [Fact]
+        public void EnsureDifferentWaysOfCalculatingLeaveMatchExpected()
+        {
+            var person = _sf.InsertPerson(staff => staff.IsThai = false);
+
+            void InsertLeaveRequest(DateTime start, DateTime? end = null, bool? approved = true)
+            {
+                var leaveRequest = new LeaveRequest
+                {
+                    Id = Guid.NewGuid(),
+                    PersonId = person.Id,
+                    Type = LeaveType.Vacation,
+                    StartDate = start,
+                    EndDate = end ?? start,
+                    Approved = approved
+                };
+                leaveRequest.Days = leaveRequest.CalculateLength();
+                _sf.DbConnection.Insert(leaveRequest);
+            }
+
+            InsertLeaveRequest(new DateTime(2018, 4, 30));
+            InsertLeaveRequest(new DateTime(2018, 4, 30), new DateTime(2018, 4, 30), false);
+            InsertLeaveRequest(new DateTime(2018, 4, 30), new DateTime(2018, 4, 30), null);
+            InsertLeaveRequest(new DateTime(2018, 6, 25), new DateTime(2018, 6, 29));
+
+            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == 7);
+        }
+
+        public static IEnumerable<object[]> GetEnsureAllLeaveUseTheSameDateRanges()
+        {
+            var personFaker = ServicesFixture.PersonFaker();
+            var rangeStart = new DateTime(2018, 5, 25);
+            var rangeEnd = new DateTime(2018, 8, 5);
+            for (int j = 1; j < 4; j++)
+            {
+                var requestDate = rangeStart;
+                do
+                {
+                    var requests = new LeaveRequest[j];
+                    var person = personFaker.Generate();
+                    person.IsThai = false;
+                    //insert 3 leave requests and test those 3 at a time
+                    for (int i = 0; i < j; i++)
+                    {
+                        var leaveRequest = new LeaveRequest
+                        {
+                            Id = Guid.NewGuid(),
+                            Approved = true,
+                            StartDate = requestDate,
+                            EndDate = requestDate,
+                            PersonId = person.Id,
+                            Type = LeaveType.Vacation
+                        };
+                        leaveRequest.Days = leaveRequest.CalculateLength();
+                        requests[i] = leaveRequest;
+                        requestDate += TimeSpan.FromDays(1);
+                    }
+
+                    yield return new object[] {person, requests, j};
+                } while (requestDate < rangeEnd);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEnsureAllLeaveUseTheSameDateRanges))]
+        public void EnsureAllLeaveCalculatesUseTheSameDateRanges(PersonWithStaff person,
+            ICollection<LeaveRequest> requests,
+            int size)
+        {
+            _sf.DbConnection.Insert(person);
+            _sf.DbConnection.Insert<Staff>(person.Staff);
+            _sf.DbConnection.BulkCopy(requests);
+
+            var leaveUsages =
+                WaysToGetVacationLeaveCalculation(person.Id, 2017, _sf.Get<LeaveService>());
+            leaveUsages.ShouldAllBe(used => leaveUsages.First().Used == used.Used,
+                () =>
+                    $"Window at {requests.First().StartDate.ToShortDateString()} Size: {size}, Requests: [{string.Join(", ", requests)}]");
+        }
+
+        public static IEnumerable<object[]> GetExpectedLeaveValues()
+        {
+            Guid personId = Guid.Empty;
+
+            PersonWithStaff P()
+            {
+                Guid staffId = Guid.NewGuid();
+                personId = Guid.NewGuid();
+                return new PersonWithStaff
+                {
+                    IsThai = true,
+                    Id = personId,
+                    StaffId = staffId,
+                    Staff = new StaffWithOrgName {Id = staffId}
+                };
+            }
+
+            DateTime Date(int year, int month, int day)
+            {
+                return new DateTime(year, month, day);
+            }
+
+            LeaveRequest LR(DateTime start, DateTime end)
+            {
+                return new LeaveRequest(start, end)
+                {
+                    Approved = true,
+                    Id = Guid.NewGuid(),
+                    PersonId = personId,
+                    Type = LeaveType.Vacation
+                };
+            }
+
+            IEnumerable<(PersonWithStaff, LeaveRequest[], int used)> MakeValues()
+            {
+                //NOTE dates are based on 2018, which is the 2017 school year,
+                //any dates after school is out should be the 2018 school year
+                yield return (P(),
+                    new[]
+                    {
+                        LR(Date(2018, 4, 5), Date(2018, 4, 6))
+                    }, used: 2);
+
+                yield return (P(),
+                    new[]
+                    {
+                        LR(Date(2018, 4, 5), Date(2018, 4, 6)),
+                        LR(Date(2018, 5, 30), Date(2018, 6, 1))
+                    }, used: 5);
+
+                yield return (P(),
+                    new[]
+                    {
+                        LR(Date(2018, 6, 15), Date(2018, 6, 15)),
+                        LR(Date(2017, 6, 15), Date(2017, 6, 15))
+                    }, used: 1);
+
+                yield return (P(),
+                    new[]
+                    {
+                        LR(Date(2017, 7, 19), Date(2017, 7, 19))
+                    }, used: 1);
+
+                yield return (P(),
+                    new[]
+                    {
+                        //first week day of July 2017
+                        LR(Date(2017, 7, 3), Date(2017, 7, 3))
+                    }, used: 1);
+
+                yield return (P(),
+                    new[]
+                    {
+                        //last week day of June 2017
+                        LR(Date(2017, 6, 30), Date(2017, 6, 30))
+                    }, used: 0);
+
+                yield return (P(),
+                    new[]
+                    {
+                        LR(Date(2017, 8, 8), Date(2017, 8, 8))
+                    }, used: 1);
+
+
+//                var rangeStart = new DateTime(2018, 5, 25);
+//                var rangeEnd = new DateTime(2018, 8, 5);
+//                var requestDate = rangeStart;
+//                do
+//                {
+//                    var person = P();
+//                    var lr18 = LR(requestDate, requestDate);
+//                    var lr17 = LR(requestDate.AddYears(-1), requestDate.AddYears(-1));
+//                    //exclude when they're on weekends
+//                    if (lr18.Days == 1 && lr17.Days == 1)
+//                        yield return (person, new[] {lr18, lr17}, used: 1);
+//                    requestDate += TimeSpan.FromDays(1);
+//                } while (requestDate < rangeEnd);
+            }
+
+            return MakeValues().Select(tuple => tuple.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetExpectedLeaveValues))]
+        public void LeaveUsedIsCalculatedAsExpected(PersonWithStaff person, LeaveRequest[] leaveRequests, int used)
+        {
+            _sf.DbConnection.Insert(person);
+            _sf.DbConnection.Insert(person.Staff);
+            _sf.DbConnection.BulkCopy(leaveRequests);
+
+            WaysToGetVacationLeaveCalculation(person.Id, 2017, _leaveService).ShouldAllBe(usage => usage.Used == used);
+        }
+
 
         public void Dispose()
         {

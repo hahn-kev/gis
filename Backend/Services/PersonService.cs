@@ -117,10 +117,12 @@ namespace Backend.Services
         public IList<StaffWithName> StaffWithNames => _personRepository.StaffWithNames.ToList();
 
         public IList<PersonWithStaff> StaffAll =>
-            _personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null).ToList();
+            _personRepository.PeopleWithStaff.Where(staff => staff.StaffId != null)
+                .OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName).ToList();
 
         public IList<PersonWithStaffSummaries> StaffSummaries =>
-            _personRepository.PeopleWithStaffSummaries.Where(staff => staff.StaffId != null).ToList();
+            _personRepository.PeopleWithStaffSummaries.Where(staff => staff.StaffId != null)
+                .OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName).ToList();
 
         public IList<StaffWithRoles> StaffWithRoles => _personRepository.StaffWithRoles;
 

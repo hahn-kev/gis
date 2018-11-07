@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,32 +11,19 @@ using Backend.Entities;
 using Backend.Services;
 using Bogus;
 using LinqToDB;
-using LinqToDB.Data;
 using LinqToDB.Identity;
-using LinqToDB.Linq;
-using LinqToDB.Reflection;
-using LinqToDB.SqlQuery;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-//using Microsoft.AspNetCore.Mvc.Testing;
-//using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Extensions.Logging.Debug;
-using Microsoft.Extensions.Options;
 using Moq;
-using Npgsql;
-using SendGrid.Helpers.Mail;
-using Serilog.Extensions.Logging;
 using Xunit;
-using Attachment = Backend.Entities.Attachment;
-using DataExtensions = Backend.DataLayer.DataExtensions;
 using IdentityUser = Backend.Entities.IdentityUser;
+
+//using Microsoft.AspNetCore.Mvc.Testing;
+//using Microsoft.AspNetCore.TestHost;
 
 namespace UnitTestProject
 {
@@ -66,6 +52,17 @@ namespace UnitTestProject
             action?.Invoke(webHostBuilder);
             WebHost = webHostBuilder.Build();
             ServiceProvider = WebHost.Services;
+        }
+
+        private bool hasDoneBefore;
+
+        public void DoOnce(Action<ServicesFixture> action)
+        {
+            if (!hasDoneBefore)
+            {
+                hasDoneBefore = true;
+                action(this);
+            }
         }
 
         public Task InitializeAsync()
@@ -154,7 +151,7 @@ namespace UnitTestProject
                 new KeyValuePair<string, string>("TemplateSettings:RequestLeaveApproval", "123"),
                 new KeyValuePair<string, string>("TemplateSettings:NotifyHrLeaveRequest", "123abc"),
                 new KeyValuePair<string, string>("web:client_id", "helloClient"),
-                new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret"),
+                new KeyValuePair<string, string>("web:client_secret", "i'm_A_Secret")
             });
         }
 
@@ -327,7 +324,7 @@ namespace UnitTestProject
             return InsertPerson(staff => staff.Staff.OrgGroupId = orgGroupId);
         }
 
-        public PersonRole InsertRole(Guid jobId, Guid personId = default(Guid), int years = 2, bool active = true)
+        public PersonRole InsertRole(Guid jobId, Guid personId = default, int years = 2, bool active = true)
         {
             return InsertRole(role =>
             {
@@ -414,6 +411,38 @@ namespace UnitTestProject
             action?.Invoke(orgGroup);
             DbConnection.Insert(orgGroup);
             return orgGroup;
+        }
+
+        public static (OrgGroupWithSupervisor root, OrgGroupWithSupervisor a, OrgGroupWithSupervisor aa,
+            OrgGroupWithSupervisor ab, OrgGroupWithSupervisor aaa) MakeGroupTree()
+        {
+            OrgGroupWithSupervisor MakeGroup(string name, Guid? parent, out Guid groupId)
+            {
+                groupId = Guid.NewGuid();
+                var staffId = Guid.NewGuid();
+                Guid supervisor = Guid.NewGuid();
+                return new OrgGroupWithSupervisor
+                {
+                    GroupName = name, Id = groupId, ParentId = parent, Supervisor = supervisor,
+                    SupervisorPerson = new PersonWithStaff
+                    {
+                        FirstName = name + " group super",
+                        Id = supervisor,
+                        StaffId = staffId,
+                        Staff = new StaffWithOrgName
+                        {
+                            Id = staffId,
+                            OrgGroupId = parent,
+                            Email = name + " staff email"
+                        }
+                    }
+                };
+            }
+
+            return (MakeGroup("root", null, out var rootId),
+                MakeGroup("a", rootId, out var aId),
+                MakeGroup("aa", aId, out var aaId), MakeGroup("ab", aId, out _),
+                MakeGroup("aaa", aaId, out _));
         }
 
         public void SetupData()
@@ -512,6 +541,18 @@ namespace UnitTestProject
                 personWithTraining.StaffId ?? throw new NullReferenceException("person staff id is null");
             staffTraining.TrainingRequirementId = trainingRequirement.Id;
             DbConnection.Insert(staffTraining);
+        }
+
+        public (Staff staff, PersonExtended person) InsertStaff(Guid? personId = null, Guid? orgGroupId = null)
+        {
+            var person = PersonFaker().Generate();
+            var staff = person.Staff;
+            staff.OrgGroupId = orgGroupId;
+            DbConnection.Insert(staff);
+            person.StaffId = staff.Id;
+            person.Id = personId ?? Guid.NewGuid();
+            DbConnection.Insert(person);
+            return (staff, person);
         }
     }
 }

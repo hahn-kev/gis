@@ -89,7 +89,7 @@ namespace Backend.DataLayer
         }
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
-            (from person in _dbConnection.PeopleExtended
+            from person in _dbConnection.PeopleExtended
                 from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
                     .DefaultIfEmpty()
                 where !person.Deleted
@@ -128,7 +128,7 @@ namespace Backend.DataLayer
                     ThaiZip = person.ThaiZip,
                     ProfilePicDriveId = person.ProfilePicDriveId,
                     Deleted = person.Deleted,
-                }).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
+                };
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job

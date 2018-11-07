@@ -75,9 +75,9 @@ namespace Backend.Services
             Either
         }
 
-        public static bool IsOrgGroupSortedByHierarchy(ICollection<OrgGroup> orgGroups, SortedBy sortedBy = SortedBy.Either)
+        public static bool IsOrgGroupSortedByHierarchy<T>(ICollection<T> orgGroups, SortedBy sortedBy = SortedBy.Either) where T : OrgGroup
         {
-            if (!orgGroups.Any()) return true;
+            if (orgGroups.Count <= 1) return true;
             bool ParentInList(OrgGroup group)
             {
                 return orgGroups.Any(orgGroup => orgGroup.Id == @group.ParentId);

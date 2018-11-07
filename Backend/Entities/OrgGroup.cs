@@ -12,6 +12,11 @@ namespace Backend.Entities
         public Guid? Supervisor { get; set; }
         public Guid? ParentId { get; set; }
         public bool ApproverIsSupervisor { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(GroupName)}: {GroupName}";
+        }
     }
 
     [Table("OrgGroup", IsColumnAttributeRequired = false)]
