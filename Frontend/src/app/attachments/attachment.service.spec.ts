@@ -1,6 +1,6 @@
-import { inject, TestBed } from '@angular/core/testing';
+import {inject, TestBed } from '@angular/core/testing';
 
-import { AttachmentService } from './attachment.service';
+import {AttachmentService} from './attachment.service';
 
 xdescribe('AttachmentService', () => {
   beforeEach(() => {

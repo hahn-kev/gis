@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { PersonWithOthers } from '../../person';
-import { Attachment } from '../../../components/attachments/attachment';
+import {Component, Input, OnInit} from '@angular/core';
+import {PersonWithOthers} from '../../person';
+import {Attachment} from '../../../attachments/attachment';
 
 @Component({
   selector: 'app-profile-picture',

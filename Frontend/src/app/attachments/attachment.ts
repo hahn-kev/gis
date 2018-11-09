@@ -1,4 +1,4 @@
-﻿import { BaseEntity } from '../../classes/base-entity';
+﻿import {BaseEntity} from '../classes/base-entity';
 
 export class Attachment extends BaseEntity {
   public name: string;

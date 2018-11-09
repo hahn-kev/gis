@@ -1,7 +1,7 @@
-import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
-import { Attachment } from '../components/attachments/attachment';
-import { PickerResponse } from './picker-response';
-import { DrivePickerService } from './drive-picker.service';
+import {Directive, EventEmitter, HostListener, Output} from '@angular/core';
+import {Attachment} from '../attachments/attachment';
+import {PickerResponse} from './picker-response';
+import {DrivePickerService} from './drive-picker.service';
 
 @Directive({
   selector: '[appPickFile]'

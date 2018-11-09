@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { ActivationEnd, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { Attachment } from './attachment';
-import { HttpClient } from '@angular/common/http';
-import { filter, map, shareReplay } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {ActivationEnd, Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {Attachment} from './attachment';
+import {HttpClient} from '@angular/common/http';
+import {filter, map, shareReplay} from 'rxjs/operators';
 
 @Injectable()
 export class AttachmentService {

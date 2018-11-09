@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MatBottomSheet, MatDialog, MatSidenav } from '@angular/material';
 import { Router, RouterEvent } from '@angular/router';
@@ -7,7 +7,7 @@ import { LoginService } from './services/auth/login.service';
 import { ActivityIndicatorService } from './services/activity-indicator.service';
 import { SettingsService } from './services/settings.service';
 import { UserToken } from './login/user-token';
-import { AttachmentService } from './components/attachments/attachment.service';
+import { AttachmentService } from './attachments/attachment.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
 import { JobStatus, NonSchoolAidJobStatus } from './job/job';

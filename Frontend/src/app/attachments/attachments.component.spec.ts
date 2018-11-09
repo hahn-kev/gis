@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AttachmentsComponent } from './attachments.component';
+import {AttachmentsComponent} from './attachments.component';
 
 xdescribe('AttachmentsComponent', () => {
   let component: AttachmentsComponent;
