@@ -94,16 +94,15 @@ namespace Backend.Services
                         if (startsWithChild) return false;
                         break;
             }
-            OrgGroup previous = null;
-            foreach (var orgGroup in startsWithChild ? orgGroups.Reverse() : orgGroups)
-            {
-                if (previous == null)
-                {
-                    if (groupWithoutParent != orgGroup) return false;
-                }
-                else if (orgGroup.ParentId != previous.Id) return false;
 
-                previous = orgGroup;
+            OrgGroup previous = null;
+            foreach (var current in startsWithChild ? orgGroups.Reverse() : orgGroups)
+            {
+                if (previous != null && current.ParentId != previous.Id)
+                {
+                    return false;
+                }
+                previous = current;
             }
 
             return true;
