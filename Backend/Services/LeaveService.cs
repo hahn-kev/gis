@@ -139,44 +139,40 @@ namespace Backend.Services
             LeaveUsage leaveUsage)
         {
             if (!OrgGroupService.IsOrgGroupSortedByHierarchy(orgGroups, OrgGroupService.SortedBy.ChildFirst)) throw new ArgumentException("org groups not sorted properly");
+            var supervisorsToNotify = new List<PersonWithStaff>();
+            PersonWithStaff approver = null;
             foreach (var orgGroup in orgGroups)
             {
-                var result = await DoNotifyWork(leaveRequest, requestedBy, orgGroup, leaveUsage);
-                if (result != null) return result;
+                //super and requested by will be the same if the requester is a supervisor
+                if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor || orgGroup.SupervisorPerson == null) continue;
+                if (orgGroup.ApproverIsSupervisor)
+                {
+                    await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUsage);
+                    approver = orgGroup.SupervisorPerson;
+                    break;
+                }
+                supervisorsToNotify.Add(orgGroup.SupervisorPerson);
             }
 
-            return null;
+            await Task.WhenAll(supervisorsToNotify.Where(person => person.Id != approver?.Id).Select(supervisor =>
+                NotifyOfLeaveRequest(leaveRequest, requestedBy, supervisor, approver, leaveUsage)));
+
+            return approver;
         }
-
-        private async ValueTask<PersonWithStaff> DoNotifyWork(LeaveRequest leaveRequest,
-            PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor orgGroup,
-            LeaveUsage leaveUsage)
-        {
-            //super and requested by will be the same if the requester is a supervisor
-            if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor) return null;
-            if (orgGroup.ApproverIsSupervisor && orgGroup.SupervisorPerson != null)
-            {
-                await SendRequestApproval(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUsage);
-                return orgGroup.SupervisorPerson;
-            }
-
-            if (orgGroup.SupervisorPerson != null)
-            {
-                await NotifyOfLeaveRequest(leaveRequest, requestedBy, orgGroup.SupervisorPerson, leaveUsage);
-            }
-
-            return null;
-        }
-
+        
         private async Task NotifyOfLeaveRequest(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
             PersonWithStaff supervisor,
+            PersonWithStaff approver,
             LeaveUsage leaveUsage)
         {
             //this is a list of substitutions avalible in the email template
             //these are used when notifying non approving supervisors of leave
             //$LEAVE-SUBSTITUTIONS$
+            
+            //todo supervisor here is who's getting emailed, 
+            //we need to get the supervisor who's approving leave so we can include
+            //that information here
             var substituions = new Dictionary<string, string>
             {
                 {":type", leaveRequest.Type.ToString()},
@@ -185,10 +181,11 @@ namespace Backend.Services
                 {":start", leaveRequest.StartDate.ToString("MMM d yyyy")},
                 {":end", leaveRequest.EndDate.ToString("MMM d yyyy")},
                 {":time", $"{leaveRequest.Days} Day(s)"},
-                {":left", $"{leaveUsage.Left} Day(s)"}
+                {":left", $"{leaveUsage.Left} Day(s)"},
+                {":approver", approver.PreferredName + " " + approver.LastName}
             };
             await _emailService.SendTemplateEmail(substituions,
-                $"{requestedBy.PreferredName} has requested leave",
+                $"{PersonFullName(requestedBy)} has requested leave",
                 EmailTemplate.NotifyLeaveRequest,
                 requestedBy,
                 supervisor);
@@ -210,7 +207,7 @@ namespace Backend.Services
                 {":left", $"{leaveUsage.Left} Day(s)"}
             };
             await _emailService.SendTemplateEmail(substituions,
-                $"{requestedBy.PreferredName} has requested leave",
+                $"{PersonFullName(requestedBy)} has requested leave",
                 EmailTemplate.NotifyHrLeaveRequest,
                 requestedBy,
                 _personRepository.GetStaffNotifyHr());
@@ -246,10 +243,15 @@ namespace Backend.Services
             };
 
             await _emailService.SendTemplateEmail(substituions,
-                $"{requestedBy.PreferredName} Leave request approval",
+                $"{PersonFullName(requestedBy)} Leave request approval",
                 EmailTemplate.RequestLeaveApproval,
                 requestedBy,
                 supervisor);
+        }
+
+        private string PersonFullName(Person person)
+        {
+            return (person.PreferredName ?? person.FirstName) + " " + person.LastName;
         }
 
         public async ValueTask<bool> CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)

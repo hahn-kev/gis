@@ -94,7 +94,7 @@ namespace UnitTestProject
             await sf.InitializeAsync();
             sf.SetupPeople();
             var leaveService = sf.Get<LeaveService>();
-            
+
             var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
             Assert.NotNull(jacob);
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
@@ -330,6 +330,35 @@ namespace UnitTestProject
                     person2Id,
                     true,
                     2);
+                
+                yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver", new LeaveRequest {PersonId = person1Id},
+                    Person(person1Id),
+                    new OrgGroupWithSupervisor
+                    {
+                        Id = departmentId,
+                        ParentId = devisionId,
+                        ApproverIsSupervisor = false,
+                        Supervisor = person4Id,
+                        SupervisorPerson = Person(person4Id)
+                    },
+                    new OrgGroupWithSupervisor
+                    {
+                        Id = devisionId,
+                        ParentId = supervisorGroupId,
+                        ApproverIsSupervisor = true,
+                        Supervisor = person3Id,
+                        SupervisorPerson = Person(person3Id)
+                    },
+                    new OrgGroupWithSupervisor
+                    {
+                        Id = supervisorGroupId,
+                        ApproverIsSupervisor = false,
+                        Supervisor = person2Id,
+                        SupervisorPerson = Person(person2Id)
+                    },
+                    person3Id,
+                    true,
+                    1);
 
                 yield return ("person with a group inbetween to not notify", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
@@ -388,7 +417,7 @@ namespace UnitTestProject
                         Supervisor = person1Id,
                         SupervisorPerson = Person(person1Id)
                     },
-                    new OrgGroupWithSupervisor {Id = devisionId,ParentId = supervisorGroupId},
+                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
                     new OrgGroupWithSupervisor
                     {
                         Id = supervisorGroupId,
@@ -430,28 +459,30 @@ namespace UnitTestProject
                     true,
                     1);
 
-//                yield return ("supervisor is in list twice",
-//                        new LeaveRequest {PersonId = person1Id},
-//                        Person(person1Id),
-//                        new OrgGroupWithSupervisor
-//                        {
-//                            Id = departmentId,
-//                            ApproverIsSupervisor = false,
-//                            Supervisor = person2Id,
-//                            SupervisorPerson = Person(person2Id)
-//                        },
-//                        new OrgGroupWithSupervisor
-//                        {
-//                            Id = devisionId,
-//                            ApproverIsSupervisor = true,
-//                            Supervisor = person2Id,
-//                            SupervisorPerson = Person(person2Id)
-//                        },
-//                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
-//                        person2Id,
-//                        true,
-//                        0
-//                    );
+                yield return ("supervisor is in list twice",
+                        new LeaveRequest {PersonId = person1Id},
+                        Person(person1Id),
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
+                        person2Id,
+                        true,
+                        0
+                    );
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
@@ -501,7 +532,7 @@ namespace UnitTestProject
                     devision,
                     supervisorGroup
                 }.FindAll(g => g != null),
-                new LeaveUsage() {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
+                new LeaveUsage {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
             if (actualApprover != null)
                 Assert.Equal(expectedApproverId, actualApprover.Id);
@@ -618,7 +649,8 @@ namespace UnitTestProject
                 aaa.ApproverIsSupervisor = true;
                 aa.ApproverIsSupervisor = false;
                 a.ApproverIsSupervisor = true;
-                yield return (aaa.SupervisorPerson.Id, people, groups, a.SupervisorPerson.FirstName, new []{aa.SupervisorPerson.FirstName});
+                yield return (aaa.SupervisorPerson.Id, people, groups, a.SupervisorPerson.FirstName,
+                    new[] {aa.SupervisorPerson.FirstName});
             }
 
             return MakeValues().Select(t => t.ToArray());
