@@ -1,4 +1,17 @@
 <ng-container *appTemplateContent="'title'">Users ({{dataSource.filteredData.length}})</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button>
+  </button>
+  <mat-form-field appearance="fill" class="print-hide">
+    <mat-icon matPrefix="">search</mat-icon>
+    <mat-label>Search</mat-label>
+    <input autofocus matInput
+           [value]="urlBinding.values.search"
+           (keyup)="urlBinding.values.search = $event.target.value"
+           placeholder="Search">
+  </mat-form-field>
+  <app-export-button [values]="dataSource" fileName="peopleData"></app-export-button>
+</ng-container>
 <mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="userName">
     <mat-header-cell *matHeaderCellDef>User Name</mat-header-cell>
