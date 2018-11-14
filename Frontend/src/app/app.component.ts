@@ -1,7 +1,7 @@
 ﻿import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {MatBottomSheet, MatDialog, MatSidenav} from '@angular/material';
-import {Router} from '@angular/router';
+import {Router, RouterEvent} from '@angular/router';
 import {CookieService} from 'ngx-cookie';
 import {LoginService} from './services/auth/login.service';
 import {ActivityIndicatorService} from './services/activity-indicator.service';
@@ -51,11 +51,12 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.router.events.subscribe(() => {
+    this.router.events.subscribe((e: RouterEvent) => {
       this.sidenav.close();
       if (this.rightDrawer) this.rightDrawer.close();
       this.bottomSheet.dismiss();
-      this.dialog.closeAll();
+      //todo figure out how to let dialogs change search parameters without closing dialogs
+      // this.dialog.closeAll();
     });
     this.hasAttachments = this.attachmentService.extractId().pipe(map(value => value.hasAttachments));
   }
