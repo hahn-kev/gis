@@ -12,8 +12,6 @@ import {AdminComponent} from './user/admin/admin.component';
 import {HomeComponent} from './home/home.component';
 import {ActivityIndicatorService} from './services/activity-indicator.service';
 import {ActivityIndicatorInterceptorService} from './services/activity-indicator-interceptor.service';
-import {ToolbarTemplateDirective} from './toolbar/toolbar-template.directive';
-import {ToolbarContentDirective} from './toolbar/toolbar-content.directive';
 import {AppTemplateService} from './toolbar/app-template.service';
 import {MyErrorHandlerService} from './services/my-error-handler.service';
 import {configureSettings, SettingsService} from './services/settings.service';
@@ -84,8 +82,6 @@ if (environment.production) {
     AdminComponent,
     HomeComponent,
     RequireRoleDirective,
-    ToolbarTemplateDirective,
-    ToolbarContentDirective,
     ConfirmDialogComponent,
     MessageComponent,
     RolesReportComponent,

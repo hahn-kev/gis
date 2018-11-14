@@ -49,6 +49,8 @@ import {QuickAddButtonComponent} from '../people/person/quick-add/quick-add-butt
 import {RoleComponent} from '../people/person/role.component';
 import {CookieService} from 'ngx-cookie-service';
 import {RouterModule} from '@angular/router';
+import {ToolbarContentDirective} from '../toolbar/toolbar-content.directive';
+import {ToolbarTemplateDirective} from '../toolbar/toolbar-template.directive';
 
 const matModules = [
   MatButtonModule,
@@ -101,6 +103,8 @@ const matModules = [
     QuickAddDirective,
     QuickAddButtonComponent,
     RoleComponent,
+    ToolbarContentDirective,
+    ToolbarTemplateDirective,
   ],
   providers: [CookieService],
   imports: [
@@ -126,6 +130,8 @@ const matModules = [
     QuickAddDirective,
     QuickAddButtonComponent,
     RoleComponent,
+    ToolbarContentDirective,
+    ToolbarTemplateDirective,
     ...matModules
   ],
   entryComponents: [
