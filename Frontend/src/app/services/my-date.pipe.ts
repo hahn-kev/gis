@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Optional, Pipe, PipeTransform } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 @Pipe({
@@ -6,7 +6,7 @@ import { DatePipe } from '@angular/common';
 })
 export class MyDatePipe extends DatePipe implements PipeTransform {
 
-  constructor(locale: string) {
+  constructor(@Optional() locale: string = 'en') {
     super(locale);
   }
 
