@@ -11,6 +11,7 @@
     </ng-container>
     <mat-action-row *ngIf="showActions">
       <button type="button"
+              id="save-new"
               (click)="newForm.ngForm.ngSubmit.emit()"
               [disabled]="newForm?.ngForm.invalid" mat-button>
         Add {{itemTitle}}
@@ -36,6 +37,7 @@
       </ng-container>
       <button type="button" mat-button (click)="onDelete(item)" color="warn">Delete</button>
       <button type="button"
+              [id]="'save-' + index"
               (click)="forms[index].ngForm.ngSubmit.emit()"
               [disabled]="forms[index]?.ngForm.invalid" mat-button>
         Save {{itemTitle}}

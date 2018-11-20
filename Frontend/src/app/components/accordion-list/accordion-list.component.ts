@@ -27,7 +27,7 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   @Input() save: (item: T) => Promise<T> | Observable<T>;
   @Input() delete: (item: T) => Promise<boolean> | Observable<boolean>;
   @ViewChildren(MatExpansionPanel) expansionPanels: QueryList<MatExpansionPanel>;
-  newForm: AccordionListFormDirective<T>;
+  newForm: AccordionListFormDirective<T> = null;
   forms: AccordionListFormDirective<T>[] = [];
   public header: AccordionListHeaderDirective<T>;
   public content: AccordionListContentDirective<T>;
