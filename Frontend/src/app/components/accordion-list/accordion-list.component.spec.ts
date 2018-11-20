@@ -1,10 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AccordionListComponent } from './accordion-list.component';
+import { BaseEntity } from '../../classes/base-entity';
 
-describe('AccordionListComponent', () => {
-  let component: AccordionListComponent;
-  let fixture: ComponentFixture<AccordionListComponent>;
+xdescribe('AccordionListComponent', () => {
+  let component: AccordionListComponent<BaseEntity>;
+  let fixture: ComponentFixture<AccordionListComponent<BaseEntity>>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

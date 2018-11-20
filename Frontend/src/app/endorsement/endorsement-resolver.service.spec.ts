@@ -2,7 +2,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import { EndorsementResolverService } from './endorsement-resolver.service';
 
-describe('EndorsementResolverService', () => {
+xdescribe('EndorsementResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [EndorsementResolverService]

@@ -2,7 +2,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import { EmergencyContactResolverService } from './emergency-contact-resolver.service';
 
-describe('EmergencyContactResolverService', () => {
+xdescribe('EmergencyContactResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [EmergencyContactResolverService]

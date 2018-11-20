@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LeaveListComponent } from './leave-list.component';
 
-describe('LeaveListComponent', () => {
+xdescribe('LeaveListComponent', () => {
   let component: LeaveListComponent;
   let fixture: ComponentFixture<LeaveListComponent>;
 

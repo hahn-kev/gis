@@ -2,7 +2,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import { OrgTreeDataResolverService } from './org-tree-data-resolver.service';
 
-describe('OrgTreeDataResolverService', () => {
+xdescribe('OrgTreeDataResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [OrgTreeDataResolverService]

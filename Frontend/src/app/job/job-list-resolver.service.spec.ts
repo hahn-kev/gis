@@ -1,8 +1,8 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { JobListResolverService } from './job-list-resolver.service';
 
-describe('JobListResolverService', () => {
+xdescribe('JobListResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [JobListResolverService]

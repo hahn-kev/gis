@@ -47,6 +47,12 @@ export class StaffWithOrgName extends Staff {
 }
 
 export class StaffWithRoles {
+
+  constructor(staffWithName?: StaffWithName, personRolesWithJob?: RoleWithJob[]) {
+    this.staffWithName = staffWithName;
+    this.personRolesWithJob = personRolesWithJob;
+  }
+
   staffWithName: StaffWithName;
   personRolesWithJob: RoleWithJob[];
 }

@@ -1,8 +1,8 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { GroupResolveService } from './group-resolve.service';
 
-describe('GroupResolveService', () => {
+xdescribe('GroupResolveService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [GroupResolveService]

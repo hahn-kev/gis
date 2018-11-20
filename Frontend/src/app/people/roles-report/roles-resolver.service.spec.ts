@@ -1,8 +1,8 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { RolesResolverService } from './roles-resolver.service';
 
-describe('RolesResolverService', () => {
+xdescribe('RolesResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [RolesResolverService]

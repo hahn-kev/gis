@@ -5,6 +5,11 @@ import { DatePipe } from '@angular/common';
   name: 'date'
 })
 export class MyDatePipe extends DatePipe implements PipeTransform {
+
+  constructor(locale: string) {
+    super(locale);
+  }
+
   transform(value: any, args?: any): any {
     if (!args) {
       args = 'MMM d, y';

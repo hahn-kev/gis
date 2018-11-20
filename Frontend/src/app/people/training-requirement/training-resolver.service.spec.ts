@@ -2,7 +2,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import { TrainingResolverService } from './training-resolver.service';
 
-describe('TrainingResolverService', () => {
+xdescribe('TrainingResolverService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [TrainingResolverService]
