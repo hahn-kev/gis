@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
-using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
-using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -27,7 +25,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -35,7 +32,6 @@ using Npgsql;
 using Sentinel.Sdk.Extensions;
 using Sentinel.Sdk.Middleware;
 using IdentityUser = Backend.Entities.IdentityUser;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Backend
 {
@@ -147,6 +143,22 @@ namespace Backend
                 .AddGoogle(options =>
                 {
                     var google = Configuration.GetSection("web");
+                    options.UserInformationEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
+                    options.ClaimActions.Clear();
+                    options.ClaimActions.MapJsonKey(
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+                        "sub");
+                    options.ClaimActions.MapJsonKey("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
+                        "name");
+                    options.ClaimActions.MapJsonKey("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+                        "given_name");
+                    options.ClaimActions.MapJsonKey("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
+                        "family_name");
+                    options.ClaimActions.MapJsonKey("urn:google:profile", "profile");
+                    options.ClaimActions.MapJsonKey(
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+                        "email");
+
                     options.ClientId = google["client_id"];
                     options.ClientSecret = google["client_secret"];
                     options.Scope.Add("https://www.googleapis.com/auth/drive");
