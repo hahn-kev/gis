@@ -1,6 +1,6 @@
 <span class="mat-caption" *ngIf="caption">{{caption}}</span>
 <mat-accordion>
-  <mat-expansion-panel *ngIf="addNew" #newItemPanel (opened)="newItem = newItem ? newItem : createNewItem()">
+  <mat-expansion-panel *ngIf="addNew" (opened)="newItem = newItem ? newItem : createNewItem()">
     <mat-expansion-panel-header>
       <mat-panel-title>Add new {{itemTitle}}</mat-panel-title>
     </mat-expansion-panel-header>
@@ -12,8 +12,8 @@
     <mat-action-row *ngIf="showActions">
       <button type="button"
               id="save-new"
-              (click)="newForm.ngForm.ngSubmit.emit()"
-              [disabled]="newForm?.ngForm.invalid" mat-button>
+              (click)="findForm(-1).ngForm.ngSubmit.emit()"
+              [disabled]="(forms | findForm: -1)?.ngForm.invalid" mat-button>
         Add {{itemTitle}}
       </button>
     </mat-action-row>
@@ -21,7 +21,7 @@
 
   <ng-content select="before"></ng-content>
 
-  <mat-expansion-panel #itemPanel *ngFor="let item of items; index as index">
+  <mat-expansion-panel *ngFor="let item of items; index as index">
     <mat-expansion-panel-header *ngIf="header">
       <ng-container *ngTemplateOutlet="header; context: {$implicit: item, index: index}"></ng-container>
     </mat-expansion-panel-header>
@@ -38,8 +38,8 @@
       <button type="button" mat-button (click)="onDelete(item)" color="warn">Delete</button>
       <button type="button"
               [id]="'save-' + index"
-              (click)="forms[index].ngForm.ngSubmit.emit()"
-              [disabled]="forms[index]?.ngForm.invalid" mat-button>
+              (click)="findForm(index).ngForm.ngSubmit.emit()"
+              [disabled]="(forms | findForm: index)?.ngForm.invalid" mat-button>
         Save {{itemTitle}}
       </button>
     </mat-action-row>

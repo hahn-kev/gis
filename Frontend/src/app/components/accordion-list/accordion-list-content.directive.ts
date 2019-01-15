@@ -6,7 +6,6 @@ import { BaseEntity } from '../../classes/base-entity';
   selector: '[appAccordionListContent]'
 })
 export class AccordionListContentDirective<T extends BaseEntity> extends TemplateRef<{ $implicit: T, index: number }> {
-  lastCreatedTemplateContext: { $implicit: T; index: number };
 
   constructor(@Host() parent: AccordionListComponent<T>,
               private templateRef: TemplateRef<{ $implicit: T, index: number }>) {
@@ -15,9 +14,7 @@ export class AccordionListContentDirective<T extends BaseEntity> extends Templat
   }
 
   createEmbeddedView(context: { $implicit: T; index: number }): EmbeddedViewRef<{ $implicit: T; index: number }> {
-    this.lastCreatedTemplateContext = context;
-    let ref = this.templateRef.createEmbeddedView(context);
-    return ref;
+    return this.templateRef.createEmbeddedView(context);
   }
 
   get elementRef() {

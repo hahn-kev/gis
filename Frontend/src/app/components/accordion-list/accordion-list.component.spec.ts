@@ -10,6 +10,7 @@ import { AccordionListFormDirective } from './accordion-list-form.directive';
 import { AccordionListCustomActionDirective } from './accordion-list-custom-action.directive';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
+import { FindFormPipe } from './find-form.pipe';
 import Spy = jasmine.Spy;
 import SpyObj = jasmine.SpyObj;
 
@@ -98,7 +99,8 @@ fdescribe('AccordionListComponent', () => {
     return panel.componentInstance;
   }
 
-  function expandPanel(panel: DebugElement) {
+  function expandPanel(panel: DebugElement | number) {
+    if (typeof panel == 'number') panel = getExpansionPanels()[panel];
     panelInstance(panel).open();
     return doubleCheck();
   }
@@ -111,14 +113,14 @@ fdescribe('AccordionListComponent', () => {
   }
 
   function createComponent<T extends BaseHostComponent<BaseEntity>>(t: Type<T>) {
-    fixture = <ComponentFixture<BaseHostComponent<BaseEntity>>> TestBed.createComponent(t);
+    fixture = <ComponentFixture<BaseHostComponent<BaseEntity>>>TestBed.createComponent(t);
     hostComponent = fixture.componentInstance;
-    saveSpy = <Spy> hostComponent.save;
+    saveSpy = <Spy>hostComponent.save;
     saveSpy.and.callFake((v) => {
       return Promise.resolve(v);
     });
 
-    deleteSpy = <Spy> hostComponent.delete;
+    deleteSpy = <Spy>hostComponent.delete;
     deleteSpy.and.callFake((v) => {
       return Promise.resolve();
     });
@@ -143,7 +145,8 @@ fdescribe('AccordionListComponent', () => {
         AccordionListHeaderDirective,
         AccordionListContentDirective,
         AccordionListFormDirective,
-        AccordionListCustomActionDirective
+        AccordionListCustomActionDirective,
+        FindFormPipe
       ],
       providers: [
         {provide: MatSnackBar, useValue: jasmine.createSpyObj('MatSnackBar', ['open'])},
@@ -190,7 +193,14 @@ fdescribe('AccordionListComponent', () => {
     }
 
     function getSaveButton(panel: DebugElement) {
-      return panel.query(value => value.attributes.id && value.attributes.id.includes('save-'));
+      return panel.query(value => (value.attributes.id || value.properties.id || '').includes('save-'));
+    }
+
+    function clickSave(panel: DebugElement | number) {
+      if (typeof panel == 'number') panel = getExpansionPanels()[panel];
+      let saveButton = getSaveButton(panel);
+      saveButton.nativeElement.click();
+      fixture.detectChanges();
     }
 
     describe('new', () => {
@@ -204,7 +214,7 @@ fdescribe('AccordionListComponent', () => {
           let saveButton = getSaveButton(newPanel);
           expectDisabled(saveButton);
         });
-        it('should enable the save button if validation failed', async(async () => {
+        it('should enable the save button if validation passed', async(async () => {
           hostComponent.listComponent.newItem.id = 'newId';
           await doubleCheck();
           let saveButton = getSaveButton(newPanel);
@@ -213,19 +223,12 @@ fdescribe('AccordionListComponent', () => {
       });
       describe('save', () => {
         let expectedNewItem: BaseEntity;
-
-        function clickSave() {
-          let saveButton = getSaveButton(newPanel);
-          saveButton.nativeElement.click();
-          fixture.detectChanges();
-        }
-
         beforeEach(async(async () => {
           hostComponent.listComponent.newItem.id = 'newId';
           expectedNewItem = hostComponent.listComponent.newItem;
 
           await doubleCheck();
-          clickSave();
+          clickSave(newPanel);
           await doubleCheck();
         }));
 
@@ -233,19 +236,64 @@ fdescribe('AccordionListComponent', () => {
           expect(saveSpy).toHaveBeenCalledWith(expectedNewItem);
         });
 
-        it('should emit the new items list', async () => {
+        it('should emit the new items list', () => {
           expect(itemsChangesSpy).toHaveBeenCalledTimes(1);
           let values: BaseEntity[] = itemsChangesSpy.calls.first().args[0];
           expect(values.length).toBe(1);
           expect(values[0].id).toBe(expectedNewItem.id);
         });
 
-        it('should open a snack bar', async () => {
+        it('should open a snack bar', () => {
           expect(snackbarSpy.open).toHaveBeenCalled();
         });
       });
 
 
+    });
+
+    describe('list', () => {
+      let baseEntity1: BaseEntity;
+      let baseEntity2: BaseEntity;
+      beforeEach(() => {
+        baseEntity1 = new BaseEntity();
+        baseEntity1.id = '1';
+        baseEntity2 = new BaseEntity();
+        baseEntity2.id = '2';
+        hostComponent.items = [baseEntity1, baseEntity2];
+        fixture.detectChanges();
+      });
+
+      function expectPanelToContainText(panelIndex: number, text: string) {
+        fixture.detectChanges();
+        let nodes = getExpansionPanels();
+        expect(nodes.length).toBe(3);
+        let dataPanel = nodes[panelIndex];
+        expect(dataPanel.nativeElement.textContent)
+          .toContain(text);
+      }
+
+      it('should update on sorted', () => {
+        expectPanelToContainText(1, baseEntity1.id);
+        hostComponent.items = [baseEntity2, baseEntity1];
+        expectPanelToContainText(1, baseEntity2.id);
+      });
+
+      it('should save the proper entity', async(async () => {
+        await expandPanel(1);
+        clickSave(1);
+        expect(saveSpy).toHaveBeenCalledWith(baseEntity1);
+      }));
+
+      it('should submit the expected entity on save after sorted', async(async () => {
+        await expandPanel(1);
+        await expandPanel(2);
+
+        hostComponent.items = [baseEntity2, baseEntity1];
+        expectPanelToContainText(1, baseEntity2.id);
+        clickSave(1);
+        await doubleCheck();
+        expect(saveSpy).toHaveBeenCalledWith(baseEntity2);
+      }));
     });
   });
 

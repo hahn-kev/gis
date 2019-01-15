@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { AccordionListContentDirective } from './accordion-list-content.directive';
 import { AccordionListFormDirective } from './accordion-list-form.directive';
 import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
@@ -27,13 +27,13 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
   @Input() save: (item: T) => Promise<T> | Observable<T>;
   @Input() delete: (item: T) => Promise<boolean> | Observable<boolean>;
   @ViewChildren(MatExpansionPanel) expansionPanels: QueryList<MatExpansionPanel>;
-  newForm: AccordionListFormDirective<T> = null;
-  forms: AccordionListFormDirective<T>[] = [];
+  @ViewChildren(MatExpansionPanel, {read: ElementRef}) expansionPanelElements: QueryList<ElementRef<HTMLElement>>;
   public header: AccordionListHeaderDirective<T>;
   public content: AccordionListContentDirective<T>;
   public customAction: AccordionListCustomActionDirective<T>;
+  private forms: AccordionListFormDirective<T>[] = [];
 
-  constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private element: ElementRef<HTMLElement>) {
   }
 
   async onDelete(item: T) {
@@ -70,5 +70,35 @@ export class AccordionListComponent<T extends BaseEntity> implements OnInit {
     if (this.delete == null) throw new Error('Delete callback not provided');
     if (this.header == null) throw new Error('Missing *appAccordionListHeader');
     if (this.content == null) throw new Error('Missing *appAccordionListContent');
+  }
+
+  findIndex(form: AccordionListFormDirective<T>) {
+    let foundIndex = -1;
+    this.expansionPanelElements.forEach((item, index) => {
+      if (foundIndex != -1) return;
+      if (form.hasAsParent(item.nativeElement)) {
+        foundIndex = index;
+      }
+    });
+    return foundIndex - 1;
+  }
+
+  addForm(form: AccordionListFormDirective<T>) {
+    this.forms = [...this.forms, form];
+  }
+
+  removeForm(form: AccordionListFormDirective<T>) {
+    this.forms = [...this.forms.filter(value => value == form)];
+  }
+
+  findForm(index: number) {
+    for (let form of this.forms) {
+      if (form.getContext().index == index) return form;
+    }
+    return null;
+  }
+
+  matchesElement(element: HTMLElement) {
+    return this.element.nativeElement == element;
   }
 }
