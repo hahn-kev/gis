@@ -85,12 +85,13 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   }
 
   updateDaysUsed() {
-    if (this.leaveRequest.startDate && !this.leaveRequest.endDate) {
+    if ((this.leaveRequest.startDate && !this.leaveRequest.endDate) || this.leaveRequestService.isStartAfterEnd(this.leaveRequest)) {
       this.leaveRequest.endDate = this.leaveRequest.startDate;
     }
-    if (!this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
-      this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
-    }
+    if (this.leaveRequest)
+      if (!this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
+        this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
+      }
   }
 
   ngOnDestroy(): void {
@@ -100,43 +101,57 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   async submit(isDraft = false): Promise<void> {
     if (this.isReadonly) return;
     if (isDraft) this.formSubmitted = true;
-    if (this.isNew) {
-      let overUsingLeave = this.leaveRequestService.isOverUsingLeave(
-        this.leaveRequest,
-        this.selectedPerson.leaveUsages);
-      let doctorsNote = this.leaveRequest.type == LeaveType.Sick && (this.leaveRequest.days > 2);
-      if (overUsingLeave || doctorsNote) {
-
-        const result = await ConfirmDialogComponent.OpenWait(
-          this.dialog,
-          (overUsingLeave ? `This leave request is using more leave than you have\n` : '')
-          + (doctorsNote ? `You must email a doctors note to HR` : ''),
-          'Request Leave',
-          'Cancel');
-        if (!result) return;
-      }
+    if (this.isNew && !await this.promptNewRequest()) {
+      return;
     }
     if (!isDraft && this.sendNotification) {
-      const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
-      let message: string;
-      if (!notified) {
-        message = `Leave request ${this.isNew ? 'created' : 'updated'}, supervisor not found, no notification was sent`;
-      } else {
-        message = `Leave request ${this.isNew ? 'created' : 'updated'}, notified ${notified.firstName} ${notified.lastName}`;
-      }
-      this.snackBar.open(message, 'Dismiss');
-      this.router.navigate([
-        'leave-request',
-        'list',
-        this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
-      ]);
+      await this.submitLeaveRequest();
     } else {
-      await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
-      let message = 'Leave updated, notification was not sent of changes';
-      if (isDraft) message = 'Leave Request draft saved';
-      this.snackBar.open(message, null, {duration: 2000});
-      this.location.back();
+      await this.saveRequest(isDraft);
     }
+  }
+
+  private async promptNewRequest() {
+    let overUsingLeave = this.leaveRequestService.isOverUsingLeave(
+      this.leaveRequest,
+      this.selectedPerson.leaveUsages);
+    let doctorsNote = this.leaveRequest.type == LeaveType.Sick && (this.leaveRequest.days > 2);
+    if (overUsingLeave || doctorsNote) {
+
+      return await ConfirmDialogComponent.OpenWait(
+        this.dialog,
+        (overUsingLeave ? `This leave request is using more leave than you have\n` : '')
+        + (doctorsNote ? `You must email a doctors note to HR` : ''),
+        'Request Leave',
+        'Cancel');
+    }
+    return true;
+  }
+
+  private async submitLeaveRequest() {
+    const notified = await this.leaveRequestService.requestLeave(this.leaveRequest);
+    let message: string;
+    if (!notified) {
+      message = `Leave request ${this.isNew ? 'created' : 'updated'}, supervisor not found, no notification was sent`;
+    } else {
+      message = `Leave request ${this.isNew ?
+        'created' :
+        'updated'}, notified ${notified.firstName} ${notified.lastName}`;
+    }
+    this.snackBar.open(message, 'Dismiss');
+    this.router.navigate([
+      'leave-request',
+      'list',
+      this.myPersonId === this.leaveRequest.personId ? 'mine' : this.leaveRequest.personId
+    ]);
+  }
+
+  private async saveRequest(isDraft: boolean) {
+    await this.leaveRequestService.updateLeave(this.leaveRequest).toPromise();
+    let message = 'Leave updated, notification was not sent of changes';
+    if (isDraft) message = 'Leave Request draft saved';
+    this.snackBar.open(message, null, {duration: 2000});
+    this.location.back();
   }
 
   promptSendNotification() {

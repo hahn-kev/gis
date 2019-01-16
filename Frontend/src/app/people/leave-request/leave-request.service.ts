@@ -80,4 +80,8 @@ export class LeaveRequestService {
     const momentTwo = moment(dayTwo).startOf('day').add(1, 'd');
     return buisness.weekDays(moment(dayOne).startOf('day'), momentTwo);
   }
+
+  isStartAfterEnd(leaveRequest: LeaveRequest) {
+    return moment(leaveRequest.startDate).isAfter(leaveRequest.endDate, 'D');
+  }
 }

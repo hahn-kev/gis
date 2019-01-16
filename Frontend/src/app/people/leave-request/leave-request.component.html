@@ -35,7 +35,6 @@
         <input name="startDate" required matInput
                [(ngModel)]="leaveRequest.startDate"
                (ngModelChange)="updateDaysUsed()"
-               [max]="leaveRequest.endDate"
                [disabled]="(leaveRequest.overrideDays && !isHr) || isReadonly"
                [matDatepicker]="startDatePicker"
                placeholder="Start Date">
