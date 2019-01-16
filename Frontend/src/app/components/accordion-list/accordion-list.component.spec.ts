@@ -75,7 +75,7 @@ class HostComponentSimple<T> extends BaseHostComponent<T> {}
 class HostComponentForm<T> extends BaseHostComponent<T> {}
 
 
-fdescribe('AccordionListComponent', () => {
+describe('AccordionListComponent', () => {
   let hostComponent: BaseHostComponent<BaseEntity>;
   let fixture: ComponentFixture<BaseHostComponent<BaseEntity>>;
   let saveSpy: Spy;
