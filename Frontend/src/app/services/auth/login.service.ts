@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { JwtHelperService } from './jwt-helper.service';
 import { filter, map } from 'rxjs/operators';
 import * as Raven from 'raven-js';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { UserToken } from '../../login/user-token';
 
 @Injectable()
@@ -22,8 +22,8 @@ export class LoginService implements CanActivate {
       if (user) {
         Raven.setUserContext({username: user.userName});
         let email = user.email;
-        if (email) {
-          this.cookieService.put('.Sub', email);
+        if (email && user.oauth) {
+          this.cookieService.set('.Sub', email);
         }
       } else {
         Raven.setUserContext();

@@ -50,7 +50,7 @@ import { MyErrorHandlerService } from './services/my-error-handler.service';
 import { configureSettings, SettingsService } from './services/settings.service';
 import { ConfirmDialogComponent } from './dialog/confirm-dialog/confirm-dialog.component';
 import { MessageComponent } from './message/message.component';
-import { CookieModule } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';
 import { RequireRoleDirective } from './directives/require-role.directive';
 import { AuthenciateInterceptorService } from './services/auth/authenciate-interceptor.service';
 import { LoginService } from 'app/services/auth/login.service';
@@ -251,7 +251,6 @@ if (environment.production) {
     MatBadgeModule,
     FormsModule,
     AppRoutingModule,
-    CookieModule.forRoot(),
     GoogleApiModule.forRoot({
       provide: NG_GAPI_CONFIG,
       deps: [SettingsService],
@@ -305,7 +304,8 @@ if (environment.production) {
       useClass: PathLocationStrategy
     },
     EvaluationService,
-    PolicyGuard
+    PolicyGuard,
+    CookieService
   ],
   bootstrap: [AppComponent]
 })
