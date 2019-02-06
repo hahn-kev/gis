@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Authentication;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers
 {
@@ -120,14 +116,15 @@ namespace Backend.Controllers
 
         [HttpGet("approve/{leaveRequestId}")]
         [Authorize("isSupervisor")]
-        public IActionResult Approve(Guid leaveRequestId)
+        public async Task<IActionResult> Approve(Guid leaveRequestId)
         {
             var personId = User.PersonId();
             if (personId == null)
                 throw new UnauthorizedAccessException(
                     "Logged in user must be connected to a person, talk to HR about this issue");
-            _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
-            return this.ShowFrontendMessage("Leave request approved");
+            var (_, notified) = await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
+            return this.ShowFrontendMessage(
+                $"Leave request approved{Environment.NewLine}{notified.PreferredName ?? notified.FirstName} has been notified");
         }
 
 

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Backend.Entities;
+using System.Text.RegularExpressions;
 
 namespace Backend.Utils
 {
     public static class Utils
     {
-        /// <inheritdoc cref="BusinessDaysUntil(System.DateTime,System.DateTime,IEnumerable{System.DateTime})"/>
+        /// <inheritdoc cref="BusinessDaysUntil(System.DateTime,System.DateTime,System.Collections.Generic.IEnumerable{System.DateTime})"/>
         public static int BusinessDaysUntil(this DateTime firstDay, DateTime lastDay)
         {
             return BusinessDaysUntil(firstDay, lastDay, Enumerable.Empty<DateTime>());
@@ -67,14 +66,9 @@ namespace Backend.Utils
             return businessDays;
         }
 
-        public static IList<T> ForEach<T>(this IList<T> list, Action<T> action)
+        public static string SplitCamelCase(this string value)
         {
-            foreach (var v in list)
-            {
-                action(v);
-            }
-
-            return list;
+            return Regex.Replace(value, @"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", " $1");
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Backend.DataLayer;
 using LinqToDB.Configuration;
 
 namespace Backend
@@ -74,5 +73,6 @@ namespace Backend
         public string NotifyLeaveRequest { get; set; }
         public string RequestLeaveApproval { get; set; }
         public string NotifyHrLeaveRequest { get; set; }
+        public string NotifyLeaveApproved { get; set; }
     }
 }

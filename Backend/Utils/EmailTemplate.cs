@@ -23,6 +23,7 @@ namespace Backend.Utils
         public static EmailTemplate NotifyLeaveRequest => new EmailTemplate(_ => _.NotifyLeaveRequest);
         public static EmailTemplate RequestLeaveApproval => new EmailTemplate(_ => _.RequestLeaveApproval);
         public static EmailTemplate NotifyHrLeaveRequest => new EmailTemplate(_ => _.NotifyHrLeaveRequest);
+        public static EmailTemplate NotifyLeaveApproved => new EmailTemplate(_ => _.NotifyLeaveApproved);
 
         public bool Equals(EmailTemplate other)
         {

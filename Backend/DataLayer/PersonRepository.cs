@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Backend.Entities;
 using LinqToDB;
+using LinqToDB.Tools;
 
 namespace Backend.DataLayer
 {
@@ -32,6 +32,11 @@ namespace Backend.DataLayer
                 .ThenBy(person => person.LastName);
 
         public IQueryable<PersonWithStaff> PeopleWithStaff => PeopleGeneric<PersonWithStaff>();
+
+        public Dictionary<Guid, PersonWithStaff> FindByIds(IEnumerable<Guid> guids)
+        {
+            return PeopleWithStaff.Where(p => p.Id.In(guids)).ToDictionary(p => p.Id);
+        }
 
         public IQueryable<PersonWithStaffSummaries> PeopleWithStaffSummaries
         {
@@ -90,45 +95,45 @@ namespace Backend.DataLayer
 
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             from person in _dbConnection.PeopleExtended
-                from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
-                    .DefaultIfEmpty()
-                where !person.Deleted
-                select new TPerson
-                {
-                    Id = person.Id,
-                    Email = person.Email,
-                    FirstName = person.FirstName,
-                    IsThai = person.IsThai,
-                    IsSchoolAid = person.IsSchoolAid,
-                    IsAlumni = person.IsAlumni,
-                    IsParent = person.IsParent,
-                    LastName = person.LastName,
-                    ThaiFirstName = person.ThaiFirstName,
-                    ThaiLastName = person.ThaiLastName,
-                    PreferredName = person.PreferredName,
-                    SpeaksEnglish = person.SpeaksEnglish,
-                    Staff = staff,
-                    StaffId = person.StaffId,
-                    DonorId = person.DonorId,
-                    PhoneNumber = person.PhoneNumber,
-                    SpouseId = person.SpouseId,
-                    Birthdate = person.Birthdate,
-                    Gender = person.Gender,
-                    PassportAddress = person.PassportAddress,
-                    PassportCity = person.PassportCity,
-                    PassportCountry = person.PassportCountry,
-                    PassportState = person.PassportState,
-                    PassportZip = person.PassportZip,
-                    ThaiAddress = person.ThaiAddress,
-                    ThaiAmphur = person.ThaiAmphur,
-                    ThaiMubaan = person.ThaiMubaan,
-                    ThaiProvince = person.ThaiProvince,
-                    ThaiSoi = person.ThaiSoi,
-                    ThaiTambon = person.ThaiTambon,
-                    ThaiZip = person.ThaiZip,
-                    ProfilePicDriveId = person.ProfilePicDriveId,
-                    Deleted = person.Deleted,
-                };
+            from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
+                .DefaultIfEmpty()
+            where !person.Deleted
+            select new TPerson
+            {
+                Id = person.Id,
+                Email = person.Email,
+                FirstName = person.FirstName,
+                IsThai = person.IsThai,
+                IsSchoolAid = person.IsSchoolAid,
+                IsAlumni = person.IsAlumni,
+                IsParent = person.IsParent,
+                LastName = person.LastName,
+                ThaiFirstName = person.ThaiFirstName,
+                ThaiLastName = person.ThaiLastName,
+                PreferredName = person.PreferredName,
+                SpeaksEnglish = person.SpeaksEnglish,
+                Staff = staff,
+                StaffId = person.StaffId,
+                DonorId = person.DonorId,
+                PhoneNumber = person.PhoneNumber,
+                SpouseId = person.SpouseId,
+                Birthdate = person.Birthdate,
+                Gender = person.Gender,
+                PassportAddress = person.PassportAddress,
+                PassportCity = person.PassportCity,
+                PassportCountry = person.PassportCountry,
+                PassportState = person.PassportState,
+                PassportZip = person.PassportZip,
+                ThaiAddress = person.ThaiAddress,
+                ThaiAmphur = person.ThaiAmphur,
+                ThaiMubaan = person.ThaiMubaan,
+                ThaiProvince = person.ThaiProvince,
+                ThaiSoi = person.ThaiSoi,
+                ThaiTambon = person.ThaiTambon,
+                ThaiZip = person.ThaiZip,
+                ProfilePicDriveId = person.ProfilePicDriveId,
+                Deleted = person.Deleted,
+            };
 
         private IQueryable<JobWithOrgGroup> JobsWithOrgGroup =>
             from job in _dbConnection.Job

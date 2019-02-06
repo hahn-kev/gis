@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +7,8 @@ using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
-using Bogus.DataSets;
 using LinqToDB;
 using LinqToDB.Data;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using SendGrid.Helpers.Mail;
 using Shouldly;
@@ -232,7 +227,7 @@ namespace UnitTestProject
             _sf.InsertRole(job.Id, personWithStaff.Id, totalYears);
             //insert used leave
             _sf.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
-            var actualEmailed = _leaveService.ShouldNotifyHr(request,
+            var actualEmailed = LeaveRequestEmailService.ShouldNotifyHr(request,
                 _leaveService.GetCurrentLeaveUseage(request.Type, personWithStaff.Id));
             Assert.Equal(expectedEmailed, actualEmailed);
         }
@@ -330,8 +325,9 @@ namespace UnitTestProject
                     person2Id,
                     true,
                     2);
-                
-                yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver", new LeaveRequest {PersonId = person1Id},
+
+                yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver",
+                    new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {

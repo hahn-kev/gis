@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Backend.Entities;
 using Backend.Utils;
-using LinqToDB.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
@@ -17,15 +14,13 @@ namespace Backend.Services
 {
     public interface IEmailService
     {
-        Task<MailgunReponse> SendEmail(string to, string subject, string body);
-
-        Task SendTemplateEmail(Dictionary<string, string> substituions,
+        Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             PersonWithStaff from,
             PersonWithStaff to);
 
-        Task SendTemplateEmail(Dictionary<string, string> substituions,
+        Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             PersonWithStaff from,
@@ -36,10 +31,10 @@ namespace Backend.Services
 
     public class EmailService : IEmailService
     {
-//        private static readonly IMailGunApi MailGunApi = RestClient.For<IMailGunApi>("https://api.mailgun.net/v3");
         private readonly SendGridClient _sendGridClient;
-        private readonly string _domain;
         private readonly TemplateSettings _templateSettings;
+
+        // ReSharper disable once NotAccessedField.Local
         private readonly ILogger<EmailService> _logger;
 
         public EmailService(IOptions<Settings> options,
@@ -47,32 +42,17 @@ namespace Backend.Services
             ILogger<EmailService> logger)
         {
             _logger = logger;
-//            var apiKey = options.Value.MailgunApiKey;
-//            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException("MailgunApiKey setting can not be null");
-//            var value = Convert.ToBase64String(Encoding.ASCII.GetBytes("api:" + apiKey));
-//            MailGunApi.Authorization = new AuthenticationHeaderValue("Basic", value);
-//            _domain = options.Value.MailgunDomain;
-//            if (string.IsNullOrEmpty(_domain))
-//                throw new NullReferenceException("MailgunDomain setting can not be null");
             _sendGridClient = new SendGridClient(options.Value.SendGridAPIKey);
             _templateSettings = templateSettings.Value;
         }
 
-        public async Task<MailgunReponse> SendEmail(string to, string subject, string body)
-        {
-            throw new NotImplementedException("mailgun email isn't implemented yet");
-//            var mailgunReponse =
-//                await MailGunApi.SendEmail(_domain, "GIS GIS@" + _domain, to, subject, body);
-//            return mailgunReponse;
-        }
-
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             PersonWithStaff @from,
             PersonWithStaff to)
         {
-            return SendTemplateEmail(substituions,
+            return SendTemplateEmail(substitutions,
                 subject,
                 emailTemplate,
                 from.Staff.Email,
@@ -81,13 +61,13 @@ namespace Backend.Services
                 to.PreferredName);
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             PersonWithStaff @from,
             IEnumerable<PersonWithStaff> tos)
         {
-            return SendTemplateEmail(substituions,
+            return SendTemplateEmail(substitutions,
                 subject,
                 emailTemplate,
                 from.Staff.Email,
@@ -95,13 +75,13 @@ namespace Backend.Services
                 tos.Select(person => new EmailAddress(person.Staff.Email, person.PreferredName)).ToList());
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             PersonExtended from,
             PersonExtended to)
         {
-            return SendTemplateEmail(substituions,
+            return SendTemplateEmail(substitutions,
                 subject,
                 emailTemplate,
                 from.Email,
@@ -110,7 +90,7 @@ namespace Backend.Services
                 to.PreferredName);
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             string fromEmail,
@@ -120,7 +100,7 @@ namespace Backend.Services
         {
             if (toEmail == null)
                 throw new ArgumentNullException(nameof(toEmail), $"{toName} does not have an email assigned");
-            return SendTemplateEmail(substituions,
+            return SendTemplateEmail(substitutions,
                 subject,
                 emailTemplate,
                 fromEmail,
@@ -128,7 +108,7 @@ namespace Backend.Services
                 new List<EmailAddress> {new EmailAddress(toEmail, toName)});
         }
 
-        public virtual Task SendTemplateEmail(Dictionary<string, string> substituions,
+        public virtual Task SendTemplateEmail(Dictionary<string, string> substitutions,
             string subject,
             EmailTemplate emailTemplate,
             string fromEmail,
@@ -151,7 +131,7 @@ namespace Backend.Services
                     new Personalization
                     {
                         Tos = tos,
-                        Substitutions = substituions
+                        TemplateData = substitutions
                     }
                 },
                 From = new EmailAddress(fromEmail, fromName),
@@ -165,7 +145,8 @@ namespace Backend.Services
         public virtual async Task SendEmail(SendGridMessage message)
         {
 #if DEBUG
-            var to =string.Join(", ", message.Personalizations.Select(personalization => string.Join(", ", personalization.Tos.Select(address => $"{address.Name}:{address.Email}"))));
+            var to =
+ string.Join(", ", message.Personalizations.Select(personalization => string.Join(", ", personalization.Tos.Select(address => $"{address.Name}:{address.Email}"))));
             _logger.LogDebug("email not sent to: [{0}], subject: {1}, because of debugging", to, message.Subject);
             return;
 #endif
@@ -176,20 +157,5 @@ namespace Backend.Services
                 throw new Exception("send grid error: " + Environment.NewLine + body);
             }
         }
-    }
-
-    public interface IMailGunApi
-    {
-//        [Header("Authorization")] 
-        AuthenticationHeaderValue Authorization { get; set; }
-
-//        [Post("{domain}/messages")]
-//        Task<MailgunReponse> SendEmail([Path] string domain, string from, string to, string subject, string text);
-    }
-
-    public class MailgunReponse
-    {
-        public string Message;
-        public string Id;
     }
 }
