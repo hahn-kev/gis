@@ -210,16 +210,18 @@ namespace Backend.Services
                 .Where(request => request.PersonId == personId).ToList();
             return new LeaveDetails
             {
-                LeaveUsages = CalculateLeaveDetails(personRoles, leaveRequests)
+                LeaveUsages = CalculateLeaveDetails(personRoles, leaveRequests, schoolYear)
             };
         }
 
         private List<LeaveUsage> CalculateLeaveDetails(IEnumerable<PersonRoleWithJob> personRoles,
-            IEnumerable<LeaveRequest> leaveRequests)
+            IEnumerable<LeaveRequest> leaveRequests,
+            int schoolYear)
         {
             var leaveTypes = Enum.GetValues(typeof(LeaveType)).Cast<LeaveType>();
-            //we do this here so we can make personRoles enumerable
-            var vacationAllowed = LeaveAllowed(LeaveType.Vacation, personRoles);
+            var vacationAllowed = LeaveAllowed(LeaveType.Vacation, personRoles, schoolYear);
+            //we do this whole group join thing so that we get a result for each leave type
+            //even if there's no requests for them
             return leaveTypes.GroupJoin(leaveRequests,
                 type => type,
                 request => request.Type,
@@ -229,7 +231,7 @@ namespace Backend.Services
                     Used = TotalLeaveUsed(requests),
                     TotalAllowed = type == LeaveType.Vacation
                         ? vacationAllowed
-                        : LeaveAllowed(type, Enumerable.Empty<PersonRoleWithJob>())
+                        : LeaveAllowed(type, Enumerable.Empty<PersonRoleWithJob>(), schoolYear)
                 }
             ).ToList();
         }
@@ -265,12 +267,18 @@ namespace Backend.Services
 
         public int LeaveAllowed(LeaveType leaveType, Guid personId)
         {
-            if (leaveType != LeaveType.Vacation) return LeaveAllowed(leaveType, Enumerable.Empty<PersonRoleWithJob>());
-            //fetch personRoles
-            return LeaveAllowed(leaveType, _personRepository.GetPersonRolesWithJob(personId));
+            return LeaveAllowed(leaveType, personId, DateTime.Now.SchoolYear());
         }
 
-        public static int LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles)
+        public int LeaveAllowed(LeaveType leaveType, Guid personId, int schoolYear)
+        {
+            if (leaveType != LeaveType.Vacation)
+                return LeaveAllowed(leaveType, Enumerable.Empty<PersonRoleWithJob>(), schoolYear);
+            //fetch personRoles
+            return LeaveAllowed(leaveType, _personRepository.GetPersonRolesWithJob(personId), schoolYear);
+        }
+
+        public static int LeaveAllowed(LeaveType leaveType, IEnumerable<PersonRoleWithJob> personRoles, int schoolYear)
         {
             switch (leaveType)
             {
@@ -288,10 +296,11 @@ namespace Backend.Services
             var jobStatusWithLeave = new[] {JobStatus.FullTime, JobStatus.HalfTime, JobStatus.FullTime10Mo};
             foreach (var role in personRoles)
             {
+                if (role.Job.Status == JobStatus.FullTime10Mo && role.ActiveDuringYear(schoolYear)) return 0;
                 if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
                     role.Active) return 20;
                 if (role.Job.Status.HasValue && jobStatusWithLeave.Contains(role.Job.Status.Value))
-                    totalServiceTime = totalServiceTime + role.LengthOfService();
+                    totalServiceTime = totalServiceTime + role.LengthOfService(schoolYear);
             }
 
             //no time has been spent as staff or a director, therefore no vacation time is allowed
@@ -351,7 +360,7 @@ namespace Backend.Services
             return peopleQueryable.Select(person => new PersonAndLeaveDetails
             {
                 Person = person,
-                LeaveUsages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id])
+                LeaveUsages = CalculateLeaveDetails(personRoles[person.Id], leaveRequests[person.Id], schoolYear)
             }).ToList();
         }
 

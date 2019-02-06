@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
@@ -147,16 +146,16 @@ namespace UnitTestProject
                 };
             }
 
-            IEnumerable<(int?, IList<PersonRoleWithJob> )> MakeValues()
+            IEnumerable<(int?, PersonRoleWithJob[])> MakeValues()
             {
-                var twoYearsAgo = DateTime.Now - TimeSpan.FromDays(2 * 366);
+                var twoYearsAgo = new DateTime(2018, 2, 22) - TimeSpan.FromDays(2 * 366);
                 yield return (10,
-                    new List<PersonRoleWithJob>
+                    new[]
                     {
                         Role(startDate: twoYearsAgo)
                     });
                 yield return (10,
-                    new List<PersonRoleWithJob>
+                    new[]
                     {
                         Role(startDate: twoYearsAgo),
                         //director position doesn't count to the 20 days because it's not active
@@ -165,35 +164,47 @@ namespace UnitTestProject
                             new DateTime(2002, 1, 1),
                             supervisorId: personId)
                     });
-                yield return (20, new List<PersonRoleWithJob>
+                yield return (20, new[]
                 {
                     Role(startDate: twoYearsAgo, supervisorId: personId)
                 });
                 //don't get extra leave if supervisor isn't me
-                yield return (10, new List<PersonRoleWithJob>
+                yield return (10, new[]
                 {
                     Role(startDate: twoYearsAgo, supervisorId: Guid.NewGuid())
                 });
-                yield return (15, new List<PersonRoleWithJob>
+                yield return (15, new[]
                 {
                     Role(startDate: twoYearsAgo),
                     Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1)),
                     Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1))
                 });
-                yield return (20, new List<PersonRoleWithJob>
+                yield return (20, new[]
                 {
                     Role(startDate: twoYearsAgo),
                     Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1)),
                     Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1)),
                     Role(false, new DateTime(1995, 1, 1), new DateTime(2000, 1, 1)),
                 });
-                yield return (0, new List<PersonRoleWithJob>());
+                yield return (0, new PersonRoleWithJob[0]);
                 //non fulltime/half don't get leave
-                yield return (0, new List<PersonRoleWithJob>
+                yield return (0, new[]
                 {
                     Role(startDate: twoYearsAgo, jobType: JobStatus.Contractor),
                     Role(startDate: twoYearsAgo, jobType: JobStatus.DailyWorker),
                     Role(startDate: twoYearsAgo, jobType: JobStatus.SchoolAid)
+                });
+
+                //10 month jobs don't get leave now
+                yield return (0, new[]
+                {
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.FullTime10Mo)
+                });
+                //10 month jobs do count for leave time if you're not in a 10 month job now
+                yield return (15, new[]
+                {
+                    Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1), JobStatus.FullTime10Mo),
+                    Role(startDate: twoYearsAgo)
                 });
             }
 
@@ -202,9 +213,10 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(RolesMemberData))]
-        public void ShouldCalculateLeaveAllowed(int expected, IList<PersonRoleWithJob> personRoles)
+        public void ShouldCalculateLeaveAllowed(int expected, PersonRoleWithJob[] personRoles)
         {
-            var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles);
+            var result =
+                LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles, new DateTime(2018, 2, 21).SchoolYear());
             Assert.Equal(expected, result);
         }
 

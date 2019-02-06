@@ -47,6 +47,11 @@ namespace Backend.DataLayer
             return date.Month >= SchoolStartMonth ? date.Year : date.Year - 1;
         }
 
+        public static DateTime EndOfSchoolYear(this int schoolYear)
+        {
+            return new DateTime(schoolYear + 1, SchoolEndMonth, 30);
+        }
+
         /// <summary>
         /// this checks to see if the given date is in the school year and school month
         /// after it's been divided up into blocks defined by the month range

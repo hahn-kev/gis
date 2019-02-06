@@ -1,8 +1,5 @@
 ﻿using System;
-using LinqToDB;
-using LinqToDB.Mapping;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Backend.DataLayer;
 
 namespace Backend.Entities
 {
@@ -15,14 +12,20 @@ namespace Backend.Entities
         public bool Active { get; set; }
         public string Notes { get; set; }
 
-        public TimeSpan LengthOfService()
+        public TimeSpan LengthOfService(int schoolYear)
         {
             return (Active
-                       ? DateTime.Now
+                       ? schoolYear.EndOfSchoolYear()
                        : EndDate ??
                          throw new NullReferenceException(
                              "End date null for inactive role"))
                    - StartDate;
+        }
+
+        public bool ActiveDuringYear(int schoolYear)
+        {
+            return StartDate.SchoolYear() <= schoolYear &&
+                   (Active || (EndDate.HasValue && EndDate.Value.SchoolYear() >= schoolYear));
         }
     }
 
