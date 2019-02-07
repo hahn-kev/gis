@@ -708,6 +708,24 @@ namespace UnitTestProject
             notifyEmails.ShouldBe(notified);
         }
 
+        [Fact]
+        public async Task ApprovalWorksForStaffWithoutEmail()
+        {
+            var setup = _sf.SetupLeaveRequest(p => { p.Staff.Email = null; });
+            var result = await _leaveService.ApproveLeaveRequest(setup.request.Id, setup.supervisor.Id);
+            result.notified.ShouldBeFalse();
+            result.requester.Id.ShouldBe(setup.requester.Id);
+        }
+
+        [Fact]
+        public async Task ApprovalWorksForStaffEmail()
+        {
+            var setup = _sf.SetupLeaveRequest(p => { p.Staff.Email = "some test email"; });
+            var result = await _leaveService.ApproveLeaveRequest(setup.request.Id, setup.supervisor.Id);
+            result.notified.ShouldBeTrue();
+            result.requester.Id.ShouldBe(setup.requester.Id);
+        }
+
         public void Dispose()
         {
             _transaction?.Dispose();
