@@ -25,7 +25,6 @@ import {RoleGuardService} from 'app/services/auth/role-guard.service';
 import * as Raven from 'raven-js';
 import {PersonService} from './people/person.service';
 import {environment} from '../environments/environment';
-import {RolesReportComponent} from './people/roles-report/roles-report.component';
 import {OrgGroupListComponent} from './people/groups/org-group-list/org-group-list.component';
 import {GroupService} from './people/groups/group.service';
 import {GroupComponent} from './people/groups/group/group.component';
@@ -44,14 +43,10 @@ import {GoogleApiModule, NG_GAPI_CONFIG} from 'ng-gapi';
 import {DrivePickerService} from './google-picker/drive-picker.service';
 import {AttachmentsComponent} from './attachments/attachments.component';
 import {AttachmentService} from './attachments/attachment.service';
-import {JobListComponent} from './job/list/job-list.component';
-import {JobComponent} from './job/job/job.component';
 import {JobService} from './job/job.service';
 import {MissionOrgListComponent} from './mission-org/list/mission-org-list.component';
 import {MissionOrgComponent} from './mission-org/edit/mission-org.component';
 import {MissionOrgService} from './mission-org/mission-org.service';
-import {GradeListComponent} from './job/grade/list/grade-list.component';
-import {GradeComponent} from './job/grade/edit/grade.component';
 import {GradeService} from './job/grade/grade.service';
 import {MyDatePipe} from './services/my-date.pipe';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
@@ -84,7 +79,6 @@ if (environment.production) {
     RequireRoleDirective,
     ConfirmDialogComponent,
     MessageComponent,
-    RolesReportComponent,
     OrgGroupListComponent,
     GroupComponent,
     LeaveRequestComponent,
@@ -96,12 +90,8 @@ if (environment.production) {
     LeaveReportComponent,
     GooglePickerComponent,
     AttachmentsComponent,
-    JobListComponent,
-    JobComponent,
     MissionOrgListComponent,
     MissionOrgComponent,
-    GradeListComponent,
-    GradeComponent,
     MyDatePipe,
     SandboxComponent,
     RenderTemplateBottomSheetComponent,

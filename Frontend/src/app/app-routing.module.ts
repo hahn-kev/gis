@@ -11,7 +11,6 @@ import {IsSelfResolverService} from './user/is-self-resolver.service';
 import {LoginService} from './services/auth/login.service';
 import {PersonResolverService} from './people/person-resolver.service';
 import {PeopleResolveService} from './people/list/people-resolve.service';
-import {RolesReportComponent} from './people/roles-report/roles-report.component';
 import {RolesResolverService} from './people/roles-report/roles-resolver.service';
 import {GroupComponent} from './people/groups/group/group.component';
 import {GroupResolveService} from './people/groups/group/group-resolve.service';
@@ -31,19 +30,10 @@ import {LeaveRequestResolverService} from './people/leave-request/leave-request-
 import {EmergencyContactResolverService} from './people/emergency-contact-resolver.service';
 import {PeopleWithLeaveResolverService} from './people/leave-request/people-with-leave-resolver.service';
 import {LeaveReportComponent} from './people/leave-request/leave-report/leave-report.component';
-import {JobResolverService} from './job/job-resolver.service';
-import {JobListComponent} from './job/list/job-list.component';
-import {JobComponent} from './job/job/job.component';
-import {JobListResolverService} from './job/job-list-resolver.service';
 import {MissionOrgListComponent} from './mission-org/list/mission-org-list.component';
 import {MissionOrgResolverService} from './mission-org/edit/mission-org-resolver.service';
 import {MissionOrgListResolverService} from './mission-org/list/mission-org-list-resolver.service';
 import {MissionOrgComponent} from './mission-org/edit/mission-org.component';
-import {GradeListComponent} from './job/grade/list/grade-list.component';
-import {GradeListResolverService} from './job/grade/grade-list-resolver.service';
-import {GradeResolverService} from './job/grade/grade-resolver.service';
-import {GradeComponent} from 'app/job/grade/edit/grade.component';
-import {JobFilledListResolverService} from './job/list/job-filled-list-resolver.service';
 import {CanDeactivateGuard} from './services/can-deactivate.guard';
 import {SandboxComponent} from './components/sandbox/sandbox.component';
 import {SchoolAidResolveService} from './people/list/school-aid-resolve.service';
@@ -94,68 +84,7 @@ const routes: Routes = [
       },
       {
         path: 'job',
-        canActivate: [PolicyGuard],
-        data: {
-          requirePolicy: 'hrEdit'
-        },
-        children: [
-          {
-            path: 'list',
-            component: JobListComponent,
-            resolve: {
-              jobs: JobFilledListResolverService
-            }
-          },
-          {
-            path: 'edit/:id',
-            component: JobComponent,
-            canDeactivate: [CanDeactivateGuard],
-            resolve: {
-              job: JobResolverService,
-              groups: GroupsResolveService,
-              grades: GradeListResolverService
-            }
-          },
-          {
-            path: 'report',
-            children: [
-              {
-                path: 'roles/:year',
-                component: RolesReportComponent,
-                resolve: {
-                  roles: RolesResolverService
-                }
-              },
-              {
-                path: 'roles',
-                component: RolesReportComponent,
-                resolve: {
-                  roles: RolesResolverService
-                }
-              }
-            ]
-          },
-          {
-            path: 'grade',
-            children: [
-              {
-                path: 'list',
-                component: GradeListComponent,
-                resolve: {
-                  grades: GradeListResolverService
-                }
-              },
-              {
-                path: 'edit/:id',
-                component: GradeComponent,
-                canDeactivate: [CanDeactivateGuard],
-                resolve: {
-                  grade: GradeResolverService
-                }
-              }
-            ]
-          }
-        ]
+        loadChildren: './job/job.module#JobModule'
       },
       {
         path: 'groups',
@@ -540,13 +469,8 @@ const routes: Routes = [
     LeaveRequestResolverService,
     EmergencyContactResolverService,
     PeopleWithLeaveResolverService,
-    JobResolverService,
-    JobListResolverService,
     MissionOrgResolverService,
     MissionOrgListResolverService,
-    GradeResolverService,
-    GradeListResolverService,
-    JobFilledListResolverService,
     CanDeactivateGuard,
     SchoolAidResolveService,
     StaffSummariesResolveService,
