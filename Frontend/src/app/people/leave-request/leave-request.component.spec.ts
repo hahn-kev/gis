@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 
 import { Location } from '@angular/common';
 import { LeaveRequestComponent } from './leave-request.component';
@@ -6,6 +6,7 @@ import {
   MatCardModule,
   MatChipsModule,
   MatDatepickerModule,
+  MatDialog,
   MatInputModule,
   MatSelectModule,
   MatSlideToggleModule,
@@ -23,6 +24,8 @@ import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { LeaveRequestWithNames } from './leave-request';
 import { UserToken } from '../../login/user-token';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
+import SpyObj = jasmine.SpyObj;
 
 @Directive({
   selector: '[appTemplateContent]'
@@ -32,9 +35,10 @@ class MockAppTemplateContentDirective {
   @Input('appTemplateContent') appTemplateContent: string;
 }
 
-describe('LeaveRequestComponent', () => {
+fdescribe('LeaveRequestComponent', () => {
   let component: LeaveRequestComponent;
   let fixture: ComponentFixture<LeaveRequestComponent>;
+  let dialogSpy: SpyObj<MatDialog>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -59,6 +63,7 @@ describe('LeaveRequestComponent', () => {
             queryParams: [{noNotification: false}]
           }
         },
+        {provide: MatDialog, useValue: jasmine.createSpyObj(['open'])},
         {provide: Router, useValue: {}},
         {provide: LeaveRequestService, useValue: new LeaveRequestService(null)},
         {provide: MatSnackBar, useValue: {}},
@@ -74,13 +79,41 @@ describe('LeaveRequestComponent', () => {
       .compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(async () => {
     fixture = TestBed.createComponent(LeaveRequestComponent);
     component = fixture.componentInstance;
+    dialogSpy = TestBed.get(MatDialog);
+    dialogSpy.open.and.callFake(() => {
+      return {afterClosed: () => of(true)};
+    });
     fixture.detectChanges();
-  });
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }));
+
+  function confirmDialogOpened(messageContains: string) {
+    expect(dialogSpy.open).toHaveBeenCalledTimes(1);
+    let callInfo = dialogSpy.open.calls.first();
+    expect(callInfo.args[1].data.title).toContain(messageContains);
+    dialogSpy.open.calls.reset();
+  }
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('confirm dialogs', () => {
+
+    it('should confirm send email dialogs', () => {
+      component.leaveRequest.approved = true;
+      component.promptSendNotification();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
+
+      component.leaveRequest.approved = false;
+      component.promptSendNotification();
+      confirmDialogOpened('email?');
+    });
+
+
   });
 });
