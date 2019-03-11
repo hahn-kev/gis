@@ -3,7 +3,7 @@ import { MatSort } from '@angular/material';
 import { UrlBindingService } from '../../services/url-binding.service';
 import { ActivatedRoute } from '@angular/router';
 import { AppDataSource } from '../../classes/app-data-source';
-import { Person } from '../../people/person';
+import { Endorsement } from '../endorsement';
 
 @Component({
   selector: 'app-endorsement-list',
@@ -12,19 +12,19 @@ import { Person } from '../../people/person';
   providers: [UrlBindingService]
 })
 export class EndorsementListComponent implements OnInit {
-  public dataSource: AppDataSource<Person>;
+  public dataSource: AppDataSource<Endorsement>;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
   }
 
   ngOnInit(): void {
-    this.dataSource = new AppDataSource<Person>();
+    this.dataSource = new AppDataSource<Endorsement>();
     this.dataSource.bindToRouteData(this.route, 'endorsements');
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     this.dataSource.sort = this.sort;
     this.dataSource.filterPredicate = ((data, filter) =>
-      data.firstName.toUpperCase().startsWith(filter) || data.lastName.toUpperCase().startsWith(filter));
+      data.name.toUpperCase().includes(filter));
     this.urlBinding.loadFromParams();
   }
 
