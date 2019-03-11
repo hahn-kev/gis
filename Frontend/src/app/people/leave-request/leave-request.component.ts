@@ -13,6 +13,7 @@ import { PersonAndLeaveDetails } from './person-and-leave-details';
 import { LeaveType, LeaveUsage } from '../self/self';
 import { Gender } from '../person';
 import { BaseEditComponent } from '../../components/base-edit-component';
+import { Holiday } from './holiday';
 
 @Component({
   selector: 'app-leave-request',
@@ -30,6 +31,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public sendNotification = true;
   private myPersonId: string | null;
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
+  holidays: Holiday[];
 
   private subscription: Subscription;
 
@@ -71,6 +73,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           this.selectedPerson = person;
         }
       });
+      this.leaveRequestService.listHolidays().subscribe(holidays => this.holidays = holidays);
   }
 
   warnNoLeaveNotification(sendNotification = false) {
@@ -88,9 +91,8 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     if ((this.leaveRequest.startDate && !this.leaveRequest.endDate) || this.leaveRequestService.isStartAfterEnd(this.leaveRequest)) {
       this.leaveRequest.endDate = this.leaveRequest.startDate;
     }
-    if (this.leaveRequest)
-      if (!this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
-        this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest);
+    if (this.leaveRequest && !this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
+        this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest, this.holidays);
       }
   }
 
