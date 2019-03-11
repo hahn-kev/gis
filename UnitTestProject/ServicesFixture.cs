@@ -403,11 +403,13 @@ namespace UnitTestProject
 
         public OrgGroup InsertOrgGroup(Guid? parentId = null,
             Guid? supervisorId = null,
-            Action<OrgGroup> action = null)
+            Action<OrgGroup> action = null,
+            string name = null)
         {
             var orgGroup = AutoFaker.Generate<OrgGroup>();
             orgGroup.ParentId = parentId;
             orgGroup.Supervisor = supervisorId;
+            if (!string.IsNullOrEmpty(name)) orgGroup.GroupName = name;
             action?.Invoke(orgGroup);
             DbConnection.Insert(orgGroup);
             return orgGroup;

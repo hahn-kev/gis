@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LinqToDB;
 using LinqToDB.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -22,7 +21,7 @@ namespace Backend.Entities
         public bool IsSchoolAid { get; set; }
         public bool IsParent { get; set; }
         public bool IsAlumni { get; set; }
-        
+
         private string _preferredName;
 
         public string PreferredName
@@ -67,6 +66,12 @@ namespace Backend.Entities
         public string ThaiZip { get; set; }
 
         public string ProfilePicDriveId { get; set; }
+    }
+
+    [Table("Person", IsColumnAttributeRequired = false)]
+    public class PersonWithStaffBasic : PersonExtended
+    {
+        public Staff Staff { get; set; }
     }
 
     [Table("Person", IsColumnAttributeRequired = false)]

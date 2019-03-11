@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoBogus;
+using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
@@ -34,11 +34,11 @@ namespace UnitTestProject
             var orgRootId = Guid.NewGuid();
 
             org1Super = _sf.InsertPerson();
-            org1 = _sf.InsertOrgGroup(orgRootId, org1Super.Id);
+            org1 = _sf.InsertOrgGroup(orgRootId, org1Super.Id, name: "org1");
             org1aSuper = _sf.InsertPerson();
-            org1a = _sf.InsertOrgGroup(org1.Id, org1aSuper.Id);
+            org1a = _sf.InsertOrgGroup(org1.Id, org1aSuper.Id, name: "org1a");
 
-            orgRoot = _sf.InsertOrgGroup(action: group => group.Id = orgRootId);
+            orgRoot = _sf.InsertOrgGroup(action: group => group.Id = orgRootId, name: "orgRoot");
 
             org1Staff = _sf.InsertStaff(org1.Id);
             org1aStaff = _sf.InsertStaff(org1a.Id);
@@ -92,6 +92,12 @@ namespace UnitTestProject
         }
 
         [Fact]
+        public void ShouldFailIfMatchDoesntFail()
+        {
+            Assert.ThrowsAny<Exception>(() => { ShouldMatchOrder(new[] {"1", "2", "3"}, new[] {"1", "3", "2"}); });
+        }
+
+        [Fact]
         public void ShouldGetParentsOrdered()
         {
             var orgGroups = _groupRepository.GetWithParentsWhere(group => @group.Id == org1a.Id)
@@ -116,6 +122,14 @@ namespace UnitTestProject
                 org1.Id,
                 org1a.Id,
             });
+        }
+
+        [Fact]
+        public async Task ShouldShowPersonInGroup()
+        {
+            (await _groupService.IsPersonInGroup(org1aStaff.Id, org1.Id)).ShouldBeTrue();
+            var org2 = _sf.InsertOrgGroup(orgRoot.Id, name: "org2");
+            (await _groupService.IsPersonInGroup(org1aStaff.Id, org2.Id)).ShouldBeFalse();
         }
     }
 }

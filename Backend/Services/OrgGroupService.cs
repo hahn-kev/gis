@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
@@ -13,14 +14,17 @@ namespace Backend.Services
         private readonly OrgGroupRepository _orgGroupRepository;
         private readonly JobRepository _jobRepository;
         private readonly IEntityService _entityService;
+        private readonly PersonRepository _personRepository;
 
         public OrgGroupService(OrgGroupRepository orgGroupRepository,
             IEntityService entityService,
-            JobRepository jobRepository)
+            JobRepository jobRepository,
+            PersonRepository personRepository)
         {
             _orgGroupRepository = orgGroupRepository;
             _entityService = entityService;
             _jobRepository = jobRepository;
+            _personRepository = personRepository;
         }
 
         public List<OrgGroupWithSupervisor> OrgGroups =>
@@ -67,7 +71,17 @@ namespace Backend.Services
 
             return data;
         }
-        
+
+        public Task<bool> IsPersonInGroup(Guid personId, Guid groupId)
+        {
+            return _orgGroupRepository.GetWithParentsWhere(group =>
+                group.Id == _personRepository.PeopleWithStaffBasic
+                    .Where(person => person.Id == personId)
+                    .Select(basic => basic.Staff.OrgGroupId)
+                    .Single()
+            ).AnyAsync(group => group.Id == groupId);
+        }
+
         public enum SortedBy
         {
             ParentFirst,
@@ -75,9 +89,11 @@ namespace Backend.Services
             Either
         }
 
-        public static bool IsOrgGroupSortedByHierarchy<T>(ICollection<T> orgGroups, SortedBy sortedBy = SortedBy.Either) where T : OrgGroup
+        public static bool IsOrgGroupSortedByHierarchy<T>(ICollection<T> orgGroups, SortedBy sortedBy = SortedBy.Either)
+            where T : OrgGroup
         {
             if (orgGroups.Count <= 1) return true;
+
             bool ParentInList(OrgGroup group)
             {
                 return orgGroups.Any(orgGroup => orgGroup.Id == @group.ParentId);
@@ -87,12 +103,12 @@ namespace Backend.Services
             var startsWithChild = orgGroups.First() != groupWithoutParent;
             switch (sortedBy)
             {
-                    case SortedBy.ChildFirst:
-                        if (!startsWithChild) return false;
-                        break;
-                    case SortedBy.ParentFirst:
-                        if (startsWithChild) return false;
-                        break;
+                case SortedBy.ChildFirst:
+                    if (!startsWithChild) return false;
+                    break;
+                case SortedBy.ParentFirst:
+                    if (startsWithChild) return false;
+                    break;
             }
 
             OrgGroup previous = null;
@@ -102,6 +118,7 @@ namespace Backend.Services
                 {
                     return false;
                 }
+
                 previous = current;
             }
 

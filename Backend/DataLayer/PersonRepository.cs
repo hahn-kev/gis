@@ -38,6 +38,54 @@ namespace Backend.DataLayer
             return PeopleWithStaff.Where(p => p.Id.In(guids)).ToDictionary(p => p.Id);
         }
 
+        public IQueryable<PersonWithStaffBasic> PeopleWithStaffBasic
+        {
+            get
+            {
+                return from person in _dbConnection.PeopleExtended
+                    from staff in Staff
+                        .LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
+                        .DefaultIfEmpty()
+                    where !person.Deleted
+                    select new PersonWithStaffBasic
+                    {
+                        Id = person.Id,
+                        Email = person.Email,
+                        FirstName = person.FirstName,
+                        IsThai = person.IsThai,
+                        IsSchoolAid = person.IsSchoolAid,
+                        IsAlumni = person.IsAlumni,
+                        IsParent = person.IsParent,
+                        LastName = person.LastName,
+                        ThaiFirstName = person.ThaiFirstName,
+                        ThaiLastName = person.ThaiLastName,
+                        PreferredName = person.PreferredName,
+                        SpeaksEnglish = person.SpeaksEnglish,
+                        Staff = staff,
+                        StaffId = person.StaffId,
+                        DonorId = person.DonorId,
+                        PhoneNumber = person.PhoneNumber,
+                        SpouseId = person.SpouseId,
+                        Birthdate = person.Birthdate,
+                        Gender = person.Gender,
+                        PassportAddress = person.PassportAddress,
+                        PassportCity = person.PassportCity,
+                        PassportCountry = person.PassportCountry,
+                        PassportState = person.PassportState,
+                        PassportZip = person.PassportZip,
+                        ThaiAddress = person.ThaiAddress,
+                        ThaiAmphur = person.ThaiAmphur,
+                        ThaiMubaan = person.ThaiMubaan,
+                        ThaiProvince = person.ThaiProvince,
+                        ThaiSoi = person.ThaiSoi,
+                        ThaiTambon = person.ThaiTambon,
+                        ThaiZip = person.ThaiZip,
+                        ProfilePicDriveId = person.ProfilePicDriveId,
+                        Deleted = person.Deleted
+                    };
+            }
+        }
+
         public IQueryable<PersonWithStaffSummaries> PeopleWithStaffSummaries
         {
             get
