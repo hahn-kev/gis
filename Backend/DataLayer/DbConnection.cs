@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Backend.Entities;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.DataProvider;
 using LinqToDB.Identity;
 using LinqToDB.Mapping;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
 
@@ -36,6 +33,7 @@ namespace Backend.DataLayer
         IQueryable<RequiredEndorsement> RequiredEndorsements { get; }
         IQueryable<Education> Education { get; }
         IQueryable<LeaveRequest> LeaveRequests { get; }
+        IQueryable<Holiday> Holidays { get; }
         IQueryable<TrainingRequirement> TrainingRequirements { get; }
         IQueryable<Staff> Staff { get; }
         IQueryable<StaffTraining> StaffTraining { get; }
@@ -55,7 +53,8 @@ namespace Backend.DataLayer
         IDataProvider DataProvider { get; }
     }
 
-    public class DbConnection : IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
+    public class DbConnection :
+        LinqToDB.Identity.IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
         IDbConnection,
         IDisposable
     {
@@ -121,6 +120,7 @@ namespace Backend.DataLayer
         public IQueryable<RequiredEndorsement> RequiredEndorsements => GetTable<RequiredEndorsement>();
         public IQueryable<Education> Education => GetTable<Education>();
         public IQueryable<LeaveRequest> LeaveRequests => GetTable<LeaveRequest>();
+        public IQueryable<Holiday> Holidays => GetTable<Holiday>();
         public IQueryable<TrainingRequirement> TrainingRequirements => GetTable<TrainingRequirement>();
         public IQueryable<Staff> Staff => GetTable<Staff>();
         public IQueryable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
@@ -139,6 +139,7 @@ namespace Backend.DataLayer
     public class AppConnectionFactory : IConnectionFactory
     {
         private readonly IDbConnection _dbConnection;
+
         public AppConnectionFactory(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;

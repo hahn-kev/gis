@@ -65,10 +65,6 @@ export class LeaveRequestService {
       {params: {year: year.toString()}});
   }
 
-  listHolidays() {
-    return this.http.get<Holiday[]>('/api/holiday');
-  }
-
   isOverUsingLeave(leaveRequest: LeaveRequest, leaveUsages: LeaveUsage[]) {
     const leaveUsage = leaveUsages.find(value => value.leaveType == leaveRequest.type);
     if (leaveUsage == null) return true;

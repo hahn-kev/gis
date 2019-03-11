@@ -1,0 +1,39 @@
+<ng-container *appTemplateContent="'title'">Holidays ({{dataSource.filteredData.length}})</ng-container>
+<ng-container *appToolbarContent>
+  <button mat-icon-button>
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field floatLabel="never">
+    <input autofocus matInput
+           [value]="urlBinding.values.search"
+           (keyup)="urlBinding.values.search = $event.target.value"
+           placeholder="Search">
+  </mat-form-field>
+  <app-export-button [values]="dataSource" fileName="certificationsData"></app-export-button>
+</ng-container>
+<mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="start">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Start</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.start | date}}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="end">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>End</mat-header-cell>
+    <mat-cell *matCellDef="let row"> {{row.end | date}}</mat-cell>
+  </ng-container>
+
+  <!-- Header and Row Declarations -->
+  <mat-header-row
+    *matHeaderRowDef="['name', 'start', 'end']"></mat-header-row>
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: ['name', 'start', 'end']"
+           [routerLink]="'/holiday/edit/' + row.id"></mat-row>
+</mat-table>
+
+<a routerLink="/holiday/edit/new" class="add-button" mat-fab matTooltip="Add new Holiday"
+   matTooltipPosition="left">
+  <mat-icon>add</mat-icon>
+</a>

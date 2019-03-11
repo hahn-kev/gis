@@ -14,6 +14,7 @@ import { LeaveType, LeaveUsage } from '../self/self';
 import { Gender } from '../person';
 import { BaseEditComponent } from '../../components/base-edit-component';
 import { Holiday } from './holiday';
+import { HolidayService } from '../../holiday/holiday.service';
 
 @Component({
   selector: 'app-leave-request',
@@ -46,6 +47,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
               public loginService: LoginService,
               private personService: PersonService,
               private location: Location,
+              private holidayService: HolidayService,
               dialog: MatDialog) {
     super(dialog);
   }
@@ -73,7 +75,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           this.selectedPerson = person;
         }
       });
-      this.leaveRequestService.listHolidays().subscribe(holidays => this.holidays = holidays);
+    this.holidayService.currentHolidays().subscribe(holidays => this.holidays = holidays);
   }
 
   warnNoLeaveNotification(sendNotification = false) {

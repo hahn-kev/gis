@@ -16,7 +16,6 @@ public class HolidayController : MyController
     }
 
 
-
     [HttpGet]
     public List<Holiday> Holidays()
     {
@@ -31,9 +30,8 @@ public class HolidayController : MyController
     }
 
 
-
     [HttpGet("{id}")]
-    [Authorize(Policy = "jobs")]
+    [Authorize("holidays")]
     public Holiday GetById(Guid id)
     {
         return _entityService.GetById<Holiday>(id);
@@ -48,6 +46,7 @@ public class HolidayController : MyController
     }
 
     [HttpDelete]
+    [Authorize("holidays")]
     public IActionResult Delete(Guid id)
     {
         _entityService.Delete<Holiday>(id);

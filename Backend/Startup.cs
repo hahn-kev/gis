@@ -197,6 +197,9 @@ namespace Backend
                 options.AddPolicy("staff",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
+                options.AddPolicy("holidays",
+                    builder => builder.RequireAssertion(context =>
+                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
                 options.AddPolicy("contact",
                     builder => builder.RequireAssertion(context =>
                         context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
