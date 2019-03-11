@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Security.Authentication;
+using System.Threading.Tasks;
 using Backend.Entities;
 using Backend.Services;
-using Backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +12,12 @@ namespace Backend.Controllers
     public class PersonController : MyController
     {
         private readonly PersonService _personService;
+        private readonly IAuthorizationService _authorizationService;
 
-        public PersonController(PersonService personService)
+        public PersonController(PersonService personService, IAuthorizationService authorizationService)
         {
             _personService = personService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -35,10 +35,13 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "people")]
-        public PersonWithOthers Get(Guid id)
+        [Authorize]
+        public async Task<ActionResult<PersonWithOthers>> Get(Guid id)
         {
-            return _personService.GetById(id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, id, "peopleEdit");
+            if (authorizationResult.Succeeded)
+                return _personService.GetById(id);
+            return new ForbidResult();
         }
 
         [HttpPost("self")]
@@ -54,19 +57,31 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "people")]
-        public IActionResult Update([FromBody] PersonWithOthers person)
+        [Authorize]
+        public async Task<ActionResult<PersonWithOthers>> Update([FromBody] PersonWithOthers person)
         {
-            _personService.Save(person);
-            return Json(person);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, person.Id, "peopleEdit");
+            if (authorizationResult.Succeeded)
+            {
+                _personService.Save(person);
+                return person;
+            }
+
+            return new ForbidResult();
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "people")]
-        public IActionResult DeletePerson(Guid id)
+        [Authorize]
+        public async Task<ActionResult> DeletePerson(Guid id)
         {
-            _personService.DeletePerson(id);
-            return Ok();
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, id, "peopleEdit");
+            if (authorizationResult.Succeeded)
+            {
+                _personService.DeletePerson(id);
+                return Ok();
+            }
+
+            return new ForbidResult();
         }
 
         [HttpPost("role")]
@@ -123,6 +138,7 @@ namespace Backend.Controllers
             {
                 s.StaffWithName?.RemoveSalary();
             }
+
             return staff;
         }
 

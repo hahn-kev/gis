@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Backend.Authorization;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Services;
@@ -177,59 +178,7 @@ namespace Backend
                     };
                 });
             //todo addGoogle for authentication
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("attachments",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("jobs",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("grades",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("role",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("evaluations",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("staff",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("contact",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("isSupervisor",
-                    builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
-                options.AddPolicy("leaveRequest",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("leaveSupervisor",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsSupervisor() || context.User.IsLeaveDelegate()));
-
-                options.AddPolicy("training",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("orgGroup",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("endorsement",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("people",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsInAnyRole("admin", "hr", "registrar") ||
-                        context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("sendingOrg",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsInAnyRole("admin", "hr", "registrar") ||
-                        context.User.IsHighLevelSupervisor()));
-                options.AddPolicy("orgTreeData",
-                    builder => builder.RequireAssertion(context =>
-                        context.User.IsSupervisor() || context.User.IsAdminOrHr()));
-            });
+            services.AddMyAuthorization();
             foreach (var type in typeof(Startup).Assembly.GetTypes()
                 .Where(type =>
                     (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
