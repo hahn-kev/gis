@@ -33,6 +33,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   private myPersonId: string | null;
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
   holidays: Holiday[];
+  public intersectingHolidays = '';
 
   private subscription: Subscription;
 
@@ -94,8 +95,10 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
       this.leaveRequest.endDate = this.leaveRequest.startDate;
     }
     if (this.leaveRequest && !this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
-        this.leaveRequest.days = this.leaveRequestService.weekDays(this.leaveRequest, this.holidays);
-      }
+      let result = this.leaveRequestService.weekDays(this.leaveRequest, this.holidays);
+      this.leaveRequest.days = result.days;
+      this.intersectingHolidays = result.countedHolidays;
+    }
   }
 
   ngOnDestroy(): void {

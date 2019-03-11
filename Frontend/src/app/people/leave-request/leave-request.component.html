@@ -53,7 +53,9 @@
         <mat-datepicker #endDatePicker></mat-datepicker>
       </mat-form-field>
       <div class="span-2-columns">
-        <mat-form-field [style.width]="'80px'">
+        <mat-icon *ngIf="intersectingHolidays" [matTooltip]="'Holiday(s) included ' + intersectingHolidays">info
+        </mat-icon>
+        <mat-form-field [style.width]="'90px'">
           <input matInput
                  name="days"
                  type="number"

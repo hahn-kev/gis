@@ -72,12 +72,16 @@ export class LeaveRequestService {
     return leaveUsage.left - leaveRequest.days < 0;
   }
 
-  weekDays(leaveRequest: LeaveRequest, holidays: Holiday[]) {
+  weekDays(leaveRequest: LeaveRequest, holidays: Holiday[]): { days: number, countedHolidays: string } {
     let days = this.weekDaysBetween(leaveRequest.startDate, leaveRequest.endDate);
+    const countedHolidays = [];
     for (const holiday of holidays) {
-      days -= this.overlapingHolidayDays(leaveRequest, holiday);
+      let overlapping = this.overlapingHolidayDays(leaveRequest, holiday);
+      if (overlapping > 0) countedHolidays.push(holiday.name);
+      days -= overlapping;
     }
-    return days;
+
+    return {days, countedHolidays: countedHolidays.join(', ')};
   }
 
   overlapingHolidayDays(leaveRequest: LeaveRequest, holiday: Holiday) {
