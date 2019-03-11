@@ -6,6 +6,7 @@ import {
   MatCardModule,
   MatChipsModule,
   MatDatepickerModule,
+  MatIconModule,
   MatInputModule,
   MatSelectModule,
   MatSlideToggleModule,
@@ -23,6 +24,8 @@ import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { LeaveRequestWithNames } from './leave-request';
 import { UserToken } from '../../login/user-token';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HolidayService } from '../../holiday/holiday.service';
+import { of } from 'rxjs';
 
 @Directive({
   selector: '[appTemplateContent]'
@@ -47,6 +50,7 @@ describe('LeaveRequestComponent', () => {
         MatChipsModule,
         MatTooltipModule,
         MatMomentDateModule,
+        MatIconModule,
         FormsModule,
         NoopAnimationsModule
       ],
@@ -67,6 +71,7 @@ describe('LeaveRequestComponent', () => {
             safeUserToken: () => [new UserToken({})]
           }
         },
+        {provide: HolidayService, useValue: {currentHolidays: () => of([])}},
         {provide: PersonService, useValue: {}},
         {provide: Location, useValue: {}},
       ]
