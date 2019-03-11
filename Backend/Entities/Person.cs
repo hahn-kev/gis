@@ -69,6 +69,14 @@ namespace Backend.Entities
         public string ProfilePicDriveId { get; set; }
     }
 
+    public class PersonWithRoleSummaries : PersonExtended
+    {
+        
+        public DateTime? StartDate { get; set; }
+        public double DaysOfService { get; set; }
+        public bool IsActive { get; set; }
+    }
+    
     [Table("Person", IsColumnAttributeRequired = false)]
     public class PersonWithStaff : PersonExtended
     {

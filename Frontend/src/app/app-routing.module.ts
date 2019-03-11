@@ -50,7 +50,6 @@ import { GradeComponent } from 'app/job/grade/edit/grade.component';
 import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
 import { CanDeactivateGuard } from './services/can-deactivate.guard';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
-import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 import { StaffSummariesResolveService } from './people/staff/staff-report/staff-summaries-resolve.service';
 import { PersonRequiredGuard } from './services/person-required.guard';
 import { OrgTreeComponent } from './org-tree/org-tree.component';
@@ -64,6 +63,8 @@ import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { EndorsementResolverService } from './endorsement/endorsement-resolver.service';
 import { PolicyGuard } from './services/auth/policy.guard';
 import { CalendarComponent } from './calendar/calendar.component';
+import {SchoolAidListComponent} from './people/schoolAidList/school-aid-list.component';
+import { SchoolAidResolveService } from './people/schoolAidList/school-aid-resolve.service';
 
 const routes: Routes = [
   {
@@ -121,7 +122,7 @@ const routes: Routes = [
             children: [
               {
                 path: 'list',
-                component: PeopleListComponent,
+                component: SchoolAidListComponent,
                 data: {title: 'School Aids'},
                 resolve: {
                   people: SchoolAidResolveService

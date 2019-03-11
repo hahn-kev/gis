@@ -130,6 +130,7 @@ import { BottomSheetDirective } from './components/render-template-bottom-sheet/
 import { GroupTypeNamePipe } from './people/groups/group-type-name.pipe';
 import { IsLastVisiblePipe } from './org-tree/is-last-visible.pipe';
 import { FindFormPipe } from './components/accordion-list/find-form.pipe';
+import {SchoolAidListComponent} from './people/schoolAidList/school-aid-list.component';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -207,7 +208,8 @@ if (environment.production) {
     ,
     IsLastVisiblePipe
     ,
-    FindFormPipe
+    FindFormPipe,
+    SchoolAidListComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
