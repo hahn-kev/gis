@@ -110,7 +110,7 @@ export class StaffReportComponent implements OnInit {
 
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     this.urlBinding.addParam('showInactive', false);
-    this.urlBinding.addParam('selectedColumns', ['preferredName', 'lastName']);
+    this.urlBinding.addParam('selectedColumns', ['preferredName', 'lastName', 'personalEmail', 'phoneNumber', 'serviceLength']);
     this.urlBinding.addParam('showThai', true);
     this.urlBinding.addParam('showNonThai', true);
     this.urlBinding.addParam('showMen', true);
