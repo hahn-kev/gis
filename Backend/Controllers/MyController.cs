@@ -38,6 +38,19 @@ namespace Backend.Controllers
             return new ForbidResult();
         }
 
+        protected async Task<ActionResult> TryExecute<TR>(MyPolicies policy,
+            TR resource,
+            Func<ActionResult> onSuccess)
+        {
+            var authorizationResult = await AuthorizationService.AuthorizeAsync(User, resource, policy.ToString());
+            if (authorizationResult.Succeeded)
+            {
+                return onSuccess();
+            }
+
+            return new ForbidResult();
+        }
+
         protected async Task<ActionResult<T>> TryExecute<T, TR>(MyPolicies policy, TR resource, Func<Task<T>> onSuccess)
         {
             var authorizationResult = await AuthorizationService.AuthorizeAsync(User, resource, policy.ToString());
