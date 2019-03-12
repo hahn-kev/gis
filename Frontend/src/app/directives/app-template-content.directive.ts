@@ -21,11 +21,3 @@ export class AppTemplateContentDirective implements OnDestroy {
 
 
 }
-
-@Directive({
-  selector: '[appTemplateContent]'
-})
-// tslint:disable-next-line:component-class-suffix
-export class MockAppTemplateContentDirective {
-  @Input('appTemplateContent') appTemplateContent: string;
-}

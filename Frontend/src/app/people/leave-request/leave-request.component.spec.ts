@@ -20,22 +20,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LeaveRequestService } from './leave-request.service';
 import { LoginService } from '../../services/auth/login.service';
 import { PersonService } from '../person.service';
-import { Directive, Input } from '@angular/core';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { LeaveRequestWithNames } from './leave-request';
 import { UserToken } from '../../login/user-token';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { HolidayService } from '../../holiday/holiday.service';
+import { MockAppTemplateContentDirective } from '../../directives/app-template-content.directive.spec';
 import SpyObj = jasmine.SpyObj;
-
-@Directive({
-  selector: '[appTemplateContent]'
-})
-// tslint:disable-next-line:component-class-suffix
-class MockAppTemplateContentDirective {
-  @Input('appTemplateContent') appTemplateContent: string;
-}
 
 describe('LeaveRequestComponent', () => {
   let component: LeaveRequestComponent;

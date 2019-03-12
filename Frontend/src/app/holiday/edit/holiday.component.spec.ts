@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HolidayComponent } from './holiday.component';
-import { MockAppTemplateContentDirective } from '../../directives/app-template-content.directive';
+import { MockAppTemplateContentDirective } from '../../directives/app-template-content.directive.spec';
 
 xdescribe('HolidayComponent', () => {
   let component: HolidayComponent;
