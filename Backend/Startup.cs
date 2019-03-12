@@ -202,6 +202,10 @@ namespace Backend
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
                     (NpgsqlConnection) provider.GetRequiredService<IDbConnection>().Connection));
+
+#if DEBUG
+            services.AddSwaggerDocument();
+#endif
         }
 
         private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services,
@@ -270,6 +274,12 @@ namespace Backend
                     }
             });
             app.UseAuthentication();
+
+#if DEBUG
+            app.UseSwagger();
+            app.UseSwaggerUi3();
+#endif
+
             app.UseSentinel();
             app.UseMvc();
 
