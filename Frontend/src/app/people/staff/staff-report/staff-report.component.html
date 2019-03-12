@@ -152,14 +152,14 @@
   <ng-container matColumnDef="isThai">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Thai</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.isThai"></mat-checkbox>
+      <mat-icon color="accent">{{row.isThai ? 'check_box' : 'check_box_outline_blank'}}</mat-icon>
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="speaksEnglish">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Speaks English</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.speaksEnglish"></mat-checkbox>
+      <mat-icon color="accent">{{row.speaksEnglish ? 'check_box' : 'check_box_outline_blank'}}</mat-icon>
     </mat-cell>
   </ng-container>
 
@@ -176,7 +176,7 @@
   <ng-container matColumnDef="isActive">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Is Active</mat-header-cell>
     <mat-cell *matCellDef="let row">
-      <mat-checkbox disabled [checked]="row.isActive"></mat-checkbox>
+      <mat-icon color="accent">{{row.isActive ? 'check_box' : 'check_box_outline_blank'}}</mat-icon>
     </mat-cell>
   </ng-container>
 
