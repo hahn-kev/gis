@@ -10,6 +10,7 @@ import { Person } from '../people/person';
 import { environment } from '../../environments/environment';
 import { AuthenticateService } from '../services/auth/authenticate.service';
 import { BaseEditComponent } from '../components/base-edit-component';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-user',
@@ -29,6 +30,7 @@ export class UserComponent extends BaseEditComponent implements OnInit {
               private userService: UserService,
               private authService: AuthenticateService,
               private router: Router,
+              private location: Location,
               dialog: MatDialog,
               private personService: PersonService,
               private snackBar: MatSnackBar) {
@@ -95,7 +97,8 @@ export class UserComponent extends BaseEditComponent implements OnInit {
       `You're now logged in as ${this.user.userName} just logout to stop impersonating them`,
       null,
       {duration: 2000});
-    this.router.navigate(['/home']);
+    await this.router.navigate(['/home']);
+    this.location.go(this.location.path());
   }
 
 }

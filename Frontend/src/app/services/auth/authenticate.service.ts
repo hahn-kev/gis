@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LoginService } from './login.service';
 import { User } from '../../user/user';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
 export class AuthenticateService {
 
-  constructor(private http: HttpClient, private loginService: LoginService) {
+  constructor(private http: HttpClient, private loginService: LoginService, private cookieService: CookieService) {
   }
 
   async login(username: string, currentPassword: string, newPassword?: string): Promise<User> {
@@ -22,7 +23,10 @@ export class AuthenticateService {
   }
 
   async impersonate(email: string) {
-    return this.postLogin(await this.http.get<any>('/api/authenticate/impersonate/' + encodeURI(email)).toPromise());
+    let user = this.postLogin(await this.http.get<any>('/api/authenticate/impersonate/' + encodeURI(email))
+      .toPromise());
+    this.cookieService.delete('.Sub');
+    return user;
   }
 
   private postLogin(json: { user: User, access_token: string }): User {
