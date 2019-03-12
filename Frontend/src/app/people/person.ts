@@ -55,6 +55,12 @@ export class PersonExtended extends Person {
   public profilePicDriveId: string;
 }
 
+export class PersonWithRoleSummaries extends PersonExtended {
+  public startDate: Date;
+  public daysOfService: number;
+  public isActive: boolean;
+}
+
 export class PersonWithStaff extends PersonExtended {
   public staff: StaffWithOrgName;
 }

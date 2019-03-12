@@ -1,18 +1,19 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {PolicyGuard} from '../services/auth/policy.guard';
-import {PersonComponent} from './person/person.component';
-import {CanDeactivateGuard} from '../services/can-deactivate.guard';
-import {PersonResolverService} from './person-resolver.service';
-import {PeopleResolveService} from './list/people-resolve.service';
-import {PeopleListComponent} from './list/people-list.component';
-import {SchoolAidResolveService} from './list/school-aid-resolve.service';
-import {EvaluationReportComponent} from './evaluation-report/evaluation-report.component';
-import {EvaluationSummaryResolveService} from './evaluation-report/evaluation-summary-resolve.service';
-import {StaffReportComponent} from './staff/staff-report/staff-report.component';
-import {StaffSummariesResolveService} from './staff/staff-report/staff-summaries-resolve.service';
-import {PersonRequiredGuard} from '../services/person-required.guard';
-import {SelfService} from './self/self.service';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { PolicyGuard } from '../services/auth/policy.guard';
+import { PersonComponent } from './person/person.component';
+import { CanDeactivateGuard } from '../services/can-deactivate.guard';
+import { PersonResolverService } from './person-resolver.service';
+import { PeopleResolveService } from './list/people-resolve.service';
+import { PeopleListComponent } from './list/people-list.component';
+import { SchoolAidResolveService } from './schoolAidList/school-aid-resolve.service';
+import { EvaluationReportComponent } from './evaluation-report/evaluation-report.component';
+import { EvaluationSummaryResolveService } from './evaluation-report/evaluation-summary-resolve.service';
+import { StaffReportComponent } from './staff/staff-report/staff-report.component';
+import { StaffSummariesResolveService } from './staff/staff-report/staff-summaries-resolve.service';
+import { PersonRequiredGuard } from '../services/person-required.guard';
+import { SelfService } from './self/self.service';
+import { SchoolAidListComponent } from './schoolAidList/school-aid-list.component';
 
 const routes: Routes = [
   {
@@ -43,7 +44,7 @@ const routes: Routes = [
         children: [
           {
             path: 'list',
-            component: PeopleListComponent,
+            component: SchoolAidListComponent,
             data: {title: 'School Aids'},
             resolve: {
               people: SchoolAidResolveService

@@ -554,5 +554,19 @@ namespace UnitTestProject
             DbConnection.Insert(person);
             return (staff, person);
         }
+
+        public (LeaveRequest request, PersonWithStaff requester, PersonWithStaff supervisor) SetupLeaveRequest(
+            Action<PersonWithStaff> modifyRequester)
+        {
+            var supervisor = InsertPerson(true);
+            var orgGroup = InsertOrgGroup(supervisorId: supervisor.Id);
+            var requester = InsertPerson(p =>
+            {
+                modifyRequester(p);
+                p.Staff.OrgGroupId = orgGroup.Id;
+            });
+            var request = InsertLeaveRequest(LeaveType.Sick, requester.Id, 5);
+            return (request, requester, supervisor);
+        }
     }
 }

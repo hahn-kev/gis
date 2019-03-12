@@ -122,9 +122,15 @@ namespace Backend.Controllers
             if (personId == null)
                 throw new UnauthorizedAccessException(
                     "Logged in user must be connected to a person, talk to HR about this issue");
-            var (_, notified) = await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
+            var (_, requester, notified) = await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
+            if (notified)
+            {
+                return this.ShowFrontendMessage(
+                    $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} has been notified");
+            }
+
             return this.ShowFrontendMessage(
-                $"Leave request approved{Environment.NewLine}{notified.PreferredName ?? notified.FirstName} has been notified");
+                $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} does not have an email and has not been notified");
         }
 
 

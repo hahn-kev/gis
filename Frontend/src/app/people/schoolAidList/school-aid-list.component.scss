@@ -1,0 +1,11 @@
+.mat-column-staffId, .mat-column-isSchoolAid, .mat-column-donorId, .mat-column-isParent, .mat-column-isAlumni {
+  flex-grow : 0.5;
+}
+
+.mat-table {
+  width : 100%;
+}
+
+.mat-table-sticky {
+  border-top: 1px solid #e0e0e0;
+}

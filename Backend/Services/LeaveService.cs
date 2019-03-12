@@ -92,23 +92,30 @@ namespace Backend.Services
             _entityService.Delete<LeaveRequest>(id);
         }
 
-        public async Task<(bool updated, PersonWithStaff notified)> ApproveLeaveRequest(Guid leaveRequestId,
+        public async Task<(bool updated, PersonWithStaff requester, bool notified)> ApproveLeaveRequest(
+            Guid leaveRequestId,
             Guid supervisorId)
         {
             //ensure that this id is a valid person before we approve it
             var leaveRequest =
                 _leaveRequestRepository.LeaveRequests.SingleOrDefault(request => request.Id == leaveRequestId);
-            if (leaveRequest == null) return (false, null);
+            if (leaveRequest == null) return (false, null, false);
             var people = _personRepository.FindByIds(new[] {supervisorId, leaveRequest.PersonId});
             if (!people.TryGetValue(supervisorId, out var supervisor))
             {
-                return (false, null);
+                return (false, null, false);
             }
 
             var requester = people[leaveRequest.PersonId];
             var updated = _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, supervisor.Id);
-            await _leaveRequestEmailService.NotifyRequestApproved(leaveRequest, requester, supervisor);
-            return (updated, requester);
+            var notified = false;
+            if (!string.IsNullOrEmpty(requester.Staff?.Email))
+            {
+                await _leaveRequestEmailService.NotifyRequestApproved(leaveRequest, requester, supervisor);
+                notified = true;
+            }
+
+            return (updated, requester, notified);
         }
 
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)

@@ -93,6 +93,67 @@ namespace Backend.DataLayer
             }
         }
 
+        public List<PersonWithRoleSummaries> GetSchoolAidSummaries()
+        {
+            return PersonWithRoleSummaries.Where(person => person.IsSchoolAid).ToList();
+        }
+
+        public List<PersonWithRoleSummaries> GetPersonWithRoleSummariesList()
+        {
+            return PersonWithRoleSummaries.ToList();
+        }
+
+        private IQueryable<PersonWithRoleSummaries> PersonWithRoleSummaries
+        {
+            get
+            {
+                return from person in _dbConnection.PeopleExtended
+                from role in _dbConnection.PersonRoles.LeftJoin(role => role.PersonId == person.Id)
+                from job in _dbConnection.Job.LeftJoin(job => job.Id == role.JobId)
+                group new {role, job} by new {person}
+                into g
+                select new PersonWithRoleSummaries
+                {
+                    Id = g.Key.person.Id,
+                    Email = g.Key.person.Email,
+                    FirstName = g.Key.person.FirstName,
+                    IsThai = g.Key.person.IsThai,
+                    IsSchoolAid = g.Key.person.IsSchoolAid,
+                    IsAlumni = g.Key.person.IsAlumni,
+                    IsParent = g.Key.person.IsParent,
+                    LastName = g.Key.person.LastName,
+                    ThaiFirstName = g.Key.person.ThaiFirstName,
+                    ThaiLastName = g.Key.person.ThaiLastName,
+                    PreferredName = g.Key.person.PreferredName,
+                    SpeaksEnglish = g.Key.person.SpeaksEnglish,
+                    StaffId = g.Key.person.StaffId,
+                    DonorId = g.Key.person.DonorId,
+                    PhoneNumber = g.Key.person.PhoneNumber,
+                    SpouseId = g.Key.person.SpouseId,
+                    Birthdate = g.Key.person.Birthdate,
+                    Gender = g.Key.person.Gender,
+                    PassportAddress = g.Key.person.PassportAddress,
+                    PassportCity = g.Key.person.PassportCity,
+                    PassportCountry = g.Key.person.PassportCountry,
+                    PassportState = g.Key.person.PassportState,
+                    PassportZip = g.Key.person.PassportZip,
+                    ThaiAddress = g.Key.person.ThaiAddress,
+                    ThaiAmphur = g.Key.person.ThaiAmphur,
+                    ThaiMubaan = g.Key.person.ThaiMubaan,
+                    ThaiProvince = g.Key.person.ThaiProvince,
+                    ThaiSoi = g.Key.person.ThaiSoi,
+                    ThaiTambon = g.Key.person.ThaiTambon,
+                    ThaiZip = g.Key.person.ThaiZip,
+                    ProfilePicDriveId = g.Key.person.ProfilePicDriveId,
+                    Deleted = g.Key.person.Deleted,
+                    //summary here
+                    DaysOfService = g.Sum(r => r.role.StartDate.DayDiff(r.role.EndDate ?? Sql.CurrentTimestamp)),
+                    IsActive = g.Sum(r => r.role.Active ? 1 : 0) > 0,
+                    StartDate = g.Min(r => (DateTime?) r.role.StartDate)
+                };
+            }
+        }
+
         private IQueryable<TPerson> PeopleGeneric<TPerson>() where TPerson : PersonWithStaff, new() =>
             from person in _dbConnection.PeopleExtended
             from staff in StaffWithOrgNames.LeftJoin(staff => person.StaffId.HasValue && staff.Id == person.StaffId)
@@ -351,6 +412,11 @@ namespace Backend.DataLayer
         public void DeleteDonor(Guid donorId)
         {
             _dbConnection.Donors.Delete(donor => donor.Id == donorId);
+        }
+
+        public List<Person> GetSchoolAids()
+        {
+            return this.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
         }
     }
 }

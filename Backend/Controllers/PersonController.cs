@@ -34,6 +34,13 @@ namespace Backend.Controllers
             return _personService.SchoolAids();
         }
 
+        [HttpGet("school-aids/summaries")]
+        [Authorize(Policy = "people")]
+        public List<PersonWithRoleSummaries> ListSchoolAidSummaries()
+        {
+            return _personService.GetSchoolAidSummaries();
+        }
+
         [HttpGet("{id}")]
         [Authorize(Policy = "people")]
         public PersonWithOthers Get(Guid id)
