@@ -22,7 +22,7 @@ namespace Backend.Services
         public Endorsement GetById(Guid id) =>
             _endorsementRepository.Endorsements.Single(endorsement => endorsement.Id == id);
 
-        public IList<StaffEndorsementWithName> ListStaffEndorsements(Guid personId) =>
+        public List<StaffEndorsementWithName> ListStaffEndorsements(Guid personId) =>
             _endorsementRepository.StaffEndorsementsWithName.Where(se => se.PersonId == personId).ToList();
 
         public IList<RequiredEndorsementWithName> ListRequiredEndorsements(Guid jobId) =>

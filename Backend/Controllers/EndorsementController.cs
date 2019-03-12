@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Backend.Authorization;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Policy = "endorsement")]
+    [Authorize]
     public class EndorsementController : MyController
     {
         private readonly EndorsementService _endorsementService;
@@ -25,9 +27,11 @@ namespace Backend.Controllers
         public Endorsement GetById(Guid id) => _endorsementService.GetById(id);
 
         [HttpGet("staff/{personId}")]
-        public IList<StaffEndorsementWithName> ListStaffEndorsements(Guid personId)
+        public Task<ActionResult<List<StaffEndorsementWithName>>> ListStaffEndorsements(Guid personId)
         {
-            return _endorsementService.ListStaffEndorsements(personId);
+            return TryExecute(MyPolicies.peopleEdit,
+                personId,
+                () => _endorsementService.ListStaffEndorsements(personId));
         }
 
         [HttpGet("required/{jobId}")]
@@ -37,6 +41,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
+        [MyAuthorize(MyPolicies.endorsement)]
         public Endorsement Save([FromBody] Endorsement endorsement)
         {
             _endorsementService.Save(endorsement);
@@ -44,10 +49,15 @@ namespace Backend.Controllers
         }
 
         [HttpPost("staff")]
-        public StaffEndorsement Save([FromBody] StaffEndorsement staffEndorsement)
+        public Task<ActionResult<StaffEndorsement>> Save([FromBody] StaffEndorsement staffEndorsement)
         {
-            _endorsementService.Save(staffEndorsement);
-            return staffEndorsement;
+            return TryExecute(MyPolicies.peopleEdit,
+                staffEndorsement.PersonId,
+                () =>
+                {
+                    _endorsementService.Save(staffEndorsement);
+                    return staffEndorsement;
+                });
         }
 
         [HttpPost("required")]
@@ -58,6 +68,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{endorsementId}")]
+        [MyAuthorize(MyPolicies.endorsement)]
         public IActionResult DeleteEndorsement(Guid endorsementId)
         {
             _endorsementService.DeleteEndorsement(endorsementId);
@@ -65,8 +76,10 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("staff/{staffEndorsementId}")]
+        [MyAuthorize(MyPolicies.hrSupervisorAdmin)]
         public IActionResult DeleteStaffEndorsement(Guid staffEndorsementId)
         {
+            //todo prevent access to only valid supervisors
             _endorsementService.DeleteStaffEndorsement(staffEndorsementId);
             return Ok();
         }
