@@ -66,7 +66,17 @@
             <a *ngIf="user.isSupervisor" mat-list-item [routerLink]="['/org-tree', user.orgGroupId]"
                routerLinkActive="active-link">
               <mat-icon mat-list-icon>location_city</mat-icon>
-              <span mat-line>My People</span>
+              <span mat-line>My Org Chart</span>
+            </a>
+            <a *ngIf="user.isSupervisor" mat-list-item routerLink="/people/staff/report/supervisor"
+               routerLinkActive="active-link">
+              <mat-icon mat-list-icon>business</mat-icon>
+              <span mat-line>My Staff report</span>
+            </a>
+            <a *ngIf="user.isSupervisor" mat-list-item routerLink="/job/report/roles/supervisor"
+               routerLinkActive="active-link">
+              <mat-icon mat-list-icon>work</mat-icon>
+              <span mat-line>My Roles report</span>
             </a>
             <a *ngIf="user.isSupervisor || user.isLeaveDelegate"
                mat-list-item

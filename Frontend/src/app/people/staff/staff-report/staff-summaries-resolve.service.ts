@@ -12,6 +12,9 @@ export class StaffSummariesResolveService implements Resolve<PersonWithStaffSumm
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<PersonWithStaffSummaries[]> | Promise<PersonWithStaffSummaries[]> | PersonWithStaffSummaries[] {
+      if (route.data.supervisor) {
+        return this.personService.getSupervisorStaffSummaries();
+      }
     return this.personService.getStaffSummaries();
   }
 

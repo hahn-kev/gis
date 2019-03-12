@@ -45,7 +45,7 @@ const routes: Routes = [
           {
             path: 'list',
             component: SchoolAidListComponent,
-            data: {title: 'School Aids'},
+            data: { title: 'School Aids' },
             resolve: {
               people: SchoolAidResolveService
             }
@@ -68,17 +68,29 @@ const routes: Routes = [
   },
   {
     path: 'staff',
-    canActivate: [PolicyGuard],
-    data: {
-      requirePolicy: 'hrEdit'
-    },
     children: [
       {
+        canActivate: [PolicyGuard],
+        path: 'report/supervisor',
+        component: StaffReportComponent,
+        resolve: {
+          staff: StaffSummariesResolveService
+        },
+        data: {
+          requirePolicy: 'isSupervisor',
+          supervisor: true
+        }
+      },
+      {
+        canActivate: [PolicyGuard],
         path: 'report',
         component: StaffReportComponent,
         resolve: {
           staff: StaffSummariesResolveService
-        }
+        },
+        data: {
+          requirePolicy: 'hrEdit'
+        },
       }
     ]
   },
@@ -110,4 +122,4 @@ const routes: Routes = [
     PersonRequiredGuard
   ]
 })
-export class PeopleRoutingModule {}
+export class PeopleRoutingModule { }
