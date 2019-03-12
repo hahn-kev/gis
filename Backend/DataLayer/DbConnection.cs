@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Backend.Entities;
+using Backend.Linq2DbIdentity;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.DataProvider;
-using LinqToDB.Identity;
 using LinqToDB.Mapping;
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
 
@@ -38,23 +39,23 @@ namespace Backend.DataLayer
         IQueryable<Staff> Staff { get; }
         IQueryable<StaffTraining> StaffTraining { get; }
         IQueryable<IdentityUser> Users { get; }
-        IQueryable<LinqToDB.Identity.IdentityUserClaim<int>> UserClaims { get; }
-        IQueryable<LinqToDB.Identity.IdentityUserLogin<int>> UserLogins { get; }
-        IQueryable<LinqToDB.Identity.IdentityUserRole<int>> UserRoles { get; }
-        IQueryable<LinqToDB.Identity.IdentityUserToken<int>> UserTokens { get; }
-        IQueryable<LinqToDB.Identity.IdentityRole<int>> Roles { get; }
-        IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> RoleClaims { get; }
+        IQueryable<IdentityUserClaim<int>> UserClaims { get; }
+        IQueryable<IdentityUserLogin<int>> UserLogins { get; }
+        IQueryable<IdentityUserRole<int>> UserRoles { get; }
+        IQueryable<IdentityUserToken<int>> UserTokens { get; }
+        IQueryable<IdentityRole<int>> Roles { get; }
+        IQueryable<IdentityRoleClaim<int>> RoleClaims { get; }
         void TryCreateTable<T>();
         DataConnectionTransaction BeginTransaction();
         void CommitTransaction();
         void RollbackTransaction();
-        BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list);
+        BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list) where T : class;
         System.Data.IDbConnection Connection { get; }
         IDataProvider DataProvider { get; }
     }
 
     public class DbConnection :
-        LinqToDB.Identity.IdentityDataConnection<IdentityUser, LinqToDB.Identity.IdentityRole<int>, int>,
+        IdentityDataConnection<IdentityUser, IdentityRole<int>, int>,
         IDbConnection,
         IDisposable
     {
@@ -70,14 +71,14 @@ namespace Backend.DataLayer
             if (_hasSetupMapping) return;
             var builder = mappingSchema.GetFluentMappingBuilder();
             builder.Entity<IdentityUser>().HasIdentity(user => user.Id);
-            builder.Entity<LinqToDB.Identity.IdentityUserClaim<int>>().HasTableName("UserClaim")
+            builder.Entity<IdentityUserClaim<int>>().HasTableName("UserClaim")
                 .HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
-            builder.Entity<LinqToDB.Identity.IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
-            builder.Entity<LinqToDB.Identity.IdentityRoleClaim<int>>().HasTableName("RoleClaim")
+            builder.Entity<IdentityRole<int>>().HasTableName("Role").HasIdentity(role => role.Id);
+            builder.Entity<IdentityRoleClaim<int>>().HasTableName("RoleClaim")
                 .HasIdentity(claim => claim.Id).HasPrimaryKey(claim => claim.Id);
-            builder.Entity<LinqToDB.Identity.IdentityUserLogin<int>>().HasTableName("UserLogin");
-            builder.Entity<LinqToDB.Identity.IdentityUserToken<int>>().HasTableName("UserToken");
-            builder.Entity<LinqToDB.Identity.IdentityUserRole<int>>().HasTableName("UserRole");
+            builder.Entity<IdentityUserLogin<int>>().HasTableName("UserLogin");
+            builder.Entity<IdentityUserToken<int>>().HasTableName("UserToken");
+            builder.Entity<IdentityUserRole<int>>().HasTableName("UserRole");
             _hasSetupMapping = true;
         }
 
@@ -94,12 +95,12 @@ namespace Backend.DataLayer
         }
 
         IQueryable<IdentityUser> IDbConnection.Users => Users;
-        IQueryable<LinqToDB.Identity.IdentityUserClaim<int>> IDbConnection.UserClaims => UserClaims;
-        IQueryable<LinqToDB.Identity.IdentityUserLogin<int>> IDbConnection.UserLogins => UserLogins;
-        IQueryable<LinqToDB.Identity.IdentityUserRole<int>> IDbConnection.UserRoles => UserRoles;
-        IQueryable<LinqToDB.Identity.IdentityUserToken<int>> IDbConnection.UserTokens => UserTokens;
-        IQueryable<LinqToDB.Identity.IdentityRole<int>> IDbConnection.Roles => Roles;
-        IQueryable<LinqToDB.Identity.IdentityRoleClaim<int>> IDbConnection.RoleClaims => RoleClaims;
+        IQueryable<IdentityUserClaim<int>> IDbConnection.UserClaims => UserClaims;
+        IQueryable<IdentityUserLogin<int>> IDbConnection.UserLogins => UserLogins;
+        IQueryable<IdentityUserRole<int>> IDbConnection.UserRoles => UserRoles;
+        IQueryable<IdentityUserToken<int>> IDbConnection.UserTokens => UserTokens;
+        IQueryable<IdentityRole<int>> IDbConnection.Roles => Roles;
+        IQueryable<IdentityRoleClaim<int>> IDbConnection.RoleClaims => RoleClaims;
 
         public IQueryable<ImageInfo> Images => GetTable<ImageInfo>();
         public IQueryable<Attachment> Attachments => GetTable<Attachment>();
@@ -125,7 +126,7 @@ namespace Backend.DataLayer
         public IQueryable<Staff> Staff => GetTable<Staff>();
         public IQueryable<StaffTraining> StaffTraining => GetTable<StaffTraining>();
 
-        public BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list)
+        public BulkCopyRowsCopied BulkCopy<T>(IEnumerable<T> list) where T : class
         {
             return DataConnectionExtensions.BulkCopy(this, list);
         }

@@ -1,23 +1,15 @@
-using System;
 using System.Threading.Tasks;
 using Backend;
 using Backend.DataLayer;
-using Backend.Entities;
 using Backend.Services;
-using LinqToDB;
 using LinqToDB.Data;
-using LinqToDB.Identity;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Npgsql;
 using SendGrid.Helpers.Mail;
-using Attachment = Backend.Entities.Attachment;
-using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
 {

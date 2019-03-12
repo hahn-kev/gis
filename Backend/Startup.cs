@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Backend.Authorization;
 using Backend.Controllers;
 using Backend.DataLayer;
+using Backend.Linq2DbIdentity;
 using Backend.Services;
 using Backend.Utils;
 using LinqToDB.Data;
-using LinqToDB.Identity;
 using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,7 +57,7 @@ namespace Backend
             var settings = Configuration.Get<Settings>();
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
             services.Configure<TemplateSettings>(Configuration.GetSection("TemplateSettings"));
-            AddIdentity<IdentityUser, LinqToDB.Identity.IdentityRole<int>>(services,
+            AddIdentity<IdentityUser, IdentityRole<int>>(services,
                     options =>
                     {
                         options.SignIn.RequireConfirmedEmail = false;
@@ -93,6 +94,8 @@ namespace Backend
 
                     options.Filters.Add(typeof(GlobalExceptionHandler));
                 })
+                .AddControllersAsServices()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options =>
                 {
                     //time zone info won't be included, this is so we can pass a date from the front end without the timezone
@@ -197,7 +200,6 @@ namespace Backend
                 }
             }
 
-            services.AddScoped<AuthenticateController>();
             AddDatabase(services);
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
@@ -311,12 +313,12 @@ namespace Backend
             using (var scope = serviceProvider.CreateScope())
             {
                 var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
-                var roleManager = scope.ServiceProvider.GetService<RoleManager<LinqToDB.Identity.IdentityRole<int>>>();
+                var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole<int>>>();
                 var missingRoles =
                     new[] {"admin", "hr", "hradmin", "registrar"}.Except(roleManager.Roles.Select(role => role.Name));
                 foreach (var missingRole in missingRoles)
                 {
-                    await roleManager.CreateAsync(new LinqToDB.Identity.IdentityRole<int>(missingRole));
+                    await roleManager.CreateAsync(new IdentityRole<int>(missingRole));
                 }
 
                 //to configure db look at ServiceFixture.SetupSchema

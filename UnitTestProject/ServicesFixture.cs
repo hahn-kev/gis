@@ -11,8 +11,8 @@ using Backend.Entities;
 using Backend.Services;
 using Bogus;
 using LinqToDB;
-using LinqToDB.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
@@ -21,9 +21,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using IdentityUser = Backend.Entities.IdentityUser;
-
-//using Microsoft.AspNetCore.Mvc.Testing;
-//using Microsoft.AspNetCore.TestHost;
 
 namespace UnitTestProject
 {

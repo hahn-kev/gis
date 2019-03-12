@@ -146,7 +146,7 @@ namespace UnitTestProject
                 };
             }
 
-            IEnumerable<(int?, PersonRoleWithJob[])> MakeValues()
+            IEnumerable<(int, PersonRoleWithJob[])> MakeValues()
             {
                 var twoYearsAgo = new DateTime(2018, 2, 22) - TimeSpan.FromDays(2 * 366);
                 yield return (10,

@@ -1,11 +1,11 @@
 ﻿using System;
-using LinqToDB.Identity;
 using LinqToDB.Mapping;
+using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Entities
 {
     [Table("User", IsColumnAttributeRequired = false)]
-    public class IdentityUser: IdentityUser<int>, IUser
+    public class IdentityUser : IdentityUser<int>, IUser
     {
         public bool ResetPassword { get; set; }
         public Guid? PersonId { get; set; }
