@@ -112,6 +112,17 @@ namespace Backend.Controllers
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }
 
+        [HttpGet("role")]
+        [MyAuthorize(MyPolicies.isSupervisor)]
+        public List<PersonRoleWithJob> SupervisorsRoles(bool canStartDuringRange,
+            DateTime beginRange,
+            DateTime endRange)
+        {
+            var groupId = User.SupervisorGroupId();
+            if (!groupId.HasValue) return new List<PersonRoleWithJob>();
+            return _personService.RolesForOrgGroup(canStartDuringRange, beginRange, endRange, groupId.Value);
+        }
+
         [HttpGet("staff")]
         [Authorize(Policy = "staff")]
         public IList<StaffWithName> Staff()

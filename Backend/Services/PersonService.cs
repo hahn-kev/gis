@@ -4,9 +4,6 @@ using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
-using Backend.Utils;
-using Microsoft.AspNetCore.Razor.Language.CodeGeneration;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Backend.Services
 {
@@ -47,7 +44,7 @@ namespace Backend.Services
         {
             return _personRepository.PeopleWithStaff.FirstOrDefault(person => person.Id == personId);
         }
-        
+
         public PersonWithOthers GetById(Guid id)
         {
             var personWithOthers = _personRepository.GetById(id);
@@ -58,6 +55,7 @@ namespace Backend.Services
                 personWithOthers.LeaveDetails = _leaveService.GetCurrentLeaveDetails(personWithOthers);
                 personWithOthers.StaffEndorsements = _endorsementService.ListStaffEndorsements(id);
             }
+
             return personWithOthers;
         }
 
@@ -178,6 +176,20 @@ namespace Backend.Services
             return _personRepository.PersonRolesWithJob
                 .Where(role => (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
                                (role.Active || role.EndDate > endRange)).ToList();
+        }
+
+        public List<PersonRoleWithJob> RolesForOrgGroup(bool canStartDuringRange,
+            DateTime beginRange,
+            DateTime endRange,
+            Guid groupId)
+        {
+            //todo filter by groupId
+            throw new NotImplementedException();
+            return
+                _personRepository.PersonRolesWithJob
+                    .Where(role =>
+                        (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
+                        (role.Active || role.EndDate > endRange)).ToList();
         }
 
         #endregion
