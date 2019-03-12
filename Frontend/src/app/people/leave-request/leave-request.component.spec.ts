@@ -6,8 +6,8 @@ import {
   MatCardModule,
   MatChipsModule,
   MatDatepickerModule,
-  MatIconModule,
   MatDialog,
+  MatIconModule,
   MatInputModule,
   MatSelectModule,
   MatSlideToggleModule,
@@ -26,8 +26,8 @@ import { LeaveRequestWithNames } from './leave-request';
 import { UserToken } from '../../login/user-token';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
-import SpyObj = jasmine.SpyObj;
 import { HolidayService } from '../../holiday/holiday.service';
+import SpyObj = jasmine.SpyObj;
 
 @Directive({
   selector: '[appTemplateContent]'
@@ -37,7 +37,7 @@ class MockAppTemplateContentDirective {
   @Input('appTemplateContent') appTemplateContent: string;
 }
 
-fdescribe('LeaveRequestComponent', () => {
+describe('LeaveRequestComponent', () => {
   let component: LeaveRequestComponent;
   let fixture: ComponentFixture<LeaveRequestComponent>;
   let dialogSpy: SpyObj<MatDialog>;

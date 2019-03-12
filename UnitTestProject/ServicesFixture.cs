@@ -106,6 +106,7 @@ namespace UnitTestProject
             TryCreateTable<Attachment>(DbConnection);
             TryCreateTable<MissionOrg>(DbConnection);
             TryCreateTable<MissionOrgYearSummary>(DbConnection);
+            TryCreateTable<Holiday>(DbConnection);
 
             DbConnection.MappingSchema.SetConvertExpression<string, string[]>(
                 s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
