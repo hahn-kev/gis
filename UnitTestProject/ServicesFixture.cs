@@ -514,6 +514,7 @@ namespace UnitTestProject
 
             DbConnection.Insert(AutoFaker.Generate<Grade>());
             DbConnection.Insert(AutoFaker.Generate<MissionOrg>());
+            DbConnection.Insert(AutoFaker.Generate<Holiday>());
             DbConnection.Insert(AutoFaker.Generate<IdentityRoleClaim<int>>());
             DbConnection.Insert(AutoFaker.Generate<IdentityUserClaim<int>>());
             DbConnection.Insert(AutoFaker.Generate<IdentityUserLogin<int>>());
