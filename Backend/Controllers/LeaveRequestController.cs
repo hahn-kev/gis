@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Backend.Authorization;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +15,10 @@ namespace Backend.Controllers
     public class LeaveRequestController : MyController
     {
         private readonly LeaveService _leaveService;
-        private readonly IAuthorizationService _authorizationService;
 
-        public LeaveRequestController(LeaveService leaveService, IAuthorizationService authorizationService)
+        public LeaveRequestController(LeaveService leaveService)
         {
             _leaveService = leaveService;
-            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -49,10 +48,11 @@ namespace Backend.Controllers
         }
 
         [HttpGet("person/{personId}")]
-        [Authorize("leaveRequest")]
-        public IList<LeaveRequestWithNames> ListByPerson(Guid personId)
+        public Task<ActionResult<IList<LeaveRequestWithNames>>> ListByPerson(Guid personId)
         {
-            return _leaveService.ListByPersonId(personId);
+            return TryExecute(MyPolicies.peopleEdit,
+                personId,
+                () => _leaveService.ListByPersonId(personId));
         }
 
         [HttpGet("supervisor/{supervisorId}")]
@@ -69,16 +69,21 @@ namespace Backend.Controllers
         }
 
         [HttpPut]
-        public LeaveRequest Update([FromBody] LeaveRequest updatedLeaveRequest)
+        public Task<ActionResult<LeaveRequest>> Update([FromBody] LeaveRequest updatedLeaveRequest)
         {
-            if (!User.IsAdminOrHr())
-            {
-                _leaveService.ThrowIfHrRequiredForUpdate(updatedLeaveRequest, User.PersonId());
-            }
+            return TryExecute(MyPolicies.canRequestLeave,
+                updatedLeaveRequest,
+                () =>
+                {
+                    if (!User.IsAdminOrHr())
+                    {
+                        _leaveService.ThrowIfHrRequiredForUpdate(updatedLeaveRequest);
+                    }
 
-            _leaveService.UpdateLeave(updatedLeaveRequest);
+                    _leaveService.UpdateLeave(updatedLeaveRequest);
 
-            return updatedLeaveRequest;
+                    return updatedLeaveRequest;
+                });
         }
 
         [HttpDelete("{id}")]
@@ -98,39 +103,45 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RequestLeave([FromBody] LeaveRequest leaveRequest)
+        public Task<ActionResult<Person>> RequestLeave([FromBody] LeaveRequest leaveRequest)
         {
-            if (!await _leaveService.CanRequestLeave(User, leaveRequest))
-            {
-                throw new UnauthorizedAccessException("Logged in user isn't allowed to request leave for this person");
-            }
+            return TryExecute(MyPolicies.canRequestLeave,
+                leaveRequest,
+                () =>
+                {
+                    if (!User.IsAdminOrHr())
+                    {
+                        _leaveService.ThrowIfHrRequiredForUpdate(leaveRequest);
+                    }
 
-            if (!User.IsAdminOrHr())
-            {
-                _leaveService.ThrowIfHrRequiredForUpdate(leaveRequest, User.PersonId());
-            }
-
-            Person notified = await _leaveService.RequestLeave(leaveRequest);
-            return Json(notified);
+                    return _leaveService.RequestLeave(leaveRequest);
+                });
         }
 
         [HttpGet("approve/{leaveRequestId}")]
         [Authorize("isSupervisor")]
-        public async Task<IActionResult> Approve(Guid leaveRequestId)
+        public Task<ActionResult> Approve(Guid leaveRequestId)
         {
             var personId = User.PersonId();
             if (personId == null)
                 throw new UnauthorizedAccessException(
                     "Logged in user must be connected to a person, talk to HR about this issue");
-            var (_, requester, notified) = await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
-            if (notified)
-            {
-                return this.ShowFrontendMessage(
-                    $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} has been notified");
-            }
+            return TryExecute<Func<Guid>>(MyPolicies.peopleEdit,
+                () => _leaveService.GetLeavePersonId(leaveRequestId) ??
+                      throw new ArgumentException("Unable to find leave request, it may have been deleted"),
+                async () =>
+                {
+                    var (_, requester, notified) =
+                        await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
+                    if (notified)
+                    {
+                        return this.ShowFrontendMessage(
+                            $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} has been notified");
+                    }
 
-            return this.ShowFrontendMessage(
-                $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} does not have an email and has not been notified");
+                    return this.ShowFrontendMessage(
+                        $"Leave request approved{Environment.NewLine}{requester.PreferredName ?? requester.FirstName} does not have an email and has not been notified");
+                });
         }
 
 

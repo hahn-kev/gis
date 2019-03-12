@@ -352,7 +352,7 @@ const routes: Routes = [
                 path: '',
                 canActivate: [PolicyGuard],
                 data: {
-                  requirePolicy: 'leaveManager'
+                  requirePolicy: 'staffLeaveManager'
                 },
                 children: [
                   {
@@ -369,7 +369,8 @@ const routes: Routes = [
                       leave: LeaveListResolverService
                     },
                     data: {
-                      all: true
+                      all: true,
+                      requirePolicy: 'leaveManager'
                     }
                   },
                   {

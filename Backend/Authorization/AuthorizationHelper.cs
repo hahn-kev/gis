@@ -13,6 +13,7 @@ namespace Backend.Authorization
             services.AddScoped<IAuthorizationHandler, PersonEditAuthorizationHandlerLazy>();
             services.AddScoped<PersonEditAuthorizationHandlerLazy>();
             services.AddScoped<IAuthorizationHandler, StaffEditAuthorizationHandler>();
+            services.AddScoped<IAuthorizationHandler, CanRequestLeaveHandler>();
         }
 
         private static void AddPolicies(AuthorizationOptions options)
@@ -43,12 +44,16 @@ namespace Backend.Authorization
                     context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
             options.AddPolicy(nameof(MyPolicies.isSupervisor),
                 builder => builder.RequireClaim(AuthenticateController.ClaimSupervisor));
+
+            //leave
             options.AddPolicy(nameof(MyPolicies.leaveRequest),
                 builder => builder.RequireAssertion(context =>
                     context.User.IsAdminOrHr() || context.User.IsHighLevelSupervisor()));
             options.AddPolicy(nameof(MyPolicies.leaveSupervisor),
                 builder => builder.RequireAssertion(context =>
                     context.User.IsSupervisor() || context.User.IsLeaveDelegate()));
+            options.AddPolicy(nameof(MyPolicies.canRequestLeave),
+                builder => builder.AddRequirements(new CanRequestLeaveRequirement()));
 
             options.AddPolicy(nameof(MyPolicies.training),
                 builder => builder.RequireAssertion(context =>
@@ -104,6 +109,7 @@ namespace Backend.Authorization
         people,
         sendingOrg,
         orgTreeData,
-        hrSupervisorAdmin
+        hrSupervisorAdmin,
+        canRequestLeave
     }
 }

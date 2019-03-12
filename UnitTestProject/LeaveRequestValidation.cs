@@ -26,24 +26,19 @@ namespace UnitTestProject
             leaveRequest.Days = leaveRequest.CalculateLength();
             return leaveRequest;
         }
-        
+
         #region validation
 
         [Fact]
         public void ThrowsErrorWhenPersonIsInvalid()
         {
-            var personId = Guid.NewGuid();
             LeaveRequest oldRequest = GenerateRequest();
             LeaveRequest newRequest = oldRequest.Copy();
-            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
-            Assert.Contains("modify this leave request", ex.Message);
-
-            personId = oldRequest.PersonId;
             newRequest.PersonId = Guid.NewGuid();
-            ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, personId));
-            Assert.Contains("modify this leave request", ex.Message);
+
+            var ex = Assert.Throws<UnauthorizedAccessException>(() =>
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+            ex.Message.ShouldContain("change the person");
         }
 
         [Fact]
@@ -55,14 +50,14 @@ namespace UnitTestProject
             newRequest.Days--;
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
 
             Assert.Contains("must match calculated", ex.Message);
 
             newRequest.Days = newRequest.CalculateLength();
             newRequest.EndDate += TimeSpan.FromDays(4);
             ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
 
             Assert.Contains("must match calculated", ex.Message);
         }
@@ -76,7 +71,7 @@ namespace UnitTestProject
             newRequest.Days++;
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
 
             Assert.Contains("modify the length", ex.Message);
         }
@@ -90,7 +85,7 @@ namespace UnitTestProject
             newRequest.EndDate += TimeSpan.FromDays(4);
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
 
             Assert.Contains("modify the start or end", ex.Message);
         }
@@ -103,7 +98,7 @@ namespace UnitTestProject
             oldRequest.Approved = false;
             newRequest.Approved = true;
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
             Assert.Contains("approve", ex.Message);
         }
 
@@ -118,7 +113,7 @@ namespace UnitTestProject
             LeaveRequest newRequest = oldRequest.Copy();
             newRequest.Days = 0.5m;
             //does not throw
-            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId);
+            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest);
         }
 
         [Fact]
@@ -133,7 +128,7 @@ namespace UnitTestProject
             newRequest.Days = 0.5m;
             //does not throw
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
         }
 
         [Fact]
@@ -142,7 +137,7 @@ namespace UnitTestProject
             LeaveRequest request = GenerateRequest();
             request.OverrideDays = true;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(null, request));
         }
 
         [Fact]
@@ -156,7 +151,7 @@ namespace UnitTestProject
             //should be 3 days
             request.Days = 2;
             Assert.Throws<ArgumentException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(null, request, request.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(null, request));
             request.Days.ShouldBe(2);
         }
 
@@ -166,13 +161,13 @@ namespace UnitTestProject
             LeaveRequest oldRequest = GenerateRequest();
             oldRequest.Approved = true;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest));
             oldRequest.Approved = false;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest));
             oldRequest.Approved = null;
             //doesn't throw
-            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, oldRequest.PersonId);
+            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest);
         }
 
         #endregion

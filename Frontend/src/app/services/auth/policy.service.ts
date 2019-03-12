@@ -15,6 +15,7 @@ export class PolicyService {
       orgGroupManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
       orgChart: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isSupervisor,
       leaveManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
+      staffLeaveManager: (user: UserToken) => user.isHrOrAdmin() || user.isLeaveDelegate || user.isSupervisor,
       leaveSupervisor: (user: UserToken) => user.isLeaveDelegate || user.isSupervisor,
       endorsementManager: (user: UserToken) => user.hasAnyRole(['admin', 'hr']) || user.isHigherup,
       peopleEdit: (user: UserToken) => user.hasAnyRole(['admin', 'hr', 'registrar']) || user.isSupervisor,

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Services
 {
@@ -18,21 +15,18 @@ namespace Backend.Services
         private readonly PersonRepository _personRepository;
         private readonly LeaveRequestRepository _leaveRequestRepository;
         private readonly IEntityService _entityService;
-        private readonly IAuthorizationService _authorizationService;
         private readonly LeaveRequestEmailService _leaveRequestEmailService;
 
         public LeaveService(OrgGroupRepository orgGroupRepository,
             PersonRepository personRepository,
             LeaveRequestRepository leaveRequestRepository,
             IEntityService entityService,
-            IAuthorizationService authorizationService,
             LeaveRequestEmailService leaveRequestEmailService)
         {
             _orgGroupRepository = orgGroupRepository;
             _personRepository = personRepository;
             _leaveRequestRepository = leaveRequestRepository;
             _entityService = entityService;
-            _authorizationService = authorizationService;
             _leaveRequestEmailService = leaveRequestEmailService;
         }
 
@@ -181,17 +175,6 @@ namespace Backend.Services
                     leaveUsage)));
 
             return approver;
-        }
-
-
-        public async ValueTask<bool> CanRequestLeave(ClaimsPrincipal user, LeaveRequest leaveRequest)
-        {
-            if (leaveRequest.PersonId == user.PersonId()) return true;
-            if ((await _authorizationService.AuthorizeAsync(user, "leaveRequest")).Succeeded) return true;
-            var groupId = user.LeaveDelegateGroupId() ?? user.SupervisorGroupId();
-            if (groupId != null)
-                return PeopleWithStaffUnderGroup(groupId.Value).Any(person => person.Id == leaveRequest.PersonId);
-            return false;
         }
 
         public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
@@ -371,16 +354,16 @@ namespace Backend.Services
             }).ToList();
         }
 
-        public void ThrowIfHrRequiredForUpdate(LeaveRequest updatedLeaveRequest, Guid? personMakingChanges)
+        public void ThrowIfHrRequiredForUpdate(LeaveRequest updatedLeaveRequest)
         {
             LeaveRequest oldRequest = null;
             if (!updatedLeaveRequest.IsNew())
                 oldRequest = _leaveRequestRepository.LeaveRequests.SingleOrDefault(request =>
                     request.Id == updatedLeaveRequest.Id);
-            ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest, personMakingChanges);
+            ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest);
         }
 
-        private IQueryable<PersonWithStaff> PeopleWithStaffUnderGroup(Guid orgGroupId)
+        public IQueryable<PersonWithStaff> PeopleWithStaffUnderGroup(Guid orgGroupId)
         {
             return (from person in _personRepository.PeopleWithStaff
                 from org in _orgGroupRepository.GetByIdWithChildren(orgGroupId)
@@ -388,9 +371,7 @@ namespace Backend.Services
                 select person).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
         }
 
-        public static void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
-            LeaveRequest newRequest,
-            Guid? personMakingChanges)
+        public static void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest, LeaveRequest newRequest)
         {
             if (oldRequest == null)
             {
@@ -415,10 +396,9 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException("You're not allowed to modify approved leave requests");
             }
 
-            if (oldRequest.PersonId != personMakingChanges ||
-                oldRequest.PersonId != newRequest.PersonId)
+            if (oldRequest.PersonId != newRequest.PersonId)
             {
-                throw new UnauthorizedAccessException("You aren't allowed to modify this leave request");
+                throw new UnauthorizedAccessException("You aren't allowed to change the person requesting leave");
             }
 
             if (!oldRequest.OverrideDays && newRequest.OverrideDays)

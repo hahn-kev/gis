@@ -6,7 +6,6 @@ using Backend.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Net.Http.Headers;
 
 namespace Backend.Controllers
@@ -20,7 +19,7 @@ namespace Backend.Controllers
                     .Select(x => x.Description)));
         }
 
-        public static IActionResult ShowFrontendMessage(this Controller controller, string message)
+        public static ActionResult ShowFrontendMessage(this Controller controller, string message)
         {
             return controller.Redirect(RedirectFrontendMessagePath(message));
         }
