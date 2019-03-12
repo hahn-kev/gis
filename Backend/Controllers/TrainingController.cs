@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using Backend.Authorization;
 using Backend.Entities;
 using Backend.Services;
-using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
-    public class TrainingController : Controller
+    public class TrainingController : MyController
     {
         private readonly TrainingService _trainingService;
 
@@ -62,11 +62,15 @@ namespace Backend.Controllers
         }
 
         [HttpPost("staff")]
-        [Authorize(Policy = "training")]
-        public StaffTraining Save([FromBody] StaffTraining staffTraining)
+        public Task<ActionResult<StaffTraining>> Save([FromBody] StaffTraining staffTraining)
         {
-            _trainingService.Save(staffTraining);
-            return staffTraining;
+            return TryExecute(MyPolicies.staffEdit,
+                staffTraining.StaffId,
+                () =>
+                {
+                    _trainingService.Save(staffTraining);
+                    return staffTraining;
+                });
         }
 
         [HttpDelete("staff/{id}")]
@@ -78,7 +82,8 @@ namespace Backend.Controllers
 
         [HttpPost("staff/allComplete")]
         [Authorize(Policy = "training")]
-        public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds, Guid? requirementId,
+        public IActionResult MarkAllComplete([FromBody] List<Guid> staffIds,
+            Guid? requirementId,
             DateTime? completeDate)
         {
             if (completeDate == null) throw new ArgumentNullException(nameof(completeDate));
