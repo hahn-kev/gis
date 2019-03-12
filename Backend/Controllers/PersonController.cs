@@ -112,7 +112,7 @@ namespace Backend.Controllers
             return _personService.Roles(canStartDuringRange, beginRange, endRange);
         }
 
-        [HttpGet("role")]
+        [HttpGet("role/supervisor")]
         [MyAuthorize(MyPolicies.isSupervisor)]
         public List<PersonRoleWithJob> SupervisorsRoles(bool canStartDuringRange,
             DateTime beginRange,
@@ -142,6 +142,15 @@ namespace Backend.Controllers
         public IList<PersonWithStaffSummaries> StaffSummaries()
         {
             return _personService.StaffSummaries.RemoveSalaryStaff();
+        }
+
+        [HttpGet("staff/summaries/supervisor")]
+        [MyAuthorize(MyPolicies.isSupervisor)]
+        public IList<PersonWithStaffSummaries> StaffSummariesForSupervisor()
+        {
+            var groupId = User.SupervisorGroupId();
+            if (!groupId.HasValue) return new List<PersonWithStaffSummaries>();
+            return _personService.GetStaffSummariesForOrgGroup(groupId.Value).RemoveSalaryStaff();
         }
 
         [HttpGet("staff/roles")]

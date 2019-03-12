@@ -65,6 +65,14 @@ export class PersonService {
     return this.http.get<RoleWithJob[]>('/api/person/role', {params: params}).toPromise();
   }
 
+  getSupervisorRoles(canStartDuringRange: boolean, beginRange: Date, endRange: Date): Promise<RoleWithJob[]> {
+    const params = new HttpParams()
+      .append('canStartDuringRange', canStartDuringRange.toString())
+      .append('beginRange', beginRange.toISOString())
+      .append('endRange', endRange.toISOString());
+    return this.http.get<RoleWithJob[]>('/api/person/role/supervisor', {params: params}).toPromise();
+  }
+
   getStaff(): Observable<StaffWithName[]> {
     return this.http.get<StaffWithName[]>('/api/person/staff');
   }
@@ -75,6 +83,10 @@ export class PersonService {
 
   getStaffSummaries() {
     return this.http.get<PersonWithStaffSummaries[]>('/api/person/staff/summaries');
+  }
+
+  getSupervisorStaffSummaries() {
+    return this.http.get<PersonWithStaffSummaries[]>('/api/person/staff/summaries/supervisor');
   }
 
   getStaffWithRoles() {

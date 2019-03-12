@@ -16,6 +16,7 @@ namespace Backend.Services
         private readonly LeaveService _leaveService;
         private readonly EvaluationRepository _evaluationRepository;
         private readonly EndorsementService _endorsementService;
+        private readonly OrgGroupRepository _orgGroupRepository;
 
         public PersonService(PersonRepository personRepository,
             IEntityService entityService,
@@ -23,7 +24,8 @@ namespace Backend.Services
             JobRepository jobRepository,
             LeaveService leaveService,
             EvaluationRepository evaluationRepository,
-            EndorsementService endorsementService)
+            EndorsementService endorsementService,
+            OrgGroupRepository orgGroupRepository)
         {
             _personRepository = personRepository;
             _entityService = entityService;
@@ -32,6 +34,7 @@ namespace Backend.Services
             _leaveService = leaveService;
             _evaluationRepository = evaluationRepository;
             _endorsementService = endorsementService;
+            _orgGroupRepository = orgGroupRepository;
         }
 
         #region people
@@ -107,7 +110,7 @@ namespace Backend.Services
                 {
                     //find the current spouse and make them not spouses anymore
                     _personRepository.PeopleExtended.Where(extended => extended.SpouseId == person.Id)
-                        .Set(extended => extended.SpouseId, (Guid?) null).Update();
+                        .Set(extended => extended.SpouseId, (Guid?)null).Update();
                 }
             }
         }
@@ -121,6 +124,15 @@ namespace Backend.Services
         public IList<PersonWithStaffSummaries> StaffSummaries =>
             _personRepository.PeopleWithStaffSummaries.Where(staff => staff.StaffId != null)
                 .OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName).ToList();
+
+        public List<PersonWithStaffSummaries> GetStaffSummariesForOrgGroup(Guid orgGroupId)
+        {
+            return (from person in _personRepository.PeopleWithStaffSummaries
+                    from orgGroup in _orgGroupRepository.GetByIdWithChildren(orgGroupId).InnerJoin(org => org.Id == person.Staff.OrgGroupId)
+                    where person.StaffId != null
+                    orderby person.PreferredName ?? person.FirstName, person.LastName
+                    select person).ToList();
+        }
 
         public List<PersonWithRoleSummaries> GetPersonWithRoleSummariesList()
         {
@@ -159,7 +171,7 @@ namespace Backend.Services
                 _personRepository.Staff
                     .Where(staff => staff.Id == _personRepository.People
                                         .Where(person => person.Id == role.PersonId && person.StaffId != null)
-                                        .Select(person => (Guid) person.StaffId).SingleOrDefault())
+                                        .Select(person => (Guid)person.StaffId).SingleOrDefault())
                     .Set(staff => staff.OrgGroupId,
                         () => _jobRepository.Job.Where(job => job.Id == role.JobId).Select(job => job.OrgGroupId)
                             .SingleOrDefault()).Update();
@@ -183,13 +195,11 @@ namespace Backend.Services
             DateTime endRange,
             Guid groupId)
         {
-            //todo filter by groupId
-            throw new NotImplementedException();
-            return
-                _personRepository.PersonRolesWithJob
-                    .Where(role =>
-                        (role.StartDate < beginRange || (canStartDuringRange && role.StartDate < endRange)) &&
-                        (role.Active || role.EndDate > endRange)).ToList();
+            return (from person in _personRepository.PersonRolesWithJob
+                    from orgGroup in _orgGroupRepository.GetByIdWithChildren(groupId).InnerJoin(org => org.Id == person.Job.OrgGroupId)
+                    where (person.StartDate < beginRange || (canStartDuringRange && person.StartDate < endRange)) &&
+                    (person.Active || person.EndDate > endRange)
+                    select person).ToList();
         }
 
         #endregion

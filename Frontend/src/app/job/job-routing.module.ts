@@ -40,25 +40,6 @@ const routes: Routes = [
         }
       },
       {
-        path: 'report',
-        children: [
-          {
-            path: 'roles/:year',
-            component: RolesReportComponent,
-            resolve: {
-              roles: RolesResolverService
-            }
-          },
-          {
-            path: 'roles',
-            component: RolesReportComponent,
-            resolve: {
-              roles: RolesResolverService
-            }
-          }
-        ]
-      },
-      {
         path: 'grade',
         children: [
           {
@@ -77,6 +58,57 @@ const routes: Routes = [
             }
           }
         ]
+      }
+    ]
+  },
+  {
+    path: 'report',
+    children: [
+      {
+        canActivate: [PolicyGuard],
+        path: 'roles/supervisor/:year',
+        component: RolesReportComponent,
+        resolve: {
+          roles: RolesResolverService
+        },
+        data: {
+          supervisor: true,
+          requirePolicy: 'isSupervisor'
+        }
+      },
+      {
+        canActivate: [PolicyGuard],
+        path: 'roles/supervisor',
+        component: RolesReportComponent,
+        resolve: {
+          roles: RolesResolverService
+        },
+        data: {
+          supervisor: true,
+          requirePolicy: 'isSupervisor'
+        }
+      },
+      {
+        canActivate: [PolicyGuard],
+        path: 'roles/:year',
+        component: RolesReportComponent,
+        resolve: {
+          roles: RolesResolverService
+        },
+        data: {
+          requirePolicy: 'hrEdit'
+        },
+      },
+      {
+        canActivate: [PolicyGuard],
+        path: 'roles',
+        component: RolesReportComponent,
+        resolve: {
+          roles: RolesResolverService
+        },
+        data: {
+          requirePolicy: 'hrEdit'
+        },
       }
     ]
   }
