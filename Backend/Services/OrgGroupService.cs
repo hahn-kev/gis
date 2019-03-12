@@ -82,6 +82,16 @@ namespace Backend.Services
             ).AnyAsync(group => group.Id == groupId);
         }
 
+        public Task<bool> IsStaffInGroup(Guid staffId, Guid groupId)
+        {
+            return _orgGroupRepository.GetWithParentsWhere(group =>
+                group.Id == _personRepository.Staff
+                    .Where(staff => staff.Id == staffId)
+                    .Select(staff => staff.OrgGroupId)
+                    .Single()
+            ).AnyAsync(group => group.Id == groupId);
+        }
+
         public enum SortedBy
         {
             ParentFirst,
