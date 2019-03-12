@@ -1,12 +1,12 @@
-import { Injectable, Injector } from '@angular/core';
-import { GoogleApiService } from 'ng-gapi';
-import { SettingsService } from '../services/settings.service';
-import { LoginService } from '../services/auth/login.service';
+import {Injectable, Injector} from '@angular/core';
+import {GoogleApiService} from 'ng-gapi';
+import {SettingsService} from '../services/settings.service';
+import {LoginService} from '../services/auth/login.service';
 // noinspection ES6UnusedImports
 import {} from 'google.picker';
-import { Attachment } from '../components/attachments/attachment';
-import { PickerDocument, PickerResponse } from './picker-response';
-import { first } from 'rxjs/operators';
+import {Attachment} from '../attachments/attachment';
+import {PickerDocument, PickerResponse} from './picker-response';
+import {first} from 'rxjs/operators';
 
 @Injectable()
 export class DrivePickerService {

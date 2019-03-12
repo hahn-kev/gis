@@ -41,7 +41,7 @@ namespace Backend.Services
 
         public IList<Person> People() => _personRepository.People.Where(person => !person.Deleted).ToList();
 
-        public IList<Person> SchoolAids() => _personRepository.People.Where(p => p.IsSchoolAid && !p.Deleted).ToList();
+        public IList<Person> SchoolAids() => _personRepository.GetSchoolAids();
 
         public PersonWithStaff GetStaffById(Guid personId)
         {
@@ -123,6 +123,16 @@ namespace Backend.Services
         public IList<PersonWithStaffSummaries> StaffSummaries =>
             _personRepository.PeopleWithStaffSummaries.Where(staff => staff.StaffId != null)
                 .OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName).ToList();
+
+        public List<PersonWithRoleSummaries> GetPersonWithRoleSummariesList()
+        {
+            return _personRepository.GetPersonWithRoleSummariesList();
+        }
+
+        public List<PersonWithRoleSummaries> GetSchoolAidSummaries()
+        {
+            return _personRepository.GetSchoolAidSummaries();
+        }
 
         public IList<StaffWithRoles> StaffWithRoles => _personRepository.StaffWithRoles;
 

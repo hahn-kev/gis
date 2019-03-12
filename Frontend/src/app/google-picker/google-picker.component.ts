@@ -1,7 +1,7 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { DrivePickerService } from './drive-picker.service';
-import { Attachment } from '../components/attachments/attachment';
-import { PickerResponse } from './picker-response';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {DrivePickerService} from './drive-picker.service';
+import {Attachment} from '../attachments/attachment';
+import {PickerResponse} from './picker-response';
 
 @Component({
   selector: 'app-google-picker',

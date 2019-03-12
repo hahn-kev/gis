@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { of } from 'rxjs';
-import { AttachmentService } from './attachment.service';
-import { Attachment } from './attachment';
-import { MatDialog } from '@angular/material';
-import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { mergeMap } from 'rxjs/operators';
+import {Component, OnInit} from '@angular/core';
+import {of} from 'rxjs';
+import {AttachmentService} from './attachment.service';
+import {Attachment} from './attachment';
+import {MatDialog} from '@angular/material';
+import {mergeMap} from 'rxjs/operators';
+import {ConfirmDialogComponent} from '../dialog/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-attachments',

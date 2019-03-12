@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { JwtHelperService } from './jwt-helper.service';
-import { filter, map } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {JwtHelperService} from './jwt-helper.service';
+import {filter, map} from 'rxjs/operators';
 import * as Raven from 'raven-js';
-import { CookieService } from 'ngx-cookie-service';
-import { UserToken } from '../../login/user-token';
+import {CookieService} from 'ngx-cookie-service';
+import {UserToken} from '../../login/user-token';
 
 @Injectable()
 export class LoginService implements CanActivate {

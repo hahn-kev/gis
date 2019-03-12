@@ -9,11 +9,8 @@ import { IsNewResolverService } from './user/is-new-resolver.service';
 import { MessageComponent } from './message/message.component';
 import { IsSelfResolverService } from './user/is-self-resolver.service';
 import { LoginService } from './services/auth/login.service';
-import { PersonComponent } from './people/person/person.component';
 import { PersonResolverService } from './people/person-resolver.service';
-import { PeopleListComponent } from './people/list/people-list.component';
 import { PeopleResolveService } from './people/list/people-resolve.service';
-import { RolesReportComponent } from './people/roles-report/roles-report.component';
 import { RolesResolverService } from './people/roles-report/roles-resolver.service';
 import { GroupComponent } from './people/groups/group/group.component';
 import { GroupResolveService } from './people/groups/group/group-resolve.service';
@@ -31,31 +28,18 @@ import { StaffTrainingResolverService } from './people/training-requirement/staf
 import { StaffResolveService } from './people/staff-resolve.service';
 import { LeaveRequestResolverService } from './people/leave-request/leave-request-resolver.service';
 import { EmergencyContactResolverService } from './people/emergency-contact-resolver.service';
-import { SelfService } from './people/self/self.service';
 import { PeopleWithLeaveResolverService } from './people/leave-request/people-with-leave-resolver.service';
 import { LeaveReportComponent } from './people/leave-request/leave-report/leave-report.component';
-import { StaffReportComponent } from './people/staff/staff-report/staff-report.component';
-import { JobResolverService } from './job/job-resolver.service';
-import { JobListComponent } from './job/list/job-list.component';
-import { JobComponent } from './job/job/job.component';
-import { JobListResolverService } from './job/job-list-resolver.service';
 import { MissionOrgListComponent } from './mission-org/list/mission-org-list.component';
 import { MissionOrgResolverService } from './mission-org/edit/mission-org-resolver.service';
 import { MissionOrgListResolverService } from './mission-org/list/mission-org-list-resolver.service';
 import { MissionOrgComponent } from './mission-org/edit/mission-org.component';
-import { GradeListComponent } from './job/grade/list/grade-list.component';
-import { GradeListResolverService } from './job/grade/grade-list-resolver.service';
-import { GradeResolverService } from './job/grade/grade-resolver.service';
-import { GradeComponent } from 'app/job/grade/edit/grade.component';
-import { JobFilledListResolverService } from './job/list/job-filled-list-resolver.service';
 import { CanDeactivateGuard } from './services/can-deactivate.guard';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
-import { SchoolAidResolveService } from './people/list/school-aid-resolve.service';
 import { StaffSummariesResolveService } from './people/staff/staff-report/staff-summaries-resolve.service';
 import { PersonRequiredGuard } from './services/person-required.guard';
 import { OrgTreeComponent } from './org-tree/org-tree.component';
 import { AllRolesResolverService } from './org-tree/all-roles-resolver.service';
-import { EvaluationReportComponent } from './people/evaluation-report/evaluation-report.component';
 import { EvaluationSummaryResolveService } from './people/evaluation-report/evaluation-summary-resolve.service';
 import { OrgTreeDataResolverService } from './org-tree/org-tree-data-resolver.service';
 import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
@@ -99,134 +83,11 @@ const routes: Routes = [
       },
       {
         path: 'people',
-        canActivate: [PolicyGuard],
-        data: {
-          requirePolicy: 'peopleEdit'
-        },
-        children: [
-          {
-            path: 'edit/:id',
-            component: PersonComponent,
-            canDeactivate: [CanDeactivateGuard],
-            resolve: {
-              person: PersonResolverService,
-              people: PeopleResolveService
-            }
-          },
-          {
-            path: 'list',
-            component: PeopleListComponent,
-            resolve: {
-              people: PeopleResolveService
-            }
-          },
-          {
-            path: 'school-aid',
-            children: [
-              {
-                path: 'list',
-                component: PeopleListComponent,
-                data: {title: 'School Aids'},
-                resolve: {
-                  people: SchoolAidResolveService
-                }
-              }
-            ]
-          },
-          {
-            path: 'report',
-            children: [
-              {
-                path: 'evaluations',
-                component: EvaluationReportComponent,
-                resolve: {
-                  evaluationSummary: EvaluationSummaryResolveService
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        path: 'staff',
-        canActivate: [PolicyGuard],
-        data: {
-          requirePolicy: 'hrEdit'
-        },
-        children: [
-          {
-            path: 'report',
-            component: StaffReportComponent,
-            resolve: {
-              staff: StaffSummariesResolveService
-            }
-          }
-        ]
+        loadChildren: './people/people.module#PeopleModule',
       },
       {
         path: 'job',
-        canActivate: [PolicyGuard],
-        data: {
-          requirePolicy: 'hrEdit'
-        },
-        children: [
-          {
-            path: 'list',
-            component: JobListComponent,
-            resolve: {
-              jobs: JobFilledListResolverService
-            }
-          },
-          {
-            path: 'edit/:id',
-            component: JobComponent,
-            canDeactivate: [CanDeactivateGuard],
-            resolve: {
-              job: JobResolverService,
-              groups: GroupsResolveService,
-              grades: GradeListResolverService
-            }
-          },
-          {
-            path: 'report',
-            children: [
-              {
-                path: 'roles/:year',
-                component: RolesReportComponent,
-                resolve: {
-                  roles: RolesResolverService
-                }
-              },
-              {
-                path: 'roles',
-                component: RolesReportComponent,
-                resolve: {
-                  roles: RolesResolverService
-                }
-              }
-            ]
-          },
-          {
-            path: 'grade',
-            children: [
-              {
-                path: 'list',
-                component: GradeListComponent,
-                resolve: {
-                  grades: GradeListResolverService
-                }
-              },
-              {
-                path: 'edit/:id',
-                component: GradeComponent,
-                canDeactivate: [CanDeactivateGuard],
-                resolve: {
-                  grade: GradeResolverService
-                }
-              }
-            ]
-          }
-        ]
+        loadChildren: './job/job.module#JobModule'
       },
       {
         path: 'groups',
@@ -584,15 +445,7 @@ const routes: Routes = [
           }
         ]
       },
-      {
-        path: 'self',
-        canActivate: [PersonRequiredGuard],
-        component: PersonComponent,
-        resolve: {
-          person: SelfService,
-          people: PeopleResolveService
-        }
-      },
+
       {
         path: 'sandbox',
         component: SandboxComponent
@@ -643,15 +496,9 @@ const routes: Routes = [
     LeaveRequestResolverService,
     EmergencyContactResolverService,
     PeopleWithLeaveResolverService,
-    JobResolverService,
-    JobListResolverService,
     MissionOrgResolverService,
     MissionOrgListResolverService,
-    GradeResolverService,
-    GradeListResolverService,
-    JobFilledListResolverService,
     CanDeactivateGuard,
-    SchoolAidResolveService,
     StaffSummariesResolveService,
     PersonRequiredGuard,
     AllRolesResolverService,

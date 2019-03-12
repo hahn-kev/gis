@@ -85,6 +85,7 @@ html, body {
   position: fixed !important;
   bottom: 23px;
   right: 23px;
+  z-index: 25;
   @media print {
     visibility: hidden;
   }
