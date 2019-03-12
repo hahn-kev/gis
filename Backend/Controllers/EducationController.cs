@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using Backend.Authorization;
 using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +18,19 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public Education Update([FromBody] Education education)
+        public Task<ActionResult<Education>> Update([FromBody] Education education)
         {
-            _entityService.Save(education);
-            return education;
+            return TryExecute(MyPolicies.peopleEdit,
+                education.PersonId,
+                () =>
+                {
+                    _entityService.Save(education);
+                    return education;
+                });
         }
 
         [HttpDelete("{id}")]
+        [MyAuthorize(MyPolicies.hrSupervisorAdmin)]
         public IActionResult Delete(Guid id)
         {
             _entityService.Delete<Education>(id);
