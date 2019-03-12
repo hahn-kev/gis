@@ -64,6 +64,10 @@ import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { EndorsementResolverService } from './endorsement/endorsement-resolver.service';
 import { PolicyGuard } from './services/auth/policy.guard';
 import { CalendarComponent } from './calendar/calendar.component';
+import { HolidayListComponent } from './holiday/list/holiday-list.component';
+import { HolidayListResolverService } from './holiday/holiday-list-resolver.service';
+import { HolidayResolverService } from './holiday/holiday-resolver.service';
+import { HolidayComponent } from './holiday/edit/holiday.component';
 
 const routes: Routes = [
   {
@@ -387,6 +391,29 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'holiday',
+        canActivate: [PolicyGuard],
+        data: {
+          requirePolicy: 'hrEdit'
+        },
+        children: [
+          {
+            path: 'list',
+            component: HolidayListComponent,
+            resolve: {
+              holidays: HolidayListResolverService
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: HolidayComponent,
+            resolve: {
+              holiday: HolidayResolverService
+            }
+          }
+        ]
+      },
+      {
         path: 'training',
         canActivate: [PolicyGuard],
         data: {
@@ -631,7 +658,9 @@ const routes: Routes = [
     EvaluationSummaryResolveService,
     OrgTreeDataResolverService,
     EndorsementListResolverService,
-    EndorsementResolverService
+    EndorsementResolverService,
+    HolidayListResolverService,
+    HolidayResolverService
   ]
 })
 export class AppRoutingModule {

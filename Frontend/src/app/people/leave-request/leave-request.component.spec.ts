@@ -6,6 +6,7 @@ import {
   MatCardModule,
   MatChipsModule,
   MatDatepickerModule,
+  MatIconModule,
   MatDialog,
   MatInputModule,
   MatSelectModule,
@@ -26,6 +27,7 @@ import { UserToken } from '../../login/user-token';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
+import { HolidayService } from '../../holiday/holiday.service';
 
 @Directive({
   selector: '[appTemplateContent]'
@@ -51,6 +53,7 @@ fdescribe('LeaveRequestComponent', () => {
         MatChipsModule,
         MatTooltipModule,
         MatMomentDateModule,
+        MatIconModule,
         FormsModule,
         NoopAnimationsModule
       ],
@@ -72,6 +75,7 @@ fdescribe('LeaveRequestComponent', () => {
             safeUserToken: () => [new UserToken({})]
           }
         },
+        {provide: HolidayService, useValue: {currentHolidays: () => of([])}},
         {provide: PersonService, useValue: {}},
         {provide: Location, useValue: {}},
       ]

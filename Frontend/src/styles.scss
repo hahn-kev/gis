@@ -139,9 +139,15 @@ html, body {
   }
 
   .mat-slide-toggle:not(:first-child) {
-
     padding-left: 8px;
+  }
 
+  .mat-icon {
+    vertical-align: middle;
+
+    & + .mat-form-field {
+      margin-left: 8px;
+    }
   }
 }
 

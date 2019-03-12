@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Backend.DataLayer;
 using Backend.Entities;
@@ -11,6 +12,8 @@ namespace Backend.Services
         void Save<T>(T entity) where T : BaseEntity;
         void Delete<T>(T entity) where T : BaseEntity;
         void Delete<T>(Guid id) where T : BaseEntity;
+        T GetById<T>(Guid id) where T : BaseEntity;
+        List<T> List<T>() where T : BaseEntity;
     }
 
     public class EntityService : IEntityService
@@ -48,6 +51,16 @@ namespace Backend.Services
         {
             _dbConnection.GetTable<T>().Delete(arg => arg.Id == id);
             _dbConnection.Attachments.Where(attachment => attachment.AttachedToId == id).Delete();
+        }
+
+        public T GetById<T>(Guid id) where T : BaseEntity
+        {
+            return _dbConnection.GetTable<T>().SingleOrDefault(arg => arg.Id == id);
+        }
+
+        public List<T> List<T>() where T : BaseEntity
+        {
+            return _dbConnection.GetTable<T>().ToList();
         }
     }
 }
