@@ -32,7 +32,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
   public sendNotification = true;
   private myPersonId: string | null;
   private noNotificationSnackbarRef: MatSnackBarRef<SimpleSnackBar> = null;
-  holidays: Holiday[];
+  holidays: Holiday[] = [];
   public intersectingHolidays = '';
 
   private subscription: Subscription;
@@ -76,7 +76,10 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
           this.selectedPerson = person;
         }
       });
-    this.holidayService.currentHolidays().subscribe(holidays => this.holidays = holidays);
+    this.holidayService.currentHolidays().subscribe(holidays => {
+      this.holidays = holidays;
+      this.updateDaysUsed();
+    });
   }
 
   warnNoLeaveNotification(sendNotification = false) {
@@ -94,7 +97,7 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
     if ((this.leaveRequest.startDate && !this.leaveRequest.endDate) || this.leaveRequestService.isStartAfterEnd(this.leaveRequest)) {
       this.leaveRequest.endDate = this.leaveRequest.startDate;
     }
-    if (this.leaveRequest && !this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
+    if (this.leaveRequest && !this.leaveRequest.approved && !this.leaveRequest.overrideDays && this.leaveRequest.startDate && this.leaveRequest.endDate) {
       let result = this.leaveRequestService.weekDays(this.leaveRequest, this.holidays);
       this.leaveRequest.days = result.days;
       this.intersectingHolidays = result.countedHolidays;

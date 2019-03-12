@@ -16,6 +16,7 @@
         <mat-select name="person"
                     [(ngModel)]="leaveRequest.personId"
                     (ngModelChange)="personSelectedChanged($event)"
+                    [disabled]="isReadonly"
                     required
                     placeholder="Person Leaving">
           <mat-option>None</mat-option>
