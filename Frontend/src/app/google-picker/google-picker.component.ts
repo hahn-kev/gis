@@ -1,7 +1,7 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {DrivePickerService} from './drive-picker.service';
-import {Attachment} from '../attachments/attachment';
-import {PickerResponse} from './picker-response';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { DrivePickerService } from './drive-picker.service';
+import { Attachment } from '../attachments/attachment';
+import { PickerResponse } from './picker-response';
 
 @Component({
   selector: 'app-google-picker',
@@ -19,12 +19,17 @@ export class GooglePickerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.driveService.loadPicker();
   }
 
 
-  async invokePicker() {
-    this.result = await this.driveService.openPicker();
-    if (this.result)
-      this.fileAttached.emit(this.driveService.convertToAttachment(this.result.documents[0]));
+  invokePicker() {
+    this.driveService.signIn()
+      .then(() => this.driveService.openPicker())
+      .then((result) => {
+        this.result = result;
+        if (result)
+          this.fileAttached.emit(this.driveService.convertToAttachment(this.result.documents[0]));
+      });
   }
 }

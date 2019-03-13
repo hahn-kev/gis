@@ -1,12 +1,10 @@
-import {Injectable, Injector} from '@angular/core';
-import {GoogleApiService} from 'ng-gapi';
-import {SettingsService} from '../services/settings.service';
-import {LoginService} from '../services/auth/login.service';
+import { Injectable, Injector } from '@angular/core';
+import { GoogleApiService } from 'ng-gapi';
+import { SettingsService } from '../services/settings.service';
 // noinspection ES6UnusedImports
 import {} from 'google.picker';
-import {Attachment} from '../attachments/attachment';
-import {PickerDocument, PickerResponse} from './picker-response';
-import {first} from 'rxjs/operators';
+import { Attachment } from '../attachments/attachment';
+import { PickerDocument, PickerResponse } from './picker-response';
 
 @Injectable()
 export class DrivePickerService {
@@ -14,27 +12,39 @@ export class DrivePickerService {
   private activePicker: google.picker.Picker;
 
   constructor(private injector: Injector,
-              private settings: SettingsService,
-              private loginService: LoginService) {
+              private settings: SettingsService) {
   }
 
-  private loadPicker() {
-    if (this.loaded) return Promise.resolve();
-    return new Promise<void>(resolve => {
-      this.injector.get(GoogleApiService).onLoad().subscribe(() => {
-        gapi.load('picker', () => {
-          this.loaded = true;
-          resolve();
-        });
+  public signIn() {
+    let authInstance = gapi.auth2.getAuthInstance();
+    if (authInstance.isSignedIn.get()) return Promise.resolve();
+    return authInstance.signIn()
+      .then((user: gapi.auth2.CurrentUser) => {
+        return user.get().isSignedIn();
+      });
+  }
+
+  public async loadPicker() {
+    if (this.loaded) return;
+    let googleApiService = this.injector.get(GoogleApiService);
+    await googleApiService.onLoad().toPromise();
+    await new Promise<void>(resolve => {
+      gapi.load('client:picker:auth2', () => {
+        resolve();
       });
     });
+    // @ts-ignore
+    await gapi.auth2.init(googleApiService.getConfig().getClientConfig());
+    this.loaded = true;
   }
 
   async openPicker(): Promise<PickerResponse> {
     const gisTeamDriveId = '0ANi-SiRomIBKUk9PVA';
     await this.loadPicker();
-    const token = await this.loginService.currentUserToken().pipe(first()).toPromise();
     return new Promise<PickerResponse>(resolve => {
+      let authInstance = gapi.auth2.getAuthInstance();
+      let googleUser = authInstance.currentUser.get();
+
       this.activePicker = new google.picker.PickerBuilder()
         .enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES)
         .addView(new google.picker.DocsView()
@@ -45,7 +55,7 @@ export class DrivePickerService {
           .setParent(gisTeamDriveId)
           .setIncludeFolders(true)
         )
-        .setOAuthToken(token.oauth)
+        .setOAuthToken(googleUser.getAuthResponse().access_token)
         .setDeveloperKey(this.settings.get<string>('googleAPIKey'))
         .setCallback((data) => {
           if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) resolve(new PickerResponse(data));

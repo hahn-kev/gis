@@ -124,7 +124,11 @@ if (environment.production) {
     GoogleApiModule.forRoot({
       provide: NG_GAPI_CONFIG,
       deps: [SettingsService],
-      useFactory: (settings: SettingsService) => ({client_id: settings.get<string>('googleClientId')})
+      useFactory: (settings: SettingsService) => ({
+        apiKey: settings.get<string>('googleAPIKey'),
+        client_id: settings.get<string>('googleClientId'),
+        scope: 'https://www.googleapis.com/auth/drive'
+      })
     })
   ],
   exports: [],
