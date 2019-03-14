@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.DataLayer;
 using Backend.Entities;
+using Backend.Utils;
 using LinqToDB;
 
 namespace Backend.Services
@@ -117,7 +118,6 @@ namespace Backend.Services
             var personOnLeave = _personRepository.PeopleWithStaff.SingleOrDefault(p => p.Id == leaveRequest.PersonId);
             if (personOnLeave?.StaffId == null)
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
-            var result = _orgGroupRepository.StaffParentOrgGroups(personOnLeave.Staff).ToList();
             leaveRequest.Approved = null;
             leaveRequest.ApprovedById = null;
             var leaveUsage = GetLeaveUseage(leaveRequest.Type, personOnLeave.Id, leaveRequest.StartDate.SchoolYear());
@@ -125,12 +125,9 @@ namespace Backend.Services
             _entityService.Save(leaveRequest);
             try
             {
-                var supervisor = await ResolveLeaveRequestEmails(leaveRequest,
-                    personOnLeave,
-                    result,
-                    leaveUsage);
-                await _leaveRequestEmailService.NotifyHr(leaveRequest, personOnLeave, supervisor, leaveUsage);
-                return supervisor;
+                var (toApprove, toNotify) = ResolveLeaveRequestEmails(personOnLeave);
+                await SendLeaveRequestEmails(leaveRequest, personOnLeave, toApprove, toNotify, leaveUsage);
+                return toApprove;
             }
             catch
             {
@@ -140,41 +137,59 @@ namespace Backend.Services
             }
         }
 
-        public async Task<PersonExtended> ResolveLeaveRequestEmails(LeaveRequest leaveRequest,
+        public async Task SendLeaveRequestEmails(LeaveRequest leaveRequest,
             PersonWithStaff requestedBy,
-            List<OrgGroupWithSupervisor> orgGroups,
+            PersonWithStaff toApprove,
+            IEnumerable<PersonWithStaff> toNotify,
             LeaveUsage leaveUsage)
         {
-            if (!OrgGroupService.IsOrgGroupSortedByHierarchy(orgGroups, OrgGroupService.SortedBy.ChildFirst))
+            await _leaveRequestEmailService.SendRequestApproval(leaveRequest,
+                requestedBy,
+                toApprove,
+                leaveUsage);
+            await Task.WhenAll(toNotify.Where(person => person.Id != toApprove?.Id).Select(supervisor =>
+                _leaveRequestEmailService.NotifyOfLeaveRequest(leaveRequest,
+                    requestedBy,
+                    supervisor,
+                    toApprove,
+                    leaveUsage)));
+
+            await _leaveRequestEmailService.NotifyHr(leaveRequest, requestedBy, toApprove, leaveUsage);
+        }
+
+        public (PersonWithStaff toApprove, List<PersonWithStaff> toNotify) ResolveLeaveRequestEmails(
+            PersonWithStaff requestedBy)
+        {
+            return ResolveLeaveRequestEmails(requestedBy,
+                _orgGroupRepository.StaffParentOrgGroups(requestedBy.Staff).ToList(),
+                _orgGroupRepository.GetOrgGroupsByPersonsRole(requestedBy.Id));
+        }
+
+        public static (PersonWithStaff toApprove, List<PersonWithStaff> toNotify) ResolveLeaveRequestEmails(
+            PersonWithStaff requestedBy,
+            List<OrgGroupWithSupervisor> approvalGroups,
+            List<OrgGroupWithSupervisor> roleGroups)
+        {
+            if (!OrgGroupService.IsOrgGroupSortedByHierarchy(approvalGroups, OrgGroupService.SortedBy.ChildFirst))
                 throw new ArgumentException("org groups not sorted properly");
-            var supervisorsToNotify = new List<PersonWithStaff>();
-            PersonWithStaff approver = null;
-            foreach (var orgGroup in orgGroups)
+            var supervisorsToNotify = new List<PersonWithStaff>(roleGroups.Select(org => org.SupervisorPerson));
+            PersonWithStaff toApprove = null;
+            foreach (var orgGroup in approvalGroups)
             {
                 //super and requested by will be the same if the requester is a supervisor
                 if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor ||
                     orgGroup.SupervisorPerson == null) continue;
                 if (orgGroup.ApproverIsSupervisor)
                 {
-                    await _leaveRequestEmailService.SendRequestApproval(leaveRequest,
-                        requestedBy,
-                        orgGroup.SupervisorPerson,
-                        leaveUsage);
-                    approver = orgGroup.SupervisorPerson;
+                    toApprove = orgGroup.SupervisorPerson;
                     break;
                 }
 
                 supervisorsToNotify.Add(orgGroup.SupervisorPerson);
             }
 
-            await Task.WhenAll(supervisorsToNotify.Where(person => person.Id != approver?.Id).Select(supervisor =>
-                _leaveRequestEmailService.NotifyOfLeaveRequest(leaveRequest,
-                    requestedBy,
-                    supervisor,
-                    approver,
-                    leaveUsage)));
-
-            return approver;
+            return (toApprove,
+                supervisorsToNotify.Where(staff => staff.Id != toApprove?.Id).DistinctBy(staff => staff.Id).ToList());
         }
 
         public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)

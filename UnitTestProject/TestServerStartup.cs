@@ -21,15 +21,8 @@ namespace UnitTestProject
 
         public override void ConfigureServices(IServiceCollection services)
         {
-#if DEBUG
-            services.AddLogging(loggingBuilder =>
-                loggingBuilder.SetMinimumLevel(LogLevel.Trace)
-                    .AddConsole(options => options.IncludeScopes = true)
-                    .AddDebug());
-#endif
-
             base.ConfigureServices(services);
-            services.Replace(ServiceDescriptor.Singleton<IEmailService>(provider =>
+            services.Replace(ServiceDescriptor.Scoped<IEmailService>(provider =>
             {
                 var esm = new Mock<EmailService>(provider.GetService<IOptions<Settings>>(),
                     provider.GetService<IOptions<TemplateSettings>>(),
@@ -38,7 +31,7 @@ namespace UnitTestProject
                 esm.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>())).Returns(Task.CompletedTask);
                 return esm.Object;
             }));
-            services.Replace(ServiceDescriptor.Singleton<IEntityService>(provider =>
+            services.Replace(ServiceDescriptor.Scoped<IEntityService>(provider =>
             {
                 var esm = new Mock<EntityService>(provider.GetService<IDbConnection>());
 //                esm.CallBase = true;
