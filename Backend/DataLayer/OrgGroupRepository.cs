@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Backend.Entities;
@@ -33,39 +34,55 @@ namespace Backend.DataLayer
         public IQueryable<OrgGroup> GetWithChildrenWhere(Expression<Func<OrgGroup, bool>> rootPredicate,
             Expression<Func<OrgGroup, bool>> childPredicate = null)
         {
-            return _connection.GetCte<OrgGroup>(parents =>
-            {
-                var rootQuery = (
-                    from orgGroup in OrgGroups
-                    select orgGroup
-                ).Where(rootPredicate);
-                var childQuery = (
-                    from orgGroup in OrgGroups
-                    from parent in parents.InnerJoin(parent => parent.Id == orgGroup.ParentId)
-                    select orgGroup
-                );
-                if (childPredicate != null)
-                    childQuery = childQuery.Where(childPredicate);
-                return rootQuery.Union(childQuery);
-            });
+            return GetRecursive(OrgGroups.Where(rootPredicate),
+                parents =>
+                {
+                    var childQuery = from child in OrgGroups
+                        from parent in parents.InnerJoin(parent => parent.Id == child.ParentId)
+                        select child;
+                    if (childPredicate != null)
+                        childQuery = childQuery.Where(childPredicate);
+                    return childQuery;
+                });
         }
 
+        public delegate bool OrgGroupQueryPredicate(OrgGroup parent, OrgGroup child);
+
         public IQueryable<OrgGroup> GetWithParentsWhere(Expression<Func<OrgGroup, bool>> rootPredicate,
-            Func<IQueryable<OrgGroup>, IQueryable<OrgGroup>> visit = null)
+            Expression<OrgGroupQueryPredicate> parentQueryPredicate = null)
         {
-            return _connection.GetCte<OrgGroup>(children =>
-            {
-                var rootQuery = (
-                    from orgGroup in OrgGroups
-                    select orgGroup
-                ).Where(rootPredicate);
-                var childQuery = from orgGroup in OrgGroups
-                    from parent in children.InnerJoin(child => child.ParentId == orgGroup.Id)
-                    select orgGroup;
-                if (visit != null)
-                    childQuery = visit(childQuery);
-                return rootQuery.Union(childQuery);
-            });
+            return GetWithParents(OrgGroups.Where(rootPredicate), parentQueryPredicate);
+        }
+
+        private IQueryable<OrgGroup> GetWithParents(IQueryable<OrgGroup> rootQuery,
+            Expression<OrgGroupQueryPredicate> parentQueryPredicate = null)
+        {
+            return GetRecursive(rootQuery,
+                children =>
+                {
+                    IQueryable<OrgGroup> parentQuery;
+                    if (parentQueryPredicate != null)
+                    {
+                        parentQuery = from parent in OrgGroups
+                            from child in children.InnerJoin(child => child.ParentId == parent.Id)
+                            where parentQueryPredicate.Compile()(parent, child)
+                            select parent;
+                    }
+                    else
+                    {
+                        parentQuery = from parent in OrgGroups
+                            from child in children.InnerJoin(child => child.ParentId == parent.Id)
+                            select parent;
+                    }
+
+                    return parentQuery;
+                });
+        }
+
+        private IQueryable<OrgGroup> GetRecursive(IQueryable<OrgGroup> baseQuery,
+            Func<IQueryable<OrgGroup>, IQueryable<OrgGroup>> subQueryFunc)
+        {
+            return _connection.GetCte<OrgGroup>(previous => baseQuery.Union(subQueryFunc(previous)));
         }
 
         public IQueryable<OrgGroupWithSupervisor> OrgGroupsWithSupervisor =>
@@ -87,9 +104,25 @@ namespace Backend.DataLayer
 
         public IQueryable<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
         {
-            return from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id)
+            return from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id,
+                    (parent, child) => !child.ApproverIsSupervisor || parent.ApproverIsSupervisor)
                 from orgGroupWithSupervisor in OrgGroupsWithSupervisor.InnerJoin(g => g.Id == orgGroup.Id)
+                where orgGroup.Supervisor != null
                 select orgGroupWithSupervisor;
+        }
+
+        public List<OrgGroupWithSupervisor> GetOrgGroupsByPersonsRole(Guid personId)
+        {
+            var baseQuery = from role in _connection.PersonRoles
+                from job in _connection.Job.InnerJoin(job => job.Id == role.JobId)
+                from org in OrgGroups.InnerJoin(org => org.Id == job.OrgGroupId)
+                where role.PersonId == personId && role.ActiveNow()
+                select org;
+
+            return (from org in GetWithParents(baseQuery, (parent, child) => child.Supervisor == null)
+                from orgGroupWithSupervisor in OrgGroupsWithSupervisor.InnerJoin(g => g.Id == org.Id)
+                where org.Supervisor != null
+                select orgGroupWithSupervisor).ToList();
         }
     }
 }

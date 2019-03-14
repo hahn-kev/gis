@@ -20,10 +20,15 @@ namespace UnitTestProject
         private PersonWithStaff org1Staff;
         private PersonWithStaff org1aStaff;
         private PersonWithStaff org1Super;
+        private PersonWithStaff org2Super;
         private PersonWithStaff org1aSuper;
         private OrgGroup org1;
         private OrgGroup org1a;
         private OrgGroup orgRoot;
+
+        private OrgGroup org2;
+        private OrgGroup org2a;
+        private PersonWithStaff org2aStaff;
 
         public OrgGroupTests(ServicesFixture sf)
         {
@@ -34,12 +39,18 @@ namespace UnitTestProject
             var orgRootId = Guid.NewGuid();
 
             org1Super = _sf.InsertPerson();
-            org1 = _sf.InsertOrgGroup(orgRootId, org1Super.Id, name: "org1");
+            org1 = _sf.InsertOrgGroup(orgRootId, org1Super.Id, name: "org1", approvesLeave: true);
+
+            org2Super = _sf.InsertPerson();
+            org2 = _sf.InsertOrgGroup(orgRootId, org2Super.Id, name: "org2", approvesLeave: true);
+            org2a = _sf.InsertOrgGroup(org2.Id, name: "org2a");
+
             org1aSuper = _sf.InsertPerson();
             org1a = _sf.InsertOrgGroup(org1.Id, org1aSuper.Id, name: "org1a");
 
             orgRoot = _sf.InsertOrgGroup(action: group => group.Id = orgRootId, name: "orgRoot");
 
+            org2aStaff = _sf.InsertStaff(org2a.Id);
             org1Staff = _sf.InsertStaff(org1.Id);
             org1aStaff = _sf.InsertStaff(org1a.Id);
         }
@@ -115,21 +126,62 @@ namespace UnitTestProject
         public void ShouldGetChildrenOrdered()
         {
             var orgGroups = _groupRepository.GetWithChildrenWhere(group => @group.Id == orgRoot.Id)
-                .Select(group => group.Id).ToList();
+                .Select(group => group.GroupName).ToList();
+            //todo setup explicit order by with depth and then not ignore order
             orgGroups.ShouldBe(new[]
-            {
-                orgRoot.Id,
-                org1.Id,
-                org1a.Id,
-            });
+                {
+                    orgRoot.GroupName,
+                    org1.GroupName,
+                    org2.GroupName,
+                    org1a.GroupName,
+                    org2a.GroupName,
+                },
+                true);
         }
 
         [Fact]
         public async Task ShouldShowPersonInGroup()
         {
             (await _groupService.IsPersonInGroup(org1aStaff.Id, org1.Id)).ShouldBeTrue();
-            var org2 = _sf.InsertOrgGroup(orgRoot.Id, name: "org2");
             (await _groupService.IsPersonInGroup(org1aStaff.Id, org2.Id)).ShouldBeFalse();
+        }
+
+
+        [Fact]
+        public void OrgsByRolesResolvesAsExpected()
+        {
+            _sf.InsertRoleAndJob(org1aStaff.Id, jobOrgGroupId: org2a.Id);
+            _sf.InsertRoleAndJob(org1aStaff.Id, jobOrgGroupId: org1a.Id);
+            var orgs = _groupRepository.GetOrgGroupsByPersonsRole(org1aStaff.Id);
+
+            orgs.ShouldContain(org => org.Id == org1a.Id);
+            orgs.ShouldContain(org => org.Id == org2.Id);
+
+            orgs.ShouldNotContain(org => org.Id == org2a.Id);
+            orgs.ShouldNotContain(org => org.Id == org1.Id);
+            orgs.ShouldNotContain(org => org.Id == orgRoot.Id);
+            orgs.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void OrgsByReportingStaffResolvesAsExpected()
+        {
+            var reportingOrgs = _groupRepository.StaffParentOrgGroups(org1aStaff.Staff);
+            reportingOrgs.ShouldContain(org => org.Id == org1a.Id);
+            reportingOrgs.ShouldContain(org => org.Id == org1.Id);
+
+            reportingOrgs.ShouldNotContain(org => org.Id == org2.Id);
+            reportingOrgs.ShouldNotContain(org => org.Id == org2a.Id);
+            reportingOrgs.ShouldNotContain(org => org.Id == orgRoot.Id);
+            reportingOrgs.Count().ShouldBe(2);
+
+            reportingOrgs = _groupRepository.StaffParentOrgGroups(org2aStaff.Staff);
+
+            reportingOrgs.ShouldNotContain(org => org.Id == org2a.Id);
+            reportingOrgs.ShouldNotContain(org => org.Id == org1.Id);
+            reportingOrgs.ShouldNotContain(org => org.Id == org1a.Id);
+            reportingOrgs.ShouldNotContain(org => org.Id == orgRoot.Id);
+            reportingOrgs.ShouldHaveSingleItem().Id.ShouldBe(org2.Id);
         }
     }
 }

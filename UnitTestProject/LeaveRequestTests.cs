@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
 using Backend.Utils;
 using LinqToDB;
 using LinqToDB.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using SendGrid.Helpers.Mail;
 using Shouldly;
@@ -22,6 +22,8 @@ namespace UnitTestProject
         private OrgGroupRepository _orgGroupRepository;
         private ServicesFixture _sf;
         private DataConnectionTransaction _transaction;
+        private IServiceScope _serviceScope;
+        private IServiceProvider _scopeServiceProvider;
 
         public LeaveRequestTests(ServicesFixture sf)
         {
@@ -30,37 +32,35 @@ namespace UnitTestProject
             _orgGroupRepository = _sf.Get<OrgGroupRepository>();
             _sf.DoOnce(fixture => fixture.SetupPeople());
             _transaction = _sf.DbConnection.BeginTransaction();
+            _serviceScope = _sf.ServiceProvider.CreateScope();
+            _scopeServiceProvider = _serviceScope.ServiceProvider;
         }
 
         [Fact]
         public async Task FindsSupervisor()
         {
-            var jacob = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
-            Assert.NotNull(jacob);
-            var expectedSupervisor = _sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Bob");
-            Assert.NotNull(expectedSupervisor);
+            var jacob = _sf.Jacob;
+            jacob.ShouldNotBeNull();
+            var expectedSupervisor = _sf.JacobSupervisor;
+            expectedSupervisor.ShouldNotBeNull();
             var actualSupervisor = await _leaveService.RequestLeave(new LeaveRequest
                 {PersonId = jacob.Id, StartDate = DateTime.Now});
-            Assert.NotNull(actualSupervisor);
-            Assert.Equal(expectedSupervisor.FirstName, actualSupervisor.FirstName);
+            actualSupervisor.ShouldNotBeNull();
+            actualSupervisor.FirstName.ShouldBe(expectedSupervisor.FirstName);
         }
 
         [Fact]
-        public static async Task SendsEmail()
+        public async Task SendsEmail()
         {
-            var sf = new ServicesFixture();
-            await sf.InitializeAsync();
-            sf.SetupPeople();
-            var leaveService = sf.Get<LeaveService>();
+            var leaveService = _scopeServiceProvider.GetService<LeaveService>();
 
-            var emailMock = sf.EmailServiceMock;
+            var emailMock = _sf.GetScopedMockEmailService(_serviceScope);
             emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
                 It.IsAny<EmailTemplate>(),
                 It.IsAny<PersonWithStaff>(),
                 It.IsAny<PersonWithStaff>())).Returns(Task.CompletedTask);
-            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
-            Assert.NotNull(jacob);
+            var jacob = _sf.Jacob;
 
             await leaveService.RequestLeave(new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now});
 
@@ -83,84 +83,39 @@ namespace UnitTestProject
         }
 
         [Fact]
-        public static async Task SavesLeaveRequest()
+        public async Task SavesLeaveRequest()
         {
-            var sf = new ServicesFixture();
-            await sf.InitializeAsync();
-            sf.SetupPeople();
-            var leaveService = sf.Get<LeaveService>();
+            var leaveService = _scopeServiceProvider.GetService<LeaveService>();
 
-            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
-            Assert.NotNull(jacob);
+            var jacob = _sf.Jacob;
+            jacob.ShouldNotBeNull();
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
             await leaveService.RequestLeave(expectedLeaveRequest);
-            sf.EntityServiceMock.Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
+
+            _sf.GetScopedMockEntityService(_serviceScope)
+                .Verify(service => service.Save(It.IsAny<LeaveRequest>()), Times.Once);
         }
 
         [Fact]
-        public static async Task EmailThrowingAnErrorWillCauseALeaveRequestToBeDeleted()
+        public async Task EmailThrowingAnErrorWillCauseALeaveRequestToBeDeleted()
         {
-            var sf = new ServicesFixture();
-            await sf.InitializeAsync();
-            sf.SetupPeople();
-
-            var leaveService = sf.Get<LeaveService>();
-
+            var mock = _sf.GetScopedMockEmailService(_serviceScope);
             var expectedException = new Exception("email test exception");
-            sf.EmailServiceMock
-                .Setup(email => email.SendEmail(It.IsAny<SendGridMessage>()))
+            mock.Setup(email => email.SendEmail(It.IsAny<SendGridMessage>()))
                 .Throws(expectedException);
-            var jacob = sf.DbConnection.People.FirstOrDefault(person => person.FirstName == "Jacob");
-            Assert.NotNull(jacob);
+            var jacob = _sf.Jacob;
+            jacob.ShouldNotBeNull();
+
+            //act
+            var leaveService = _scopeServiceProvider.GetService<LeaveService>();
             var expectedLeaveRequest = new LeaveRequest {PersonId = jacob.Id, StartDate = DateTime.Now};
             var actualException =
-                await Assert.ThrowsAsync<Exception>(() => leaveService.RequestLeave(expectedLeaveRequest));
-            Assert.Same(expectedException, actualException);
-            sf.EntityServiceMock.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
-            sf.EntityServiceMock.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
-        }
-
-        [Fact]
-        public void OrgGroupChainResolvesAsExpected()
-        {
-            var personFaker = ServicesFixture.PersonFaker();
-            var expectedPersonOnLeave = personFaker.Generate();
-            var expectedDepartment = AutoFaker.Generate<OrgGroup>();
-            var expectedDevision = AutoFaker.Generate<OrgGroup>();
-            var expectedDevisionSupervisor = personFaker.Generate();
-
-            expectedPersonOnLeave.Staff.OrgGroupId = expectedDepartment.Id;
-
-            expectedDepartment.Supervisor = null;
-            expectedDepartment.ParentId = expectedDevision.Id;
-
-            expectedDevision.Supervisor = expectedDevisionSupervisor.Id;
-            expectedDevision.ParentId = null;
-
-            _sf.DbConnection.Insert(expectedPersonOnLeave);
-            _sf.DbConnection.Insert(expectedPersonOnLeave.Staff);
-            _sf.DbConnection.Insert(expectedDepartment);
-            _sf.DbConnection.Insert(expectedDevision);
-            _sf.DbConnection.Insert(expectedDevisionSupervisor);
-            _sf.DbConnection.Insert(expectedDevisionSupervisor.Staff);
-
-            //test method
-            var orgGroupWithSupervisors = _orgGroupRepository.StaffParentOrgGroups(expectedPersonOnLeave.Staff)
-                .Take(3)
-                .AsEnumerable()
-                .Concat(new OrgGroupWithSupervisor[3]).ToList();
-
-            OrgGroupWithSupervisor actualDepartment = orgGroupWithSupervisors[0];
-            OrgGroupWithSupervisor actualDevision = orgGroupWithSupervisors[1];
-            OrgGroupWithSupervisor actualSupervisorGroup = orgGroupWithSupervisors[2];
-
-            Assert.NotNull(actualDepartment);
-            Assert.Equal(expectedDepartment.Id, actualDepartment.Id);
-            Assert.Null(actualDepartment.SupervisorPerson);
-            Assert.NotNull(actualDevision);
-            Assert.Equal(expectedDevision.Id, actualDevision.Id);
-            Assert.Equal(expectedDevisionSupervisor.Id, actualDevision.SupervisorPerson.Id);
-            Assert.Null(actualSupervisorGroup);
+                await Should.ThrowAsync<Exception>(() => leaveService.RequestLeave(expectedLeaveRequest));
+            //test
+            actualException.ShouldBe(expectedException);
+            var mockEntityService = _sf.GetScopedMockEntityService(_serviceScope);
+            mockEntityService.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
+            mockEntityService.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
         }
 
         public static IEnumerable<object[]> GetExpectedNotifyHrValues()
@@ -229,7 +184,7 @@ namespace UnitTestProject
             _sf.InsertLeaveRequest(request.Type, personWithStaff.Id, usedLeave);
             var actualEmailed = LeaveRequestEmailService.ShouldNotifyHr(request,
                 _leaveService.GetCurrentLeaveUseage(request.Type, personWithStaff.Id));
-            Assert.Equal(expectedEmailed, actualEmailed);
+            actualEmailed.ShouldBe(expectedEmailed);
         }
 
         public static IEnumerable<object[]> GetExpectedEmailValues()
@@ -253,232 +208,31 @@ namespace UnitTestProject
 
             IEnumerable<(string reason, LeaveRequest request,
                 PersonWithStaff requestedBy,
-                OrgGroupWithSupervisor department,
-                OrgGroupWithSupervisor devision,
-                OrgGroupWithSupervisor supervisorGroup,
-                Guid expectedApproverId,
+                PersonWithStaff toApprove,
+                List<PersonWithStaff> toNotify,
                 bool expectApprovalEmailSent,
                 int expectedNotifyEmailCount)> MakeValues()
             {
                 yield return ("Person with a single supervisor", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
+                    Person(person2Id),
+                    new List<PersonWithStaff>(),
                     true,
                     0);
 
                 yield return ("Person with a supervisor to notify", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
+                    Person(person2Id),
+                    new List<PersonWithStaff> {Person(person3Id)},
                     true,
                     1);
 
                 yield return ("Person with 2 supervisors to notify", new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
+                    Person(person2Id),
+                    new List<PersonWithStaff> {Person(person4Id), Person(person3Id)},
                     true,
                     2);
-
-                yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver",
-                    new LeaveRequest {PersonId = person1Id},
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person3Id,
-                    true,
-                    1);
-
-                yield return ("person with a group inbetween to not notify", new LeaveRequest {PersonId = person1Id},
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    true,
-                    1);
-
-                yield return ("person with 2 groups who could approve, stops at department", new LeaveRequest
-                    {
-                        PersonId = person1Id
-                    },
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person4Id,
-                    true,
-                    0);
-
-                yield return ("supervisor requesting leave, no one to notify", new LeaveRequest {PersonId = person1Id},
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person1Id,
-                        SupervisorPerson = Person(person1Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    true,
-                    0);
-
-                yield return ("supervisor requesting leave, 1 person to notify",
-                    new LeaveRequest {PersonId = person1Id},
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person1Id,
-                        SupervisorPerson = Person(person1Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    true,
-                    1);
-
-                yield return ("supervisor is in list twice",
-                        new LeaveRequest {PersonId = person1Id},
-                        Person(person1Id),
-                        new OrgGroupWithSupervisor
-                        {
-                            Id = departmentId,
-                            ParentId = devisionId,
-                            ApproverIsSupervisor = false,
-                            Supervisor = person2Id,
-                            SupervisorPerson = Person(person2Id)
-                        },
-                        new OrgGroupWithSupervisor
-                        {
-                            Id = devisionId,
-                            ParentId = supervisorGroupId,
-                            ApproverIsSupervisor = true,
-                            Supervisor = person2Id,
-                            SupervisorPerson = Person(person2Id)
-                        },
-                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
-                        person2Id,
-                        true,
-                        0
-                    );
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
@@ -487,25 +241,21 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(GetExpectedEmailValues))]
-        public static async Task SendsExpectedEmails(string reason,
+        public async Task SendsExpectedEmails(string reason,
             LeaveRequest request,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor department,
-            OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup,
-            Guid expectedApproverId,
+            PersonWithStaff toApprove,
+            List<PersonWithStaff> toNotify,
             bool expectApprovalEmailSent,
             int expectedNotifyEmailCount)
         {
-            var sf = new ServicesFixture();
-            sf.CreateWebHost();
-            var leaveService = sf.Get<LeaveService>();
+            var leaveService = _scopeServiceProvider.GetService<LeaveService>();
 
             bool actualApprovalEmailSent = false;
             int actualNotifyEmailCount = 0;
 
-            var emailMock = sf.EmailServiceMock.As<IEmailService>();
-            emailMock.Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
+            _sf.GetScopedMockEmailService(_serviceScope)
+                .Setup(service => service.SendTemplateEmail(It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<string>(),
                     It.IsAny<EmailTemplate>(),
                     It.IsAny<PersonWithStaff>(),
@@ -519,21 +269,342 @@ namespace UnitTestProject
                             actualNotifyEmailCount++;
                     });
 
-
-            var actualApprover = await leaveService.ResolveLeaveRequestEmails(request,
+            await leaveService.SendLeaveRequestEmails(request,
                 requestedBy,
-                new List<OrgGroupWithSupervisor>
-                {
-                    department,
-                    devision,
-                    supervisorGroup
-                }.FindAll(g => g != null),
+                toApprove,
+                toNotify,
                 new LeaveUsage {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
-            Assert.True((expectedApproverId == Guid.Empty) == (actualApprover == null));
-            if (actualApprover != null)
-                Assert.Equal(expectedApproverId, actualApprover.Id);
-            Assert.Equal(expectApprovalEmailSent, actualApprovalEmailSent);
-            Assert.Equal(expectedNotifyEmailCount, actualNotifyEmailCount);
+            actualApprovalEmailSent.ShouldBe(expectApprovalEmailSent, reason);
+            actualNotifyEmailCount.ShouldBe(expectedNotifyEmailCount, reason);
+        }
+
+        public static IEnumerable<object[]> GetExpectedResolvedSupervisors()
+        {
+            var person1Id = Guid.NewGuid();
+            var person2Id = Guid.NewGuid();
+            var person3Id = Guid.NewGuid();
+            var person4Id = Guid.NewGuid();
+            var departmentId = Guid.NewGuid();
+            var devisionId = Guid.NewGuid();
+            var supervisorGroupId = Guid.NewGuid();
+
+            PersonWithStaff Person(Guid id)
+            {
+                return new PersonWithStaff
+                {
+                    Id = id,
+                    Staff = new StaffWithOrgName()
+                };
+            }
+
+            List<OrgGroupWithSupervisor> List(params OrgGroupWithSupervisor[] orgs)
+            {
+                return orgs.ToList();
+            }
+
+            IEnumerable<(string reason,
+                PersonWithStaff requestedBy,
+                List<OrgGroupWithSupervisor> approvalOrgs,
+                List<OrgGroupWithSupervisor> roleOrgs,
+                Guid expectedApproverId,
+                int expectedNotifyEmailCount)> MakeValues()
+            {
+                yield return ("Person with a single supervisor",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    0);
+
+                yield return ("Person with a supervisor to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    1);
+
+                yield return ("Person with 2 supervisors to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    2);
+
+                yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person3Id,
+                    1);
+
+                yield return ("person with a group inbetween to not notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    1);
+
+                yield return ("person with 2 groups who could approve, stops at department",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person4Id,
+                    0);
+
+                yield return ("supervisor requesting leave, no one to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    0);
+
+                yield return ("supervisor requesting leave, 1 person to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    1);
+                yield return ("supervisor requesting leave, don't notify self as supervisor",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(new OrgGroupWithSupervisor
+                    {
+                        Id = departmentId,
+                        ParentId = devisionId,
+                        ApproverIsSupervisor = true,
+                        Supervisor = person1Id,
+                        SupervisorPerson = Person(person1Id)
+                    }),
+                    person2Id,
+                    0);
+
+                yield return ("supervisor is in list twice",
+                        Person(person1Id),
+                        List(new OrgGroupWithSupervisor
+                            {
+                                Id = departmentId,
+                                ParentId = devisionId,
+                                ApproverIsSupervisor = false,
+                                Supervisor = person2Id,
+                                SupervisorPerson = Person(person2Id)
+                            },
+                            new OrgGroupWithSupervisor
+                            {
+                                Id = devisionId,
+                                ParentId = supervisorGroupId,
+                                ApproverIsSupervisor = true,
+                                Supervisor = person2Id,
+                                SupervisorPerson = Person(person2Id)
+                            },
+                            new OrgGroupWithSupervisor {Id = supervisorGroupId}),
+                        List(),
+                        person2Id,
+                        0
+                    );
+
+                yield return ("notify shows up in roles list",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(new OrgGroupWithSupervisor
+                    {
+                        Id = Guid.NewGuid(),
+                        ApproverIsSupervisor = false,
+                        Supervisor = person3Id,
+                        SupervisorPerson = Person(person3Id)
+                    }),
+                    person2Id,
+                    1);
+            }
+
+            return MakeValues().Select(tuple => tuple.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetExpectedResolvedSupervisors))]
+        public void ResolvesExpectedSupervisors(string reason,
+            PersonWithStaff requestedBy,
+            List<OrgGroupWithSupervisor> approvalGroups,
+            List<OrgGroupWithSupervisor> roleGroups,
+            Guid expectedApproverId,
+            int expectedNotifyEmailCount)
+        {
+            var (actualApprover, toNotify) =
+                LeaveService.ResolveLeaveRequestEmails(requestedBy, approvalGroups, roleGroups);
+
+            if (expectedApproverId == Guid.Empty)
+            {
+                actualApprover.ShouldBeNull(reason);
+            }
+            else
+            {
+                actualApprover.ShouldNotBeNull(reason);
+                actualApprover.Id.ShouldBe(expectedApproverId, reason);
+            }
+
+            toNotify.Count.ShouldBe(expectedNotifyEmailCount, reason);
         }
 
         public static IEnumerable<object[]> ValidateEmailValues()
@@ -614,34 +685,34 @@ namespace UnitTestProject
                 OrgGroup[] groups,
                 string approver, string[] notified)> MakeValues()
             {
-                var (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                var (_, _, a, _, aa, _, _, _, aaa, aaaStaff, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = true;
                 yield return (aaaStaff.Id, people, groups, aaa.SupervisorPerson.FirstName, new string[0]);
 
-                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                (_, _, _, _, aa, _, _, _, aaa, aaaStaff, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = false;
                 aa.ApproverIsSupervisor = true;
                 yield return (aaaStaff.Id, people, groups, aa.SupervisorPerson.FirstName,
                     new[] {aaa.SupervisorPerson.FirstName});
 
-                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                (_, _, a, _, aa, _, _, _, aaa, aaaStaff, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = false;
                 aa.ApproverIsSupervisor = false;
                 a.ApproverIsSupervisor = true;
                 yield return (aaaStaff.Id, people, groups, a.SupervisorPerson.FirstName,
                     new[] {aaa.SupervisorPerson.FirstName, aa.SupervisorPerson.FirstName});
 
-                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                (_, _, _, _, aa, _, _, _, aaa, _, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = false;
                 aa.ApproverIsSupervisor = true;
                 yield return (aaa.SupervisorPerson.Id, people, groups, aa.SupervisorPerson.FirstName, new string[0]);
 
-                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                (_, _, _, _, aa, _, _, _, aaa, _, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = true;
                 aa.ApproverIsSupervisor = true;
                 yield return (aaa.SupervisorPerson.Id, people, groups, aa.SupervisorPerson.FirstName, new string[0]);
 
-                (root, rootStaff, a, aStaff, aa, aaStaff, ab, abStaff, aaa, aaaStaff, people, groups) = MakeTree();
+                (_, _, a, _, aa, _, _, _, aaa, _, people, groups) = MakeTree();
                 aaa.ApproverIsSupervisor = true;
                 aa.ApproverIsSupervisor = false;
                 a.ApproverIsSupervisor = true;
@@ -709,6 +780,29 @@ namespace UnitTestProject
         }
 
         [Fact]
+        public void ShouldEmailSupervisorOfRoleNotJustReport()
+        {
+            var indirectReportGroup = Guid.NewGuid();
+            var roleSupervisor = _sf.InsertStaff();
+            var directSupervisor = _sf.InsertStaff();
+            var directReportGroup = _sf.InsertOrgGroup(supervisorId: directSupervisor.person.Id,
+                action: group => group.ApproverIsSupervisor = true);
+            var requester = _sf.InsertStaff(directReportGroup.Id);
+
+            var job = _sf.InsertStaffJob(group =>
+            {
+                group.OrgGroup.Id = indirectReportGroup;
+                group.OrgGroupId = indirectReportGroup;
+                group.OrgGroup.Supervisor = roleSupervisor.person.Id;
+            });
+            _sf.InsertRole(job.Id, requester.Id);
+
+            var (toApprove, toNotify) = _leaveService.ResolveLeaveRequestEmails(requester);
+            toApprove.FirstName.ShouldBe(directSupervisor.person.FirstName);
+            toNotify.ShouldHaveSingleItem().FirstName.ShouldBe(roleSupervisor.person.FirstName);
+        }
+
+        [Fact]
         public async Task ApprovalWorksForStaffWithoutEmail()
         {
             var setup = _sf.SetupLeaveRequest(p => { p.Staff.Email = null; });
@@ -729,6 +823,7 @@ namespace UnitTestProject
         public void Dispose()
         {
             _transaction?.Dispose();
+            _serviceScope?.Dispose();
         }
     }
 }

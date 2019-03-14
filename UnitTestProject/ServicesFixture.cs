@@ -51,6 +51,16 @@ namespace UnitTestProject
             ServiceProvider = WebHost.Services;
         }
 
+        public Mock<EmailService> GetScopedMockEmailService(IServiceScope scope)
+        {
+            return Mock.Get((EmailService) scope.ServiceProvider.GetService<IEmailService>());
+        }
+
+        public Mock<EntityService> GetScopedMockEntityService(IServiceScope scope)
+        {
+            return Mock.Get((EntityService) scope.ServiceProvider.GetService<IEntityService>());
+        }
+
         private bool hasDoneBefore;
 
         public void DoOnce(Action<ServicesFixture> action)
@@ -133,6 +143,10 @@ namespace UnitTestProject
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.ConfigureLogging(loggingBuilder =>
+            {
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace).AddDebug().AddConsole();
+            });
             builder.ConfigureAppConfiguration(SetupConfig);
         }
 
@@ -168,49 +182,67 @@ namespace UnitTestProject
             return identityUser;
         }
 
+        public PersonWithStaff Jacob { get; private set; }
+        public PersonWithStaff JacobSupervisor { get; private set; }
+
         public void SetupPeople()
         {
+            if (Jacob != null) return;
             var faker = PersonFaker();
-            var jacob = faker.Generate();
-            jacob.FirstName = "Jacob";
-            var bob = faker.Generate();
-            bob.FirstName = "Bob";
+            Jacob = faker.Generate();
+            Jacob.FirstName = "Jacob";
+            JacobSupervisor = faker.Generate();
+            JacobSupervisor.FirstName = "Bob";
             var jacobWife = faker.Generate();
-            jacobWife.SpouseId = jacob.Id;
-            jacob.SpouseId = jacobWife.Id;
+            jacobWife.SpouseId = Jacob.Id;
+            Jacob.SpouseId = jacobWife.Id;
 
             var jacobDonor = AutoFaker.Generate<Donor>();
-            jacob.DonorId = jacobDonor.Id;
+            Jacob.DonorId = jacobDonor.Id;
 
             Assert.Empty(DbConnection.People);
-            DbConnection.Insert(jacob);
+            DbConnection.Insert(Jacob);
             DbConnection.Insert(jacobWife);
-            DbConnection.Insert(bob);
+            DbConnection.Insert(JacobSupervisor);
             DbConnection.BulkCopy(faker.Generate(5));
-            DbConnection.Insert(jacob.Staff);
-            DbConnection.Insert(bob.Staff);
+            DbConnection.Insert(Jacob.Staff);
+            DbConnection.Insert(JacobSupervisor.Staff);
             DbConnection.Insert(jacobDonor);
-            InsertUser("jacob", jacob.Id, new[] {"admin"});
+            InsertUser("jacob", Jacob.Id, new[] {"admin"});
+
+            var jacobParentGroup = AutoFaker.Generate<OrgGroup>();
+            jacobParentGroup.Id = Guid.NewGuid();
+            jacobParentGroup.Supervisor = InsertPerson().Id;
+            jacobParentGroup.ApproverIsSupervisor = true;
+            DbConnection.Insert(jacobParentGroup);
+
             var jacobGroup = AutoFaker.Generate<OrgGroup>();
-            jacobGroup.Id = jacob.Staff.OrgGroupId ?? Guid.Empty;
-            jacobGroup.Supervisor = bob.Id;
+            jacobGroup.Id = Jacob.Staff.OrgGroupId ?? Guid.Empty;
+            jacobGroup.ParentId = jacobParentGroup.Id;
+            jacobGroup.Supervisor = JacobSupervisor.Id;
             jacobGroup.ApproverIsSupervisor = true;
             DbConnection.Insert(jacobGroup);
+
+
             var jacobMissionOrg = AutoFaker.Generate<MissionOrg>();
-            jacobMissionOrg.Id = jacob.Staff.MissionOrgId ?? Guid.Empty;
+            jacobMissionOrg.Id = Jacob.Staff.MissionOrgId ?? Guid.Empty;
             DbConnection.Insert(jacobMissionOrg);
             var jacobMissionOrgYear = AutoFaker.Generate<MissionOrgYearSummary>();
             jacobMissionOrgYear.MissionOrgId = jacobMissionOrg.Id;
             DbConnection.Insert(jacobMissionOrgYear);
 
             var jacobDonation = AutoFaker.Generate<Donation>();
-            jacobDonation.PersonId = jacob.Id;
+            jacobDonation.PersonId = Jacob.Id;
             jacobDonation.MissionOrgId = jacobMissionOrg.Id;
             DbConnection.Insert(jacobDonation);
-            var jacobJob = InsertJob();
+            var jacobJob = InsertJob(job =>
+            {
+                job.OrgGroup = null;
+                job.OrgGroupId = jacobGroup.Id;
+            });
             InsertRole(role =>
             {
-                role.PersonId = jacob.Id;
+                role.PersonId = Jacob.Id;
                 role.JobId = jacobJob.Id;
             });
 
@@ -219,7 +251,7 @@ namespace UnitTestProject
             DbConnection.Insert(endorsement);
             var jacobEndorsement = AutoFaker.Generate<StaffEndorsement>();
             jacobEndorsement.EndorsementId = endorsement.Id;
-            jacobEndorsement.PersonId = jacob.Id;
+            jacobEndorsement.PersonId = Jacob.Id;
             DbConnection.Insert(jacobEndorsement);
             var requiredEndorsement = AutoFaker.Generate<RequiredEndorsement>();
             requiredEndorsement.EndorsementId = endorsement.Id;
@@ -227,7 +259,7 @@ namespace UnitTestProject
             DbConnection.Insert(requiredEndorsement);
 
             var education = AutoFaker.Generate<Education>();
-            education.PersonId = jacob.Id;
+            education.PersonId = Jacob.Id;
             DbConnection.Insert(education);
         }
 
@@ -297,7 +329,8 @@ namespace UnitTestProject
             var job = JobFaker().Generate();
             action?.Invoke(job);
             DbConnection.Insert<Job>(job);
-            DbConnection.Insert(job.OrgGroup);
+            if (job.OrgGroup != null)
+                DbConnection.Insert(job.OrgGroup);
             return job;
         }
 
@@ -333,9 +366,32 @@ namespace UnitTestProject
             });
         }
 
+        public (PersonRole role, JobWithOrgGroup job) InsertRoleAndJob(Guid personId,
+            int years = 2,
+            bool active = true,
+            Guid jobOrgGroupId = default)
+        {
+            var job = InsertJob(_ =>
+            {
+                if (jobOrgGroupId != default)
+                {
+                    _.OrgGroup = null;
+                    _.OrgGroupId = jobOrgGroupId;
+                }
+            });
+            return (InsertRole(role =>
+            {
+                role.JobId = job.Id;
+                role.PersonId = personId;
+                role.StartDate = DateTime.Now - TimeSpan.FromDays(years * 366);
+                role.Active = active;
+            }), job);
+        }
+
         public PersonRole InsertRole(Action<PersonRole> action = null)
         {
             var role = AutoFaker.Generate<PersonRole>();
+            role.Active = true;
             action?.Invoke(role);
             DbConnection.Insert(role);
             return role;
@@ -402,11 +458,13 @@ namespace UnitTestProject
         public OrgGroup InsertOrgGroup(Guid? parentId = null,
             Guid? supervisorId = null,
             Action<OrgGroup> action = null,
+            bool approvesLeave = false,
             string name = null)
         {
             var orgGroup = AutoFaker.Generate<OrgGroup>();
             orgGroup.ParentId = parentId;
             orgGroup.Supervisor = supervisorId;
+            orgGroup.ApproverIsSupervisor = approvesLeave;
             if (!string.IsNullOrEmpty(name)) orgGroup.GroupName = name;
             action?.Invoke(orgGroup);
             DbConnection.Insert(orgGroup);
