@@ -297,218 +297,286 @@ namespace UnitTestProject
                 };
             }
 
+            List<OrgGroupWithSupervisor> List(params OrgGroupWithSupervisor[] orgs)
+            {
+                return orgs.ToList();
+            }
+
             IEnumerable<(string reason,
                 PersonWithStaff requestedBy,
-                OrgGroupWithSupervisor department,
-                OrgGroupWithSupervisor devision,
-                OrgGroupWithSupervisor supervisorGroup,
+                List<OrgGroupWithSupervisor> approvalOrgs,
+                List<OrgGroupWithSupervisor> roleOrgs,
                 Guid expectedApproverId,
                 int expectedNotifyEmailCount)> MakeValues()
             {
                 yield return ("Person with a single supervisor",
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
                     person2Id,
                     0);
 
                 yield return ("Person with a supervisor to notify",
                     Person(person1Id),
-                    new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
                     person2Id,
                     1);
 
                 yield return ("Person with 2 supervisors to notify",
                     Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
                     person2Id,
                     2);
 
                 yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver",
                     Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person3Id,
-                    1);
-
-                yield return ("person with a group inbetween to not notify",
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    1);
-
-                yield return ("person with 2 groups who could approve, stops at department",
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person4Id,
-                        SupervisorPerson = Person(person4Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person4Id,
-                    0);
-
-                yield return ("supervisor requesting leave, no one to notify",
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person1Id,
-                        SupervisorPerson = Person(person1Id)
-                    },
-                    new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    0);
-
-                yield return ("supervisor requesting leave, 1 person to notify",
-                    Person(person1Id),
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = departmentId,
-                        ParentId = devisionId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person1Id,
-                        SupervisorPerson = Person(person1Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = devisionId,
-                        ParentId = supervisorGroupId,
-                        ApproverIsSupervisor = false,
-                        Supervisor = person3Id,
-                        SupervisorPerson = Person(person3Id)
-                    },
-                    new OrgGroupWithSupervisor
-                    {
-                        Id = supervisorGroupId,
-                        ApproverIsSupervisor = true,
-                        Supervisor = person2Id,
-                        SupervisorPerson = Person(person2Id)
-                    },
-                    person2Id,
-                    1);
-
-                yield return ("supervisor is in list twice",
-                        Person(person1Id),
-                        new OrgGroupWithSupervisor
+                    List(new OrgGroupWithSupervisor
                         {
                             Id = departmentId,
                             ParentId = devisionId,
                             ApproverIsSupervisor = false,
-                            Supervisor = person2Id,
-                            SupervisorPerson = Person(person2Id)
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
                         },
                         new OrgGroupWithSupervisor
                         {
                             Id = devisionId,
                             ParentId = supervisorGroupId,
                             ApproverIsSupervisor = true,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = false,
                             Supervisor = person2Id,
                             SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person3Id,
+                    1);
+
+                yield return ("person with a group inbetween to not notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
                         },
-                        new OrgGroupWithSupervisor {Id = supervisorGroupId},
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    1);
+
+                yield return ("person with 2 groups who could approve, stops at department",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person4Id,
+                            SupervisorPerson = Person(person4Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person4Id,
+                    0);
+
+                yield return ("supervisor requesting leave, no one to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    0);
+
+                yield return ("supervisor requesting leave, 1 person to notify",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(),
+                    person2Id,
+                    1);
+                yield return ("supervisor requesting leave, don't notify self as supervisor",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor
+                        {
+                            Id = departmentId,
+                            ParentId = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person1Id,
+                            SupervisorPerson = Person(person1Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(new OrgGroupWithSupervisor
+                    {
+                        Id = departmentId,
+                        ParentId = devisionId,
+                        ApproverIsSupervisor = true,
+                        Supervisor = person1Id,
+                        SupervisorPerson = Person(person1Id)
+                    }),
+                    person2Id,
+                    0);
+
+                yield return ("supervisor is in list twice",
+                        Person(person1Id),
+                        List(new OrgGroupWithSupervisor
+                            {
+                                Id = departmentId,
+                                ParentId = devisionId,
+                                ApproverIsSupervisor = false,
+                                Supervisor = person2Id,
+                                SupervisorPerson = Person(person2Id)
+                            },
+                            new OrgGroupWithSupervisor
+                            {
+                                Id = devisionId,
+                                ParentId = supervisorGroupId,
+                                ApproverIsSupervisor = true,
+                                Supervisor = person2Id,
+                                SupervisorPerson = Person(person2Id)
+                            },
+                            new OrgGroupWithSupervisor {Id = supervisorGroupId}),
+                        List(),
                         person2Id,
                         0
                     );
+
+                yield return ("notify shows up in roles list",
+                    Person(person1Id),
+                    List(new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = devisionId,
+                            ParentId = supervisorGroupId,
+                            ApproverIsSupervisor = false,
+                            Supervisor = person3Id,
+                            SupervisorPerson = Person(person3Id)
+                        },
+                        new OrgGroupWithSupervisor
+                        {
+                            Id = supervisorGroupId,
+                            ApproverIsSupervisor = true,
+                            Supervisor = person2Id,
+                            SupervisorPerson = Person(person2Id)
+                        }),
+                    List(new OrgGroupWithSupervisor
+                    {
+                        Id = Guid.NewGuid(),
+                        ApproverIsSupervisor = false,
+                        Supervisor = person3Id,
+                        SupervisorPerson = Person(person3Id)
+                    }),
+                    person2Id,
+                    1);
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
@@ -518,20 +586,13 @@ namespace UnitTestProject
         [MemberData(nameof(GetExpectedResolvedSupervisors))]
         public void ResolvesExpectedSupervisors(string reason,
             PersonWithStaff requestedBy,
-            OrgGroupWithSupervisor department,
-            OrgGroupWithSupervisor devision,
-            OrgGroupWithSupervisor supervisorGroup,
+            List<OrgGroupWithSupervisor> approvalGroups,
+            List<OrgGroupWithSupervisor> roleGroups,
             Guid expectedApproverId,
             int expectedNotifyEmailCount)
         {
-            var (actualApprover, toNotify) = LeaveService.ResolveLeaveRequestEmails(requestedBy,
-                new List<OrgGroupWithSupervisor>
-                {
-                    department,
-                    devision,
-                    supervisorGroup
-                }.FindAll(g => g != null),
-                new List<OrgGroupWithSupervisor>());
+            var (actualApprover, toNotify) =
+                LeaveService.ResolveLeaveRequestEmails(requestedBy, approvalGroups, roleGroups);
 
             if (expectedApproverId == Guid.Empty)
             {

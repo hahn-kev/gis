@@ -189,7 +189,10 @@ namespace Backend.Services
             }
 
             return (toApprove,
-                supervisorsToNotify.Where(staff => staff.Id != toApprove?.Id).DistinctBy(staff => staff.Id).ToList());
+                supervisorsToNotify
+                    .Where(toNotify => toNotify.Id != toApprove?.Id && toNotify.Id != requestedBy.Id)
+                    .DistinctBy(staff => staff.Id)
+                    .ToList());
         }
 
         public LeaveDetails GetCurrentLeaveDetails(PersonWithOthers person)
