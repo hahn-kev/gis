@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LeaveRequest, LeaveRequestWithNames } from './leave-request';
+import { LeaveRequest, LeaveRequestPublic, LeaveRequestWithNames } from './leave-request';
 import { Person } from '../person';
 import { Observable, of } from 'rxjs';
 import { PersonAndLeaveDetails } from './person-and-leave-details';
@@ -33,6 +33,10 @@ export class LeaveRequestService {
 
   list(): Observable<LeaveRequestWithNames[]> {
     return this.http.get<LeaveRequestWithNames[]>('/api/leaveRequest');
+  }
+
+  listPublic(): Observable<LeaveRequestPublic[]> {
+    return this.http.get<LeaveRequestPublic[]>('/api/leaveRequest/public');
   }
 
   listByPersonId(personId: string): Observable<LeaveRequestWithNames[]> {

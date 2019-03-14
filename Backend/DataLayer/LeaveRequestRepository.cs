@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Backend.Entities;
 using LinqToDB;
@@ -18,12 +19,13 @@ namespace Backend.DataLayer
 
         public IQueryable<LeaveRequestWithNames> LeaveRequestWithNames =>
             from l in _connection.LeaveRequests
-            from person in _connection.PeopleExtended.InnerJoin(person => person.Id == l.PersonId)
+            from person in _connection.People.InnerJoin(person => person.Id == l.PersonId)
             from staff in _connection.Staff.LeftJoin(s => s.Id == person.StaffId).DefaultIfEmpty()
             from orgGroup in _connection.OrgGroups.LeftJoin(org => org.Id == staff.OrgGroupId).DefaultIfEmpty()
-            from supervisor in _connection.PeopleExtended.LeftJoin(supervisor => supervisor.Id == l.ApprovedById).DefaultIfEmpty()
+            from supervisor in _connection.People.LeftJoin(supervisor => supervisor.Id == l.ApprovedById)
+                .DefaultIfEmpty()
             where !person.Deleted
-            orderby l.StartDate descending 
+            orderby l.StartDate descending
             select new LeaveRequestWithNames
             {
                 Approved = l.Approved,
@@ -42,6 +44,21 @@ namespace Backend.DataLayer
                 Days = l.Days,
                 OverrideDays = l.OverrideDays
             };
+
+        public List<LeaveRequestPublic> PublicLeaveRequests()
+        {
+            return (from request in LeaveRequestWithNames
+                where request.Approved == true
+                select new LeaveRequestPublic
+                {
+                    Id = request.Id,
+                    RequesterName = request.RequesterName,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    Days = request.Days,
+                    OrgGroupName = request.OrgGroupName
+                }).ToList();
+        }
 
         public bool ApproveLeaveRequest(Guid id, Guid approver)
         {

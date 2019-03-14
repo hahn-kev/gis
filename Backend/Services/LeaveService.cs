@@ -34,6 +34,11 @@ namespace Backend.Services
         public IList<LeaveRequestWithNames> LeaveRequestsWithNames =>
             _leaveRequestRepository.LeaveRequestWithNames.ToList();
 
+        public List<LeaveRequestPublic> PublicLeaveRequests()
+        {
+            return _leaveRequestRepository.PublicLeaveRequests();
+        }
+
         private IList<LeaveRequestWithNames> ListForPeople(IQueryable<Guid> people)
         {
             return (from request in _leaveRequestRepository.LeaveRequestWithNames

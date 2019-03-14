@@ -411,6 +411,16 @@ const routes: Routes = [
             }
           },
           {
+            path: 'public',
+            component: CalendarComponent,
+            resolve: {
+              leave: LeaveListResolverService
+            },
+            data: {
+              public: true
+            }
+          },
+          {
             path: '',
             canActivate: [PolicyGuard],
             data: {

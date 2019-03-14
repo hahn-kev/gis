@@ -28,6 +28,13 @@ namespace Backend.Controllers
             return _leaveService.LeaveRequestsWithNames;
         }
 
+        [HttpGet("public")]
+        [Authorize]
+        public List<LeaveRequestPublic> Public()
+        {
+            return _leaveService.PublicLeaveRequests();
+        }
+
         [HttpGet("mine")]
         public IList<LeaveRequestWithNames> ListMyLeave()
         {

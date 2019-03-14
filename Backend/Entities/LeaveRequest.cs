@@ -76,6 +76,16 @@ namespace Backend.Entities
         public Guid? OrgGroupId { get; set; }
     }
 
+    public class LeaveRequestPublic
+    {
+        public Guid Id { get; set; }
+        public bool IsPublic { get; } = true;
+        public string OrgGroupName { get; set; }
+        public string RequesterName { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public decimal Days { get; set; }
+    }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum LeaveType

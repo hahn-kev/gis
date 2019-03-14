@@ -25,4 +25,18 @@ export class LeaveRequest extends BaseEntity {
 export class LeaveRequestWithNames extends LeaveRequest {
   public requesterName: string;
   public approvedByName: string;
+  public orgGroupName: string;
+  public orgGroupId: string;
 }
+
+
+export class LeaveRequestPublic {
+  public isPublic = true;
+  public requesterName: string;
+  public startDate: Date;
+  public endDate: Date;
+  public days: number;
+  public orgGroupName: string;
+}
+
+export type CalendarLeaveRequest = LeaveRequestPublic | LeaveRequestWithNames;

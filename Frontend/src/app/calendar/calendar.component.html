@@ -1,10 +1,15 @@
 <ng-container *appTemplateContent="'title'">Calendar</ng-container>
 <ng-container *appToolbarContent>
+  <mat-form-field>
+    <mat-select placeholder="Filter Department" [(ngModel)]="urlBinding.values.group" multiple>
+      <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
+    </mat-select>
+  </mat-form-field>
   <div class="month-nav">
     <button mat-icon-button (click)="incrementMonth(-1)">
       <mat-icon>navigate_before</mat-icon>
     </button>
-    <span>{{month.format('MMMM YY')}}</span>
+    <span>{{month.format('MMMM YYYY')}}</span>
     <button mat-icon-button (click)="incrementMonth(1)">
       <mat-icon>navigate_next</mat-icon>
     </button>
@@ -25,8 +30,8 @@
     <button (click)="leaveSheet.show(req)" mat-button
             style="display: block"
             *ngFor="let req of model.items">
-      [{{leaveTypeName(req.type)}}] {{req.requesterName}}
-
+      <ng-container *ngIf="!req.isPublic">[{{leaveTypeName(req.type)}}]</ng-container>
+      {{req.requesterName}}
     </button>
   </div>
 </div>
@@ -40,19 +45,21 @@
     <mat-form-field>
       <input matInput readonly [value]="leave.requesterName" placeholder="Name">
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field *ngIf="!leave.isPublic">
       <input matInput readonly [value]="leaveTypeName(leave.type)" placeholder="Type">
     </mat-form-field>
-    <mat-form-field>
-      <input matInput readonly [value]="leave.startDate | date" placeholder="Start Date">
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput readonly [value]="leave.endDate | date" placeholder="End Date">
-    </mat-form-field>
+    <div class="span-2-columns">
+      <mat-form-field>
+        <input matInput readonly [value]="leave.startDate | date" placeholder="Start Date">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput readonly [value]="leave.endDate | date" placeholder="End Date">
+      </mat-form-field>
+    </div>
     <mat-form-field>
       <input matInput readonly [value]="leave.days == 0.5 ? '1/2' : leave.days" placeholder="Length (days)">
     </mat-form-field>
-    <mat-checkbox readonly [checked]="leave.approved">Approved</mat-checkbox>
+    <mat-checkbox *ngIf="!leave.isPublic" readonly [checked]="leave.approved">Approved</mat-checkbox>
 
     <mat-form-field class="span-2-columns" *ngIf="leave.reason">
       <input matInput readonly [value]="leave.reason" placeholder="Reason">

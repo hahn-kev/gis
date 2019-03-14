@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { LeaveRequestService } from '../leave-request.service';
-import { LeaveRequestWithNames } from '../leave-request';
+import { CalendarLeaveRequest } from '../leave-request';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]> {
+export class LeaveListResolverService implements Resolve<CalendarLeaveRequest[]> {
   resolve(route: ActivatedRouteSnapshot,
-          state: RouterStateSnapshot): Observable<LeaveRequestWithNames[]> | Promise<LeaveRequestWithNames[]> | LeaveRequestWithNames[] {
+          state: RouterStateSnapshot): Observable<CalendarLeaveRequest[]> | Promise<CalendarLeaveRequest[]> | CalendarLeaveRequest[] {
 
     if (route.data.mine) {
       return this.leaveService.listMyLeave();
@@ -17,6 +17,10 @@ export class LeaveListResolverService implements Resolve<LeaveRequestWithNames[]
     }
     if (route.data.all) {
       return this.leaveService.list();
+    }
+
+    if (route.data.public) {
+      return this.leaveService.listPublic();
     }
 
     const supervisorId = route.params['supervisorId'];

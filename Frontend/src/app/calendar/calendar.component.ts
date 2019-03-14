@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LeaveRequestWithNames } from '../people/leave-request/leave-request';
+import { CalendarLeaveRequest } from '../people/leave-request/leave-request';
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { DateModel } from './date-model';
@@ -17,22 +17,32 @@ export class CalendarComponent implements OnInit {
   leaveTypeName = LeaveTypeName;
   readonly FORMAT = 'M-D-YYYY';
   readonly URL_FORMAT = 'M-YYYY';
-  leaveRequests: Map<string, LeaveRequestWithNames[]>;
-  models: DateModel<LeaveRequestWithNames>[];
+  leaveRequests: Map<string, CalendarLeaveRequest[]>;
+  models: DateModel<CalendarLeaveRequest>[];
   month: Moment;
+  public allOrgGroups: string[] = [];
 
-  constructor(private route: ActivatedRoute, private urlBinding: UrlBindingService<{ date: string }>) {
+  constructor(private route: ActivatedRoute, private urlBinding: UrlBindingService<{ date: string, group: string[] }>) {
+  }
+
+  ngOnInit() {
     this.urlBinding.addParam('date', moment().format(this.URL_FORMAT))
       .subscribe(value => this.month = moment(value, this.URL_FORMAT));
+    this.urlBinding.addParam('group', [])
+      .subscribe(() => this.generateModel());
     this.urlBinding.loadFromParams();
-    this.route.data.subscribe((value: { leave: LeaveRequestWithNames[] }) => {
+    this.route.data.subscribe((value: { leave: CalendarLeaveRequest[] }) => {
       this.groupLeaveRequestsByDate(value.leave);
       this.generateModel();
     });
   }
 
-  groupLeaveRequestsByDate(leaveRequests: LeaveRequestWithNames[]) {
-    this.leaveRequests = new Map<string, LeaveRequestWithNames[]>();
+  groupLeaveRequestsByDate(leaveRequests: CalendarLeaveRequest[]) {
+    this.leaveRequests = new Map<string, CalendarLeaveRequest[]>();
+    this.allOrgGroups = leaveRequests
+      .map(value => value.orgGroupName)
+      .filter((value, index, array) => array.indexOf(value) == index && value != null)
+      .sort();
     for (let req of leaveRequests) {
       let startDate = moment(req.startDate);
       let endDate = moment(req.endDate);
@@ -49,6 +59,7 @@ export class CalendarComponent implements OnInit {
   }
 
   generateModel() {
+    if (!this.leaveRequests) return;
     let rows = 5;
     let columns = 7;
     let monthStartWeekday = this.month.weekday();
@@ -60,8 +71,12 @@ export class CalendarComponent implements OnInit {
     this.models = new Array(rows * columns);
     for (let i = 1; i <= this.models.length; i++) {
       let date = this.month.clone().date(i - offset);
-      this.models[i - 1] = new DateModel<LeaveRequestWithNames>(date,
-        this.leaveRequests.get(date.format(this.FORMAT)) || [],
+      let requests = this.leaveRequests.get(date.format(this.FORMAT)) || [];
+      if (this.urlBinding.values.group.length > 0) {
+        requests = requests.filter(request => this.urlBinding.values.group.includes(request.orgGroupName));
+      }
+      this.models[i - 1] = new DateModel<CalendarLeaveRequest>(date,
+        requests,
         this.month.month() == date.month());
     }
   }
@@ -70,9 +85,6 @@ export class CalendarComponent implements OnInit {
     this.month.add(amount, 'month');
     this.urlBinding.values.date = this.month.format(this.URL_FORMAT);
     this.generateModel();
-  }
-
-  ngOnInit() {
   }
 
 }
