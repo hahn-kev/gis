@@ -126,12 +126,14 @@ namespace UnitTestProject
         public void ShouldGetChildrenOrdered()
         {
             var orgGroups = _groupRepository.GetWithChildrenWhere(group => @group.Id == orgRoot.Id)
-                .Select(group => group.Id).ToList();
+                .Select(group => group.GroupName).ToList();
             orgGroups.ShouldBe(new[]
             {
-                orgRoot.Id,
-                org1.Id,
-                org1a.Id,
+                orgRoot.GroupName,
+                org1.GroupName,
+                org2.GroupName,
+                org1a.GroupName,
+                org2a.GroupName
             });
         }
 

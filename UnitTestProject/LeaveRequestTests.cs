@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoBogus;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
@@ -117,49 +116,6 @@ namespace UnitTestProject
             var mockEntityService = _sf.GetScopedMockEntityService(_serviceScope);
             mockEntityService.Verify(service => service.Save(expectedLeaveRequest), Times.Once);
             mockEntityService.Verify(service => service.Delete(expectedLeaveRequest), Times.Once);
-        }
-
-        [Fact]
-        public void OrgGroupChainResolvesAsExpected()
-        {
-            var personFaker = ServicesFixture.PersonFaker();
-            var expectedPersonOnLeave = personFaker.Generate();
-            var expectedDepartment = AutoFaker.Generate<OrgGroup>();
-            var expectedDevision = AutoFaker.Generate<OrgGroup>();
-            var expectedDevisionSupervisor = personFaker.Generate();
-
-            expectedPersonOnLeave.Staff.OrgGroupId = expectedDepartment.Id;
-
-            expectedDepartment.Supervisor = null;
-            expectedDepartment.ParentId = expectedDevision.Id;
-
-            expectedDevision.Supervisor = expectedDevisionSupervisor.Id;
-            expectedDevision.ParentId = null;
-
-            _sf.DbConnection.Insert(expectedPersonOnLeave);
-            _sf.DbConnection.Insert(expectedPersonOnLeave.Staff);
-            _sf.DbConnection.Insert(expectedDepartment);
-            _sf.DbConnection.Insert(expectedDevision);
-            _sf.DbConnection.Insert(expectedDevisionSupervisor);
-            _sf.DbConnection.Insert(expectedDevisionSupervisor.Staff);
-
-            //test method
-            var orgGroupWithSupervisors = _orgGroupRepository.StaffParentOrgGroups(expectedPersonOnLeave.Staff)
-                .Take(3)
-                .AsEnumerable()
-                .Concat(new OrgGroupWithSupervisor[3]).ToList();
-
-            OrgGroupWithSupervisor actualDepartment = orgGroupWithSupervisors[0];
-            OrgGroupWithSupervisor actualDevision = orgGroupWithSupervisors[1];
-            OrgGroupWithSupervisor actualSupervisorGroup = orgGroupWithSupervisors[2];
-
-            actualDepartment.ShouldNotBeNull();
-            actualDepartment.Id.ShouldBe(expectedDepartment.Id);
-            actualDepartment.SupervisorPerson.ShouldBeNull();
-            actualDevision.ShouldNotBeNull();
-            actualDevision.Id.ShouldBe(expectedDevision.Id);
-            actualDevision.SupervisorPerson.Id.ShouldBe(expectedDevisionSupervisor.Id);
-            actualSupervisorGroup.ShouldBeNull();
         }
 
         public static IEnumerable<object[]> GetExpectedNotifyHrValues()
@@ -318,8 +274,8 @@ namespace UnitTestProject
                 toApprove,
                 toNotify,
                 new LeaveUsage {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
-            actualApprovalEmailSent.ShouldBe(expectApprovalEmailSent);
-            actualNotifyEmailCount.ShouldBe(expectedNotifyEmailCount);
+            actualApprovalEmailSent.ShouldBe(expectApprovalEmailSent, reason);
+            actualNotifyEmailCount.ShouldBe(expectedNotifyEmailCount, reason);
         }
 
         public static IEnumerable<object[]> GetExpectedResolvedSupervisors()
@@ -341,7 +297,7 @@ namespace UnitTestProject
                 };
             }
 
-            IEnumerable<(string reason, LeaveRequest request,
+            IEnumerable<(string reason,
                 PersonWithStaff requestedBy,
                 OrgGroupWithSupervisor department,
                 OrgGroupWithSupervisor devision,
@@ -349,7 +305,7 @@ namespace UnitTestProject
                 Guid expectedApproverId,
                 int expectedNotifyEmailCount)> MakeValues()
             {
-                yield return ("Person with a single supervisor", new LeaveRequest {PersonId = person1Id},
+                yield return ("Person with a single supervisor",
                     Person(person1Id),
                     new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
                     new OrgGroupWithSupervisor {Id = devisionId, ParentId = supervisorGroupId},
@@ -363,7 +319,7 @@ namespace UnitTestProject
                     person2Id,
                     0);
 
-                yield return ("Person with a supervisor to notify", new LeaveRequest {PersonId = person1Id},
+                yield return ("Person with a supervisor to notify",
                     Person(person1Id),
                     new OrgGroupWithSupervisor {Id = departmentId, ParentId = devisionId},
                     new OrgGroupWithSupervisor
@@ -384,7 +340,7 @@ namespace UnitTestProject
                     person2Id,
                     1);
 
-                yield return ("Person with 2 supervisors to notify", new LeaveRequest {PersonId = person1Id},
+                yield return ("Person with 2 supervisors to notify",
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -413,7 +369,6 @@ namespace UnitTestProject
                     2);
 
                 yield return ("Person with 1 supervisor to notify, don't notify supervisor above approver",
-                    new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -441,7 +396,7 @@ namespace UnitTestProject
                     person3Id,
                     1);
 
-                yield return ("person with a group inbetween to not notify", new LeaveRequest {PersonId = person1Id},
+                yield return ("person with a group inbetween to not notify",
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -462,10 +417,7 @@ namespace UnitTestProject
                     person2Id,
                     1);
 
-                yield return ("person with 2 groups who could approve, stops at department", new LeaveRequest
-                    {
-                        PersonId = person1Id
-                    },
+                yield return ("person with 2 groups who could approve, stops at department",
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -486,7 +438,7 @@ namespace UnitTestProject
                     person4Id,
                     0);
 
-                yield return ("supervisor requesting leave, no one to notify", new LeaveRequest {PersonId = person1Id},
+                yield return ("supervisor requesting leave, no one to notify",
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -508,7 +460,6 @@ namespace UnitTestProject
                     0);
 
                 yield return ("supervisor requesting leave, 1 person to notify",
-                    new LeaveRequest {PersonId = person1Id},
                     Person(person1Id),
                     new OrgGroupWithSupervisor
                     {
@@ -537,7 +488,6 @@ namespace UnitTestProject
                     1);
 
                 yield return ("supervisor is in list twice",
-                        new LeaveRequest {PersonId = person1Id},
                         Person(person1Id),
                         new OrgGroupWithSupervisor
                         {
@@ -567,7 +517,6 @@ namespace UnitTestProject
         [Theory]
         [MemberData(nameof(GetExpectedResolvedSupervisors))]
         public void ResolvesExpectedSupervisors(string reason,
-            LeaveRequest request,
             PersonWithStaff requestedBy,
             OrgGroupWithSupervisor department,
             OrgGroupWithSupervisor devision,
@@ -586,15 +535,15 @@ namespace UnitTestProject
 
             if (expectedApproverId == Guid.Empty)
             {
-                actualApprover.ShouldBeNull();
+                actualApprover.ShouldBeNull(reason);
             }
             else
             {
-                actualApprover.ShouldNotBeNull();
-                actualApprover.Id.ShouldBe(expectedApproverId);
+                actualApprover.ShouldNotBeNull(reason);
+                actualApprover.Id.ShouldBe(expectedApproverId, reason);
             }
 
-            toNotify.Count.ShouldBe(expectedNotifyEmailCount);
+            toNotify.Count.ShouldBe(expectedNotifyEmailCount, reason);
         }
 
         public static IEnumerable<object[]> ValidateEmailValues()
