@@ -127,14 +127,16 @@ namespace UnitTestProject
         {
             var orgGroups = _groupRepository.GetWithChildrenWhere(group => @group.Id == orgRoot.Id)
                 .Select(group => group.GroupName).ToList();
+            //todo setup explicit order by with depth and then not ignore order
             orgGroups.ShouldBe(new[]
-            {
-                orgRoot.GroupName,
-                org1.GroupName,
-                org2.GroupName,
-                org1a.GroupName,
-                org2a.GroupName
-            });
+                {
+                    orgRoot.GroupName,
+                    org1.GroupName,
+                    org2.GroupName,
+                    org1a.GroupName,
+                    org2a.GroupName,
+                },
+                true);
         }
 
         [Fact]
