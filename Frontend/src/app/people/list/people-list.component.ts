@@ -1,9 +1,9 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
-import {Person} from '../person';
-import {ActivatedRoute} from '@angular/router';
-import {AppDataSource} from '../../classes/app-data-source';
-import {MatSort} from '@angular/material';
-import {UrlBindingService} from '../../services/url-binding.service';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { Person } from '../person';
+import { ActivatedRoute } from '@angular/router';
+import { AppDataSource } from '../../classes/app-data-source';
+import { MatSort } from '@angular/material';
+import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({
   selector: 'app-people-list',
@@ -26,6 +26,7 @@ export class PeopleListComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new AppDataSource<Person>();
+    this.dataSource.customColumnAccessor('staffId', data => <any>!!data.staffId);
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.toUpperCase());
     this.dataSource.sort = this.sort;
     this.dataSource.bindToRouteData(this.route, 'people');

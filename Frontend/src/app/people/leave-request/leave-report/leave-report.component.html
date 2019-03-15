@@ -21,7 +21,7 @@
     <mat-icon mat-list-icon>supervisor_account</mat-icon>
     Show Leave Requests
   </a>
-  <app-export-button [values]="dataSource" fileName="leaveSummaryData"></app-export-button>
+  <app-export-button [values]="dataSource" [columns]="exportColumns" fileName="leaveSummaryData"></app-export-button>
 </ng-container>
 
 <!--filter dialog-->
@@ -61,58 +61,58 @@
     <mat-cell *matCellDef="let row"> {{row.person.staff.missionOrgName}}</mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="vacation">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="vacation.used">Vacation</mat-header-cell>
+  <ng-container matColumnDef="vacation.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Vacation</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.vacation?.used > row.vacation?.totalAllowed">
       {{row.vacation?.used || 0}}/{{row.vacation?.totalAllowed || 0}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="sick">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="sick.used">Sick</mat-header-cell>
+  <ng-container matColumnDef="sick.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Sick</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.sick?.used > row.sick?.totalAllowed">
       {{row.sick?.used}}/{{row.sick?.totalAllowed}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="personal">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="personal.used">Personal</mat-header-cell>
+  <ng-container matColumnDef="personal.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Personal</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.personal?.used > row.personal?.totalAllowed">
       {{row.personal?.used}}/{{row.personal?.totalAllowed}}
     </mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="parental">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="parental.used">Maternity/Paternity</mat-header-cell>
+  <ng-container matColumnDef="parental.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Maternity/Paternity</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.parental?.used > row.parental?.totalAllowed">
       {{row.parental?.used}}/{{row.parental?.totalAllowed}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="emergency">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="emergency.used">Emergency</mat-header-cell>
+  <ng-container matColumnDef="emergency.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Emergency</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.emergency?.used > row.emergency?.totalAllowed">
       {{row.emergency?.used || 0}}/{{row.emergency?.totalAllowed || 0}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="schoolRelated">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="schoolRelated.used">School Related</mat-header-cell>
+  <ng-container matColumnDef="schoolRelated.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>School Related</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.schoolRelated?.used > row.schoolRelated?.totalAllowed">
       {{row.schoolRelated?.used || 0}}/{{row.schoolRelated?.totalAllowed || 0}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="missionRelated">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="missionRelated.used">Mission Related</mat-header-cell>
+  <ng-container matColumnDef="missionRelated.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Mission Related</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.missionRelated?.used > row.missionRelated?.totalAllowed">
       {{row.missionRelated?.used || 0}}/{{row.missionRelated?.totalAllowed || 0}}
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="other">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="other.used">Other</mat-header-cell>
+  <ng-container matColumnDef="other.used">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Other</mat-header-cell>
     <mat-cell *matCellDef="let row"
               [class.warn]="row.other?.used > row.other?.totalAllowed">
       {{row.other?.used || 0}}/{{row.other?.totalAllowed || 0}}
@@ -121,9 +121,9 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['staff', 'person.staff.orgGroupName', 'person.staff.missionOrgName', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']"></mat-header-row>
+    *matHeaderRowDef="columns"></mat-header-row>
   <mat-row class="hover-overlay" [routerLink]="'/leave-request/list/' + row.person.id"
-           *matRowDef="let row; columns: ['staff', 'person.staff.orgGroupName', 'person.staff.missionOrgName', 'sick', 'vacation', 'personal', 'parental', 'emergency', 'schoolRelated', 'missionRelated', 'other']">
+           *matRowDef="let row; columns: columns">
   </mat-row>
 </mat-table>
 

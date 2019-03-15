@@ -34,7 +34,7 @@
       <mat-option *ngFor="let groupName of allOrgGroups" [value]="groupName">{{groupName}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <app-export-button [values]="dataSource" fileName="rolesData"></app-export-button>
+  <app-export-button [values]="dataSource" [columns]="columns" fileName="rolesData"></app-export-button>
 </ng-container>
 
 <mat-table [dataSource]="dataSource" matSort>
@@ -85,8 +85,8 @@
 
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'job.gradeNo', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"></mat-header-row>
+    *matHeaderRowDef="columns"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['job.title', 'job.status', 'job.type', 'job.orgGroup.groupName', 'job.gradeNo', 'preferredName', 'lastName', 'active', 'startDate', 'endDate']"
+           *matRowDef="let row; columns: columns"
            [routerLink]="'/people/edit/' + row.personId"></mat-row>
 </mat-table>

@@ -12,10 +12,12 @@
            placeholder="Search">
   </mat-form-field>
   <mat-slide-toggle [(ngModel)]="urlBinding.values.showApproved">Show Approved</mat-slide-toggle>
-  <app-export-button [values]="dataSource" fileName="leaveData"></app-export-button>
+  <app-export-button [values]="dataSource"
+                     [columns]="showingMine ? personColumns : hrColumns"
+                     fileName="leaveData"></app-export-button>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
-  <ng-container matColumnDef="requester">
+  <ng-container matColumnDef="requesterName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Leave for</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.requesterName}}</mat-cell>
   </ng-container>
@@ -29,7 +31,7 @@
       <mat-checkbox disabled [checked]="row.approved"></mat-checkbox>
     </mat-cell>
   </ng-container>
-  <ng-container matColumnDef="approvedBy">
+  <ng-container matColumnDef="approvedByName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Approved by</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.approvedByName}}</mat-cell>
   </ng-container>
@@ -53,7 +55,7 @@
   </ng-container>
 
   <ng-container matColumnDef="schoolYear">
-    <mat-header-cell *matHeaderCellDef>School Year</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header="">School Year</mat-header-cell>
     <mat-cell *matCellDef="let row">{{yearNameFromDate(row.startDate)}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->

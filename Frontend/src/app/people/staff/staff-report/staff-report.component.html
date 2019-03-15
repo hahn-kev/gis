@@ -29,7 +29,9 @@
      routerLink="/people/report/evaluations">
     <mat-icon>assignment_ind</mat-icon>
   </a>
-  <app-export-button fileName="staff" [values]="dataSource"></app-export-button>
+  <app-export-button fileName="staff"
+                     [values]="dataSource"
+                     [columns]="urlBinding.values.selectedColumns"></app-export-button>
 </ng-container>
 <ng-template #filterDialog="dialog" appDialog="Filters">
   <div class="two-colum-grid">
@@ -108,15 +110,15 @@
     <mat-cell *matCellDef="let row"> {{row.thaiLastName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="personalEmail">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="email">Personal Email</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Personal Email</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.email}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="staffEmail">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.email">Staff Email</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Staff Email</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.staff.email}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="phoneExtension">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.phoneExt">Phone Ext</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Phone Ext</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.staff.phoneExt}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="phoneNumber">
@@ -146,7 +148,7 @@
 
 
   <ng-container matColumnDef="legalStatus">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.workPermitType">Legal Status</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Legal Status</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{ row.staff.workPermitType }}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="isThai">
@@ -181,18 +183,19 @@
   </ng-container>
 
   <ng-container matColumnDef="department /Division">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="">Department / Division</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Department / Division</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.staff.orgGroupName}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="sendingOrg">
-    <mat-header-cell *matHeaderCellDef mat-sort-header="staff.missionOrgName">Sending Org</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Sending Org</mat-header-cell>
     <mat-cell *matCellDef="let row"> {{row.staff.missionOrgName}}</mat-cell>
   </ng-container>
 
   <!-- Header and Row Declarations -->
   <mat-header-row *matHeaderRowDef="urlBinding.values.selectedColumns"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: urlBinding.values.selectedColumns"
+  <mat-row class="hover-overlay"
+           *matRowDef="let row; columns: urlBinding.values.selectedColumns"
            [routerLink]="'/people/edit/' + row.id"></mat-row>
 </mat-table>
 

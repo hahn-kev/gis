@@ -28,6 +28,8 @@ export class JobListComponent implements OnInit {
   public typeName = jobTypeName;
   @ViewChild(MatSort) sort: MatSort;
 
+  public columns = ['title', 'status', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open'];
+
   constructor(private route: ActivatedRoute,
               public urlBinding: UrlBindingService<{
                 search: string,

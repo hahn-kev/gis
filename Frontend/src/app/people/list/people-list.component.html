@@ -9,7 +9,7 @@
            (keyup)="urlBinding.values.search = $event.target.value"
            placeholder="Search">
   </mat-form-field>
-  <app-export-button [values]="dataSource" fileName="peopleData"></app-export-button>
+  <app-export-button [values]="dataSource" [columns]="columns" fileName="peopleData"></app-export-button>
 </ng-container>
 <table mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="preferredName">

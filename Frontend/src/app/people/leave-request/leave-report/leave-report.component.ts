@@ -21,6 +21,31 @@ export class LeaveReportComponent implements OnInit {
   public isSupervisor = false;
   @ViewChild(MatSort) sort: MatSort;
 
+  public columns = [
+    'staff',
+    'person.staff.orgGroupName',
+    'person.staff.missionOrgName',
+    'sick.used',
+    'vacation.used',
+    'personal.used',
+    'parental.used',
+    'emergency.used',
+    'schoolRelated.used',
+    'missionRelated.used',
+    'other.used',
+  ];
+  exportColumns = [
+    ...this.columns,
+    'sick.totalAllowed',
+    'vacation.totalAllowed',
+    'personal.totalAllowed',
+    'parental.totalAllowed',
+    'emergency.totalAllowed',
+    'schoolRelated.totalAllowed',
+    'missionRelated.totalAllowed',
+    'other.totalAllowed',
+  ];
+
   constructor(private route: ActivatedRoute,
               public urlBinding: UrlBindingService<{
                 search: string,

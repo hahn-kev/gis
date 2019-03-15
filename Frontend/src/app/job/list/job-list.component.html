@@ -17,7 +17,7 @@
   <a mat-icon-button class="print-hide" matTooltip="Job Grades" matTooltipPosition="before" routerLink="../grade/list">
     <mat-icon>attach_money</mat-icon>
   </a>
-  <app-export-button [values]="dataSource" fileName="jobsData"></app-export-button>
+  <app-export-button [values]="dataSource" [columns]="columns" fileName="jobsData"></app-export-button>
 </ng-container>
 <ng-template #filterDialog="dialog" appDialog="Filters">
   <div class="two-colum-grid">
@@ -95,9 +95,9 @@
   </ng-container>
   <!-- Header and Row Declarations -->
   <mat-header-row
-    *matHeaderRowDef="['title','status', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open']"></mat-header-row>
+    *matHeaderRowDef="columns"></mat-header-row>
   <mat-row class="hover-overlay"
-           *matRowDef="let row; columns: ['title', 'status', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open']"
+           *matRowDef="let row; columns: columns"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 

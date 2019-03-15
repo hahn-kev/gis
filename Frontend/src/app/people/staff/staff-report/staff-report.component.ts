@@ -70,6 +70,11 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('age', data => moment(data.birthdate).unix());
     this.dataSource.customColumnAccessor('untilBirthday', data => this.timeToBirthday(data.birthdate).unix());
     this.dataSource.customColumnAccessor('serviceLength', data => this.serviceLength(data).asDays());
+    this.dataSource.customColumnAccessor('sendingOrg', data => data.staff.missionOrgName);
+    this.dataSource.customColumnAccessor('legalStatus', data => data.staff.workPermitType);
+    this.dataSource.customColumnAccessor('phoneExtension', data => data.staff.phoneExt);
+    this.dataSource.customColumnAccessor('staffEmail', data => data.staff.email);
+    this.dataSource.customColumnAccessor('personalEmail', data => data.email);
     this.dataSource.bindToRouteData(this.route, 'staff');
     //filter list to distinct
     this.allOrgGroups = this.dataSource.filteredData

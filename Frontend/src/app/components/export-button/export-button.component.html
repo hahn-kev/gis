@@ -1,6 +1,22 @@
-<button class="print-hide" (click)="exportCsv()"
-        mat-icon-button
-        matTooltip="Export To CSV"
-        matTooltipPosition="left">
-  <mat-icon>save</mat-icon>
-</button>
+<ng-container *ngIf="!canFilterByColumns(); else canFilter">
+  <button class="print-hide" (click)="exportCsv(true)"
+          mat-icon-button
+          matTooltip="Export To CSV"
+          matTooltipPosition="left">
+    <mat-icon>save</mat-icon>
+  </button>
+</ng-container>
+
+<ng-template #canFilter>
+  <button class="print-hide"
+          [matMenuTriggerFor]="csvMenu"
+          mat-icon-button
+          matTooltip="Export To CSV"
+          matTooltipPosition="left">
+    <mat-icon>save</mat-icon>
+  </button>
+  <mat-menu #csvMenu>
+    <button mat-menu-item (click)="exportCsv(false)">Export Current View</button>
+    <button mat-menu-item (click)="exportCsv(true)">Export All</button>
+  </mat-menu>
+</ng-template>

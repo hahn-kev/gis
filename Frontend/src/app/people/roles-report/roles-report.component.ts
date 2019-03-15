@@ -23,6 +23,19 @@ export class RolesReportComponent implements OnInit {
   public schoolYears = Year.years();
   @ViewChild(MatSort) sort: MatSort;
 
+  public columns = [
+    'job.title',
+    'job.status',
+    'job.type',
+    'job.orgGroup.groupName',
+    'job.gradeNo',
+    'preferredName',
+    'lastName',
+    'active',
+    'startDate',
+    'endDate'
+  ];
+
 
   constructor(private route: ActivatedRoute,
               public urlBinding: UrlBindingService<{

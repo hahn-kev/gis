@@ -22,10 +22,10 @@ export class LeaveListComponent implements OnInit {
   public showingMine: boolean;
   public title: string;
   public hrColumns = [
-    'requester',
+    'requesterName',
     'type',
     'approved',
-    'approvedBy',
+    'approvedByName',
     'startDate',
     'endDate',
     'days',
@@ -38,7 +38,7 @@ export class LeaveListComponent implements OnInit {
     'days',
     'type',
     'approved',
-    'approvedBy',
+    'approvedByName',
     'createdDate',
     'schoolYear'
   ];
@@ -61,6 +61,7 @@ export class LeaveListComponent implements OnInit {
       if (!this.urlBinding.values.showApproved && value.approved) return false;
       return true;
     };
+    this.dataSource.customColumnAccessor('schoolYear', data => Year.schoolYear(data.startDate));
     this.dataSource.bindToRouteData(this.route, 'leave');
     this.dataSource.filterPredicate = (data, filter) => data.requesterName.toUpperCase().includes(filter);
     if (!this.urlBinding.loadFromParams()) this.dataSource.filterUpdated();
