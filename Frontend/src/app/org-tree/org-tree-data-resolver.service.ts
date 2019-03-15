@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GroupService } from '../people/groups/group.service';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { OrgTreeData } from './org-tree-data';
 import { Observable } from 'rxjs';
+import { OrgTreeData } from './org-node';
 
 @Injectable()
 export class OrgTreeDataResolverService implements Resolve<OrgTreeData> {

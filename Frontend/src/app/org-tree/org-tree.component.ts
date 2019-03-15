@@ -1,14 +1,9 @@
-import {combineLatest, of as observableOf} from 'rxjs';
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Job, JobStatus} from '../job/job';
-import {RoleExtended} from '../people/role';
-import {OrgGroupWithSupervisor} from '../people/groups/org-group';
-import {GroupOrgNode, JobOrgNode, OrgNode, RoleOrgNode} from './org-node';
-import {NestedTreeControl} from '@angular/cdk/tree';
-import {UrlBindingService} from '../services/url-binding.service';
-import {map} from 'rxjs/operators';
-import {OrgTreeData} from './org-tree-data';
+import { combineLatest } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { OrgNode, OrgTree, OrgTreeData } from './org-node';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { UrlBindingService } from '../services/url-binding.service';
 
 
 @Component({
@@ -45,8 +40,8 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildList() {
-    this.nodes = this.data.groups.filter(org => org.parentId == null || org.id == this.rootId)
-      .map(org => this.buildOrgNode(org, this.data));
+    let orgTree = new OrgTree(this.data, this.urlBinding, this.rootId);
+    this.nodes = orgTree.nodes;
     let expanded = this.urlBinding.values.expanded;
     if (expanded.length == 0) {
       for (let node of this.nodes) {
@@ -59,45 +54,6 @@ export class OrgTreeComponent implements OnInit {
         if (node) this.treeControl.expand(node);
       }
     }
-  }
-
-  buildJobNode(job: Job, data: OrgTreeData) {
-    return new JobOrgNode(job.id,
-      job,
-      'job',
-      data.roles
-        .filter(role => role.jobId == job.id)
-        .map(role => this.buildRoleNode(role, data)),
-      combineLatest(this.urlBinding.observableValues.allRoles)
-        .pipe(map(([allRoles]: [boolean]) => (value: RoleExtended) => value.active || allRoles))
-    );
-  }
-
-  buildRoleNode(role: RoleExtended, data: OrgTreeData) {
-    return new RoleOrgNode(role.personId, role, 'role', [], observableOf(() => true));
-  }
-
-  buildOrgNode(org: OrgGroupWithSupervisor, data: OrgTreeData) {
-    return new GroupOrgNode(org.id, org, 'org', [
-        ...data.jobs
-          .filter(value => value.orgGroupId == org.id && (this.urlBinding.values.allJobs || value.current))
-          .map(value => this.buildJobNode(value, data)),
-
-        ...data.groups
-          .filter(value => value.parentId == org.id)
-          .map(value => this.buildOrgNode(value, data))
-      ],
-      combineLatest(this.urlBinding.observableValues.allJobs, this.urlBinding.observableValues.show)
-        .pipe(map(([allJobs, show]: [boolean, string[]]) =>
-          (child: OrgGroupWithSupervisor | Job) => {
-            if ('title' in child) {
-              if (!allJobs && !child.current) return false;
-              if (child.status == JobStatus.SchoolAid && !show.includes('aids')) return false;
-              if (child.status != JobStatus.SchoolAid && !show.includes('staff')) return false;
-            }
-            return true;
-          }))
-    );
   }
 
   isOrgNode = (i: number, node: OrgNode) => {

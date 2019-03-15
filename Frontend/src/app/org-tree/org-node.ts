@@ -1,12 +1,86 @@
 ﻿import { RoleExtended } from '../people/role';
 import { OrgGroup, OrgGroupWithSupervisor } from '../people/groups/org-group';
 import { Job, JobStatus } from '../job/job';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UrlBindingService } from '../services/url-binding.service';
 
-export class OrgNode<T = RoleExtended | OrgGroupWithSupervisor | Job,
-  C = RoleExtended | OrgGroupWithSupervisor | Job,
-  P = RoleExtended | OrgGroupWithSupervisor | Job> {
+type TreeOrgGroupType = OrgGroupWithSupervisor;
+
+export class OrgTree {
+  data: OrgTreeData;
+  urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean, show: string[] }>;
+  nodes: OrgNode[];
+
+  constructor(data: OrgTreeData,
+              urlBinding?: UrlBindingService<{ allRoles: boolean; allJobs: boolean; show: string[] }>,
+              rootId?: string) {
+    this.data = data;
+    this.urlBinding = urlBinding;
+    this.nodes = data.groups.filter(org => org.parentId == null || org.id == rootId)
+      .map(org => this.buildOrgNode(org, this.data));
+  }
+
+  buildJobNode(job: Job, data: OrgTreeData) {
+    return new JobOrgNode(job.id,
+      job,
+      'job',
+      data.roles
+        .filter(role => role.jobId == job.id)
+        .map(role => this.buildRoleNode(role, data)),
+      this.jobFilter()
+    );
+  }
+
+  jobFilter() {
+    if (!this.urlBinding) return undefined;
+    return combineLatest(this.urlBinding.observableValues.allRoles)
+      .pipe(map(([allRoles]: [boolean]) => (value: RoleExtended) => value.active || allRoles));
+  }
+
+  buildRoleNode(role: RoleExtended, data: OrgTreeData) {
+    return new RoleOrgNode(role.personId, role, 'role', []);
+  }
+
+  buildOrgNode(org: TreeOrgGroupType, data: OrgTreeData) {
+    return new GroupOrgNode(org.id, org, 'org', [
+        ...data.jobs
+          .filter(value => value.orgGroupId == org.id)
+          .map(value => this.buildJobNode(value, data)),
+
+        ...data.groups
+          .filter(value => value.parentId == org.id)
+          .map(value => this.buildOrgNode(value, data))
+      ],
+      this.orgFilter()
+    );
+  }
+
+  orgFilter() {
+    if (!this.urlBinding) return undefined;
+    return combineLatest(this.urlBinding.observableValues.allJobs, this.urlBinding.observableValues.show)
+      .pipe(map(([allJobs, show]: [boolean, string[]]) =>
+        (child: TreeOrgGroupType | Job) => {
+          if ('title' in child) {
+            if (!allJobs && !child.current) return false;
+            if (child.status == JobStatus.SchoolAid && !show.includes('aids')) return false;
+            if (child.status != JobStatus.SchoolAid && !show.includes('staff')) return false;
+          }
+          return true;
+        }));
+  }
+}
+
+export class OrgTreeData {
+  roles: RoleExtended[];
+  jobs: Job[];
+  groups: TreeOrgGroupType[];
+}
+
+
+export class OrgNode<T = RoleExtended | TreeOrgGroupType | Job,
+  C = RoleExtended | TreeOrgGroupType | Job,
+  P = RoleExtended | TreeOrgGroupType | Job> {
   id: string;
   value: T;
   type: 'job' | 'org' | 'role';
@@ -52,7 +126,7 @@ export class OrgNode<T = RoleExtended | OrgGroupWithSupervisor | Job,
               value: T,
               type: 'job' | 'org' | 'role',
               children: OrgNode<C>[],
-              observableFilter: Observable<(value: C) => boolean>) {
+              observableFilter?: Observable<(value: C) => boolean>) {
     this.id = id;
     this.value = value;
     this.type = type;
@@ -61,12 +135,13 @@ export class OrgNode<T = RoleExtended | OrgGroupWithSupervisor | Job,
       child.parent = this;
     }
     this.observableChildren = new BehaviorSubject(this.allChildren);
-    observableFilter.pipe(map(filter => this.allChildren.filter(child => filter(child.value))))
-      .subscribe(this.observableChildren);
+    if (observableFilter)
+      observableFilter.pipe(map(filter => this.allChildren.filter(child => filter(child.value))))
+        .subscribe(this.observableChildren);
   }
 }
 
-export class JobOrgNode extends OrgNode<Job, RoleExtended, OrgGroupWithSupervisor> {
+export class JobOrgNode extends OrgNode<Job, RoleExtended, TreeOrgGroupType> {
 
   get openJobs(): number {
     return this.jobsAvalible - (this.filteredChildren.filter(child => child.value.active).length);
@@ -87,7 +162,7 @@ export class JobOrgNode extends OrgNode<Job, RoleExtended, OrgGroupWithSuperviso
   }
 }
 
-export class GroupOrgNode extends OrgNode<OrgGroupWithSupervisor, Job | OrgGroupWithSupervisor, OrgGroup> {
+export class GroupOrgNode extends OrgNode<TreeOrgGroupType, Job | TreeOrgGroupType, OrgGroup> {
 
   get openJobs(): number {
     return this.filteredChildren.reduce((previousValue, currentValue) => previousValue + currentValue.openJobs, 0);

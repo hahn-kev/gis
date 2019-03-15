@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TrainingRequirement } from './training-requirement';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { StaffTraining, StaffTrainingWithRequirement } from './staff-training';
 import { RequirementWithStaff, StaffWithTraining } from './training-report/requirement-with-staff';
@@ -28,6 +28,7 @@ export class TrainingRequirementService {
   }
 
   getTrainingByStaffId(staffId: string) {
+    if (!staffId) return of([]);
     return this.http.get<StaffTrainingWithRequirement[]>('/api/training/staff/' + staffId);
   }
 
@@ -149,7 +150,7 @@ export class TrainingRequirementService {
       return true;
     }
     if (requirement.departmentId == null) {
-      throw new Error('training requirement corupt, missing department id');
+      throw new Error('training requirement corrupt, missing department id');
     }
     if (staff.roles.length > 0) {
       for (let role of staff.roles) {

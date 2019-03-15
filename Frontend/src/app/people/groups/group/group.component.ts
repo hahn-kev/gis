@@ -71,7 +71,7 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
   }
 
   refreshOrgChain(): void {
-    this.orgChain = this.groupService.buildOrgChain(this.group, this.people, this.groups);
+    this.orgChain = this.groupService.buildOrgChain(this.group, this.people, this.groups, this.group.supervisor);
   }
 
   async save(navigateTo = null): Promise<void> {

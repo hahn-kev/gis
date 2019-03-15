@@ -1,4 +1,4 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -67,11 +67,12 @@ describe('GroupService', () => {
     let service: GroupService;
     beforeEach(inject([GroupService], (s) => service = s));
 
-    let newGroup = (id, parentId = null, supervisor = null) => {
+    let newGroup = (id, parentId = null, supervisor = null, approverIsSupervisor = true) => {
       let group = new OrgGroup();
       group.id = id;
       group.parentId = parentId;
       group.supervisor = supervisor;
+      group.approverIsSupervisor = approverIsSupervisor;
       return group;
     };
     let newPerson = (id) => {
@@ -85,13 +86,23 @@ describe('GroupService', () => {
       expect(orgChain.links.length).toBe(3);
       expect(orgChain.linkEnd.id).toBe('p1');
     });
-    it('should skip the main group if it has a supervisor', () => {
+    it('should skip the main group if supervisor is current person', () => {
       let group = newGroup('g1', 'g2', 'p2');
       let orgChain = service.buildOrgChain(group,
         [newPerson('p1'), newPerson('p2')],
-        [newGroup('g2', null, 'p1')]);
+        [newGroup('g2', null, 'p1')], 'p2');
       expect(orgChain.links.length).toBe(3);
       expect(orgChain.linkEnd.id).toBe('p1');
+    });
+    it('should skip the non approver groups', () => {
+      let group1 = newGroup('g1', 'g2', null);
+      let group2 = newGroup('g2', 'g3', 'p2', false);
+      let group3 = newGroup('g3', null, 'p3', true);
+      let orgChain = service.buildOrgChain(group1,
+        [newPerson('p1'), newPerson('p2'), newPerson('p3')],
+        [group1, group2, group3], 'p1');
+      expect(orgChain.links.length).toBe(4);
+      expect(orgChain.linkEnd.id).toBe('p3');
     });
     it('should throw if a loop is found', () => {
       let group1 = newGroup('g1', 'g2');
