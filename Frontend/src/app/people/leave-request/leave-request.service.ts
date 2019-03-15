@@ -89,29 +89,37 @@ export class LeaveRequestService {
   }
 
   overlapingHolidayDays(leaveRequest: LeaveRequest, holiday: Holiday) {
-    const startDate = moment(leaveRequest.startDate);
-    const endDate = moment(leaveRequest.endDate);
+    const leaveStart = moment(leaveRequest.startDate);
+    const leaveEnd = moment(leaveRequest.endDate);
     const holidayStart = moment(holiday.start);
     const holidayEnd = moment(holiday.end);
-    if (holidayEnd.isBefore(startDate) || holidayStart.isAfter(endDate)) {
+    if (holidayEnd.isBefore(leaveStart) || holidayStart.isAfter(leaveEnd)) {
       return 0;
     }
     if (holidayStart.isSame(holidayEnd, 'day')) {
-      return holidayStart.isBetween(startDate, endDate, 'day', '[]') ? 1 : 0;
+      return holidayStart.isBetween(leaveStart, leaveEnd, 'day', '[]') ? 1 : 0;
     }
-    if (startDate.isSame(endDate, 'day')) {
-      return startDate.isBetween(holidayStart, holidayEnd, 'day', '[]') ? 1 : 0;
+    if (leaveStart.isSame(leaveEnd, 'day')) {
+      return leaveStart.isBetween(holidayStart, holidayEnd, 'day', '[]') ? 1 : 0;
     }
-    if (holidayEnd.isSameOrBefore(endDate) && holidayStart.isSameOrAfter(startDate)) {
+    //key leave = () holiday = []
+    //([])
+    if (leaveStart.isSameOrBefore(holidayStart) && holidayEnd.isSameOrBefore(leaveEnd)) {
       return this.weekDaysBetween(holidayStart, holidayEnd);
     }
-    if (holidayEnd.isAfter(endDate) && holidayStart.isAfter(startDate) && holidayStart.isSameOrBefore(endDate)) {
-      return this.weekDaysBetween(holidayStart, endDate);
+    //[()]
+    if (holidayStart.isSameOrBefore(leaveStart) && leaveEnd.isSameOrBefore(holidayEnd)) {
+      return this.weekDaysBetween(leaveStart, leaveEnd);
     }
-    if (holidayStart.isBefore(startDate) && holidayEnd.isBefore(endDate) && holidayEnd.isSameOrAfter(startDate)) {
-      return this.weekDaysBetween(startDate, holidayEnd);
+    //([)]
+    if (holidayEnd.isAfter(leaveEnd) && holidayStart.isAfter(leaveStart) && holidayStart.isSameOrBefore(leaveEnd)) {
+      return this.weekDaysBetween(holidayStart, leaveEnd);
     }
-    console.error('Not sure how holiday: ' + holiday.start + ' -> ' + holiday.end + ' overlaps with ' + leaveRequest.endDate + ' -> ' + leaveRequest.startDate);
+    //[(])
+    if (holidayStart.isBefore(leaveStart) && holidayEnd.isBefore(leaveEnd) && holidayEnd.isSameOrAfter(leaveStart)) {
+      return this.weekDaysBetween(leaveStart, holidayEnd);
+    }
+    console.error('Not sure how holiday: ' + holiday.start + ' -> ' + holiday.end + ' overlaps with ' + leaveRequest.startDate + ' -> ' + leaveRequest.endDate);
     return 0;
   }
 

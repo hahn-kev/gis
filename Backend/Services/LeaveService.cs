@@ -383,7 +383,7 @@ namespace Backend.Services
             if (!updatedLeaveRequest.IsNew())
                 oldRequest = _leaveRequestRepository.LeaveRequests.SingleOrDefault(request =>
                     request.Id == updatedLeaveRequest.Id);
-            ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest);
+            ThrowIfHrRequiredForUpdate(oldRequest, updatedLeaveRequest, _entityService.List<Holiday>());
         }
 
         public IQueryable<PersonWithStaff> PeopleWithStaffUnderGroup(Guid orgGroupId)
@@ -394,8 +394,11 @@ namespace Backend.Services
                 select person).OrderBy(_ => _.PreferredName ?? _.FirstName).ThenBy(_ => _.LastName);
         }
 
-        public static void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest, LeaveRequest newRequest)
+        public static void ThrowIfHrRequiredForUpdate(LeaveRequest oldRequest,
+            LeaveRequest newRequest,
+            List<Holiday> holidays)
         {
+            var newDays = CalculateLeaveDays(newRequest, holidays);
             if (oldRequest == null)
             {
                 if (newRequest.OverrideDays)
@@ -404,8 +407,8 @@ namespace Backend.Services
                         "You're not allowed to override the leave calculation, talk to HR");
                 }
 
-                if (newRequest.Days != newRequest.CalculateLength() &&
-                    newRequest.Days != newRequest.CalculateLength() - 0.5m)
+                if (newRequest.Days != newDays &&
+                    newRequest.Days != newDays - 0.5m)
                 {
                     throw new ArgumentException(
                         $"Leave request days calculated didn't match what was expected for dates {newRequest.StartDate} to {newRequest.EndDate}");
@@ -413,6 +416,8 @@ namespace Backend.Services
 
                 return;
             }
+
+            var oldDays = CalculateLeaveDays(oldRequest, holidays);
 
             if (oldRequest.Approved != null)
             {
@@ -430,8 +435,8 @@ namespace Backend.Services
                     "You aren't allowed to override the length of this leave request, talk to HR");
             }
 
-            if (!newRequest.OverrideDays && newRequest.Days != newRequest.CalculateLength() &&
-                newRequest.Days != newRequest.CalculateLength() - 0.5m)
+            if (!newRequest.OverrideDays && newRequest.Days != newDays &&
+                newRequest.Days != newDays - 0.5m)
             {
                 throw new UnauthorizedAccessException(
                     "Days of leave request must match calculated when not being overriden");
@@ -444,7 +449,7 @@ namespace Backend.Services
             }
 
             if (oldRequest.OverrideDays && newRequest.OverrideDays &&
-                oldRequest.CalculateLength() != newRequest.CalculateLength())
+                oldDays != newDays)
             {
                 throw new UnauthorizedAccessException(
                     "You aren't allowed modify the start or end dates of this leave request because the calculation has been overriden, talk to HR");
@@ -455,6 +460,50 @@ namespace Backend.Services
                 throw new UnauthorizedAccessException(
                     "You aren't allowed to approve your own leave request, talk to HR");
             }
+        }
+
+        public static int CalculateLeaveDays(LeaveRequest leaveRequest, List<Holiday> holidays)
+        {
+            var days = leaveRequest.CalculateLength();
+            foreach (var holiday in holidays)
+            {
+                days -= WeekdaysOverlapping(leaveRequest, holiday);
+            }
+
+            return days;
+        }
+
+        public static int WeekdaysOverlapping(LeaveRequest leaveRequest, Holiday holiday)
+        {
+            var holidayEnd = holiday.End.Date;
+            var holidayStart = holiday.Start.Date;
+            var leaveStart = leaveRequest.StartDate.Date;
+            var leaveEnd = leaveRequest.EndDate.Date;
+            if (holidayEnd < leaveStart || holidayStart > leaveEnd)
+                return 0;
+
+            if (holidayStart == holidayEnd)
+                return holidayStart.Between(leaveStart, leaveEnd) ? 1 : 0;
+            if (leaveStart == leaveEnd)
+                return leaveStart.Between(holidayStart, holidayEnd) ? 1 : 0;
+
+            //key leave = () holiday = []
+            //([])
+            if (leaveStart <= holidayStart && holidayEnd <= leaveEnd)
+                return holidayStart.BusinessDaysUntil(holidayEnd);
+            //[()]
+            if (holidayStart < leaveStart && leaveEnd < holidayEnd)
+                return leaveStart.BusinessDaysUntil(leaveEnd);
+
+            //([)]
+            if (leaveStart < holidayStart && leaveEnd < holidayEnd && holidayStart <= leaveEnd)
+                return holidayStart.BusinessDaysUntil(leaveEnd);
+            //[(])
+            if (holidayStart < leaveStart && holidayEnd < leaveEnd && leaveStart <= holidayEnd)
+                return leaveStart.BusinessDaysUntil(holidayEnd);
+
+            throw new Exception(
+                $"Not sure how holiday: {holidayStart} -> {holidayEnd} overlaps with {leaveStart} -> {leaveEnd}");
         }
     }
 }

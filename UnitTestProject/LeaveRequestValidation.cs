@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoBogus;
 using Backend.Entities;
 using Backend.Services;
@@ -37,7 +38,7 @@ namespace UnitTestProject
             newRequest.PersonId = Guid.NewGuid();
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
             ex.Message.ShouldContain("change the person");
         }
 
@@ -50,14 +51,14 @@ namespace UnitTestProject
             newRequest.Days--;
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
 
             Assert.Contains("must match calculated", ex.Message);
 
             newRequest.Days = newRequest.CalculateLength();
             newRequest.EndDate += TimeSpan.FromDays(4);
             ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
 
             Assert.Contains("must match calculated", ex.Message);
         }
@@ -71,7 +72,7 @@ namespace UnitTestProject
             newRequest.Days++;
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
 
             Assert.Contains("modify the length", ex.Message);
         }
@@ -85,7 +86,7 @@ namespace UnitTestProject
             newRequest.EndDate += TimeSpan.FromDays(4);
 
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
 
             Assert.Contains("modify the start or end", ex.Message);
         }
@@ -98,7 +99,7 @@ namespace UnitTestProject
             oldRequest.Approved = false;
             newRequest.Approved = true;
             var ex = Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
             Assert.Contains("approve", ex.Message);
         }
 
@@ -113,7 +114,7 @@ namespace UnitTestProject
             LeaveRequest newRequest = oldRequest.Copy();
             newRequest.Days = 0.5m;
             //does not throw
-            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest);
+            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>());
         }
 
         [Fact]
@@ -128,7 +129,7 @@ namespace UnitTestProject
             newRequest.Days = 0.5m;
             //does not throw
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, newRequest, new List<Holiday>()));
         }
 
         [Fact]
@@ -137,7 +138,7 @@ namespace UnitTestProject
             LeaveRequest request = GenerateRequest();
             request.OverrideDays = true;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(null, request));
+                LeaveService.ThrowIfHrRequiredForUpdate(null, request, new List<Holiday>()));
         }
 
         [Fact]
@@ -151,7 +152,7 @@ namespace UnitTestProject
             //should be 3 days
             request.Days = 2;
             Assert.Throws<ArgumentException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(null, request));
+                LeaveService.ThrowIfHrRequiredForUpdate(null, request, new List<Holiday>()));
             request.Days.ShouldBe(2);
         }
 
@@ -161,13 +162,13 @@ namespace UnitTestProject
             LeaveRequest oldRequest = GenerateRequest();
             oldRequest.Approved = true;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, new List<Holiday>()));
             oldRequest.Approved = false;
             Assert.Throws<UnauthorizedAccessException>(() =>
-                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest));
+                LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, new List<Holiday>()));
             oldRequest.Approved = null;
             //doesn't throw
-            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest);
+            LeaveService.ThrowIfHrRequiredForUpdate(oldRequest, oldRequest, new List<Holiday>());
         }
 
         #endregion

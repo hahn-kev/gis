@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Backend.Utils
 {
     public static class Utils
     {
-        /// <inheritdoc cref="BusinessDaysUntil(System.DateTime,System.DateTime,System.Collections.Generic.IEnumerable{System.DateTime})"/>
-        public static int BusinessDaysUntil(this DateTime firstDay, DateTime lastDay)
-        {
-            return BusinessDaysUntil(firstDay, lastDay, Enumerable.Empty<DateTime>());
-        }
-
         /// <summary>
         /// Calculates number of business days, taking into account:
         ///  - weekends (Saturdays and Sundays)
@@ -20,9 +13,8 @@ namespace Backend.Utils
         /// </summary>
         /// <param name="firstDay">First day in the time interval</param>
         /// <param name="lastDay">Last day in the time interval</param>
-        /// <param name="holidays">List of holidays excluding weekends</param>
         /// <returns>Number of business days during the 'span'</returns>
-        public static int BusinessDaysUntil(this DateTime firstDay, DateTime lastDay, IEnumerable<DateTime> holidays)
+        public static int BusinessDaysUntil(this DateTime firstDay, DateTime lastDay)
         {
             firstDay = firstDay.Date;
             lastDay = lastDay.Date;
@@ -54,14 +46,6 @@ namespace Backend.Utils
 
             // subtract the weekends during the full weeks in the interval
             businessDays -= fullWeekCount + fullWeekCount;
-
-            // subtract the number of holidays during the time interval
-            foreach (DateTime holiday in holidays)
-            {
-                DateTime bh = holiday.Date;
-                if (firstDay <= bh && bh <= lastDay)
-                    --businessDays;
-            }
 
             return businessDays;
         }

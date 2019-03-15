@@ -57,13 +57,78 @@ namespace UnitTestProject
         }
 
         [Theory]
-        [MemberData(nameof(LeaveMemberData))]
+        [MemberData(nameof(LeaveHolidayData))]
         public void ShouldMatchExpectedLeave(DateTime startDate, DateTime endDate, int expectedDays)
         {
             var leaveRequest = new LeaveRequest(startDate, endDate);
-            leaveRequest.Days = leaveRequest.CalculateLength();
+            leaveRequest.Days = LeaveService.CalculateLeaveDays(leaveRequest, new List<Holiday>());
             var result = LeaveService.TotalLeaveUsed(new[] {leaveRequest});
             Assert.Equal(expectedDays, result);
+        }
+
+        public static IEnumerable<object[]> LeaveHolidayData()
+        {
+            LeaveRequest LR(DateTime start, DateTime end) => new LeaveRequest {StartDate = start, EndDate = end};
+
+            Holiday H(DateTime start, DateTime end) => new Holiday {Start = start, End = end};
+
+            IEnumerable<(LeaveRequest, Holiday, int)> MakeValues()
+            {
+                //the 4th is a Monday
+                //gone for whole week, but Tuesday through Thursday is a holiday
+                yield return (
+                    LR(new DateTime(2015, 5, 4), new DateTime(2015, 5, 8)),
+                    H(new DateTime(2015, 5, 5), new DateTime(2015, 5, 7)),
+                    2);
+
+                //gone Tuesday through Thursday but the whole week is a holiday
+                yield return (
+                    LR(new DateTime(2015, 5, 5), new DateTime(2015, 5, 7)),
+                    H(new DateTime(2015, 5, 4), new DateTime(2015, 5, 8)),
+                    0);
+
+                //gone Monday which is also a holiday
+                yield return (
+                    LR(new DateTime(2015, 5, 4), new DateTime(2015, 5, 4)),
+                    H(new DateTime(2015, 5, 4), new DateTime(2015, 5, 4)),
+                    0);
+                //gone Monday - Tuesday, Monday is a holiday
+                yield return (
+                    LR(new DateTime(2015, 5, 4), new DateTime(2015, 5, 5)),
+                    H(new DateTime(2015, 5, 4), new DateTime(2015, 5, 4)),
+                    1);
+                //gone Tuesday, but holiday is Monday - Wednesday which is also a holiday
+                yield return (
+                    LR(new DateTime(2015, 5, 5), new DateTime(2015, 5, 5)),
+                    H(new DateTime(2015, 5, 4), new DateTime(2015, 5, 6)),
+                    0);
+
+                //gone Monday, Tuesday but holiday is Tuesday Wednesday
+                yield return (
+                    LR(new DateTime(2015, 5, 4), new DateTime(2015, 5, 5)),
+                    H(new DateTime(2015, 5, 5), new DateTime(2015, 5, 6)),
+                    1);
+                //gone Tuesday, Wednesday but holiday is Monday, Tuesday
+                yield return (
+                    LR(new DateTime(2015, 5, 5), new DateTime(2015, 5, 6)),
+                    H(new DateTime(2015, 5, 4), new DateTime(2015, 5, 5)),
+                    1);
+
+                //no overlap at all
+                yield return (
+                    LR(new DateTime(2015, 5, 5), new DateTime(2015, 5, 6)),
+                    H(new DateTime(2015, 5, 7), new DateTime(2015, 5, 8)),
+                    2);
+            }
+
+            return MakeValues().Select(tuple => tuple.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(LeaveHolidayData))]
+        public void ShouldWorkProperlyWithHolidays(LeaveRequest leaveRequest, Holiday holiday, int expectedDays)
+        {
+            LeaveService.CalculateLeaveDays(leaveRequest, new List<Holiday> {holiday}).ShouldBe(expectedDays);
         }
 
         [Fact]
