@@ -22,9 +22,18 @@ export class LeaveReportComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
-              public urlBinding: UrlBindingService<{ search: string, group: string[], sendingOrg: string[], year: number }>) {
+              public urlBinding: UrlBindingService<{
+                search: string,
+                group: string[],
+                sendingOrg: string[],
+                year: number,
+                showThai: boolean,
+                showNonThai: boolean,
+              }>) {
     this.urlBinding.addParam('group', []);
     this.urlBinding.addParam('sendingOrg', []);
+    this.urlBinding.addParam('showThai', true);
+    this.urlBinding.addParam('showNonThai', true);
     this.urlBinding.addParam('year', Year.CurrentSchoolYear(), true);
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.trim().toUpperCase());
     this.urlBinding.onParamsUpdated = values => this.dataSource.filterUpdated();
@@ -33,10 +42,14 @@ export class LeaveReportComponent implements OnInit {
         || data.person.lastName.toUpperCase().startsWith(filter)
         || data.person.preferredName.toUpperCase().startsWith(filter)
     );
-    this.dataSource.customFilter = value => (this.urlBinding.values.group.length == 0 ||
-      this.urlBinding.values.group.includes(value.person.staff.orgGroupName)) &&
-      (this.urlBinding.values.sendingOrg.length == 0 ||
-        this.urlBinding.values.sendingOrg.includes(value.person.staff.missionOrgName));
+    this.dataSource.customFilter = value => {
+      if (!this.urlBinding.values.showThai && value.person.isThai) return false;
+      if (!this.urlBinding.values.showNonThai && !value.person.isThai) return false;
+      if (this.urlBinding.values.group.length > 0 && !this.urlBinding.values.group.includes(value.person.staff.orgGroupName)) return false;
+      if (this.urlBinding.values.sendingOrg.length > 0 && !this.urlBinding.values.sendingOrg.includes(value.person.staff.missionOrgName)) return false;
+
+      return true;
+    };
     this.route.data.subscribe((value: { people: PersonAndLeaveDetails[] }) => {
       this.dataSource.unfilteredData = value.people.map(p => {
         let plm = new PersonLeaveModel();
