@@ -94,6 +94,13 @@ html, body {
 .mat-accordion .mat-expansion-panel-header-title,
 .mat-accordion .mat-expansion-panel-header-description {
   flex-basis: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-expansion-panel-header .mat-content {
+  width: 0;
 }
 
 .mat-accordion .mat-expansion-panel-header-description {
