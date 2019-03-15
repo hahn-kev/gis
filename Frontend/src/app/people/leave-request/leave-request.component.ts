@@ -214,4 +214,12 @@ export class LeaveRequestComponent extends BaseEditComponent implements OnInit, 
         return true;
     }
   }
+
+  approvedChanged(approved: boolean) {
+    if (approved) {
+      this.leaveRequest.approvedById = this.myPersonId;
+    } else {
+      this.leaveRequest.approvedById = null;
+    }
+  }
 }

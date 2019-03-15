@@ -91,7 +91,10 @@
       </mat-form-field>
 
       <mat-form-field>
-        <mat-select name="approved" [disabled]="!isHr" [(ngModel)]="leaveRequest.approved"
+        <mat-select name="approved"
+                    [disabled]="!isHr"
+                    [(ngModel)]="leaveRequest.approved"
+                    (ngModelChange)="approvedChanged($event)"
                     placeholder="Approval Status">
           <mat-option [value]="null">Unknown</mat-option>
           <mat-option [value]="true">Approved</mat-option>
