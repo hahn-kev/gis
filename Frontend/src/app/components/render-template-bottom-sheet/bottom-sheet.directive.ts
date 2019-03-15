@@ -16,4 +16,8 @@ export class BottomSheetDirective {
     });
   }
 
+  dismiss() {
+    this.bottomSheet.dismiss();
+  }
+
 }

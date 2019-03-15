@@ -41,6 +41,12 @@
     <mat-icon>transfer_within_a_station</mat-icon>
     View Request
   </a>
+  <button mat-icon-button
+          (click)="leaveSheet.dismiss()"
+          style="float: right;"
+          matTooltip="Close">
+    <mat-icon>close</mat-icon>
+  </button>
   <div class="two-colum-grid leave-summary">
     <mat-form-field>
       <input matInput readonly [value]="leave.requesterName" placeholder="Name">
