@@ -57,7 +57,7 @@ namespace UnitTestProject
         }
 
         [Theory]
-        [MemberData(nameof(LeaveHolidayData))]
+        [MemberData(nameof(LeaveMemberData))]
         public void ShouldMatchExpectedLeave(DateTime startDate, DateTime endDate, int expectedDays)
         {
             var leaveRequest = new LeaveRequest(startDate, endDate);
