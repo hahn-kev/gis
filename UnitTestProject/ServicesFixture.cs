@@ -143,10 +143,17 @@ namespace UnitTestProject
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+#if Debug
             builder.ConfigureLogging(loggingBuilder =>
             {
                 loggingBuilder.SetMinimumLevel(LogLevel.Trace).AddDebug().AddConsole();
             });
+#else
+            builder.ConfigureLogging(loggingBuilder =>
+            {
+                loggingBuilder.SetMinimumLevel(LogLevel.Error).AddDebug().AddConsole();
+            });
+#endif
             builder.ConfigureAppConfiguration(SetupConfig);
         }
 
