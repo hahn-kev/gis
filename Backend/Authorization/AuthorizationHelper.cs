@@ -14,6 +14,7 @@ namespace Backend.Authorization
             services.AddScoped<PersonEditAuthorizationHandlerLazy>();
             services.AddScoped<IAuthorizationHandler, StaffEditAuthorizationHandler>();
             services.AddScoped<IAuthorizationHandler, CanRequestLeaveHandler>();
+            services.AddScoped<IAuthorizationHandler, CanRequestLeaveByPersonHandler>();
         }
 
         private static void AddPolicies(AuthorizationOptions options)

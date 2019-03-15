@@ -57,16 +57,17 @@ namespace Backend.Controllers
         [HttpGet("person/{personId}")]
         public Task<ActionResult<IList<LeaveRequestWithNames>>> ListByPerson(Guid personId)
         {
-            return TryExecute(MyPolicies.peopleEdit,
+            return TryExecute(MyPolicies.canRequestLeave,
                 personId,
                 () => _leaveService.ListByPersonId(personId));
         }
 
         [HttpGet("supervisor/{supervisorId}")]
-        [Authorize("leaveRequest")]
-        public IList<LeaveRequestWithNames> ListBySupervisor(Guid supervisorId)
+        public Task<ActionResult<IList<LeaveRequestWithNames>>> ListBySupervisor(Guid supervisorId)
         {
-            return _leaveService.ListForSupervisor(supervisorId);
+            return TryExecute(MyPolicies.canRequestLeave,
+                supervisorId,
+                () => _leaveService.ListForSupervisor(supervisorId));
         }
 
         [HttpGet("{id}")]

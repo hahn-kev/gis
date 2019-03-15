@@ -27,8 +27,7 @@ namespace Backend.DataLayer
 
         public IQueryable<OrgGroup> GetBySupervisorIdWithChildren(Guid supervisorId)
         {
-            return GetWithChildrenWhere(orgGroup => orgGroup.Supervisor == supervisorId,
-                childGroup => !childGroup.ApproverIsSupervisor);
+            return GetWithChildrenWhere(orgGroup => orgGroup.Supervisor == supervisorId);
         }
 
         public IQueryable<OrgGroup> GetWithChildrenWhere(Expression<Func<OrgGroup, bool>> rootPredicate,
