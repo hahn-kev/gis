@@ -3,21 +3,21 @@ import { ActivatedRoute } from '@angular/router';
 import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { AllJobTypes, JobStatus, jobStatusName, JobType, jobTypeName, NonSchoolAidJobStatus } from '../../job/job';
+import { AllJobTypes, JobStatus, JobType, jobTypeName, NonSchoolAidJobStatus } from '../../job/job';
 import { Year } from '../training-requirement/year';
 import { UrlBindingService } from '../../services/url-binding.service';
+import { JobStatusNamePipe } from '../../job/job-status-name.pipe';
 
 @Component({
   selector: 'app-roles-report',
   templateUrl: './roles-report.component.html',
   styleUrls: ['./roles-report.component.scss'],
-  providers: [UrlBindingService]
+  providers: [UrlBindingService, JobStatusNamePipe]
 })
 export class RolesReportComponent implements OnInit {
   public dataSource: AppDataSource<RoleWithJob>;
   public allOrgGroups: string[] = [];
   public typeName = jobTypeName;
-  public statusName = jobStatusName;
   public jobStatus = Object.keys(JobStatus);
   public jobTypes = Object.keys(JobType);
   public schoolYears = Year.years();
@@ -44,7 +44,8 @@ export class RolesReportComponent implements OnInit {
                 status: JobStatus[],
                 search: string,
                 group: string[]
-              }>) {
+              }>,
+              private jobStatusName: JobStatusNamePipe) {
     this.dataSource = new AppDataSource<RoleWithJob>();
     this.dataSource.bindToRouteData(this.route, 'roles');
     //filter list to distinct
@@ -90,7 +91,7 @@ export class RolesReportComponent implements OnInit {
     if (typeof status === 'string') return status;
     if (status.length === this.jobStatus.length) return 'All';
     if (this.areListsEqual(status, NonSchoolAidJobStatus)) return 'Staff Jobs';
-    return status.map(value => this.statusName(value)).join(', ');
+    return status.map(value => this.jobStatusName.transform(value)).join(', ');
   }
 
   jobTypeSelectLabel(status: JobType[] | string) {

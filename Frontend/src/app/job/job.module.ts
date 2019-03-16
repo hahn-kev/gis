@@ -8,6 +8,7 @@ import { GradeComponent } from './grade/edit/grade.component';
 import { GradeListComponent } from './grade/list/grade-list.component';
 import { RolesReportComponent } from '../people/roles-report/roles-report.component';
 import { AppComponentsModule } from '../components/app-components.module';
+import { JobStatusNamePipe } from './job-status-name.pipe';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { AppComponentsModule } from '../components/app-components.module';
     JobListComponent,
     GradeComponent,
     GradeListComponent,
-    RolesReportComponent
+    RolesReportComponent,
+    JobStatusNamePipe
   ],
   imports: [
     CommonModule,

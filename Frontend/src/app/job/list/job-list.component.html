@@ -42,7 +42,7 @@
                   multiple
                   placeholder="Show Job Status">
         <mat-select-trigger>{{jobSelectLabel(urlBinding.values.status)}}</mat-select-trigger>
-        <mat-option *ngFor="let status of jobStatus" [value]="status">{{statusName(status)}}</mat-option>
+        <mat-option *ngFor="let status of jobStatus" [value]="status">{{status | jobStatusName}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field>
@@ -59,7 +59,7 @@
   </ng-container>
   <ng-container matColumnDef="status">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{statusName(row.status)}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.status | jobStatusName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
