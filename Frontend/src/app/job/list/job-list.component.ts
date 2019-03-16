@@ -4,6 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { AllJobTypes, JobStatus, JobType, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
 import { MatSort } from '@angular/material';
 import { UrlBindingService } from '../../services/url-binding.service';
+import { JobStatusNamePipe } from '../job-status-name.pipe';
+import { JobTypeNamePipe } from '../job-type-name.pipe';
 
 @Component({
   selector: 'app-job-list',
@@ -28,7 +30,9 @@ export class JobListComponent implements OnInit {
                 type: JobType[],
                 showInactive: boolean,
                 group: string[]
-              }>) {
+              }>,
+              private jobStatusName: JobStatusNamePipe,
+              private jobTypeName: JobTypeNamePipe) {
     this.dataSource = new AppDataSource<JobWithFilledInfo>();
     this.dataSource.bindToRouteData(this.route, 'jobs');
     //filter list to distinct
@@ -71,12 +75,12 @@ export class JobListComponent implements OnInit {
   jobSelectLabel(types: JobStatus[]) {
     if (types.length == this.jobStatus.length) return 'All';
     if (this.areListsEqual(types, NonSchoolAidJobStatus)) return 'Staff Jobs';
-    return types.map(value => this.statusName(value)).join(', ');
+    return types.map(value => this.jobStatusName.transform(value)).join(', ');
   }
 
   jobTypeSelectLabel(status: JobType[]) {
     if (status.length === this.jobTypes.length) return 'All';
-    return status.map(value => this.typeName(value)).join(', ');
+    return status.map(value => this.jobTypeName.transform(value)).join(', ');
   }
 
   areListsEqual<T>(a: T[], b: T[]) {

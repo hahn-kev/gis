@@ -14,12 +14,14 @@ import { Location } from '@angular/common';
 import { Endorsement, RequiredEndorsement, RequiredEndorsementWithName } from '../../endorsement/endorsement';
 import { Observable } from 'rxjs';
 import { EndorsementService } from '../../endorsement/endorsement.service';
+import { JobStatusNamePipe } from '../job-status-name.pipe';
+import { JobTypeNamePipe } from '../job-type-name.pipe';
 
 @Component({
   selector: 'app-job',
   templateUrl: './job.component.html',
   styleUrls: ['./job.component.scss'],
-  providers: [LazyLoadService]
+  providers: [LazyLoadService, JobStatusNamePipe, JobTypeNamePipe]
 })
 export class JobComponent extends BaseEditComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
