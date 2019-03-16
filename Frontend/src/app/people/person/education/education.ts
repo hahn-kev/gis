@@ -18,8 +18,3 @@ export enum Degree {
   Doctorate = 'Doctorate',
   Other = 'Other'
 }
-
-export function formatDegree(degree: Degree): string {
-  if (degree == Degree.Associates) return 'Associates/HND';
-  return degree;
-}
