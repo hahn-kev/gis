@@ -30,7 +30,7 @@
     <button (click)="leaveSheet.show(req)" mat-button
             style="display: block"
             *ngFor="let req of model.items">
-      <ng-container *ngIf="!req.isPublic">[{{leaveTypeName(req.type)}}]</ng-container>
+      <ng-container *ngIf="!req.isPublic">[{{req.type | leaveTypeName}}]</ng-container>
       {{req.requesterName}}
     </button>
   </div>
@@ -52,7 +52,7 @@
       <input matInput readonly [value]="leave.requesterName" placeholder="Name">
     </mat-form-field>
     <mat-form-field *ngIf="!leave.isPublic">
-      <input matInput readonly [value]="leaveTypeName(leave.type)" placeholder="Type">
+      <input matInput readonly [value]="leave.type | leaveTypeName" placeholder="Type">
     </mat-form-field>
     <div class="span-2-columns">
       <mat-form-field>

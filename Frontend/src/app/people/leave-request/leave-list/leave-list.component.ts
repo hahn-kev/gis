@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { LeaveRequestWithNames } from '../leave-request';
 import { AppDataSource } from 'app/classes/app-data-source';
 import { LoginService } from '../../../services/auth/login.service';
-import { LeaveTypeName } from '../../self/self';
 import { MatSort } from '@angular/material';
 import { Year } from '../../training-requirement/year';
 import { UrlBindingService } from '../../../services/url-binding.service';
@@ -17,7 +16,6 @@ import { UrlBindingService } from '../../../services/url-binding.service';
 export class LeaveListComponent implements OnInit {
   public dataSource = new AppDataSource<LeaveRequestWithNames>();
   public yearNameFromDate = Year.schoolYearNameFromDate;
-  public typeName = LeaveTypeName;
   public filteredByUser: string | null;
   public showingMine: boolean;
   public title: string;

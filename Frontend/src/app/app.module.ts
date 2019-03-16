@@ -66,6 +66,7 @@ import { IsLastVisiblePipe } from './org-tree/is-last-visible.pipe';
 import { AppComponentsModule } from './components/app-components.module';
 import { HolidayListComponent } from './holiday/list/holiday-list.component';
 import { HolidayComponent } from './holiday/edit/holiday.component';
+import { LeaveTypeNamePipe } from './people/leave-request/leave-type-name.pipe';
 
 if (environment.production) {
   Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
@@ -107,7 +108,8 @@ if (environment.production) {
     GroupTypeNamePipe,
     IsLastVisiblePipe,
     HolidayListComponent,
-    HolidayComponent
+    HolidayComponent,
+    LeaveTypeNamePipe
   ],
   entryComponents: [
     ConfirmDialogComponent,

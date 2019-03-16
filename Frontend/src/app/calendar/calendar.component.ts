@@ -4,7 +4,6 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { DateModel } from './date-model';
 import { UrlBindingService } from '../services/url-binding.service';
-import { LeaveTypeName } from '../people/self/self';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,7 +13,6 @@ import { ActivatedRoute } from '@angular/router';
   providers: [UrlBindingService]
 })
 export class CalendarComponent implements OnInit {
-  leaveTypeName = LeaveTypeName;
   readonly FORMAT = 'M-D-YYYY';
   readonly URL_FORMAT = 'M-YYYY';
   leaveRequests: Map<string, CalendarLeaveRequest[]>;

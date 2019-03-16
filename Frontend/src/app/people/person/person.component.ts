@@ -21,7 +21,7 @@ import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
 import { MissionOrgService } from '../../mission-org/mission-org.service';
-import { LeaveType, LeaveTypeName } from '../self/self';
+import { LeaveType } from '../self/self';
 import { Location } from '@angular/common';
 import { EvaluationWithNames } from './evaluation/evaluation';
 import { EvaluationService } from './evaluation/evaluation.service';
@@ -40,7 +40,6 @@ import { NavigationExtras } from '@angular/router/src/router';
   providers: [LazyLoadService]
 })
 export class PersonComponent implements OnInit, CanComponentDeactivate {
-  public leaveTypeName = LeaveTypeName;
   public isAdmin: boolean;
   public isNew: boolean;
   public isSelf: boolean;

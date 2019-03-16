@@ -23,7 +23,7 @@
   </ng-container>
   <ng-container matColumnDef="type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{typeName(row.type)}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.type | leaveTypeName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="approved">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Approved</mat-header-cell>
