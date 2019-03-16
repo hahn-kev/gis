@@ -270,26 +270,11 @@
     </app-emergency-contact>
 
     <!--leave summary-->
-    <mat-card *ngIf="person.staffId">
-      <mat-grid-list class="span-2-columns" cols="5" rowHeight="25px">
-        <mat-grid-tile [colspan]="2">
-          <a [routerLink]="['/leave-request','list', person.id]" mat-button color="accent">View Leave</a>
-        </mat-grid-tile>
-        <mat-grid-tile class="hint" matTooltip="Pending leave requests are included in the calculation for used leave">
-          Used
-        </mat-grid-tile>
-        <mat-grid-tile>Left</mat-grid-tile>
-        <mat-grid-tile>Total</mat-grid-tile>
-        <ng-container *ngFor="let leaveUsed of person.leaveDetails?.leaveUsages">
-          <ng-container *ngIf="leaveUsed.leaveType != (person.gender == 'Male' ? 'Maternity' : 'Paternity')">
-            <mat-grid-tile [colspan]="2" class="left">{{ leaveUsed.leaveType | leaveTypeName }}</mat-grid-tile>
-            <mat-grid-tile>{{leaveUsed.used}}</mat-grid-tile>
-            <mat-grid-tile>{{leaveUsed.left}}</mat-grid-tile>
-            <mat-grid-tile>{{leaveUsed.totalAllowed}}</mat-grid-tile>
-          </ng-container>
-        </ng-container>
-      </mat-grid-list>
-    </mat-card>
+    <app-leave-summary *ngIf="person.staffId"
+                       [personId]="person.id"
+                       [personGender]="person.gender"
+                       [leaveDetails]="person.leaveDetails">
+    </app-leave-summary>
   </div>
   <div class="column-2">
 

@@ -16,6 +16,7 @@ import { DonorComponent } from './person/donor/donor.component';
 import { PeopleRoutingModule } from './people-routing.module';
 import { SchoolAidListComponent } from './schoolAidList/school-aid-list.component';
 import { DegreeNamePipe } from './person/education/degree-name.pipe';
+import { LeaveSummaryComponent } from './person/leave-summary.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { DegreeNamePipe } from './person/education/degree-name.pipe';
     DonationComponent,
     DonorComponent,
     SchoolAidListComponent,
-    DegreeNamePipe
+    DegreeNamePipe,
+    LeaveSummaryComponent
   ],
   imports: [
     CommonModule,
