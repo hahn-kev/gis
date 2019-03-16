@@ -59,11 +59,3 @@ export enum JobType {
 export const AllJobTypes = Object.keys(JobType)
   .map(value => JobType[value]);
 
-export function jobTypeName(type: JobType) {
-  switch (type) {
-    case JobType.BlueCollar:
-      return 'Blue Collar';
-    default:
-      return type;
-  }
-}

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { JobService } from '../job.service';
-import { JobStatus, JobType, jobTypeName, JobWithRoles } from '../job';
+import { JobStatus, JobType, JobWithRoles } from '../job';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { OrgGroup } from '../../people/groups/org-group';
@@ -23,7 +23,6 @@ import { EndorsementService } from '../../endorsement/endorsement.service';
 })
 export class JobComponent extends BaseEditComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
-  public typeName = jobTypeName;
 
   public jobStatus = Object.keys(JobStatus);
 

@@ -11,7 +11,7 @@
                 multiple
                 placeholder="Show Job Type">
       <mat-select-trigger>{{jobTypeSelectLabel(urlBinding.values.type)}}</mat-select-trigger>
-      <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
+      <mat-option *ngFor="let type of jobTypes" [value]="type">{{type | jobTypeName}}</mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field style="padding-left: 8px">
@@ -49,7 +49,7 @@
   </ng-container>
   <ng-container matColumnDef="job.type">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Type</mat-header-cell>
-    <mat-cell *matCellDef="let row"> {{typeName(row.job.type)}}</mat-cell>
+    <mat-cell *matCellDef="let row"> {{row.job.type | jobTypeName}}</mat-cell>
   </ng-container>
   <ng-container matColumnDef="job.orgGroup.groupName">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Department/Division</mat-header-cell>

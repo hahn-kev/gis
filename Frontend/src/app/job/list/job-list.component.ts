@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute } from '@angular/router';
-import { AllJobTypes, JobStatus, JobType, jobTypeName, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
+import { AllJobTypes, JobStatus, JobType, JobWithFilledInfo, NonSchoolAidJobStatus } from '../job';
 import { MatSort } from '@angular/material';
 import { UrlBindingService } from '../../services/url-binding.service';
 
@@ -16,7 +16,6 @@ export class JobListComponent implements OnInit {
   public jobTypes = Object.keys(JobType);
   public dataSource: AppDataSource<JobWithFilledInfo>;
   public allOrgGroups: string[] = [];
-  public typeName = jobTypeName;
   @ViewChild(MatSort) sort: MatSort;
 
   public columns = ['title', 'status', 'type', 'gradeNo', 'orgGroupName', 'current', 'positions', 'filled', 'open'];

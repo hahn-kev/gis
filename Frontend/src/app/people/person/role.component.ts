@@ -1,17 +1,18 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {RoleWithJob} from '../role';
-import {NgForm} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
-import {JobWithOrgGroup} from '../../job/job';
-import {JobService} from '../../job/job.service';
-import {LazyLoadService} from '../../services/lazy-load.service';
-import {tap} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { RoleWithJob } from '../role';
+import { NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { JobWithOrgGroup } from '../../job/job';
+import { JobService } from '../../job/job.service';
+import { LazyLoadService } from '../../services/lazy-load.service';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-role',
   templateUrl: './role.component.html',
-  styleUrls: ['./role.component.scss']
+  styleUrls: ['./role.component.scss'],
+  exportAs: 'appRole'
 })
 export class RoleComponent implements OnInit {
   @Input() readonly = false;

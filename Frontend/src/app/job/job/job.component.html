@@ -13,7 +13,7 @@
         <mat-select [(ngModel)]="job.type" name="type"
                     placeholder="Type">
           <mat-option [value]="null">None</mat-option>
-          <mat-option *ngFor="let type of jobTypes" [value]="type">{{typeName(type)}}</mat-option>
+          <mat-option *ngFor="let type of jobTypes" [value]="type">{{type | jobTypeName}}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field>
@@ -74,7 +74,7 @@
         </mat-expansion-panel-header>
         <app-role [role]="role"
                   [hideJob]="true"
-                  #roleEl
+                  #roleEl="appRole"
                   [formId]="'form_' + role.id"
                   (submit)="saveRole(role); rolePanel.close();">
         </app-role>

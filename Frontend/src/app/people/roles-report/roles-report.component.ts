@@ -3,21 +3,21 @@ import { ActivatedRoute } from '@angular/router';
 import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
 import { MatSort } from '@angular/material';
-import { AllJobTypes, JobStatus, JobType, jobTypeName, NonSchoolAidJobStatus } from '../../job/job';
+import { AllJobTypes, JobStatus, JobType, NonSchoolAidJobStatus } from '../../job/job';
 import { Year } from '../training-requirement/year';
 import { UrlBindingService } from '../../services/url-binding.service';
 import { JobStatusNamePipe } from '../../job/job-status-name.pipe';
+import { JobTypeNamePipe } from '../../job/job-type-name.pipe';
 
 @Component({
   selector: 'app-roles-report',
   templateUrl: './roles-report.component.html',
   styleUrls: ['./roles-report.component.scss'],
-  providers: [UrlBindingService, JobStatusNamePipe]
+  providers: [UrlBindingService, JobStatusNamePipe, JobTypeNamePipe]
 })
 export class RolesReportComponent implements OnInit {
   public dataSource: AppDataSource<RoleWithJob>;
   public allOrgGroups: string[] = [];
-  public typeName = jobTypeName;
   public jobStatus = Object.keys(JobStatus);
   public jobTypes = Object.keys(JobType);
   public schoolYears = Year.years();
@@ -45,7 +45,8 @@ export class RolesReportComponent implements OnInit {
                 search: string,
                 group: string[]
               }>,
-              private jobStatusName: JobStatusNamePipe) {
+              private jobStatusName: JobStatusNamePipe,
+              private jobTypeName: JobTypeNamePipe) {
     this.dataSource = new AppDataSource<RoleWithJob>();
     this.dataSource.bindToRouteData(this.route, 'roles');
     //filter list to distinct
@@ -97,7 +98,7 @@ export class RolesReportComponent implements OnInit {
   jobTypeSelectLabel(status: JobType[] | string) {
     if (typeof status === 'string') return status;
     if (status.length === this.jobTypes.length) return 'All';
-    return status.map(value => this.typeName(value)).join(', ');
+    return status.map(value => this.jobTypeName.transform(value)).join(', ');
   }
 
   areListsEqual(a: JobStatus[], b: JobStatus[]) {
