@@ -16,6 +16,7 @@ export class OrgTreeComponent implements OnInit {
   treeControl: NestedTreeControl<OrgNode>;
   nodes: OrgNode[];
   data: OrgTreeData;
+  orgTree: OrgTree;
   rootId: string;
 
   constructor(private route: ActivatedRoute,
@@ -40,8 +41,8 @@ export class OrgTreeComponent implements OnInit {
   }
 
   buildList() {
-    let orgTree = new OrgTree(this.data, this.urlBinding, this.rootId);
-    this.nodes = orgTree.nodes;
+    this.orgTree = new OrgTree(this.data, this.urlBinding, this.rootId);
+    this.nodes = this.orgTree.nodes;
     let expanded = this.urlBinding.values.expanded;
     if (expanded.length == 0) {
       for (let node of this.nodes) {

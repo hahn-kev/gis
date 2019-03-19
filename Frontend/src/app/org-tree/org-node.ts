@@ -12,6 +12,8 @@ export class OrgTree {
   urlBinding: UrlBindingService<{ allRoles: boolean, allJobs: boolean, show: string[] }>;
   nodes: OrgNode[];
 
+  supervisorCountById: { [supervisorId: string]: number } = {};
+
   constructor(data: OrgTreeData,
               urlBinding?: UrlBindingService<{ allRoles: boolean; allJobs: boolean; show: string[] }>,
               rootId?: string) {
@@ -19,6 +21,10 @@ export class OrgTree {
     this.urlBinding = urlBinding;
     this.nodes = data.groups.filter(org => org.parentId == null || org.id == rootId)
       .map(org => this.buildOrgNode(org, this.data));
+    for (let group of data.groups) {
+      if (!group.supervisor) continue;
+      this.supervisorCountById[group.supervisor] = (this.supervisorCountById[group.supervisor] || 0) + 1;
+    }
   }
 
   buildJobNode(job: Job, data: OrgTreeData) {

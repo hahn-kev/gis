@@ -39,8 +39,14 @@
             </a>
             <span class="spacer"></span>
             <mat-chip-list>
-              <a mat-chip *ngIf="node.value.supervisorPerson as person"
-                 [routerLink]="['/people', 'edit', person.id]">
+              <a mat-chip
+                 *ngIf="node.value.supervisorPerson as person"
+                 [routerLink]="['/people', 'edit', person.id]"
+                 matTooltip="This supervisor is over more then 1 Department/Division, please correct this"
+                 [matTooltipDisabled]="orgTree.supervisorCountById[node.value.supervisor] <= 1"
+                 [selected]="orgTree.supervisorCountById[node.value.supervisor] > 1"
+                 color="warn">
+                <!--                color only shows up if it's selected-->
                 Supervisor {{person.preferredName}} {{person.lastName}}
                 <mat-icon matChipRemove>person</mat-icon>
               </a>
