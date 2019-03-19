@@ -15,6 +15,9 @@ export class OrgGroupListComponent implements OnInit {
   public dataSource: AppDataSource<OrgGroupWithSupervisor>;
   @ViewChild(MatSort) sort: MatSort;
 
+  supervisorCountById: { [supervisorId: string]: number } = {};
+  groupNameById: { [groupId: string]: string } = {};
+
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
     this.urlBinding.addParam('search', '');
@@ -31,6 +34,13 @@ export class OrgGroupListComponent implements OnInit {
       data => !data.supervisorPerson ?
         '' :
         (data.supervisorPerson.preferredName || data.supervisorPerson.firstName) + ' ' + data.supervisorPerson.lastName);
+    this.dataSource.customColumnAccessor('parent', data => this.groupNameById[data.id]);
+
+    for (let group of this.dataSource.unfilteredData) {
+      this.groupNameById[group.id] = group.groupName;
+      if (!group.supervisor) continue;
+      this.supervisorCountById[group.supervisor] = (this.supervisorCountById[group.supervisor] || 0) + 1;
+    }
   }
 
 }

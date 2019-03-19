@@ -22,6 +22,7 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
   public orgChain: OrgChain;
 
   public isNew = false;
+  public disabledDueToDuplicateSupervisor = false;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -37,22 +38,35 @@ export class GroupComponent extends BaseEditComponent implements OnInit {
       this.group = value.group;
       this.isNew = !this.group.id;
       this.groups = value.groups;
+      if (!this.isNew)
+        this.groups = this.groups.filter(g => g.id != this.group.id);
       this.people = value.staff;
       this.children = this.isNew ? [] : this.groups.filter(group => group.parentId === this.group.id);
-      setTimeout(() => this.refreshOrgChain());
+      setTimeout(() => this.supervisorChanged(this.group.supervisor, true));
     });
   }
 
-  supervisorChanged() {
-    let orgs = this.findOrgsSupervisorIsOver(this.group.supervisor);
-    if (orgs.length > 0) {
-      this.snackBar.open(`This Supervisor is already over department${orgs.length > 1 ? 's' : ''}: [${orgs.map(
-        value => value.groupName)
-          .join(', ')}], they will not be able to view details for other departments, all their departments should be grouped under one`,
-        'Dismiss');
-      this.refreshOrgChain();
+  supervisorChanged(supervisorId: string, initial: boolean = false) {
+    this.group.supervisor = supervisorId;
+    if (!initial && !this.group.supervisor) {
+      this.group.approverIsSupervisor = false;
       return;
     }
+    let orgs = this.findOrgsSupervisorIsOver(this.group.supervisor);
+    //the current group is not included
+    //so if it's more than zero including this one then it's duplicated
+    if (orgs.length > 0) {
+      let groupNames = orgs.map(
+        value => value.groupName)
+        .join(', ');
+      this.snackBar.open(`This Supervisor is already over department${orgs.length > 1 ? 's' : ''}: [${groupNames}],` +
+        ` they will not be able to view details for other departments, all their departments should be grouped under one`,
+        'Dismiss');
+      this.refreshOrgChain();
+      this.disabledDueToDuplicateSupervisor = true;
+      return;
+    }
+    this.disabledDueToDuplicateSupervisor = false;
     let supervisor = this.people.find(p => p.id == this.group.supervisor);
     if (supervisor != null && supervisor.staff.email == null) {
       let editSuperSnackbar = this.snackBar.open(`Supervisor won't get leave requests, they don't have a staff email`,

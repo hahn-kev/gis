@@ -17,11 +17,11 @@
       <mat-select required name="type" [(ngModel)]="group.type" placeholder="Type">
         <mat-option value="Division">Division</mat-option>
         <mat-option value="Department">Department</mat-option>
-        <mat-option value="Supervisor">{{'Supervisor' | groupTypeName}}</mat-option>
+        <mat-option value="Supervisor">Office</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field>
-      <mat-select name="supervisor" [(ngModel)]="group.supervisor" (ngModelChange)="supervisorChanged()"
+      <mat-select name="supervisor" [ngModel]="group.supervisor" (ngModelChange)="supervisorChanged($event)"
                   placeholder="Supervisor">
         <mat-option>None</mat-option>
         <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
@@ -48,7 +48,11 @@
     </div>
 
     <mat-card-actions>
-      <button type="submit" form="form" [disabled]="!groupForm.form.valid" mat-button>Save</button>
+      <button type="submit"
+              form="form"
+              [disabled]="!groupForm.form.valid || disabledDueToDuplicateSupervisor"
+              mat-button>Save
+      </button>
       <button type="button" *ngIf="!isNew" color="warn" (click)="deleteGroup()" mat-button>Delete</button>
     </mat-card-actions>
   </mat-card>
