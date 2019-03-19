@@ -28,17 +28,11 @@
         <div id="user" *ngIf="currentUser | async as user">
           <h2>
             <ng-container i18n="welcome user@@welcomeUser">Welcome {{user.userName}}</ng-container>
-            <button mat-icon-button tabindex="-1" (click)="logout()"
-                    matTooltip="Logout">
-              <mat-icon>exit_to_app</mat-icon>
-            </button>
+
           </h2>
-          <a mat-button routerLink="/user/edit/self">
-            <mat-icon mat-list-icon>edit</mat-icon>
-            <ng-container i18n="let user change password and contact info@@editProfileLink">
-              Edit profile
-            </ng-container>
-          </a>
+          <button mat-button tabindex="-1" (click)="logout()">
+            Logout
+          </button>
         </div>
 
         <a mat-list-item routerLink="/home" routerLinkActive="active-link">
