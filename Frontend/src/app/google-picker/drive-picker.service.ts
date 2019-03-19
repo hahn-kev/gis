@@ -19,8 +19,8 @@ export class DrivePickerService {
     let authInstance = gapi.auth2.getAuthInstance();
     if (authInstance.isSignedIn.get()) return Promise.resolve();
     return authInstance.signIn()
-      .then((user: gapi.auth2.CurrentUser) => {
-        return user.get().isSignedIn();
+      .then(() => {
+        return authInstance.isSignedIn.get();
       });
   }
 
