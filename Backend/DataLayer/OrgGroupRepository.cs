@@ -101,13 +101,13 @@ namespace Backend.DataLayer
                 SupervisorPerson = person
             };
 
-        public IQueryable<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
+        public List<OrgGroupWithSupervisor> StaffParentOrgGroups(Staff staff)
         {
-            return from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id,
+            return (from orgGroup in GetWithParentsWhere(g => staff.OrgGroupId == g.Id,
                     (parent, child) => !child.ApproverIsSupervisor || parent.ApproverIsSupervisor)
                 from orgGroupWithSupervisor in OrgGroupsWithSupervisor.InnerJoin(g => g.Id == orgGroup.Id)
                 where orgGroup.Supervisor != null
-                select orgGroupWithSupervisor;
+                select orgGroupWithSupervisor).ToList();
         }
 
         public List<OrgGroupWithSupervisor> GetOrgGroupsByPersonsRole(Guid personId)

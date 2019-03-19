@@ -62,9 +62,9 @@ namespace UnitTestProject
 
         public static IEnumerable<object[]> ValidateOrgGroupOrderData()
         {
-            var g1 = new OrgGroup() {Id = Guid.NewGuid(), ParentId = Guid.NewGuid()};
-            var g2 = new OrgGroup() {Id = g1.ParentId.Value, ParentId = Guid.NewGuid()};
-            var g3 = new OrgGroup() {Id = g2.ParentId.Value, ParentId = Guid.NewGuid()};
+            var g1 = new OrgGroup() {GroupName = "g1", Id = Guid.NewGuid(), ParentId = Guid.NewGuid()};
+            var g2 = new OrgGroup() {GroupName = "g2", Id = g1.ParentId.Value, ParentId = Guid.NewGuid()};
+            var g3 = new OrgGroup() {GroupName = "g3", Id = g2.ParentId.Value, ParentId = Guid.NewGuid()};
 
             yield return new object[] {new List<OrgGroup> {g3, g2, g1}, OrgGroupService.SortedBy.Either, true};
             yield return new object[] {new List<OrgGroup> {g3, g2, g1}, OrgGroupService.SortedBy.ParentFirst, true};
@@ -93,6 +93,31 @@ namespace UnitTestProject
             OrgGroupService.IsOrgGroupSortedByHierarchy(groups, sortedBy).ShouldBe(expected);
         }
 
+        [Theory]
+        [MemberData(nameof(ValidateOrgGroupOrderData))]
+        public static void ShouldSortGroups(List<OrgGroup> groups,
+            OrgGroupService.SortedBy sortedBy,
+            bool expected)
+        {
+            var sortedGroups = OrgGroupService.SortOrgGroupByHierarchy(groups, sortedBy).ToList();
+            OrgGroupService.IsOrgGroupSortedByHierarchy(sortedGroups, sortedBy).ShouldBe(true,
+                "should have been sorted by " + sortedBy + " but instead was " +
+                string.Join(", ", sortedGroups.Select(group => group.GroupName)));
+        }
+
+        [Fact]
+        public void ShouldFailGracefullyWithLoops()
+        {
+            var g1Id = Guid.NewGuid();
+            var g2Id = Guid.NewGuid();
+            var g3Id = Guid.NewGuid();
+            var g1 = new OrgGroup {Id = g1Id, ParentId = g2Id};
+            var g2 = new OrgGroup {Id = g2Id, ParentId = g3Id};
+            var g3 = new OrgGroup {Id = g3Id, ParentId = g1Id};
+            var sortedGroups = OrgGroupService
+                .SortOrgGroupByHierarchy(new[] {g1, g2, g3}, OrgGroupService.SortedBy.ChildFirst).ToList();
+        }
+
         private void ShouldMatchOrder<T>(IEnumerable<T> actual, IEnumerable<T> expected)
         {
             var actualList = actual.ToList();
@@ -118,6 +143,15 @@ namespace UnitTestProject
                 {
                     org1a.Id,
                     org1.Id,
+                    orgRoot.Id,
+                });
+            orgGroups = _groupRepository.GetWithParentsWhere(group => @group.Id == org2a.Id)
+                .Select(group => group.Id).ToList();
+            ShouldMatchOrder(orgGroups,
+                new[]
+                {
+                    org2a.Id,
+                    org2.Id,
                     orgRoot.Id,
                 });
         }

@@ -166,20 +166,19 @@ namespace Backend.Services
             PersonWithStaff requestedBy)
         {
             return ResolveLeaveRequestEmails(requestedBy,
-                _orgGroupRepository.StaffParentOrgGroups(requestedBy.Staff).ToList(),
+                _orgGroupRepository.StaffParentOrgGroups(requestedBy.Staff),
                 _orgGroupRepository.GetOrgGroupsByPersonsRole(requestedBy.Id));
         }
 
         public static (PersonWithStaff toApprove, List<PersonWithStaff> toNotify) ResolveLeaveRequestEmails(
             PersonWithStaff requestedBy,
-            List<OrgGroupWithSupervisor> approvalGroups,
-            List<OrgGroupWithSupervisor> roleGroups)
+            IEnumerable<OrgGroupWithSupervisor> approvalGroups,
+            IEnumerable<OrgGroupWithSupervisor> roleGroups)
         {
-            if (!OrgGroupService.IsOrgGroupSortedByHierarchy(approvalGroups, OrgGroupService.SortedBy.ChildFirst))
-                throw new ArgumentException("org groups not sorted properly");
             var supervisorsToNotify = new List<PersonWithStaff>(roleGroups.Select(org => org.SupervisorPerson));
             PersonWithStaff toApprove = null;
-            foreach (var orgGroup in approvalGroups)
+            foreach (var orgGroup in OrgGroupService.SortOrgGroupByHierarchy(approvalGroups,
+                OrgGroupService.SortedBy.ChildFirst))
             {
                 //super and requested by will be the same if the requester is a supervisor
                 if (orgGroup == null || requestedBy.Id == orgGroup.Supervisor ||

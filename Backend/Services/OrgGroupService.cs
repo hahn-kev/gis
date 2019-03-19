@@ -134,5 +134,47 @@ namespace Backend.Services
 
             return true;
         }
+
+        public static IEnumerable<T> SortOrgGroupByHierarchy<T>(IEnumerable<T> orgGroupsEnumerable,
+            SortedBy sortedBy) where T : OrgGroup
+        {
+            var orgGroups = orgGroupsEnumerable.ToArray();
+
+            OrgGroup Find(Guid? id)
+            {
+                if (id == null) return null;
+                return orgGroups.FirstOrDefault(group => group.Id == id.Value);
+            }
+
+            int NumberOfParents(OrgGroup group)
+            {
+                var parent = Find(group.ParentId);
+                if (parent == null) return 0;
+                int count = 0;
+                while (parent != null && parent != group)
+                {
+                    count++;
+                    parent = Find(parent.ParentId);
+                }
+
+                return count;
+            }
+
+            var valueTuples = orgGroups.Select(group => (@group, parentCount: NumberOfParents(@group)));
+            switch (sortedBy)
+            {
+                case SortedBy.Either:
+                case SortedBy.ChildFirst:
+                    valueTuples = valueTuples.OrderByDescending(tuple => tuple.parentCount)
+                        .ThenBy(tuple => tuple.group.GroupName);
+                    break;
+                case SortedBy.ParentFirst:
+                    valueTuples = valueTuples.OrderBy(tuple => tuple.parentCount)
+                        .ThenBy(tuple => tuple.group.GroupName);
+                    break;
+            }
+
+            return valueTuples.Select(tuple => tuple.group);
+        }
     }
 }
