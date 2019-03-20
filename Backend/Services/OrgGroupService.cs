@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using LinqToDB;
@@ -42,6 +43,13 @@ namespace Backend.Services
 
         public void Delete(Guid id)
         {
+            var staffUnderGroup = _personRepository.StaffWithNames
+                .Where(staff => staff.OrgGroupId == id)
+                .Select(staff => $"{staff.PreferredName} {staff.LastName}")
+                .ToList();
+            if (staffUnderGroup.Count > 0)
+                throw new UserError("This Org still has the following users reporting to it: " +
+                                    string.Join(", ", staffUnderGroup));
             _orgGroupRepository.OrgGroups.Where(child => child.ParentId == id)
                 .Set(child => child.ParentId,
                     () => _orgGroupRepository.OrgGroups.Where(group => group.Id == id).Select(group => group.ParentId)
