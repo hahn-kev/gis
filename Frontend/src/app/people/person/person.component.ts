@@ -16,7 +16,7 @@ import { map } from 'rxjs/operators';
 import { Job } from '../../job/job';
 import { MissionOrg } from '../../mission-org/mission-org';
 import { GroupService } from '../groups/group.service';
-import { OrgChain, OrgChainLink } from '../groups/org-chain';
+import { OrgChainLink } from '../groups/org-chain';
 import { CanComponentDeactivate } from '../../services/can-deactivate.guard';
 import { StaffWithOrgName } from '../staff';
 import { LazyLoadService } from '../../services/lazy-load.service';
@@ -49,6 +49,7 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public missionOrgs: Observable<MissionOrg[]>;
   public endorsements: Observable<Endorsement[]>;
   public people: Person[];
+  public peopleExcludingSelf: Person[];
   public jobs: { [key: string]: Job };
   public peopleMap: { [key: string]: Person } = {};
   public newEmergencyContact = new EmergencyContactExtended();
@@ -100,7 +101,8 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
       this.newRole.personId = this.person.id;
       this.newEmergencyContact.personId = this.person.id;
       this.newEvaluation.personId = this.person.id;
-      this.people = value.people.filter(person => person.id != value.person.id);
+      this.people = value.people;
+      this.peopleExcludingSelf = value.people.filter(person => person.id != value.person.id);
       this.peopleMap = this.people.reduce((pMap, currentValue) => {
         pMap[currentValue.id] = currentValue;
         return pMap;
@@ -117,12 +119,6 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
 
   startsWith(value: string, test: string) {
     return value.toLowerCase().indexOf(test.toLowerCase()) === 0;
-  }
-
-  orgChain(groups: OrgGroup[] | null) {
-    if (this.person.staff == null || groups == null) return new OrgChain([]);
-    let orgGroup = groups.find(value => value.id == this.person.staff.orgGroupId);
-    return this.groupService.buildOrgChain(orgGroup, this.people.concat([this.person]), groups, this.person.id);
   }
 
   trackLinksBy(index: number, link: OrgChainLink) {

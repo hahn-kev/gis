@@ -35,7 +35,7 @@ export class GroupService {
   }
 
   buildOrgChain(orgGroup: OrgGroup, people: Person[], groups: OrgGroup[], currentPersonId?: string): OrgChain {
-    if (!orgGroup) throw new Error('org group is null');
+    if (!orgGroup) return new OrgChain([]);
     if (!currentPersonId) currentPersonId = 'invalid_id';
     let chainList: OrgChainLink[] = [];
     let currentGroup = orgGroup;

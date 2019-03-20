@@ -43,7 +43,8 @@
                         name="spouse"
                         placeholder="Spouse">
               <mat-option [value]="null">None</mat-option>
-              <mat-option *ngFor="let eachPerson of people" [value]="eachPerson.id">{{eachPerson.preferredName}}
+              <mat-option *ngFor="let eachPerson of peopleExcludingSelf"
+                          [value]="eachPerson.id">{{eachPerson.preferredName}}
                 {{eachPerson.lastName}}
               </mat-option>
             </mat-select>
@@ -334,7 +335,7 @@
           </mat-form-field>
           <div *ngIf="person.staff.orgGroupId" class="span-2-columns org-chain">
             <span class="mat-caption">Department Hierarchy</span>
-            <ng-container *ngFor="let link of orgChain(groups|async).links; last as isLast; trackBy: trackLinksBy">
+            <ng-container *ngFor="let link of person.staff?.orgGroupId | orgChain: people: (groups|async): person.id; last as isLast; trackBy: trackLinksBy">
               <a mat-button
                  [disabled]="!link.id || isSelf"
                  [routerLink]="['/' + link.type, 'edit', link.id]">
