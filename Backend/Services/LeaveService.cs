@@ -75,7 +75,8 @@ namespace Backend.Services
 
         public LeaveRequestWithNames GetById(Guid id)
         {
-            return _leaveRequestRepository.LeaveRequestWithNames.Single(request => request.Id == id);
+            return _leaveRequestRepository.LeaveRequestWithNames.SingleOrDefault(request => request.Id == id) ??
+                   throw new UserError("Unable to find leave request " + id + " it may have been deleted");
         }
 
         public Guid? GetLeavePersonId(Guid leaveId) =>
@@ -140,6 +141,7 @@ namespace Backend.Services
 
         public async Task<Person> RequestLeave(LeaveRequest leaveRequest)
         {
+            if (leaveRequest == null) throw new ArgumentNullException(nameof(leaveRequest));
             var personOnLeave = _personRepository.PeopleWithStaff.SingleOrDefault(p => p.Id == leaveRequest.PersonId);
             if (personOnLeave?.StaffId == null)
                 throw new UnauthorizedAccessException("Person requesting leave must be staff");
@@ -168,6 +170,9 @@ namespace Backend.Services
             IEnumerable<PersonWithStaff> toNotify,
             LeaveUsage leaveUsage)
         {
+            if (toApprove == null)
+                throw new UserError(
+                    $"Unable to find Supervisor for: {requestedBy.PreferredName} {requestedBy.LastName}");
             await _leaveRequestEmailService.SendRequestApproval(leaveRequest,
                 requestedBy,
                 toApprove,

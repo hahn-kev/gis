@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Services;
@@ -276,6 +277,17 @@ namespace UnitTestProject
                 new LeaveUsage {LeaveType = LeaveType.Sick, TotalAllowed = 20, Used = 0});
             actualApprovalEmailSent.ShouldBe(expectApprovalEmailSent, reason);
             actualNotifyEmailCount.ShouldBe(expectedNotifyEmailCount, reason);
+        }
+
+        [Fact]
+        public void SendLeaveRequestEmailsThrowsErrorIfApproverIsNull()
+        {
+            var leaveService = _scopeServiceProvider.GetService<LeaveService>();
+            Should.Throw<UserError>(() => leaveService.SendLeaveRequestEmails(new LeaveRequest(),
+                new PersonWithStaff() {PreferredName = "pn", LastName = "ln"},
+                null,
+                new PersonWithStaff[0],
+                new LeaveUsage())).Message.ShouldContain("pn ln");
         }
 
         public static IEnumerable<object[]> GetExpectedResolvedSupervisors()
@@ -627,21 +639,21 @@ namespace UnitTestProject
             }
 
             (OrgGroupWithSupervisor root, PersonWithStaff rootStaff,
-            OrgGroupWithSupervisor a, PersonWithStaff aStaff,
-            OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
-            OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
-            OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
-            PersonWithStaff[] people, OrgGroup[] groups) Extract(
-                OrgGroupWithSupervisor root,
-                PersonWithStaff rootStaff,
-                OrgGroupWithSupervisor a,
-                PersonWithStaff aStaff,
-                OrgGroupWithSupervisor aa,
-                PersonWithStaff aaStaff,
-                OrgGroupWithSupervisor ab,
-                PersonWithStaff abStaff,
-                OrgGroupWithSupervisor aaa,
-                PersonWithStaff aaaStaff)
+                OrgGroupWithSupervisor a, PersonWithStaff aStaff,
+                OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
+                OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
+                OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
+                PersonWithStaff[] people, OrgGroup[] groups) Extract(
+                    OrgGroupWithSupervisor root,
+                    PersonWithStaff rootStaff,
+                    OrgGroupWithSupervisor a,
+                    PersonWithStaff aStaff,
+                    OrgGroupWithSupervisor aa,
+                    PersonWithStaff aaStaff,
+                    OrgGroupWithSupervisor ab,
+                    PersonWithStaff abStaff,
+                    OrgGroupWithSupervisor aaa,
+                    PersonWithStaff aaaStaff)
             {
                 return (
                     root, rootStaff,
@@ -661,11 +673,11 @@ namespace UnitTestProject
             }
 
             (OrgGroupWithSupervisor root, PersonWithStaff rootStaff,
-            OrgGroupWithSupervisor a, PersonWithStaff aStaff,
-            OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
-            OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
-            OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
-            PersonWithStaff[] people, OrgGroup[] groups) MakeTree()
+                OrgGroupWithSupervisor a, PersonWithStaff aStaff,
+                OrgGroupWithSupervisor aa, PersonWithStaff aaStaff,
+                OrgGroupWithSupervisor ab, PersonWithStaff abStaff,
+                OrgGroupWithSupervisor aaa, PersonWithStaff aaaStaff,
+                PersonWithStaff[] people, OrgGroup[] groups) MakeTree()
             {
                 var (root, a, aa, ab, aaa) = ServicesFixture.MakeGroupTree();
                 return Extract(root,
