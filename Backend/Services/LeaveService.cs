@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
 using Backend.Utils;
@@ -92,22 +93,41 @@ namespace Backend.Services
             _entityService.Delete<LeaveRequest>(id);
         }
 
-        public async Task<(bool updated, PersonWithStaff requester, bool notified)> ApproveLeaveRequest(
+        public Task<(bool updated, PersonWithStaff requester, bool notified)> ApproveLeaveRequest(
             Guid leaveRequestId,
             Guid supervisorId)
         {
-            //ensure that this id is a valid person before we approve it
             var leaveRequest =
                 _leaveRequestRepository.LeaveRequests.SingleOrDefault(request => request.Id == leaveRequestId);
-            if (leaveRequest == null) return (false, null, false);
+            if (leaveRequest == null)
+            {
+                throw new UserError("Unable to find Leave request matching Id: " + leaveRequestId +
+                                    " it may have been deleted");
+            }
+
+            return ApproveLeaveRequest(leaveRequest, supervisorId);
+        }
+
+        public async Task<(bool updated, PersonWithStaff requester, bool notified)> ApproveLeaveRequest(
+            LeaveRequest leaveRequest,
+            Guid supervisorId)
+        {
+            if (leaveRequest == null)
+                throw new ArgumentNullException(nameof(leaveRequest), "Leave request may have been deleted");
             var people = _personRepository.FindByIds(new[] {supervisorId, leaveRequest.PersonId});
             if (!people.TryGetValue(supervisorId, out var supervisor))
             {
-                return (false, null, false);
+                throw new UserError("Unable to find supervisor matching Id: " + supervisorId +
+                                    " they may have been deleted");
             }
 
-            var requester = people[leaveRequest.PersonId];
-            var updated = _leaveRequestRepository.ApproveLeaveRequest(leaveRequestId, supervisor.Id);
+            if (!people.TryGetValue(leaveRequest.PersonId, out var requester))
+            {
+                throw new UserError("Unable to find leave requester matching Id: " + leaveRequest.PersonId +
+                                    " they may have been deleted");
+            }
+
+            var updated = _leaveRequestRepository.ApproveLeaveRequest(leaveRequest.Id, supervisor.Id);
             var notified = false;
             if (!string.IsNullOrEmpty(requester.Staff?.Email))
             {

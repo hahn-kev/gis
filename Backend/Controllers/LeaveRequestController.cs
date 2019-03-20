@@ -134,13 +134,20 @@ namespace Backend.Controllers
             if (personId == null)
                 throw new UnauthorizedAccessException(
                     "Logged in user must be connected to a person, talk to HR about this issue");
+            LeaveRequest leaveRequest = null;
             return TryExecute<Func<Guid>>(MyPolicies.peopleEdit,
-                () => _leaveService.GetLeavePersonId(leaveRequestId) ??
-                      throw new ArgumentException("Unable to find leave request, it may have been deleted"),
+                () =>
+                {
+                    leaveRequest = _leaveService.GetById(leaveRequestId);
+                    return leaveRequest?.PersonId ??
+                           throw new UserError("Unable to find leave request, it may have been deleted");
+                },
                 async () =>
                 {
+                    //lambda above may not be called, so we need to fetch the request if not
+                    leaveRequest = leaveRequest ?? _leaveService.GetById(leaveRequestId);
                     var (_, requester, notified) =
-                        await _leaveService.ApproveLeaveRequest(leaveRequestId, personId.Value);
+                        await _leaveService.ApproveLeaveRequest(leaveRequest, personId.Value);
                     if (notified)
                     {
                         return this.ShowFrontendMessage(
