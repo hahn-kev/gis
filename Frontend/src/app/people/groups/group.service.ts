@@ -64,7 +64,7 @@ export class GroupService {
       .filter((value, index, array) => array.indexOf(value) == index && value != null);
 
     if (chainList.length != chainWithoutDuplicates.length)
-      throw new Error('Circular Orginization chart detected, please resolve');
+      throw new Error('Circular Organization chart detected, please resolve');
   }
 
   findParent(child: OrgGroup, orgs: OrgGroup[]) {
