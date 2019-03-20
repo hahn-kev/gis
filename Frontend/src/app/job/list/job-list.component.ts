@@ -11,7 +11,7 @@ import { JobTypeNamePipe } from '../job-type-name.pipe';
   selector: 'app-job-list',
   templateUrl: './job-list.component.html',
   styleUrls: ['./job-list.component.scss'],
-  providers: [UrlBindingService]
+  providers: [UrlBindingService, JobStatusNamePipe, JobTypeNamePipe]
 })
 export class JobListComponent implements OnInit {
   public jobStatus = Object.keys(JobStatus);
