@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CsvService } from '../../services/csv.service';
 import { AppDataSource } from '../../classes/app-data-source';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-export-button',
   templateUrl: './export-button.component.html',
-  styleUrls: ['./export-button.component.scss']
+  styleUrls: ['./export-button.component.scss'],
+  providers: [DatePipe]
 })
 export class ExportButtonComponent implements OnInit {
   @Input() values: any[] | AppDataSource<any>;
@@ -14,7 +16,7 @@ export class ExportButtonComponent implements OnInit {
   @Input() columns: string[];
 
 
-  constructor(private csvService: CsvService) {
+  constructor(private csvService: CsvService, private datePipe: DatePipe) {
   }
 
   ngOnInit() {
@@ -34,17 +36,20 @@ export class ExportButtonComponent implements OnInit {
         valuesToExport = <any[]>this.values;
       }
     } else {
-      valuesToExport = ExportButtonComponent.exportFromTable(<AppDataSource<any>>this.values, this.columns);
+      valuesToExport = this.exportFromTable(<AppDataSource<any>>this.values, this.columns);
     }
     this.csvService.saveToCsv(valuesToExport, this.fileName);
   }
 
-  static exportFromTable(values: AppDataSource<any>, columns: string[]) {
+  exportFromTable(values: AppDataSource<any>, columns: string[]) {
     let results = [];
     for (let data of values.filteredData) {
       let result = {};
       for (let column of columns) {
         result[column] = values.sortingDataAccessor(data, column);
+        if (column.toUpperCase().includes('DATE')) {
+          result[column] = this.datePipe.transform(result[column]);
+        }
       }
       results.push(result);
     }
