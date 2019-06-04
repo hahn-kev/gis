@@ -6,6 +6,9 @@
   <mat-form-field floatLabel="never">
     <input autofocus matInput placeholder="Search" [(ngModel)]="urlBinding.values.search">
   </mat-form-field>
+  <app-export-button fileName="departments"
+                     [values]="dataSource"
+                     [columns]="columns"></app-export-button>
 </ng-container>
 <mat-table [dataSource]="dataSource" matSort>
   <ng-container matColumnDef="groupName">
@@ -28,8 +31,8 @@
     <mat-cell *matCellDef="let row"> {{row.type | groupTypeName}}</mat-cell>
   </ng-container>
   <!-- Header and Row Declarations -->
-  <mat-header-row *matHeaderRowDef="['groupName', 'parent', 'supervisor', 'type']"></mat-header-row>
-  <mat-row class="hover-overlay" *matRowDef="let row; columns: ['groupName', 'parent', 'supervisor', 'type']"
+  <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+  <mat-row class="hover-overlay" *matRowDef="let row; columns: columns"
            [routerLink]="'../edit/' + row.id"></mat-row>
 </mat-table>
 

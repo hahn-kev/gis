@@ -12,6 +12,7 @@ import { MatSort } from '@angular/material';
   providers: [UrlBindingService]
 })
 export class OrgGroupListComponent implements OnInit {
+  columns = ['groupName', 'parent', 'supervisor', 'type'];
   public dataSource: AppDataSource<OrgGroupWithSupervisor>;
   @ViewChild(MatSort) sort: MatSort;
 
