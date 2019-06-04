@@ -74,6 +74,7 @@ export class StaffReportComponent implements OnInit {
     this.dataSource.customColumnAccessor('legalStatus', data => data.staff.workPermitType);
     this.dataSource.customColumnAccessor('phoneExtension', data => data.staff.phoneExt);
     this.dataSource.customColumnAccessor('staffEmail', data => data.staff.email);
+    this.dataSource.customColumnAccessor('department /Division', data => data.staff.orgGroupName);
     this.dataSource.customColumnAccessor('personalEmail', data => data.email);
     this.dataSource.bindToRouteData(this.route, 'staff');
     //filter list to distinct
