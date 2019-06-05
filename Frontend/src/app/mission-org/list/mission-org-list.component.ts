@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
 import { ActivatedRoute } from '@angular/router';
 import { MissionOrgWithNames } from '../mission-org';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { UrlBindingService } from '../../services/url-binding.service';
 })
 export class MissionOrgListComponent implements OnInit {
   public dataSource = new AppDataSource<MissionOrgWithNames>();
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
     this.urlBinding.addParam('search', '').subscribe(value => this.dataSource.filter = value.trim().toUpperCase());

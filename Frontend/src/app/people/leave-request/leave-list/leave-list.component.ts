@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LeaveRequestWithNames } from '../leave-request';
 import { AppDataSource } from 'app/classes/app-data-source';
 import { LoginService } from '../../../services/auth/login.service';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { Year } from '../../training-requirement/year';
 import { UrlBindingService } from '../../../services/url-binding.service';
 
@@ -40,7 +40,7 @@ export class LeaveListComponent implements OnInit {
     'createdDate',
     'schoolYear'
   ];
-  @ViewChild(MatSort) matSort: MatSort;
+  @ViewChild(MatSort, {static: true}) matSort: MatSort;
 
   constructor(private route: ActivatedRoute, public loginService: LoginService,
               private urlBinding: UrlBindingService<{ search: string, showApproved: boolean }>) {

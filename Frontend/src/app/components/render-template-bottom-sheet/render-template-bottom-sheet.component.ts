@@ -1,7 +1,7 @@
-import {Component, Inject, OnInit, TemplateRef} from '@angular/core';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef} from '@angular/material';
-import {AppTemplateService} from '../../toolbar/app-template.service';
-import {Observable} from 'rxjs';
+import { Component, Inject, OnInit, TemplateRef } from '@angular/core';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { AppTemplateService } from '../../toolbar/app-template.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-render-template-bottom-sheet',

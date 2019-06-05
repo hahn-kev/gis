@@ -2,18 +2,16 @@ import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testi
 
 import { Location } from '@angular/common';
 import { LeaveRequestComponent } from './leave-request.component';
-import {
-  MatCardModule,
-  MatChipsModule,
-  MatDatepickerModule,
-  MatDialog,
-  MatIconModule,
-  MatInputModule,
-  MatSelectModule,
-  MatSlideToggleModule,
-  MatSnackBar,
-  MatTooltipModule
-} from '@angular/material';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { TitleCasePipe } from '../../services/title-case.pipe';
 import { ActivatedRoute, Router } from '@angular/router';

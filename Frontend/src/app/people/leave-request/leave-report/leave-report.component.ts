@@ -4,7 +4,7 @@ import { PersonAndLeaveDetails } from '../person-and-leave-details';
 import { ActivatedRoute } from '@angular/router';
 import { UrlBindingService } from '../../../services/url-binding.service';
 import { PersonLeaveModel } from './person-leave-model';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { Year } from '../../training-requirement/year';
 
 @Component({
@@ -19,7 +19,7 @@ export class LeaveReportComponent implements OnInit {
   public allOrgGroups: string[] = [];
   public allMissionOrgs: string[] = [];
   public isSupervisor = false;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   public columns = [
     'staff',

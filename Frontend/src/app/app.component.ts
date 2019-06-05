@@ -1,6 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MatBottomSheet, MatDialog, MatSidenav } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
 import { Router, RouterEvent } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { LoginService } from './services/auth/login.service';
@@ -27,11 +29,11 @@ export class AppComponent implements OnInit {
   version: string;
   hasAttachments: Observable<boolean>;
   hasTitle = false;
-  @ViewChild('sidenav')
+  @ViewChild('sidenav', {static: true})
   private sidenav: MatSidenav;
-  @ViewChild('rightDrawer')
+  @ViewChild('rightDrawer', {static: true})
   private rightDrawer: MatSidenav;
-  @ViewChild('titleElement')
+  @ViewChild('titleElement', {static: true})
   private titleElement: ElementRef;
 
   constructor(private loginService: LoginService,

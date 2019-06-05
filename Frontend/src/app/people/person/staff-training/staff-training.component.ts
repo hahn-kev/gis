@@ -3,7 +3,8 @@ import { StaffTraining, StaffTrainingWithRequirement } from '../../training-requ
 import { TrainingRequirementService } from '../../training-requirement/training-requirement.service';
 import { TrainingRequirement } from '../../training-requirement/training-requirement';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../../dialog/confirm-dialog/confirm-dialog.component';
 import * as moment from 'moment';
 import { NgForm } from '@angular/forms';

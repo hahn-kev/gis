@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { MatBottomSheet, MatDialog, MatSnackBar } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionOrgStatus, MissionOrgWithYearSummaries } from '../mission-org';
 import { MissionOrgService } from '../mission-org.service';

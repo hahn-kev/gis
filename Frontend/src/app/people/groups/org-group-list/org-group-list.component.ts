@@ -3,7 +3,7 @@ import { AppDataSource } from '../../../classes/app-data-source';
 import { OrgGroupWithSupervisor } from '../org-group';
 import { ActivatedRoute } from '@angular/router';
 import { UrlBindingService } from '../../../services/url-binding.service';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-org-group-list',

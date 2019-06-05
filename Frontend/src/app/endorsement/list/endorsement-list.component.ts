@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { UrlBindingService } from '../../services/url-binding.service';
 import { ActivatedRoute } from '@angular/router';
 import { AppDataSource } from '../../classes/app-data-source';

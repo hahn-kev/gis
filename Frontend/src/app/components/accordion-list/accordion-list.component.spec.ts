@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AccordionListComponent } from './accordion-list.component';
 import { BaseEntity } from '../../classes/base-entity';
-import { MatDialog, MatExpansionModule, MatExpansionPanel, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Component, DebugElement, EventEmitter, Type, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AccordionListHeaderDirective } from './accordion-list-header.directive';

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { PolicyService } from './policy.service';
 import { LoginService } from './login.service';
 import { map, tap } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class PolicyGuard implements CanActivate {

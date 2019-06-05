@@ -1,9 +1,9 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
-import {PersonWithRoleSummaries} from '../person';
-import {ActivatedRoute} from '@angular/router';
-import {AppDataSource} from '../../classes/app-data-source';
-import {MatSort} from '@angular/material';
-import {UrlBindingService} from '../../services/url-binding.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { PersonWithRoleSummaries } from '../person';
+import { ActivatedRoute } from '@angular/router';
+import { AppDataSource } from '../../classes/app-data-source';
+import { MatSort } from '@angular/material/sort';
+import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({
   selector: 'app-school-aid-list',
@@ -14,7 +14,7 @@ import {UrlBindingService} from '../../services/url-binding.service';
 export class SchoolAidListComponent implements OnInit {
   public dataSource: AppDataSource<PersonWithRoleSummaries>;
   public columns = ['preferredName', 'lastName', 'isActive'];
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
   }

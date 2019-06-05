@@ -1,5 +1,5 @@
 import { Directive, TemplateRef } from '@angular/core';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 @Directive({
   selector: '[appBottomSheet]',

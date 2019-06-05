@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { QuickAddComponent } from './quick-add.component';
 import { PersonWithStaff } from '../../person';
 import { first } from 'rxjs/operators';

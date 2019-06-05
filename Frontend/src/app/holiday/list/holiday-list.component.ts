@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataSource } from '../../classes/app-data-source';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute } from '@angular/router';
 import { UrlBindingService } from '../../services/url-binding.service';
 import { Holiday } from '../../people/leave-request/holiday';
@@ -13,7 +13,7 @@ import { Holiday } from '../../people/leave-request/holiday';
 })
 export class HolidayListComponent implements OnInit {
   public dataSource: AppDataSource<Holiday>;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
   }

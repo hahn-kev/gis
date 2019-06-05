@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RoleWithJob } from '../role';
 import { AppDataSource } from '../../classes/app-data-source';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { AllJobTypes, JobStatus, JobType, NonSchoolAidJobStatus } from '../../job/job';
 import { Year } from '../training-requirement/year';
 import { UrlBindingService } from '../../services/url-binding.service';

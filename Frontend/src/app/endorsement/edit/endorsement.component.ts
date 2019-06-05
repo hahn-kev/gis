@@ -3,7 +3,8 @@ import { Endorsement } from '../endorsement';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { BaseEditComponent } from '../../components/base-edit-component';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { EndorsementService } from '../endorsement.service';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 

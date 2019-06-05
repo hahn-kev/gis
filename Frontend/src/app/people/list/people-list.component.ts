@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/
 import { Person } from '../person';
 import { ActivatedRoute } from '@angular/router';
 import { AppDataSource } from '../../classes/app-data-source';
-import { MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 import { UrlBindingService } from '../../services/url-binding.service';
 
 @Component({

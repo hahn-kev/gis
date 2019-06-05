@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { MatTableDataSource } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 
 export class AppDataSource<T> extends MatTableDataSource<T> {

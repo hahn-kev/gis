@@ -3,7 +3,8 @@ import { AppDataSource } from '../../classes/app-data-source';
 import { PersonEvluationSummary } from './person-evluation-summary';
 import { UrlBindingService } from '../../services/url-binding.service';
 import { ActivatedRoute } from '@angular/router';
-import { MatBottomSheet, MatSort } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatSort } from '@angular/material/sort';
 import { EvaluationService } from '../person/evaluation/evaluation.service';
 import { PersonWithStaff } from '../person';
 import { RenderTemplateBottomSheetComponent } from '../../components/render-template-bottom-sheet/render-template-bottom-sheet.component';
@@ -17,7 +18,7 @@ import { RenderTemplateBottomSheetComponent } from '../../components/render-temp
 export class EvaluationReportComponent implements OnInit {
   public dataSource = new AppDataSource<PersonEvluationSummary>();
   public allOrgGroups: string[] = [];
-  @ViewChild(MatSort) public sort: MatSort;
+  @ViewChild(MatSort, {static: true}) public sort: MatSort;
 
   constructor(public urlBinding: UrlBindingService<{ search: string, show: string[], group: string[] }>,
               private route: ActivatedRoute,

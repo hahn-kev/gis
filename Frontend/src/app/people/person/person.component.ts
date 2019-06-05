@@ -1,10 +1,12 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { Person, PersonWithOthers } from '../person';
 import { PersonService } from '../person.service';
 import { RoleWithJob } from '../role';
 import { OrgGroup } from '../groups/org-group';
-import { MatDialog, MatExpansionPanel, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatExpansionPanel } from '@angular/material/expansion';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { NgForm, NgModel } from '@angular/forms';
 import { EmergencyContactExtended } from '../emergency-contact';
@@ -31,7 +33,6 @@ import { first } from 'rxjs/internal/operators';
 import { Donor } from '../donor';
 import { EndorsementService } from '../../endorsement/endorsement.service';
 import { Endorsement, StaffEndorsementWithName } from '../../endorsement/endorsement';
-import { NavigationExtras } from '@angular/router/src/router';
 
 @Component({
   selector: 'app-person',
@@ -58,9 +59,9 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public staffEndorsments: Array<string> = [];
   public staffInsurer: string[] = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
-  @ViewChild('newEmergencyContactEl') newEmergencyContactEl: EmergencyContactComponent;
-  @ViewChild('newRoleEl') newRoleEl: RoleComponent;
-  @ViewChild('countriesControl') countriesControl: NgModel;
+  @ViewChild('newEmergencyContactEl', {static: true}) newEmergencyContactEl: EmergencyContactComponent;
+  @ViewChild('newRoleEl', {static: true}) newRoleEl: RoleComponent;
+  @ViewChild('countriesControl', {static: true}) countriesControl: NgModel;
 
   constructor(private route: ActivatedRoute,
               private personService: PersonService,
@@ -277,9 +278,9 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   createNewStaffEndorsement = () => new StaffEndorsementWithName(this.person.id);
   saveStaffEndorsement = async (item: StaffEndorsementWithName) => {
     return {...item, ... await this.endorsementService.saveStaffEndorsement(item)};
-  };
+  }
 
   deleteStaffEndorsement = (item: StaffEndorsementWithName) => {
     return this.endorsementService.deleteStaffEndorsement(item.id);
-  };
+  }
 }

@@ -1,8 +1,8 @@
-import {ErrorHandler, Injectable, Injector, NgZone} from '@angular/core';
-import {MatSnackBar} from '@angular/material';
-import {HttpErrorResponse} from '@angular/common/http';
+import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
 import * as Raven from 'raven-js';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class MyErrorHandlerService implements ErrorHandler {
