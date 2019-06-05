@@ -83,11 +83,11 @@ const routes: Routes = [
       },
       {
         path: 'people',
-        loadChildren: './people/people.module#PeopleModule',
+        loadChildren: () => import('./people/people.module').then(m => m.PeopleModule),
       },
       {
         path: 'job',
-        loadChildren: './job/job.module#JobModule'
+        loadChildren: () => import('./job/job.module').then(m => m.JobModule)
       },
       {
         path: 'groups',

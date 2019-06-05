@@ -18,7 +18,7 @@ class BaseHostComponent<T> {
   public headerText = 'this is the header';
   public contentText = 'this is the content';
 
-  @ViewChild(AccordionListComponent) listComponent: AccordionListComponent<BaseEntity>;
+  @ViewChild(AccordionListComponent, {static: false}) listComponent: AccordionListComponent<BaseEntity>;
   public caption = 'test caption';
   public createNewItem: () => T = jasmine.createSpy('createNewSpy', () => new BaseEntity()).and.callThrough();
   public itemTitle = 'Item';
