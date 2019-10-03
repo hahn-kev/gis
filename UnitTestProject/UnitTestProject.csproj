@@ -27,6 +27,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0"/>
     <PackageReference Include="Microsoft.AspNetCore.ResponseCaching" Version="2.2.0"/>
     <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.2.0"/>
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0"/>
     <PackageReference Include="Microsoft.CodeCoverage" Version="16.0.1"/>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.2.3"/>
