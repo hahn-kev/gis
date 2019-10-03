@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +26,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Npgsql;
 using IdentityUser = Backend.Entities.IdentityUser;
@@ -87,6 +85,7 @@ namespace Backend
                     //time zone info won't be included, this is so we can pass a date from the front end without the timezone
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
             services.AddResponseCaching();
             services.AddResponseCompression(options =>
             {
@@ -239,28 +238,15 @@ namespace Backend
                 {
                     context.Response.Redirect(ControllerExtensions.RedirectLogin(context.Request.GetDisplayUrl()));
                 }
-
-                if (context.Response.StatusCode == 404 &&
-                    !Path.HasExtension(context.Request.Path.Value) &&
-                    !context.Request.Path.Value.StartsWith("/api/"))
-                {
-//                    var requestCulture = context.Features.Get<IRequestCultureFeature>().RequestCulture;
-//                    context.Request.Path = $"/{requestCulture.Culture.TwoLetterISOLanguageName}/index.html";
-                    context.Request.Path = "/index.html";
-                    await next();
-                }
             });
             app.UseResponseCaching();
             app.UseResponseCompression();
-            app.UseStaticFiles(new StaticFileOptions
+            app.UseStaticFiles();
+            if (!env.IsDevelopment())
             {
-                OnPrepareResponse = context => context.Context.Response.GetTypedHeaders().CacheControl =
-                    new CacheControlHeaderValue
-                    {
-                        Public = true,
-                        MaxAge = TimeSpan.FromSeconds(30)
-                    }
-            });
+                app.UseSpaStaticFiles();
+            }
+
             app.UseAuthentication();
 
 #if DEBUG
@@ -269,7 +255,7 @@ namespace Backend
 #endif
 
             app.UseMvc();
-
+            app.UseSpa(spa => { spa.Options.SourcePath = "ClientApp"; });
             var databaseSetupTask = SetupDatabase(loggerFactory, app.ApplicationServices);
             if (!databaseSetupTask.IsCompleted) databaseSetupTask.AsTask().Wait();
         }
