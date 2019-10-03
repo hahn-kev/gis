@@ -13,7 +13,7 @@ import { Endorsement } from '../endorsement';
 })
 export class EndorsementListComponent implements OnInit {
   public dataSource: AppDataSource<Endorsement>;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute, public urlBinding: UrlBindingService<{ search: string }>) {
   }

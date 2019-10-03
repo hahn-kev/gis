@@ -26,7 +26,7 @@ export class StaffTrainingComponent implements OnInit, OnDestroy {
   public isNew: boolean;
   private subscription: Subscription;
   private staffIdSubject = new Subject<string>();
-  @ViewChild('newForm') newForm: NgForm;
+  @ViewChild('newForm', {static: true}) newForm: NgForm;
 
   constructor(lazyLoadService: LazyLoadService,
               private trainingService: TrainingRequirementService,

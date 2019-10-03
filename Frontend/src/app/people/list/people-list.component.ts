@@ -15,7 +15,7 @@ import { UrlBindingService } from '../../services/url-binding.service';
 export class PeopleListComponent implements OnInit {
   public dataSource: AppDataSource<Person>;
   public columns = ['preferredName', 'lastName', 'staffId', 'isSchoolAid', 'donorId', 'isParent', 'isAlumni'];
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   get title() {
     return this.route.snapshot.data.title || 'People';

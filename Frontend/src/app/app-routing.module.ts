@@ -268,6 +268,7 @@ const routes: Routes = [
           {
             path: 'edit/:id',
             component: HolidayComponent,
+            canDeactivate: [CanDeactivateGuard],
             resolve: {
               holiday: HolidayResolverService
             }

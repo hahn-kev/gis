@@ -5,7 +5,7 @@ import { CanComponentDeactivate } from '../services/can-deactivate.guard';
 import { MatDialog } from '@angular/material/dialog';
 
 export class BaseEditComponent implements CanComponentDeactivate {
-  @ViewChild(NgForm) form: NgForm;
+  @ViewChild(NgForm, {static: false}) form: NgForm;
   formSubmitted = false;
 
   constructor(protected dialog: MatDialog) {

@@ -14,7 +14,7 @@ import { MatSort } from '@angular/material/sort';
 export class OrgGroupListComponent implements OnInit {
   columns = ['groupName', 'parent', 'supervisor', 'type'];
   public dataSource: AppDataSource<OrgGroupWithSupervisor>;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   supervisorCountById: { [supervisorId: string]: number } = {};
   groupNameById: { [groupId: string]: string } = {};

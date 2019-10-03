@@ -21,7 +21,7 @@ export class RolesReportComponent implements OnInit {
   public jobStatus = Object.keys(JobStatus);
   public jobTypes = Object.keys(JobType);
   public schoolYears = Year.years();
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   public columns = [
     'job.title',

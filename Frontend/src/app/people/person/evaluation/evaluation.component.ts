@@ -16,7 +16,7 @@ export class EvaluationComponent implements OnInit {
   @Input() evaluation: EvaluationWithNames;
   @Input() formId: string;
   @Input() roles: RoleWithJob[];
-  @ViewChild(NgForm) form: NgForm;
+  @ViewChild(NgForm, {static: true}) form: NgForm;
   public people: Person[];
 
   constructor(private route: ActivatedRoute) {

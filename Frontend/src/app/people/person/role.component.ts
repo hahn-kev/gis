@@ -19,7 +19,7 @@ export class RoleComponent implements OnInit {
   @Input() hideJob = false;
   @Input() role: RoleWithJob;
   @Input() formId: string;
-  @ViewChild('form') form: NgForm;
+  @ViewChild('form', {static: true}) form: NgForm;
   jobs: JobWithOrgGroup[] = [];
   jobsObservable: Observable<JobWithOrgGroup[]>;
 

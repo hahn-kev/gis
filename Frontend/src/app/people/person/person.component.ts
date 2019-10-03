@@ -59,8 +59,8 @@ export class PersonComponent implements OnInit, CanComponentDeactivate {
   public staffEndorsments: Array<string> = [];
   public staffInsurer: string[] = [];
   @ViewChildren(NgForm) forms: QueryList<NgForm>;
-  @ViewChild('newEmergencyContactEl', {static: true}) newEmergencyContactEl: EmergencyContactComponent;
-  @ViewChild('newRoleEl', {static: true}) newRoleEl: RoleComponent;
+  @ViewChild('newEmergencyContactEl', {static: false}) newEmergencyContactEl: EmergencyContactComponent;
+  @ViewChild('newRoleEl', {static: false}) newRoleEl: RoleComponent;
   @ViewChild('countriesControl', {static: true}) countriesControl: NgModel;
 
   constructor(private route: ActivatedRoute,

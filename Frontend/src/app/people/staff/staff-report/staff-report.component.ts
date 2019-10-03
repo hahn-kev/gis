@@ -46,7 +46,7 @@ export class StaffReportComponent implements OnInit {
   ];
 
 
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
