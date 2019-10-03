@@ -1,7 +1,7 @@
 import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
-import * as Raven from 'raven-js';
+import * as Sentry from '@sentry/browser';
 import { environment } from '../../environments/environment';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class MyErrorHandlerService implements ErrorHandler {
 
     if (!(error.rejection instanceof HttpErrorResponse) && !(error instanceof HttpErrorResponse) && environment.production) {
       //don't report http errors, the server will report those
-      Raven.captureException(error);
+      Sentry.captureException(error.originalError || error);
     }
     this.original.handleError(error);
   }

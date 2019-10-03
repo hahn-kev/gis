@@ -22,9 +22,7 @@ import { AuthenciateInterceptorService } from './services/auth/authenciate-inter
 import { LoginService } from 'app/services/auth/login.service';
 import { AuthenticateService } from './services/auth/authenticate.service';
 import { RoleGuardService } from 'app/services/auth/role-guard.service';
-import * as Raven from 'raven-js';
 import { PersonService } from './people/person.service';
-import { environment } from '../environments/environment';
 import { OrgGroupListComponent } from './people/groups/org-group-list/org-group-list.component';
 import { GroupService } from './people/groups/group.service';
 import { GroupComponent } from './people/groups/group/group.component';
@@ -66,10 +64,6 @@ import { IsLastVisiblePipe } from './org-tree/is-last-visible.pipe';
 import { AppComponentsModule } from './components/app-components.module';
 import { HolidayListComponent } from './holiday/list/holiday-list.component';
 import { HolidayComponent } from './holiday/edit/holiday.component';
-
-if (environment.production) {
-  Raven.config('https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', {environment: 'production'}).install();
-}
 
 @NgModule({
   declarations: [

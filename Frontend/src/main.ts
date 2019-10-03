@@ -6,6 +6,9 @@ import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { hmrBootstrap } from './hmr';
 import 'hammerjs';
+import * as Sentry from '@sentry/browser';
+
+Sentry.init({dsn: 'https://026d43df17b245588298bfa5ac8aa333@sentry.io/249854', environment: 'production'});
 
 if (environment.production) {
   enableProdMode();

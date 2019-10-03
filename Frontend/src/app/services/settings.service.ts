@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import * as Raven from 'raven-js';
+import * as Sentry from '@sentry/browser';
 
 @Injectable()
 export class SettingsService {
@@ -12,7 +12,10 @@ export class SettingsService {
   //this is called by the settingsServiceFunction
   setSettings(settings: any) {
     this.settings = settings;
-    Raven.setRelease(this.get<string>('version'));
+    Sentry.addGlobalEventProcessor((event, hint) => {
+      event.release = this.get<string>('version');
+      return event;
+    });
   }
 
   get<T>(name: string, defaultValue?: T): T {
