@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,8 +30,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Npgsql;
-using Sentinel.Sdk.Extensions;
-using Sentinel.Sdk.Middleware;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace Backend
@@ -72,17 +69,6 @@ namespace Backend
                 .AddDefaultTokenProviders();
             //replace the singleton factory above with a scoped version
             services.Replace(ServiceDescriptor.Scoped<IConnectionFactory, AppConnectionFactory>());
-
-            services.AddSentinel(new SentinelSettings
-            {
-                Dsn = settings.SentryDsn,
-                Environment = (settings.Environment ?? "production").ToLower(),
-                IncludeRequestData = true,
-                IncludeCookies = false,
-                Release = GetType().Assembly.GetName().Version.ToString(),
-                ServerName = settings.BaseUrl,
-                IgnoreTypes = new List<Type> {typeof(UserError)}
-            });
 
             services.AddMvc(options =>
                 {
@@ -282,7 +268,6 @@ namespace Backend
             app.UseSwaggerUi3();
 #endif
 
-            app.UseSentinel();
             app.UseMvc();
 
             var databaseSetupTask = SetupDatabase(loggerFactory, app.ApplicationServices);

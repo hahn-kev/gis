@@ -9,8 +9,8 @@
       <PackageReference Include="linq2db.PostgreSQL" Version="2.6.4"/>
       <PackageReference Include="Microsoft.AspNetCore.App"/>
       <PackageReference Include="Npgsql" Version="4.0.5"/>
-      <PackageReference Include="PrestigeXP.Sentinel" Version="1.1.1"/>
       <PackageReference Include="Sendgrid" Version="9.10.0"/>
+      <PackageReference Include="Sentry.AspNetCore" Version="1.2.0"/>
       <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0"/>
   </ItemGroup>
     <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
