@@ -110,6 +110,11 @@ describe('GroupService', () => {
       let group3 = newGroup('g3', 'g1');
       expect(() => service.buildOrgChain(group1, [], [group1, group2, group3])).toThrowError();
     });
+    it('should work when it has no id', () => {
+      let group = newGroup(null);
+      let orgChain = service.buildOrgChain(group, [newPerson('p1')], [newGroup('g2')], null);
+      expect(orgChain.links.length).toBe(0);
+    });
     it('should handle case where no person is found', () => {
       let group = newGroup('g1', 'g2');
       let orgChain = service.buildOrgChain(group, [newPerson('p1')], [newGroup('g2')]);
