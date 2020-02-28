@@ -30,7 +30,7 @@
               "optimization": true,
               "outputHashing": "none",
               "sourceMap": true,
-              "subresourceIntegrity": false,
+              "subresourceIntegrity": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
