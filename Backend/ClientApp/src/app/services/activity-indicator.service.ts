@@ -13,6 +13,7 @@ export class ActivityIndicatorService {
   public showIndicator() {
     this.indicatorSubject.next(true);
   }
+
   public hideIndicator() {
     this.indicatorSubject.next(false);
   }

@@ -5,6 +5,7 @@ import { SettingsService } from '../services/settings.service';
 import {} from 'google.picker';
 import { Attachment } from '../attachments/attachment';
 import { PickerDocument, PickerResponse } from './picker-response';
+import { ActivityIndicatorService } from '../services/activity-indicator.service';
 
 @Injectable()
 export class DrivePickerService {
@@ -12,10 +13,12 @@ export class DrivePickerService {
   private activePicker: google.picker.Picker;
 
   constructor(private injector: Injector,
-              private settings: SettingsService) {
+              private settings: SettingsService,
+              private indicatorService: ActivityIndicatorService) {
   }
 
   public signIn() {
+    if (!this.loaded) throw new Error('load must be called first');
     let authInstance = gapi.auth2.getAuthInstance();
     if (authInstance.isSignedIn.get()) return Promise.resolve();
     return authInstance.signIn()
@@ -38,31 +41,37 @@ export class DrivePickerService {
     this.loaded = true;
   }
 
-  async openPicker(): Promise<PickerResponse> {
+  openPicker(): Promise<PickerResponse> {
+    this.indicatorService.showIndicator();
+    console.log('open picker');
     const gisTeamDriveId = '0ANi-SiRomIBKUk9PVA';
-    await this.loadPicker();
-    return new Promise<PickerResponse>(resolve => {
-      let authInstance = gapi.auth2.getAuthInstance();
-      let googleUser = authInstance.currentUser.get();
+    return this.loadPicker()
+      .then(() => this.signIn())
+      .then(() => {
+        return new Promise<PickerResponse>(resolve => {
+          let authInstance = gapi.auth2.getAuthInstance();
+          let googleUser = authInstance.currentUser.get();
 
-      this.activePicker = new google.picker.PickerBuilder()
-        .enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES)
-        .addView(new google.picker.DocsView()
-          .setParent(gisTeamDriveId)
-          .setIncludeFolders(true)
-        )
-        .addView(new google.picker.DocsUploadView()
-          .setParent(gisTeamDriveId)
-          .setIncludeFolders(true)
-        )
-        .setOAuthToken(googleUser.getAuthResponse().access_token)
-        .setDeveloperKey(this.settings.get<string>('googleAPIKey'))
-        .setCallback((data) => {
-          if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) resolve(new PickerResponse(data));
-          if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) resolve(null);
-        })
-        .build();
-      this.activePicker.setVisible(true);
+          this.activePicker = new google.picker.PickerBuilder()
+            .enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES)
+            .addView(new google.picker.DocsView()
+              .setParent(gisTeamDriveId)
+              .setIncludeFolders(true)
+            )
+            .addView(new google.picker.DocsUploadView()
+              .setParent(gisTeamDriveId)
+              .setIncludeFolders(true)
+            )
+            .setOAuthToken(googleUser.getAuthResponse().access_token)
+            .setDeveloperKey(this.settings.get<string>('googleAPIKey'))
+            .setCallback((data) => {
+              if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) resolve(new PickerResponse(data));
+              if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) resolve(null);
+            })
+            .build();
+          this.activePicker.setVisible(true);
+          this.indicatorService.hideIndicator();
+        });
     });
   }
 

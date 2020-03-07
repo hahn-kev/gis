@@ -16,9 +16,12 @@ export class PickFileDirective {
   }
 
   @HostListener('click')
-  async invokePicker() {
-    this.result = await this.driveService.openPicker();
-    if (this.result)
-      this.appPickFile.emit(this.driveService.convertToAttachment(this.result.documents[0]));
+  invokePicker() {
+    this.driveService.openPicker()
+      .then(result => {
+        this.result = result;
+        if (this.result)
+          this.appPickFile.emit(this.driveService.convertToAttachment(this.result.documents[0]));
+      });
   }
 }

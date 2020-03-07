@@ -24,8 +24,7 @@ export class GooglePickerComponent implements OnInit {
 
 
   invokePicker() {
-    this.driveService.signIn()
-      .then(() => this.driveService.openPicker())
+    this.driveService.openPicker()
       .then((result) => {
         this.result = result;
         if (result)

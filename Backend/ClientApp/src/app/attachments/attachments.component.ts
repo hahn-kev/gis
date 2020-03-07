@@ -3,31 +3,35 @@ import { of } from 'rxjs';
 import { AttachmentService } from './attachment.service';
 import { Attachment } from './attachment';
 import { MatDialog } from '@angular/material/dialog';
-import { mergeMap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { ConfirmDialogComponent } from '../dialog/confirm-dialog/confirm-dialog.component';
+import { BaseDestroy } from '../classes/base-destroy';
 
 @Component({
   selector: 'app-attachments',
   templateUrl: './attachments.component.html',
   styleUrls: ['./attachments.component.scss']
 })
-export class AttachmentsComponent implements OnInit {
+export class AttachmentsComponent extends BaseDestroy implements OnInit {
   attachments: Attachment[];
   attachedToId: string;
 
   constructor(private attachmentService: AttachmentService, private dialog: MatDialog) {
-    this.attachmentService.extractId().subscribe(value => this.attachedToId = value.id);
-    attachmentService.extractId().pipe(mergeMap((value) => {
-      if (value.hasAttachments) return attachmentService.attachedOn(value.id);
-      return of([]);
-    }))
-      .subscribe(attachments => {
-        this.attachments = attachments;
-      });
+    super();
   }
 
   ngOnInit() {
-
+    this.attachmentService.extractId()
+      .pipe(
+        tap(value => this.attachedToId = value.id),
+        switchMap((value) => {
+          if (value.hasAttachments) return this.attachmentService.attachedOn(value.id);
+          return of([]);
+        }),
+        this.takeUntilDestroy())
+      .subscribe(attachments => {
+        this.attachments = attachments;
+      });
   }
 
   async removeAttachment(attachment: Attachment) {
@@ -44,11 +48,5 @@ export class AttachmentsComponent implements OnInit {
     attachment.attachedToId = this.attachedToId;
     attachment = await this.attachmentService.attach(attachment).toPromise();
     this.attachments = [attachment, ...this.attachments];
-  }
-
-  getRandomIntInclusive(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
   }
 }

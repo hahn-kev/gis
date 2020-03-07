@@ -11,7 +11,7 @@ export class AttachmentService {
 
   constructor(private router: Router, private http: HttpClient) {
     this.eventsTransformed = router.events.pipe(filter(value => value instanceof ActivationEnd),
-      map(value => (<ActivationEnd > value).snapshot),
+      map(value => (<ActivationEnd>value).snapshot),
       filter(snapshot => snapshot.firstChild === null),
       map(snapshot => {
         let idParameter = snapshot.data.hasOwnProperty('idParameter') ? snapshot.data['idParameter'] : 'id';
@@ -21,7 +21,7 @@ export class AttachmentService {
         if (!/.{8}-.{4}-.{4}-.{12}/.test(id)) id = null;
         return {id: id, hasAttachments: hasAttachments && id !== null};
       }),
-      shareReplay());
+      shareReplay(1));
   }
 
 

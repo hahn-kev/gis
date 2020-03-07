@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { PersonWithOthers } from '../../person';
-import { Attachment } from '../../../attachments/attachment';
 
 @Component({
   selector: 'app-profile-picture',
@@ -9,7 +8,6 @@ import { Attachment } from '../../../attachments/attachment';
 })
 export class ProfilePictureComponent implements OnInit {
   @Input() person: PersonWithOthers;
-  attachment: Attachment = null;
 
   constructor() {
   }
