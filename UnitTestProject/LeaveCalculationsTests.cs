@@ -260,16 +260,37 @@ namespace UnitTestProject
                     Role(startDate: twoYearsAgo, jobType: JobStatus.SchoolAid)
                 });
 
-                //10 month jobs don't get leave now
+                //10 month jobs don't get leave now even if you used to do a full time job
                 yield return (0, new[]
                 {
-                    Role(startDate: twoYearsAgo, jobType: JobStatus.FullTime10Mo)
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.FullTime10Mo),
+                    Role(false, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1)),
                 });
+
+                //if doing a 10 month job and a non 10 month you get leave
+                yield return (10, new[]
+                {
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.FullTime10Mo),
+                    Role(startDate: twoYearsAgo, jobType: JobStatus.FullTime),
+                });
+
                 //10 month jobs do count for leave time if you're not in a 10 month job now
                 yield return (15, new[]
                 {
                     Role(false, new DateTime(2002, 1, 2), new DateTime(2013, 1, 1), JobStatus.FullTime10Mo),
                     Role(startDate: twoYearsAgo)
+                });
+
+                yield return (10, new[]
+                {
+                    //overlapping roles
+                    //should only count as 2 years working not 12 years, therefore 10 days of holiday
+                    Role(true, twoYearsAgo),
+                    Role(true, twoYearsAgo),
+                    Role(true, twoYearsAgo),
+                    Role(true, twoYearsAgo),
+                    Role(true, twoYearsAgo),
+                    Role(true, twoYearsAgo),
                 });
             }
 
@@ -278,10 +299,10 @@ namespace UnitTestProject
 
         [Theory]
         [MemberData(nameof(RolesMemberData))]
-        public void ShouldCalculateLeaveAllowed(int expected, PersonRoleWithJob[] personRoles)
+        public static void ShouldCalculateLeaveAllowed(int expected, PersonRoleWithJob[] personRoles)
         {
-            var result =
-                LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles, new DateTime(2018, 2, 21).SchoolYear());
+            var schoolYear = new DateTime(2018, 2, 21).SchoolYear();
+            var result = LeaveService.LeaveAllowed(LeaveType.Vacation, personRoles, schoolYear);
             Assert.Equal(expected, result);
         }
 

@@ -386,13 +386,7 @@ namespace UnitTestProject
                     _.OrgGroupId = jobOrgGroupId;
                 }
             });
-            return (InsertRole(role =>
-            {
-                role.JobId = job.Id;
-                role.PersonId = personId;
-                role.StartDate = DateTime.Now - TimeSpan.FromDays(years * 366);
-                role.Active = active;
-            }), job);
+            return (InsertRole(job.Id, personId, years, active), job);
         }
 
         public PersonRole InsertRole(Action<PersonRole> action = null)
@@ -400,6 +394,16 @@ namespace UnitTestProject
             var role = AutoFaker.Generate<PersonRole>();
             role.Active = true;
             action?.Invoke(role);
+            if (role.StartDate == default)
+            {
+                role.StartDate = DateTime.Now.AddYears(-2);
+            }
+
+            if (!role.Active && !role.EndDate.HasValue)
+            {
+                role.EndDate = role.StartDate.AddYears(1);
+            }
+
             DbConnection.Insert(role);
             return role;
         }

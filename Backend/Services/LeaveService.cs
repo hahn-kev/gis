@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.DataLayer;
 using Backend.Entities;
+using Backend.Entities.Helper;
 using Backend.Utils;
 using LinqToDB;
 
@@ -331,15 +332,19 @@ namespace Backend.Services
             //calculation for vacation time is done here
             var totalServiceTime = TimeSpan.Zero;
             var jobStatusWithLeave = new[] {JobStatus.FullTime, JobStatus.HalfTime, JobStatus.FullTime10Mo};
+            var validRoles = new List<PersonRoleWithJob>();
             foreach (var role in personRoles)
             {
-                if (role.Job.Status == JobStatus.FullTime10Mo && role.ActiveDuringYear(schoolYear)) return 0;
                 if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
                     role.Active) return 20;
                 if (role.Job.Status.HasValue && jobStatusWithLeave.Contains(role.Job.Status.Value))
-                    totalServiceTime = totalServiceTime + role.LengthOfService(schoolYear);
+                    validRoles.Add(role);
             }
 
+            if (validRoles.Where(r => r.ActiveDuringYear(schoolYear)).All(r => r.Job.Status == JobStatus.FullTime10Mo))
+                return 0;
+
+            totalServiceTime = ServiceLength(validRoles, schoolYear);
             //no time has been spent as staff or a director, therefore no vacation time is allowed
             if (totalServiceTime == TimeSpan.Zero) return 0;
             //todo pick cut off and days to count out of
@@ -348,6 +353,27 @@ namespace Backend.Services
             if (yearsOfService < 10) return 10;
             if (yearsOfService < 20) return 15;
             return 20;
+        }
+
+        public static TimeSpan ServiceLength(IEnumerable<PersonRole> validRoles, int schoolYear)
+        {
+            var totalServiceTime = TimeSpan.Zero;
+            var ranges = validRoles.Select(role =>
+            {
+                var startDate = role.StartDate;
+                var endDate = role.Active
+                    ? schoolYear.EndOfSchoolYear()
+                    : role.EndDate ?? throw new ArgumentException("unknown end date for role:" + role.Id);
+                return new DateRange(startDate, endDate);
+            });
+            ranges = DateRange.Combine(ranges);
+
+            foreach (var dateRange in ranges)
+            {
+                totalServiceTime += dateRange.Length;
+            }
+
+            return totalServiceTime;
         }
 
         public PersonAndLeaveDetails PersonWithCurrentLeave(Guid personId)
