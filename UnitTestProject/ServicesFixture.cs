@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Shouldly;
 using Xunit;
 using IdentityUser = Backend.Entities.IdentityUser;
 
@@ -393,6 +394,8 @@ namespace UnitTestProject
         {
             var role = AutoFaker.Generate<PersonRole>();
             role.Active = true;
+            role.EndDate = null;
+
             action?.Invoke(role);
             if (role.StartDate == default)
             {
@@ -404,6 +407,8 @@ namespace UnitTestProject
                 role.EndDate = role.StartDate.AddYears(1);
             }
 
+            if (role.EndDate.HasValue)
+                role.StartDate.ShouldBeLessThan(role.EndDate.Value);
             DbConnection.Insert(role);
             return role;
         }
