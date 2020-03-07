@@ -53,7 +53,6 @@ import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { EvaluationService } from './people/person/evaluation/evaluation.service';
 import { RenderTemplateBottomSheetComponent } from './components/render-template-bottom-sheet/render-template-bottom-sheet.component';
 import { OrgTreeComponent } from './org-tree/org-tree.component';
-import { PickFileDirective } from './google-picker/pick-file.directive';
 import { EndorsementListComponent } from './endorsement/list/endorsement-list.component';
 import { EndorsementComponent } from './endorsement/edit/endorsement.component';
 import { PolicyGuard } from './services/auth/policy.guard';
@@ -92,8 +91,6 @@ import { HolidayComponent } from './holiday/edit/holiday.component';
     SandboxComponent,
     RenderTemplateBottomSheetComponent,
     OrgTreeComponent,
-    PickFileDirective,
-
     EndorsementListComponent,
     EndorsementComponent,
     CalendarComponent,

@@ -51,6 +51,7 @@ import { ToolbarContentDirective } from '../toolbar/toolbar-content.directive';
 import { ToolbarTemplateDirective } from '../toolbar/toolbar-template.directive';
 import { FindFormPipe } from './accordion-list/find-form.pipe';
 import { LeaveTypeNamePipe } from '../people/leave-request/leave-type-name.pipe';
+import { PickFileDirective } from '../google-picker/pick-file.directive';
 
 const matModules = [
   MatButtonModule,
@@ -106,7 +107,8 @@ const matModules = [
     RoleComponent,
     ToolbarContentDirective,
     ToolbarTemplateDirective,
-    LeaveTypeNamePipe
+    LeaveTypeNamePipe,
+    PickFileDirective
   ],
   providers: [CookieService],
   imports: [
@@ -135,6 +137,7 @@ const matModules = [
     ToolbarContentDirective,
     ToolbarTemplateDirective,
     LeaveTypeNamePipe,
+    PickFileDirective,
     ...matModules,
   ],
   entryComponents: [
