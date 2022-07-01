@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Shouldly;
 using Xunit;
+using DataExtensions = Backend.DataLayer.DataExtensions;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace UnitTestProject
@@ -365,11 +366,13 @@ namespace UnitTestProject
 
         public PersonRole InsertRole(Guid jobId, Guid personId = default, int years = 2, bool active = true)
         {
+            var date = DateTime.Now;
+            if (date.Month == DataExtensions.SchoolStartMonth && date.Day == 1) date = date.AddDays(1);
             return InsertRole(role =>
             {
                 role.JobId = jobId;
                 role.PersonId = personId;
-                role.StartDate = DateTime.Now - TimeSpan.FromDays(years * 366);
+                role.StartDate = date.AddYears(-years);
                 role.Active = active;
             });
         }
@@ -544,6 +547,15 @@ namespace UnitTestProject
             DbConnection.Insert(personWithRole.Staff);
             var personRoleFaker = new AutoFaker<PersonRole>().RuleFor(role => role.PersonId, personWithRole.Id);
             var personRoles = personRoleFaker.Generate(5);
+            foreach (var personRole in personRoles)
+            {
+                if (personRole.EndDate.HasValue && personRole.StartDate > personRole.EndDate)
+                {
+                    var tmp = personRole.StartDate;
+                    personRole.StartDate = personRole.EndDate.Value;
+                    personRole.EndDate = tmp;
+                }
+            }
             personRoles[0].Active = true; //always have at least one active
             DbConnection.BulkCopy(personRoles);
             var grade = AutoFaker.Generate<Grade>();
