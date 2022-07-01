@@ -337,7 +337,8 @@ namespace Backend.Services
             {
                 if (role.Job.OrgGroup?.Type != GroupType.Department && role.Job.OrgGroup?.Supervisor == role.PersonId &&
                     role.Active) return 20;
-                if (role.Job.Status.HasValue && jobStatusWithLeave.Contains(role.Job.Status.Value))
+                // start date school year check is to only include roles that were valid during the year being queried
+                if (role.Job.Status.HasValue && jobStatusWithLeave.Contains(role.Job.Status.Value) && role.StartDate.SchoolYear() <= schoolYear)
                     validRoles.Add(role);
             }
 

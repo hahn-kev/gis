@@ -292,6 +292,13 @@ namespace UnitTestProject
                     Role(true, twoYearsAgo),
                     Role(true, twoYearsAgo),
                 });
+                yield return (10, new[]
+                {
+                    //started after the current school year but also worked before. There was a bug where we would attempt to
+                    //count the role but it would consider the end date as before the start date which would cause an execption
+                    Role(true, twoYearsAgo.AddYears(4)),
+                    Role(false, twoYearsAgo, twoYearsAgo.AddYears(3)),
+                });
             }
 
             return MakeValues().Select(tuple => tuple.ToArray());
