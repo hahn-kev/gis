@@ -31,7 +31,7 @@
             style="display: block"
             *ngFor="let req of model.items">
       <ng-container *ngIf="!req.isPublic">
-        <span [title]="req.approvedByName ? 'Approved' : 'Pending'">{{req.approvedByName ? '✓' : '?'}}</span>
+        <span [title]="req.approved ? 'Approved' : 'Pending'">{{req.approved ? '✓' : '?'}}</span>
         [{{req.type | leaveTypeName}}]
       </ng-container>
       {{req.requesterName}}
