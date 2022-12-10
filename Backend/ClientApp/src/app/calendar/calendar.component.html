@@ -30,7 +30,10 @@
     <button (click)="leaveSheet.show(req)" mat-button
             style="display: block"
             *ngFor="let req of model.items">
-      <ng-container *ngIf="!req.isPublic">[{{req.type | leaveTypeName}}]</ng-container>
+      <ng-container *ngIf="!req.isPublic">
+        <span [title]="req.approvedByName ? 'Approved' : 'Pending'">{{req.approvedByName ? '✓' : '?'}}</span>
+        [{{req.type | leaveTypeName}}]
+      </ng-container>
       {{req.requesterName}}
     </button>
   </div>
