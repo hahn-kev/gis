@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -132,6 +133,12 @@ namespace Backend
                 .AddGoogle(options =>
                 {
                     var google = Configuration.GetSection("web");
+
+                    //disable webviews, shouldn't casue an issue but we are getting a warning about it.
+                    // https://developers.googleblog.com/2021/06/upcoming-security-changes-to-googles-oauth-2.0-authorization-endpoint.html#test
+                    if (Configuration.GetValue<bool>("DisableGoogleWebView"))
+                        options.AuthorizationEndpoint = QueryHelpers.AddQueryString(options.AuthorizationEndpoint, "disallow_webview", "true");
+
                     options.UserInformationEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
                     options.ClaimActions.Clear();
                     options.ClaimActions.MapJsonKey(
