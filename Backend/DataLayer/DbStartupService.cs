@@ -33,7 +33,7 @@ public class DbStartupService : IHostedService
             new[] { "admin", "hr", "hradmin", "registrar" }.Except(roleManager.Roles.Select(role => role.Name));
         foreach (var missingRole in missingRoles)
         {
-            await roleManager.CreateAsync(new IdentityRole<int>(missingRole));
+            await roleManager.CreateAsync(new IdentityRole<int>(missingRole){ConcurrencyStamp = Guid.NewGuid().ToString("N")});
         }
 
         if (!dbConnection.Users.Any())
