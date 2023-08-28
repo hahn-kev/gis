@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Backend.Authorization;
 using Backend.Controllers;
 using Backend.DataLayer;
@@ -13,19 +10,12 @@ using LinqToDB.Mapping;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Npgsql;
@@ -35,17 +25,13 @@ namespace Backend
 {
     public class Startup
     {
-        private IApplicationBuilder _applicationBuilder;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
@@ -80,32 +66,17 @@ namespace Backend
                     options.Filters.Add(typeof(GlobalExceptionHandler));
                 })
                 .AddControllersAsServices()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options =>
+                .AddNewtonsoftJson(options =>
                 {
                     //time zone info won't be included, this is so we can pass a date from the front end without the timezone
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
             services.AddResponseCaching();
             services.AddResponseCompression(options =>
             {
                 options.Providers.Add(new BrotliCompressionProvider());
                 options.EnableForHttps = true;
             });
-//            services.AddLocalization();
-
-            //todo localization?
-//            services.Configure<RequestLocalizationOptions>(options =>
-//            {
-//                var fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
-//                var localeFolders = fileProvider.GetDirectoryContents("wwwroot")
-//                    .Where(info => info.IsDirectory && info.Name != "en").Select(info => info.Name);
-//                foreach (var localeFolder in localeFolders)
-//                {
-//                    options.SupportedCultures.Add(new CultureInfo(localeFolder));
-//                }
-//            });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -137,7 +108,9 @@ namespace Backend
                     //disable webviews, shouldn't casue an issue but we are getting a warning about it.
                     // https://developers.googleblog.com/2021/06/upcoming-security-changes-to-googles-oauth-2.0-authorization-endpoint.html#test
                     if (Configuration.GetValue<bool>("DisableGoogleWebView"))
-                        options.AuthorizationEndpoint = QueryHelpers.AddQueryString(options.AuthorizationEndpoint, "disallow_webview", "true");
+                        options.AuthorizationEndpoint = QueryHelpers.AddQueryString(options.AuthorizationEndpoint,
+                            "disallow_webview",
+                            "true");
 
                     options.UserInformationEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
                     options.ClaimActions.Clear();
@@ -172,11 +145,10 @@ namespace Backend
                         context.Response.Redirect(context.ReturnUri);
                     };
                 });
-            //todo addGoogle for authentication
             services.AddMyAuthorization();
             foreach (var type in typeof(Startup).Assembly.GetTypes()
-                .Where(type =>
-                    (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
+                         .Where(type =>
+                             (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
             {
                 var interfaces = type.GetInterfaces();
                 if (interfaces.Length > 0)
@@ -192,10 +164,11 @@ namespace Backend
                 }
             }
 
+            services.AddHostedService<DbStartupService>();
             AddDatabase(services);
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
-                    (NpgsqlConnection) provider.GetRequiredService<IDbConnection>().Connection));
+                    (NpgsqlConnection)provider.GetRequiredService<IDbConnection>().Connection));
 
 #if DEBUG
             services.AddSwaggerDocument();
@@ -217,16 +190,12 @@ namespace Backend
             services.TryAddScoped<UserManager<TUser>, AspNetUserManager<TUser>>();
             services.TryAddScoped<SignInManager<TUser>, SignInManager<TUser>>();
             services.TryAddScoped<RoleManager<TRole>, AspNetRoleManager<TRole>>();
-            if (setupAction != null)
-                services.Configure<IdentityOptions>(setupAction);
+            services.Configure(setupAction);
             return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            _applicationBuilder = app;
-            loggerFactory.AddFile("Logs/log-{Date}.txt", LogLevel.Warning);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -249,69 +218,24 @@ namespace Backend
             app.UseResponseCaching();
             app.UseResponseCompression();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
-
+            app.UseRouting();
             app.UseAuthentication();
 
 #if DEBUG
             app.UseSwagger();
             app.UseSwaggerUi3();
 #endif
-
-            app.UseMvc();
-            app.UseSpa(spa => { spa.Options.SourcePath = "ClientApp"; });
-            var databaseSetupTask = SetupDatabase(loggerFactory, app.ApplicationServices);
-            if (!databaseSetupTask.IsCompleted) databaseSetupTask.AsTask().Wait();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapFallbackToFile("index.html");
+            });
         }
 
         public virtual void AddDatabase(IServiceCollection services)
         {
             services.AddScoped<IDbConnection, DbConnection>();
             DataConnection.DefaultSettings = Configuration.Get<Settings>();
-        }
-
-        public static async ValueTask SetupDatabase(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
-        {
-            var databaseLogger = loggerFactory.CreateLogger("database");
-            DataConnection.TurnTraceSwitchOn();
-            DataConnection.WriteTraceLine = (message, category) => databaseLogger.LogDebug(message);
-            LinqToDB.Common.Configuration.Linq.AllowMultipleQuery = true;
-            DbConnection.SetupMappingBuilder(MappingSchema.Default);
-
-#if DEBUG
-            await SetupDevDatabase(serviceProvider);
-#endif
-        }
-
-        public static async Task SetupDevDatabase(IServiceProvider serviceProvider)
-        {
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var dbConnection = scope.ServiceProvider.GetService<IDbConnection>();
-                var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole<int>>>();
-                var missingRoles =
-                    new[] {"admin", "hr", "hradmin", "registrar"}.Except(roleManager.Roles.Select(role => role.Name));
-                foreach (var missingRole in missingRoles)
-                {
-                    await roleManager.CreateAsync(new IdentityRole<int>(missingRole));
-                }
-
-                //to configure db look at ServiceFixture.SetupSchema
-                if (!dbConnection.Users.Any())
-                {
-                    var userService = scope.ServiceProvider.GetService<UserService>();
-                    var identityUser = new IdentityUser
-                    {
-                        UserName = "khahn",
-                        ResetPassword = true
-                    };
-                    await userService.CreateAsync(identityUser, "password");
-                    await userService.AddToRoleAsync(identityUser, "admin");
-                }
-            }
         }
     }
 }

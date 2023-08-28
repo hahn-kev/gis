@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoBogus;
 using Backend;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Shouldly;
@@ -121,10 +123,8 @@ namespace UnitTestProject
                 s => s.Split(',', StringSplitOptions.RemoveEmptyEntries),
                 true);
             DbConnection.MappingSchema.SetConvertExpression<string[], string>(s => string.Join(',', s));
-            await Startup.SetupDatabase(Get<ILoggerFactory>(), ServiceProvider);
-#if !DEBUG
-            await Startup.SetupDevDatabase(ServiceProvider);
-#endif
+            await Task.WhenAll(
+                ServiceProvider.GetServices<IHostedService>().Select(s => s.StartAsync(CancellationToken.None)));
         }
 
         private void TryCreateTable<T>(IDbConnection dbConnection)
