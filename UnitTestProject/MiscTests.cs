@@ -84,7 +84,7 @@ namespace UnitTestProject
                 .ToList()
                 .Select(o => NotPopulatedValues(o, list.ElementType).ToList())
                 .OrderBy(properties => properties.Count).First();
-            value.ShouldBeEmpty();
+            value.ShouldBeEmpty($"repo type: {repoType}, property: {info.Name}");
         }
 
         private IEnumerable<string> NotPopulatedValues(object o, Type listElementType)
