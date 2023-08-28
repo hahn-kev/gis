@@ -221,6 +221,7 @@ namespace Backend
             app.UseResponseCompression();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseSentryTracing();
             app.UseAuthentication();
 
 #if DEBUG

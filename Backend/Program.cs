@@ -6,7 +6,7 @@ builder.Configuration.AddJsonFile("client_id.json");
 builder.WebHost.UseSentry(options =>
 {
     options.Release = typeof(JWTSettings).Assembly.GetName().Version?.ToString();
-    options.BeforeSend = sentryEvent =>
+    options.SetBeforeSend(sentryEvent =>
     {
         switch (sentryEvent.Exception)
         {
@@ -17,7 +17,7 @@ builder.WebHost.UseSentry(options =>
             return null;
 
         return sentryEvent;
-    };
+    });
 });
 
 builder.Logging.AddFile("Logs/log-{Date}.txt", LogLevel.Warning);

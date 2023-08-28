@@ -16,11 +16,11 @@
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.10" />
         <PackageReference Include="Npgsql" Version="4.0.5"/>
         <PackageReference Include="Sendgrid" Version="9.10.0"/>
-        <PackageReference Include="Sentry.AspNetCore" Version="1.2.0"/>
+        <PackageReference Include="Sentry.AspNetCore" Version="3.36.0" />
         <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     </ItemGroup>
     <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <PackageReference Include="NSwag.AspNetCore" Version="12.0.15"/>
+        <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -32,6 +32,7 @@
         <None Remove="$(SpaRoot)**"/>
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**"/>
     </ItemGroup>
+
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
