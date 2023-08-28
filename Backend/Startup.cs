@@ -150,6 +150,8 @@ namespace Backend
                          .Where(type =>
                              (type.Name.Contains("Service") || type.Name.Contains("Repository")) && !type.IsInterface))
             {
+                if (type == typeof(DbStartupService))
+                    continue;
                 var interfaces = type.GetInterfaces();
                 if (interfaces.Length > 0)
                 {
