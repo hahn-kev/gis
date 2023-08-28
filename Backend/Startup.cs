@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Npgsql;
+using NSwag;
 using IdentityUser = Backend.Entities.IdentityUser;
 
 namespace Backend
@@ -36,7 +37,6 @@ namespace Backend
         {
             services.AddOptions();
             services.Configure<Settings>(Configuration);
-            var settings = Configuration.Get<Settings>();
             services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
             services.Configure<TemplateSettings>(Configuration.GetSection("TemplateSettings"));
             AddIdentity<IdentityUser, IdentityRole<int>>(services,
@@ -71,6 +71,18 @@ namespace Backend
                     //time zone info won't be included, this is so we can pass a date from the front end without the timezone
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
                 });
+            services.AddOpenApiDocument(document =>
+            {
+                document.AddSecurity("JWT",
+                    Enumerable.Empty<string>(),
+                    new OpenApiSecurityScheme
+                    {
+                        Type = OpenApiSecuritySchemeType.ApiKey,
+                        Name = "Auth",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Description = "Type into the textbox: Bearer {your JWT token}."
+                    });
+            });
             services.AddResponseCaching();
             services.AddResponseCompression(options =>
             {
@@ -171,16 +183,12 @@ namespace Backend
             services.AddScoped(provider =>
                 new NpgsqlLargeObjectManager(
                     (NpgsqlConnection)provider.GetRequiredService<IDbConnection>().Connection));
-
-#if DEBUG
-            services.AddSwaggerDocument();
-#endif
         }
 
         private IdentityBuilder AddIdentity<TUser, TRole>(IServiceCollection services,
             Action<IdentityOptions> setupAction) where TUser : class where TRole : class
         {
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
             services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
             services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
             services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
@@ -192,6 +200,7 @@ namespace Backend
             services.TryAddScoped<UserManager<TUser>, AspNetUserManager<TUser>>();
             services.TryAddScoped<SignInManager<TUser>, SignInManager<TUser>>();
             services.TryAddScoped<RoleManager<TRole>, AspNetRoleManager<TRole>>();
+            services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
             services.Configure(setupAction);
             return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
         }
@@ -223,9 +232,10 @@ namespace Backend
             app.UseRouting();
             app.UseSentryTracing();
             app.UseAuthentication();
+            app.UseAuthorization();
 
 #if DEBUG
-            app.UseSwagger();
+            app.UseOpenApi();
             app.UseSwaggerUi3();
 #endif
             app.UseEndpoints(endpoints =>
