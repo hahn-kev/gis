@@ -143,8 +143,18 @@ namespace Backend.Controllers
                 "Google",
                 GoogleOAuthTokenName,
                 authProperties.GetTokenValue(GoogleOAuthTokenName));
+            await OnlyHrAndAdminLogin(user);
             if (!authTokenResult.Succeeded) throw authTokenResult.Errors();
             Response.Cookies.Append(JwtCookieName, await _jwtService.GetJwtSecurityTokenAsString(user));
+        }
+
+        private async Task OnlyHrAndAdminLogin(IdentityUser user)
+        {
+            var roles = await _signInManager.UserManager.GetRolesAsync(user);
+            if (!roles.Contains("admin") && !roles.Contains("hr") && !roles.Contains("hradmin"))
+            {
+                throw new UserError("Only admins and HR can login");
+            }
         }
 
         [HttpPost("signin")]
@@ -153,6 +163,7 @@ namespace Backend.Controllers
         {
             var identityUser = await _userService.FindByNameAsync(credentials.Username);
             if (identityUser == null) throw ThrowLoginFailed();
+            await OnlyHrAndAdminLogin(identityUser);
             return await SignIn(identityUser, credentials.Password);
         }
 
@@ -162,6 +173,7 @@ namespace Backend.Controllers
         {
             var identityUser = await _userService.FindByNameAsync(credentials.Username);
             if (identityUser == null) throw ThrowLoginFailed();
+            await OnlyHrAndAdminLogin(identityUser);
             var identityResult =
                 await _userService.ChangePasswordAsync(identityUser, credentials.Password, credentials.NewPassword);
             if (!identityResult.Succeeded)
